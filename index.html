@@ -1,76 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yorktown Tools - Veteran-Owned Pro Tools</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; text-align: center; }
-    header { background: #b22222; color: white; padding: 2rem; }
-    h1 { font-size: 2rem; }
-    .cta { background: #fff; margin: 1rem auto; padding: 1rem; max-width: 600px; border: 1px solid #ddd; }
-    input, button { padding: 0.5rem; margin: 0.5rem; width: 80%; max-width: 300px; }
-    button { background: #b22222; color: white; border: none; cursor: pointer; }
-    .products { display: flex; flex-wrap: wrap; justify-content: center; margin: 2rem 0; }
-    .product { background: #fff; margin: 1rem; padding: 1rem; width: 200px; border: 1px solid #ddd; }
-    .about { background: #eee; padding: 2rem; margin: 2rem 0; }
-    footer { background: #333; color: white; padding: 1rem; }
-  </style>
-  <script>
-    function getGuide() {
-      var email = document.getElementById('email').value;
-      if (email) window.location = 'mailto:sales@yorktowntools.com?subject=Free Guide&body=Email: ' + email;
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Yorktown Tools: Veteran-owned supplier of premium hand tools, power tools, and accessories for commercial and government contractors. Build better with Yorktown Tools.">
+    <title>Yorktown Tools | Premium Tools & Accessories for Contractors</title>
+    <style>
+        :root {
+            --primary: #1a3c6e;
+            --accent: #c8102e;
+            --light: #f4f4f4;
+            --dark: #222;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
+        header { background:var(--primary); color:#fff; padding:2rem 0; text-align:center; }
+        .logo { font-size:2.5rem; font-weight:700; }
+        .slogan { font-size:1.2rem; margin-top:0.5rem; font-style:italic; }
+        nav { background:var(--dark); padding:1rem 0; }
+        nav ul { list-style:none; display:flex; justify-content:center; gap:2rem; }
+        nav a { color:#fff; text-decoration:none; font-weight:600; }
+        nav a:hover { color:var(--accent); }
+        main { max-width:1200px; margin:2rem auto; padding:0 1rem; }
+        section { margin-bottom:4rem; }
+        h1, h2 { color:var(--primary); }
+        h1 { font-size:2.5rem; margin-bottom:1rem; text-align:center; }
+        h2 { font-size:1.8rem; margin-bottom:1rem; }
+        .hero { text-align:center; padding:4rem 1rem; background:var(--light); border-radius:8px; }
+        .btn { display:inline-block; background:var(--accent); color:#fff; padding:0.8rem 1.5rem; border-radius:5px; text-decoration:none; font-weight:600; margin-top:1rem; }
+        .btn:hover { background:#a00d22; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:2rem; }
+        .card { background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; text-align:center; transition:transform .3s; }
+        .card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,.1); }
+        .card img { width:100%; height:200px; object-fit:cover; }
+        .card h3 { padding:1rem 0.5rem 0.5rem; }
+        .card p { padding:0 1rem 1rem; font-size:0.95rem; }
+        .contact-form { background:var(--light); padding:2rem; border-radius:8px; }
+        .form-group { margin-bottom:1rem; }
+        label { display:block; margin-bottom:0.5rem; font-weight:600; }
+        input, select, textarea { width:100%; padding:0.75rem; border:1px solid #ccc; border-radius:5px; }
+        footer { background:var(--dark); color:#fff; text-align:center; padding:2rem 0; margin-top:4rem; }
+        .contact-info { margin:1rem 0; }
+        .contact-info a { color:var(--accent); text-decoration:none; }
+        @media (max-width:768px) { nav ul { flex-direction:column; align-items:center; } }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Yorktown Tools</h1>
-    <p>Proud U.S. Army Veteran-Owned • Tools for Pros</p>
-  </header>
 
-  <div class="cta">
-    <h2>Get Your FREE Tool Guide</h2>
-    <p>Top tips + discounts for contractors.</p>
-    <input id="email" type="email" placeholder="Your Email">
-    <button onclick="getGuide()">Send Me the Guide</button>
-  </div>
+<header>
+    <div class="logo">Yorktown Tools</div>
+    <div class="slogan">Build Better with Yorktown Tools</div>
+</header>
 
-  <section>
-    <h2>Our Tools & Accessories</h2>
-    <p>Matching top MD suppliers: Power tools, hand tools, safety gear, fasteners, blades from Makita, DeWalt, Milwaukee, Bosch, Metabo.</p>
-    <div class="products">
-      <div class="product">
-        <h3>Makita Drill Kit</h3>
-        <p>$199</p>
-        <a href="mailto:sales@yorktowntools.com?subject=Buy Makita Drill">Buy Now</a>
-      </div>
-      <div class="product">
-        <h3>DeWalt Hammer</h3>
-        <p>$249</p>
-        <a href="mailto:sales@yorktowntools.com?subject=Buy DeWalt Hammer">Buy Now</a>
-      </div>
-      <div class="product">
-        <h3>Milwaukee Saw</h3>
-        <p>$179</p>
-        <a href="mailto:sales@yorktowntools.com?subject=Buy Milwaukee Saw">Buy Now</a>
-      </div>
-      <div class="product">
-        <h3>3M Safety Kit</h3>
-        <p>$49</p>
-        <a href="mailto:sales@yorktowntools.com?subject=Buy 3M Kit">Buy Now</a>
-      </div>
+<nav>
+    <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#accessories">Accessories</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section id="home" class="hero">
+        <h1>Premium Tools & Accessories for Mission-Critical Projects</h1>
+        <p>Veteran-owned. Contractor-focused. Delivering the reliability commercial and government teams demand.</p>
+        <a href="#contact" class="btn">Request a Custom Quote</a>
+    </section>
+
+    <section id="tools">
+        <h2>Hand & Power Tools</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="https://via.placeholder.com/400x200?text=Precision+Hand+Tools" alt="Precision Hand Tools">
+                <h3>Precision Hand Tools</h3>
+                <p>Professional-grade wrenches, pliers, screwdrivers, and measuring instruments built for daily rigor.</p>
+            </div>
+            <div class="card">
+                <img src="https://via.placeholder.com/400x200?text=Power+Tools" alt="Power Tools">
+                <h3>Power Tools</h3>
+                <p>Corded and cordless drills, saws, grinders, and impact drivers engineered for high-output environments.</p>
+            </div>
+            <div class="card">
+                <img src="https://via.placeholder.com/400x200?text=Specialty+Tools" alt="Specialty Tools">
+                <h3>Specialty Tools</h3>
+                <p>Task-specific solutions for aviation, construction, maintenance, and secure-facility operations.</p>
+            </div>
+        </div>
+        <p style="text-align:center; margin-top:2rem;">
+            <a href="#contact" class="btn">Inquire About Our Full Catalog</a>
+        </p>
+    </section>
+
+    <section id="accessories">
+        <h2>Tool Accessories & Storage</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="https://via.placeholder.com/400x200?text=Bits+&+Blades" alt="Bits and Blades">
+                <h3>Bits, Blades & Abrasives</h3>
+                <p>High-durability consumables designed to maintain peak performance on the job.</p>
+            </div>
+            <div class="card">
+                <img src="https://via.placeholder.com/400x200?text=Storage+Solutions" alt="Storage Solutions">
+                <h3>Storage & Organization</h3>
+                <p>Modular toolboxes, chests, and mobile workstations that keep teams efficient and audit-ready.</p>
+            </div>
+            <div class="card">
+                <img src="https://via.placeholder.com/400x200?text=Safety+Gear" alt="Safety Gear">
+                <h3>Safety & PPE</h3>
+                <p>Compliant gloves, eyewear, and hearing protection trusted in government and commercial settings.</p>
+            </div>
+        </div>
+        <p style="text-align:center; margin-top:2rem;">
+            <a href="#contact" class="btn">Discuss Your Accessory Needs</a>
+        </p>
+    </section>
+
+    <section id="about">
+        <h2>About Yorktown Tools</h2>
+        <p>Founded in 2025 by Zachary Barber, a 20-year U.S. Army veteran and former First Sergeant, Yorktown Tools is a <strong>veteran-owned small business</strong> registered on SAM.gov. With dual degrees in Aeronautics and Project Management from Embry-Riddle Aeronautical University, Zachary brings disciplined leadership and technical expertise to every partnership.</p>
+        <p>We specialize in supplying commercial and government contractors with the exact tools and accessories required to execute flawlessly—on time and on spec.</p>
+        <p style="text-align:center; margin-top:1.5rem;">
+            <a href="#contact" class="btn">Connect with Our Team</a>
+        </p>
+    </section>
+
+    <section id="contact" class="contact-form">
+        <h2>Get In Touch</h2>
+        <p>Interested in volume pricing, custom kitting, or GSA scheduling? Fill out the form below and we’ll respond within 24 hours.</p>
+        <form action="https://formspree.io/f/your-form-id" method="POST">
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="company">Company / Organization *</label>
+                <input type="text" id="company" name="company" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="interest">Primary Interest *</label>
+                <select id="interest" name="interest" required>
+                    <option value="">Select...</option>
+                    <option>Hand Tools</option>
+                    <option>Power Tools</option>
+                    <option>Tool Storage</option>
+                    <option>Safety & PPE</option>
+                    <option>Custom Kitting</option>
+                    <option>Government Contracts</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn">Send Request</button>
+        </form>
+    </section>
+</main>
+
+<footer>
+    <div class="contact-info">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
+           <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
     </div>
-    <p>Email for full catalog or quotes.</p>
-  </section>
+    <p>&copy; 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.</p>
+</footer>
 
-  <section class="about">
-    <h2>About the Owner</h2>
-    <p>Zachary here – U.S. Army vet with 20+ years in logistics. Served in aviation, managing critical supplies. Now bringing that American reliability to tools in Yorktown, VA.</p>
-  </section>
-
-  <footer>
-    © 2025 Yorktown Tools • Veteran-Owned
-  </footer>
 </body>
 </html>
