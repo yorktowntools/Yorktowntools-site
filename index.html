@@ -14,13 +14,28 @@
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
-        header { background:var(--primary); color:#fff; padding:2rem 0; text-align:center; }
-        .logo { font-size:2.5rem; font-weight:700; }
-        .slogan { font-size:1.2rem; margin-top:0.5rem; font-style:italic; }
-        nav { background:var(--dark); padding:1rem 0; }
-        nav ul { list-style:none; display:flex; justify-content:center; gap:2rem; }
+        
+        header { 
+            background:var(--primary); 
+            color:#fff; 
+            padding:1.5rem 0; 
+            text-align:center; 
+            display:flex; 
+            flex-direction:column; 
+            align-items:center;
+        }
+        .logo-container { margin-bottom:0.5rem; }
+        .logo-img { height:110px; width:auto; max-width:100%; object-fit:contain; }
+        .slogan { font-size:1.2rem; font-style:italic; margin-top:0.25rem; }
+
+        .hero-banner { width:100%; overflow:hidden; border-bottom:4px solid var(--accent); }
+        .hero-banner img { width:100%; height:auto; display:block; }
+
+        nav { background:var(--dark); padding:1rem 0; position:sticky; top:0; z-index:100; }
+        nav ul { list-style:none; display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; }
         nav a { color:#fff; text-decoration:none; font-weight:600; }
         nav a:hover { color:var(--accent); }
+        
         main { max-width:1200px; margin:2rem auto; padding:0 1rem; }
         section { margin-bottom:4rem; }
         h1, h2 { color:var(--primary); }
@@ -42,15 +57,27 @@
         footer { background:var(--dark); color:#fff; text-align:center; padding:2rem 0; margin-top:4rem; }
         .contact-info { margin:1rem 0; }
         .contact-info a { color:var(--accent); text-decoration:none; }
-        @media (max-width:768px) { nav ul { flex-direction:column; align-items:center; } }
+
+        @media (max-width:768px) { 
+            .logo-img { height:80px; }
+            nav ul { flex-direction:column; align-items:center; } 
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">Yorktown Tools</div>
+    <div class="logo-container">
+        <!-- Exact filename: Yorktown tools final.png (all lowercase except "Y" and "T") -->
+        <img src="Yorktown tools final.png" alt="Yorktown Tools Logo" class="logo-img">
+    </div>
     <div class="slogan">Build Better with Yorktown Tools</div>
 </header>
+
+<div class="hero-banner">
+    <!-- Exact filename: back yt card.png -->
+    <img src="back yt card.png" alt="Yorktown Tools - Premium Contractor Supplies">
+</div>
 
 <nav>
     <ul>
