@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yorktown Tools - Veteran-Owned Pro Tools</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; text-align: center; }
+    header { background: #b22222; color: white; padding: 2rem; }
+    h1 { font-size: 2rem; }
+    .cta { background: #fff; margin: 1rem auto; padding: 1rem; max-width: 600px; border: 1px solid #ddd; }
+    input, button { padding: 0.5rem; margin: 0.5rem; width: 80%; max-width: 300px; }
+    button { background: #b22222; color: white; border: none; cursor: pointer; }
+    .products { display: flex; flex-wrap: wrap; justify-content: center; margin: 2rem 0; }
+    .product { background: #fff; margin: 1rem; padding: 1rem; width: 200px; border: 1px solid #ddd; }
+    .about { background: #eee; padding: 2rem; margin: 2rem 0; }
+    footer { background: #333; color: white; padding: 1rem; }
+  </style>
+  <script>
+    function getGuide() {
+      var email = document.getElementById('email').value;
+      if (email) window.location = 'mailto:sales@yorktowntools.com?subject=Free Guide&body=Email: ' + email;
+    }
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Yorktown Tools</h1>
+    <p>Proud U.S. Army Veteran-Owned • Tools for Pros</p>
+  </header>
+
+  <div class="cta">
+    <h2>Get Your FREE Tool Guide</h2>
+    <p>Top tips + discounts for contractors.</p>
+    <input id="email" type="email" placeholder="Your Email">
+    <button onclick="getGuide()">Send Me the Guide</button>
+  </div>
+
+  <section>
+    <h2>Our Tools & Accessories</h2>
+    <p>Matching top MD suppliers: Power tools, hand tools, safety gear, fasteners, blades from Makita, DeWalt, Milwaukee, Bosch, Metabo.</p>
+    <div class="products">
+      <div class="product">
+        <h3>Makita Drill Kit</h3>
+        <p>$199</p>
+        <a href="mailto:sales@yorktowntools.com?subject=Buy Makita Drill">Buy Now</a>
+      </div>
+      <div class="product">
+        <h3>DeWalt Hammer</h3>
+        <p>$249</p>
+        <a href="mailto:sales@yorktowntools.com?subject=Buy DeWalt Hammer">Buy Now</a>
+      </div>
+      <div class="product">
+        <h3>Milwaukee Saw</h3>
+        <p>$179</p>
+        <a href="mailto:sales@yorktowntools.com?subject=Buy Milwaukee Saw">Buy Now</a>
+      </div>
+      <div class="product">
+        <h3>3M Safety Kit</h3>
+        <p>$49</p>
+        <a href="mailto:sales@yorktowntools.com?subject=Buy 3M Kit">Buy Now</a>
+      </div>
+    </div>
+    <p>Email for full catalog or quotes.</p>
+  </section>
+
+  <section class="about">
+    <h2>About the Owner</h2>
+    <p>Zachary here – U.S. Army vet with 20+ years in logistics. Served in aviation, managing critical supplies. Now bringing that American reliability to tools in Yorktown, VA.</p>
+  </section>
+
+  <footer>
+    © 2025 Yorktown Tools • Veteran-Owned
+  </footer>
+</body>
+</html>
