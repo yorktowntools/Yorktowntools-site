@@ -7,7 +7,7 @@
     <meta name="keywords" content="veteran owned tools, government contractor tools, hand tools, power tools, ladders, safety PPE, storage solutions, SAM.gov supplier">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
-    <!-- Open Graph / Social Sharing -->
+    <!-- Open Graph / Social -->
     <meta property="og:title" content="Yorktown Tools | Tools & Gear for Mission-Critical Contractors">
     <meta property="og:description" content="Veteran-owned. SAM.gov registered. Premium tools, ladders, and PPE for government and commercial projects.">
     <meta property="og:image" content="https://yorktowntools.com/back yt card.png">
@@ -25,31 +25,12 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
 
-        header { 
-            background:var(--primary); 
-            color:#fff; 
-            padding:1rem 0; 
-            text-align:center; 
-            display:flex; 
-            flex-direction:column; 
-            align-items:center;
-        }
-        .logo-img { 
-            height:110px; 
-            width:auto; 
-            max-width:100%; 
-            object-fit:contain; 
-        }
-        .slogan { 
-            font-size:1.2rem; 
-            font-style:italic; 
-            margin-top:0.5rem;
-        }
-
+        /* === FULL BANNER (now acts as header) === */
         .hero-banner {
             width:100%;
             overflow:hidden;
             border-bottom:4px solid var(--accent);
+            margin:0;
         }
         .hero-banner img {
             width:100%;
@@ -57,45 +38,50 @@
             display:block;
         }
 
+        /* === SMART NAV: Hides on scroll down, shows on scroll up === */
         nav {
             background:var(--dark);
-            padding:1rem 0;
-            position:sticky;
+            padding:0.8rem 0;
+            position:fixed;
             top:0;
+            left:0;
+            width:100%;
             z-index:1000;
-            transition:var(--transition);
+            transition:transform 0.3s ease;
             box-shadow:0 2px 10px rgba(0,0,0,0.1);
         }
-        nav.scrolled {
-            padding:0.5rem 0;
-            font-size:0.9rem;
+        nav.hidden {
+            transform:translateY(-100%);
         }
         nav ul { 
             list-style:none; 
             display:flex; 
             justify-content:center; 
-            gap:2rem; 
+            gap:1.5rem; 
             flex-wrap:wrap; 
+            margin:0;
         }
         nav a { 
             color:#fff; 
             text-decoration:none; 
             font-weight:600; 
+            font-size:0.95rem;
             transition:var(--transition);
         }
         nav a:hover { color:var(--accent); }
 
-        main { max-width:1200px; margin:2rem auto; padding:0 1rem; }
-        section { margin-bottom:4rem; }
+        main { margin-top:0; padding:0 1rem; }
+        section { margin-bottom:4rem; padding-top:2rem; }
         h1, h2 { color:var(--primary); }
         h1 { font-size:2.5rem; margin-bottom:1rem; text-align:center; }
         h2 { font-size:1.8rem; margin-bottom:1rem; }
 
         .hero { 
             text-align:center; 
-            padding:4rem 1rem; 
+            padding:3rem 1rem; 
             background:var(--light); 
             border-radius:8px; 
+            margin-top:2rem;
         }
         .btn { 
             display:inline-block; 
@@ -179,28 +165,23 @@
         .contact-info a { color:var(--accent); text-decoration:none; }
 
         @media (max-width:768px) {
-            .logo-img { height:80px; }
+            nav { padding:0.6rem 0; }
+            nav a { font-size:0.9rem; }
+            nav ul { gap:1rem; }
             .about-grid { grid-template-columns: 1fr; text-align:center; }
             .founder-photo { max-width: 220px; margin: 0 auto; display: block; }
-            nav ul { flex-direction:column; align-items:center; gap:1rem; }
-            nav.scrolled { padding:0.4rem 0; font-size:0.85rem; }
+            .hero { padding:2rem 1rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- Header: Compact Logo (fixed lowercase) -->
-<header>
-    <img src="yorktown tools final.png" alt="Yorktown Tools Logo - Veteran-Owned Tool Supplier" class="logo-img">
-    <div class="slogan">Build Better with Yorktown Tools</div>
-</header>
-
-<!-- Full Banner -->
+<!-- FULL BANNER (now the only header) -->
 <div class="hero-banner">
-    <img src="back yt card.png" alt="Yorktown Tools - Premium Contractor Supplies and Government Tools">
+    <img src="back yt card.png" alt="Yorktown Tools - Veteran-Owned Tool Supplier for Government Contractors">
 </div>
 
-<!-- Navigation -->
+<!-- SMART NAV: Hides on scroll down -->
 <nav id="main-nav">
     <ul>
         <li><a href="#home">Home</a></li>
@@ -214,14 +195,12 @@
 
 <main>
 
-    <!-- Hero -->
     <section id="home" class="hero">
         <h1>Premium Tools, Ladders & PPE for Mission-Critical Projects</h1>
         <p>Veteran-owned. SAM.gov registered. Built for government and commercial contractors.</p>
         <a href="#contact" class="btn">Get a Custom Quote</a>
     </section>
 
-    <!-- TOOLS SECTION -->
     <section id="tools">
         <h2>Hand & Power Tools</h2>
         <div class="grid">
@@ -246,7 +225,6 @@
         </p>
     </section>
 
-    <!-- ACCESSORIES SECTION -->
     <section id="accessories">
         <h2>Tool Accessories & Storage</h2>
         <div class="grid">
@@ -271,7 +249,6 @@
         </p>
     </section>
 
-    <!-- LADDERS SECTION (new) -->
     <section id="ladders">
         <h2>Ladders & Access Equipment</h2>
         <div class="grid">
@@ -286,7 +263,6 @@
         </p>
     </section>
 
-    <!-- ABOUT -->
     <section id="about">
         <h2>About Yorktown Tools</h2>
         <div class="about-grid">
@@ -310,7 +286,6 @@
         </div>
     </section>
 
-    <!-- CONTACT -->
     <section id="contact" class="contact-form">
         <h2>Get In Touch</h2>
         <p>Need volume pricing, custom kitting, or GSA scheduling? We respond within 24 hours.</p>
@@ -364,16 +339,20 @@
     <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.</p>
 </footer>
 
+<!-- SMART NAV SCRIPT: Hides on scroll down -->
 <script>
     const nav = document.getElementById('main-nav');
     let lastScroll = 0;
+
     window.addEventListener('scroll', () => {
         const currentScroll = window.pageYOffset;
-        if (currentScroll > lastScroll && currentScroll > 100) {
-            nav.classList.add('scrolled');
-        } else if (currentScroll < lastScroll && currentScroll < 200) {
-            nav.classList.remove('scrolled');
+
+        if (currentScroll > lastScroll && currentScroll > 150) {
+            nav.classList.add('hidden');  // Hide when scrolling down
+        } else if (currentScroll < lastScroll && currentScroll < 100) {
+            nav.classList.remove('hidden'); // Show when scrolling up
         }
+
         lastScroll = currentScroll;
     });
 </script>
