@@ -11,10 +11,11 @@
             --accent: #c8102e;
             --light: #f4f4f4;
             --dark: #222;
+            --transition: all 0.3s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
-        
+
         header { 
             background:var(--primary); 
             color:#fff; 
@@ -24,62 +25,156 @@
             flex-direction:column; 
             align-items:center;
         }
-        .logo-container { margin-bottom:0.5rem; }
-        .logo-img { height:110px; width:auto; max-width:100%; object-fit:contain; }
-        .slogan { font-size:1.2rem; font-style:italic; margin-top:0.25rem; }
+        .logo-img { 
+            height:110px; 
+            width:auto; 
+            max-width:100%; 
+            object-fit:contain; 
+        }
+        .slogan { 
+            font-size:1.2rem; 
+            font-style:italic; 
+            margin-top:0.5rem;
+        }
 
-        .hero-banner { width:100%; overflow:hidden; border-bottom:4px solid var(--accent); }
-        .hero-banner img { width:100%; height:auto; display:block; }
-
-        nav { background:var(--dark); padding:1rem 0; position:sticky; top:0; z-index:100; }
-        nav ul { list-style:none; display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; }
-        nav a { color:#fff; text-decoration:none; font-weight:600; }
+        nav {
+            background:var(--dark);
+            padding:1rem 0;
+            position:sticky;
+            top:0;
+            z-index:1000;
+            transition:var(--transition);
+            box-shadow:0 2px 10px rgba(0,0,0,0.1);
+        }
+        nav.scrolled {
+            padding:0.5rem 0;
+            font-size:0.9rem;
+        }
+        nav ul { 
+            list-style:none; 
+            display:flex; 
+            justify-content:center; 
+            gap:2rem; 
+            flex-wrap:wrap; 
+        }
+        nav a { 
+            color:#fff; 
+            text-decoration:none; 
+            font-weight:600; 
+            transition:var(--transition);
+        }
         nav a:hover { color:var(--accent); }
-        
+
         main { max-width:1200px; margin:2rem auto; padding:0 1rem; }
         section { margin-bottom:4rem; }
         h1, h2 { color:var(--primary); }
         h1 { font-size:2.5rem; margin-bottom:1rem; text-align:center; }
         h2 { font-size:1.8rem; margin-bottom:1rem; }
-        .hero { text-align:center; padding:4rem 1rem; background:var(--light); border-radius:8px; }
-        .btn { display:inline-block; background:var(--accent); color:#fff; padding:0.8rem 1.5rem; border-radius:5px; text-decoration:none; font-weight:600; margin-top:1rem; }
+
+        .hero { 
+            text-align:center; 
+            padding:4rem 1rem; 
+            background:var(--light); 
+            border-radius:8px; 
+        }
+        .btn { 
+            display:inline-block; 
+            background:var(--accent); 
+            color:#fff; 
+            padding:0.8rem 1.5rem; 
+            border-radius:5px; 
+            text-decoration:none; 
+            font-weight:600; 
+            margin-top:1rem; 
+            transition:var(--transition);
+        }
         .btn:hover { background:#a00d22; }
-        .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:2rem; }
-        .card { background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; text-align:center; transition:transform .3s; }
-        .card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,.1); }
+
+        .grid { 
+            display:grid; 
+            grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); 
+            gap:2rem; 
+        }
+        .card { 
+            background:#fff; 
+            border:1px solid #ddd; 
+            border-radius:8px; 
+            overflow:hidden; 
+            text-align:center; 
+            transition:transform .3s; 
+            box-shadow:0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card:hover { 
+            transform:translateY(-5px); 
+            box-shadow:0 8px 20px rgba(0,0,0,.1); 
+        }
         .card img { width:100%; height:200px; object-fit:cover; }
         .card h3 { padding:1rem 0.5rem 0.5rem; }
         .card p { padding:0 1rem 1rem; font-size:0.95rem; }
-        .contact-form { background:var(--light); padding:2rem; border-radius:8px; }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        .founder-photo {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 12px;
+            border: 3px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
+        .mission-box {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent);
+        }
+
+        .contact-form { 
+            background:var(--light); 
+            padding:2rem; 
+            border-radius:8px; 
+        }
         .form-group { margin-bottom:1rem; }
         label { display:block; margin-bottom:0.5rem; font-weight:600; }
-        input, select, textarea { width:100%; padding:0.75rem; border:1px solid #ccc; border-radius:5px; }
-        footer { background:var(--dark); color:#fff; text-align:center; padding:2rem 0; margin-top:4rem; }
+        input, select, textarea { 
+            width:100%; 
+            padding:0.75rem; 
+            border:1px solid #ccc; 
+            border-radius:5px; 
+        }
+
+        footer { 
+            background:var(--dark); 
+            color:#fff; 
+            text-align:center; 
+            padding:2rem 0; 
+            margin-top:4rem; 
+        }
         .contact-info { margin:1rem 0; }
         .contact-info a { color:var(--accent); text-decoration:none; }
 
-        @media (max-width:768px) { 
+        @media (max-width:768px) {
             .logo-img { height:80px; }
-            nav ul { flex-direction:column; align-items:center; } 
+            .about-grid { grid-template-columns: 1fr; text-align:center; }
+            .founder-photo { max-width: 220px; margin: 0 auto; display: block; }
+            nav ul { flex-direction:column; align-items:center; gap:1rem; }
+            nav.scrolled { padding:0.4rem 0; font-size:0.85rem; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-container">
-        <!-- Exact filename: Yorktown tools final.png (all lowercase except "Y" and "T") -->
-        <img src="Yorktown tools final.png" alt="Yorktown Tools Logo" class="logo-img">
-    </div>
+    <img src="Yorktown tools FINAL.png" alt="Yorktown Tools Logo" class="logo-img">
     <div class="slogan">Build Better with Yorktown Tools</div>
 </header>
 
-<div class="hero-banner">
-    <!-- Exact filename: back yt card.png -->
-    <img src="back yt card.png" alt="Yorktown Tools - Premium Contractor Supplies">
-</div>
-
-<nav>
+<nav id="main-nav">
     <ul>
         <li><a href="#home">Home</a></li>
         <li><a href="#tools">Tools</a></li>
@@ -90,6 +185,7 @@
 </nav>
 
 <main>
+
     <section id="home" class="hero">
         <h1>Premium Tools & Accessories for Mission-Critical Projects</h1>
         <p>Veteran-owned. Contractor-focused. Delivering the reliability commercial and government teams demand.</p>
@@ -146,11 +242,29 @@
 
     <section id="about">
         <h2>About Yorktown Tools</h2>
-        <p>Founded in 2025 by Zachary Barber, a 20-year U.S. Army veteran and former First Sergeant, Yorktown Tools is a <strong>veteran-owned small business</strong> registered on SAM.gov. With dual degrees in Aeronautics and Project Management from Embry-Riddle Aeronautical University, Zachary brings disciplined leadership and technical expertise to every partnership.</p>
-        <p>We specialize in supplying commercial and government contractors with the exact tools and accessories required to execute flawlessly—on time and on spec.</p>
-        <p style="text-align:center; margin-top:1.5rem;">
-            <a href="#contact" class="btn">Connect with Our Team</a>
-        </p>
+        <div class="about-grid">
+
+            <div style="text-align:center;">
+                <!-- YOUR PHOTO: Exact filename used -->
+                <img src="IMG_1549.jpeg" alt="Zachary Barber - Founder, Yorktown Tools" class="founder-photo">
+                <h3 style="margin:1rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
+                <p style="font-style:italic; color:#555;">Founder & Owner</p>
+                <p style="margin-top:0.75rem; font-size:0.95rem;">
+                    20-year U.S. Army veteran (First Sergeant, Operations NCOIC).<br>
+                    Dual degrees from Embry-Riddle: Aeronautics & Project Management.
+                </p>
+            </div>
+
+            <div class="mission-box">
+                <h3>Our Mission</h3>
+                <p>To deliver <strong>mission-ready tools and accessories</strong> that commercial and government contractors can depend on — every time, every job.</p>
+                <p>We are a <strong>veteran-owned small business</strong> registered on SAM.gov, committed to precision, reliability, and supporting those who build and defend our nation.</p>
+                <p style="margin-top:1rem;">
+                    <a href="#contact" class="btn" style="font-size:0.9rem; padding:0.6rem 1.2rem;">Partner with Us</a>
+                </p>
+            </div>
+
+        </div>
     </section>
 
     <section id="contact" class="contact-form">
@@ -193,6 +307,7 @@
             <button type="submit" class="btn">Send Request</button>
         </form>
     </section>
+
 </main>
 
 <footer>
@@ -201,8 +316,22 @@
            <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
            <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
     </div>
-    <p>&copy; 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.</p>
+    <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.</p>
 </footer>
+
+<script>
+    const nav = document.getElementById('main-nav');
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        if (currentScroll > lastScroll && currentScroll > 100) {
+            nav.classList.add('scrolled');
+        } else if (currentScroll < lastScroll && currentScroll < 200) {
+            nav.classList.remove('scrolled');
+        }
+        lastScroll = currentScroll;
+    });
+</script>
 
 </body>
 </html>
