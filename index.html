@@ -37,6 +37,19 @@
             margin-top:0.5rem;
         }
 
+        /* Full-width banner */
+        .hero-banner {
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+            border-bottom: 4px solid var(--accent);
+        }
+        .hero-banner img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
         nav {
             background:var(--dark);
             padding:1rem 0;
@@ -164,16 +177,26 @@
             .founder-photo { max-width: 220px; margin: 0 auto; display: block; }
             nav ul { flex-direction:column; align-items:center; gap:1rem; }
             nav.scrolled { padding:0.4rem 0; font-size:0.85rem; }
+            .hero-banner img { height: auto; }
         }
     </style>
 </head>
 <body>
 
+<!-- Header with Logo (from back yt card.png) -->
 <header>
-    <img src="Yorktown tools FINAL.png" alt="Yorktown Tools Logo" class="logo-img">
+    <div class="logo-img">
+        <img src="back yt card.png" alt="Yorktown Tools Logo" style="height:110px; width:auto;">
+    </div>
     <div class="slogan">Build Better with Yorktown Tools</div>
 </header>
 
+<!-- Full Banner (same image, full width) -->
+<div class="hero-banner">
+    <img src="back yt card.png" alt="Yorktown Tools - Premium Contractor Supplies">
+</div>
+
+<!-- Navigation -->
 <nav id="main-nav">
     <ul>
         <li><a href="#home">Home</a></li>
@@ -186,27 +209,29 @@
 
 <main>
 
+    <!-- Hero Section -->
     <section id="home" class="hero">
         <h1>Premium Tools & Accessories for Mission-Critical Projects</h1>
         <p>Veteran-owned. Contractor-focused. Delivering the reliability commercial and government teams demand.</p>
         <a href="#contact" class="btn">Request a Custom Quote</a>
     </section>
 
+    <!-- Tools Section -->
     <section id="tools">
         <h2>Hand & Power Tools</h2>
         <div class="grid">
             <div class="card">
-                <img src="https://via.placeholder.com/400x200?text=Precision+Hand+Tools" alt="Precision Hand Tools">
+                <img src="IMG_4111.jpeg" alt="Precision Hand Tools">
                 <h3>Precision Hand Tools</h3>
                 <p>Professional-grade wrenches, pliers, screwdrivers, and measuring instruments built for daily rigor.</p>
             </div>
             <div class="card">
-                <img src="https://via.placeholder.com/400x200?text=Power+Tools" alt="Power Tools">
+                <img src="IMG_4112.jpeg" alt="Power Tools">
                 <h3>Power Tools</h3>
                 <p>Corded and cordless drills, saws, grinders, and impact drivers engineered for high-output environments.</p>
             </div>
             <div class="card">
-                <img src="https://via.placeholder.com/400x200?text=Specialty+Tools" alt="Specialty Tools">
+                <img src="IMG_4113.jpeg" alt="Specialty Tools">
                 <h3>Specialty Tools</h3>
                 <p>Task-specific solutions for aviation, construction, maintenance, and secure-facility operations.</p>
             </div>
@@ -216,11 +241,12 @@
         </p>
     </section>
 
+    <!-- Accessories Section -->
     <section id="accessories">
         <h2>Tool Accessories & Storage</h2>
         <div class="grid">
             <div class="card">
-                <img src="https://via.placeholder.com/400x200?text=Bits+&+Blades" alt="Bits and Blades">
+                <img src="IMG_4114.jpeg" alt="Bits, Blades & Abrasives">
                 <h3>Bits, Blades & Abrasives</h3>
                 <p>High-durability consumables designed to maintain peak performance on the job.</p>
             </div>
@@ -232,106 +258,4 @@
             <div class="card">
                 <img src="https://via.placeholder.com/400x200?text=Safety+Gear" alt="Safety Gear">
                 <h3>Safety & PPE</h3>
-                <p>Compliant gloves, eyewear, and hearing protection trusted in government and commercial settings.</p>
-            </div>
-        </div>
-        <p style="text-align:center; margin-top:2rem;">
-            <a href="#contact" class="btn">Discuss Your Accessory Needs</a>
-        </p>
-    </section>
-
-    <section id="about">
-        <h2>About Yorktown Tools</h2>
-        <div class="about-grid">
-
-            <div style="text-align:center;">
-                <!-- YOUR PHOTO: Exact filename used -->
-                <img src="IMG_1549.jpeg" alt="Zachary Barber - Founder, Yorktown Tools" class="founder-photo">
-                <h3 style="margin:1rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
-                <p style="font-style:italic; color:#555;">Founder & Owner</p>
-                <p style="margin-top:0.75rem; font-size:0.95rem;">
-                    20-year U.S. Army veteran (First Sergeant, Operations NCOIC).<br>
-                    Dual degrees from Embry-Riddle: Aeronautics & Project Management.
-                </p>
-            </div>
-
-            <div class="mission-box">
-                <h3>Our Mission</h3>
-                <p>To deliver <strong>mission-ready tools and accessories</strong> that commercial and government contractors can depend on — every time, every job.</p>
-                <p>We are a <strong>veteran-owned small business</strong> registered on SAM.gov, committed to precision, reliability, and supporting those who build and defend our nation.</p>
-                <p style="margin-top:1rem;">
-                    <a href="#contact" class="btn" style="font-size:0.9rem; padding:0.6rem 1.2rem;">Partner with Us</a>
-                </p>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="contact" class="contact-form">
-        <h2>Get In Touch</h2>
-        <p>Interested in volume pricing, custom kitting, or GSA scheduling? Fill out the form below and we’ll respond within 24 hours.</p>
-        <form action="https://formspree.io/f/your-form-id" method="POST">
-            <div class="form-group">
-                <label for="name">Name *</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="company">Company / Organization *</label>
-                <input type="text" id="company" name="company" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone</label>
-                <input type="tel" id="phone" name="phone">
-            </div>
-            <div class="form-group">
-                <label for="interest">Primary Interest *</label>
-                <select id="interest" name="interest" required>
-                    <option value="">Select...</option>
-                    <option>Hand Tools</option>
-                    <option>Power Tools</option>
-                    <option>Tool Storage</option>
-                    <option>Safety & PPE</option>
-                    <option>Custom Kitting</option>
-                    <option>Government Contracts</option>
-                    <option>Other</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" rows="4"></textarea>
-            </div>
-            <button type="submit" class="btn">Send Request</button>
-        </form>
-    </section>
-
-</main>
-
-<footer>
-    <div class="contact-info">
-        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
-           <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
-           <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
-    </div>
-    <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.</p>
-</footer>
-
-<script>
-    const nav = document.getElementById('main-nav');
-    let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        if (currentScroll > lastScroll && currentScroll > 100) {
-            nav.classList.add('scrolled');
-        } else if (currentScroll < lastScroll && currentScroll < 200) {
-            nav.classList.remove('scrolled');
-        }
-        lastScroll = currentScroll;
-    });
-</script>
-
-</body>
-</html>
+                <p>Compliant gloves, eyew​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
