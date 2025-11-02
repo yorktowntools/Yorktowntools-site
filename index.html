@@ -25,7 +25,6 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
 
-        /* === FULL BANNER === */
         .hero-banner {
             width:100%;
             overflow:hidden;
@@ -38,7 +37,6 @@
             display:block;
         }
 
-        /* === SMART NAV: Sticky (below banner initially), hides on scroll down === */
         nav {
             background:var(--dark);
             padding:0.8rem 0;
@@ -162,6 +160,10 @@
         }
         .contact-info { margin:1rem 0; }
         .contact-info a { color:var(--accent); text-decoration:none; }
+        .vosb-badge {
+            height: 50px; /* Adjust size as needed */
+            margin-top: 1rem;
+        }
 
         @media (max-width:768px) {
             nav { padding:0.6rem 0; }
@@ -175,12 +177,10 @@
 </head>
 <body>
 
-<!-- FULL BANNER -->
 <div class="hero-banner">
     <img src="back yt card.png" alt="Yorktown Tools - Veteran-Owned Tool Supplier for Government Contractors">
 </div>
 
-<!-- SMART NAV: Sticky, hides on scroll down -->
 <nav id="main-nav">
     <ul>
         <li><a href="#home">Home</a></li>
@@ -288,7 +288,7 @@
     <section id="contact" class="contact-form">
         <h2>Get In Touch</h2>
         <p>Need volume pricing, custom kitting, or GSA scheduling? We respond within 24 hours.</p>
-        <form action="https://formspree.io/f/YOUR_FORM_ID_HERE" method="POST">
+        <form action="https://formspree.io/f/xanlvyan" method="POST">
             <div class="form-group">
                 <label for="name">Name *</label>
                 <input type="text" id="name" name="name" required>
@@ -336,9 +336,9 @@
            <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
     </div>
     <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.</p>
+    <img src="vosb-badge.png" alt="Veteran-Owned Small Business Certified by SBA" class="vosb-badge">
 </footer>
 
-<!-- SMART NAV SCRIPT: Hides on scroll down -->
 <script>
     const nav = document.getElementById('main-nav');
     let lastScroll = 0;
@@ -358,3 +358,4 @@
 
 </body>
 </html>
+```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
