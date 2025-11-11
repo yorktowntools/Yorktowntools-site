@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Yorktown Tools: Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear for commercial and government contractors. SAM.gov registered. Free delivery to Hampton Roads military bases.">
-    <meta name="keywords" content="veteran owned tools, commercial contractor tools, government contractor tools, hand tools, power tools, OSHA ladders, safety PPE, tool storage, SAM.gov supplier, free base delivery, military base access">
+    <meta name="description" content="Yorktown Tools: Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear for commercial and government contractors. Free delivery to Hampton Roads military bases.">
+    <meta name="keywords" content="veteran owned tools, commercial contractor tools, government contractor tools, hand tools, power tools, OSHA ladders, safety PPE, tool storage, free base delivery, military base access">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
     <!-- Open Graph / Social -->
-    <meta property="og:title" content="Yorktown Tools | Premium Tools & Gear for Commercial & Government Contractors">
-    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to Langley, Fort Eustis, and all Hampton Roads bases.">
+    <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Base Delivery">
+    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all Hampton Roads military installations.">
     <meta property="og:image" content="https://yorktowntools.com/back yt card.png">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
@@ -17,8 +17,8 @@
     <meta name="geo.region" content="US-VA">
     <meta name="geo.placename" content="Yorktown, Virginia">
     <meta name="geo.position" content="37.2388;-76.5011">
-    <meta name="current-time" content="2025-11-11T09:53:00-05:00">
-    <!-- Schema.org for LocalBusiness + Service Area -->
+    <meta name="current-time" content="2025-11-11T10:11:00-05:00">
+    <!-- Schema.org for LocalBusiness + Delivery -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -43,21 +43,12 @@
         {"@type": "EducationalOccupationalCredential", "name": "SAM.gov Registered", "credentialCategory": "Certification"},
         {"@type": "EducationalOccupationalCredential", "name": "Veteran-Owned Small Business"}
       ],
-      "areaServed": {
-        "@type": "GeoCircle",
-        "geoMidpoint": {
-          "@type": "GeoCoordinates",
-          "latitude": "37.1",
-          "longitude": "-76.5"
-        },
-        "geoRadius": "50000"
-      },
       "makesOffer": {
         "@type": "Offer",
         "itemOffered": {
           "@type": "Service",
-          "name": "Free Tool Delivery to Military Bases",
-          "serviceOutput": "Delivery within 24 hours to Langley AFB, Fort Eustis, NAS Oceana, and all Hampton Roads installations."
+          "name": "Free Tool Delivery",
+          "description": "Complimentary delivery to all Hampton Roads military installations including Langley AFB, Fort Eustis, NAS Oceana, and more."
         }
       }
     }
@@ -69,8 +60,8 @@
             --accent: #c8102e;
             --light: #f4f4f4;
             --dark: #222;
-            --transition: all 0.3s ease;
             --success: #2e7d32;
+            --transition: all 0.3s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
@@ -88,7 +79,22 @@
             loading: lazy;
         }
 
-        /* Header Government IDs + Base Access */
+        /* Full-width Free Delivery Banner */
+        .free-delivery-banner {
+            background: var(--success);
+            color: #fff;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            display: block;
+        }
+        .free-delivery-banner strong {
+            font-size: 1.1rem;
+        }
+
+        /* Header: UEI, CAGE, SAM.gov on one line */
         .gov-ids-header {
             background: var(--primary);
             color: #fff;
@@ -96,26 +102,13 @@
             padding: 0.5rem 1rem;
             font-size: 0.85rem;
             font-weight: 500;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
         .gov-ids-header span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
+            margin: 0 0.8rem;
+            display: inline-block;
         }
         .gov-ids-header strong {
             color: #ffeb3b;
-        }
-        .base-access {
-            background: var(--success);
-            color: #fff;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
         }
 
         nav {
@@ -199,7 +192,6 @@
         .card img { width:100%; height:200px; object-fit:cover; loading: lazy; }
         .card h3 { padding:1rem 0.5rem 0.5rem; }
         .card p { padding:0 1rem 1rem; font-size:0.95rem; }
-        .card .cta { margin-top: 1rem; }
 
         .about-grid {
             display: grid;
@@ -300,24 +292,28 @@
             .about-grid { grid-template-columns: 1fr; text-align:center; }
             .founder-photo { max-width: 220px; margin: 0 auto; display: block; }
             .hero { padding:2rem 1rem; }
-            .gov-ids-header { font-size: 0.75rem; padding: 0.4rem 0.8rem; flex-direction: column; }
-            .trust-signals { flex-direction: column; align-items: center; }
+            .gov-ids-header { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
+            .free-delivery-banner { font-size: 0.9rem; }
             .item-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<!-- Government IDs + Base Access -->
+<!-- Full-Width Free Delivery Banner -->
+<div class="free-delivery-banner">
+    <strong>FREE DELIVERY</strong> to All Hampton Roads Military Installations
+</div>
+
+<!-- Header: UEI, CAGE, SAM.gov on One Line -->
 <div class="gov-ids-header" role="banner">
     <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
     <span><strong>CAGE:</strong> 16LD9</span>
     <span><strong>SAM.gov Registered</strong></span>
-    <span><span class="base-access">FREE DELIVERY TO BASE</span></span>
 </div>
 
 <div class="hero-banner">
-    <img src="back yt card.png" alt="Yorktown Tools - Free Tool Delivery to Langley, Fort Eustis, NAS Oceana" loading="lazy">
+    <img src="back yt card.png" alt="Yorktown Tools - Premium Tools with Free Delivery to Military Bases" loading="lazy">
 </div>
 
 <nav id="main-nav" role="navigation">
@@ -335,116 +331,110 @@
 
     <section id="home" class="hero">
         <h1>Premium Tools with Free Delivery to Hampton Roads Bases</h1>
-        <p>Veteran-owned and SAM.gov registered. We deliver <strong>free</strong> to Langley AFB, Fort Eustis, NAS Oceana, and all local installations — same-day when possible.</p>
+        <p>Veteran-owned and SAM.gov registered. We deliver <strong>free</strong> to Langley AFB, Fort Eustis, NAS Oceana, and all local installations.</p>
         <div class="trust-signals">
             <span class="trust-signal">Veteran-Owned</span>
             <span class="trust-signal">SAM.gov Registered</span>
             <span class="trust-signal">Free Base Delivery</span>
-            <span class="trust-signal">Secret-Cleared Access</span>
+            <span class="trust-signal">Base Access Approved</span>
         </div>
+        <!-- Only CTA #1 -->
         <a href="#contact" class="btn" aria-label="Get a custom quote">Get Your Quote in 24 Hours</a>
-        <a href="#tools" class="btn btn-secondary">Browse Tools</a>
     </section>
 
     <section id="tools">
-        <h2>Hand & Power Tools Built for the Mission</h2>
-        <p>From flightline precision to motor pool maintenance — we speak your language and stock what you need.</p>
+        <h2>High-Performance Hand & Power Tools</h2>
+        <p>Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
         <div class="grid">
             <div class="card">
-                <img src="IMG_4142.jpeg" alt="Precision hand tools for aviation and maintenance" loading="lazy">
+                <img src="IMG_4142.jpeg" alt="Precision hand tools for contractors" loading="lazy">
                 <h3>Precision Hand Tools</h3>
-                <p>Wrenches, pliers, and torque sets — audit-ready and flightline-approved.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>Wrenches, pliers, and measuring tools for high-accuracy work.</p>
             </div>
             <div class="card">
-                <img src="IMG_4174.jpeg" alt="Cordless power tools for heavy maintenance" loading="lazy">
+                <img src="IMG_4174.jpeg" alt="Power tools for heavy-duty jobs" loading="lazy">
                 <h3>Power Tools</h3>
-                <p>Mil-spec cordless drills, impacts, and saws — ready for LSCO or daily ops.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>Corded and cordless drills, saws, and impact drivers for demanding environments.</p>
             </div>
             <div class="card">
                 <img src="IMG_4117.jpeg" alt="Specialty tools for secure facilities" loading="lazy">
                 <h3>Specialty Tools</h3>
-                <p>Aviation, secure facility, and field maintenance kits — no red tape.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>Task-specific solutions for maintenance and secure facility operations.</p>
             </div>
         </div>
     </section>
 
     <section id="accessories">
-        <h2>Tool Accessories, Storage & PPE</h2>
-        <p>Keep your team compliant and your tools organized — delivered to your hangar or motor pool.</p>
+        <h2>Tool Accessories, Storage & Safety Gear</h2>
+        <p>Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
         <div class="grid">
             <div class="card">
-                <img src="IMG_4143.jpeg" alt="Drill bits and blades for contractors" loading="lazy">
+                <img src="IMG_4143.jpeg" alt="Drill bits and blades" loading="lazy">
                 <h3>Bits, Blades & Abrasives</h3>
-                <p>High-wear consumables that last through FTX and beyond.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>High-durability consumables for consistent performance.</p>
             </div>
             <div class="card">
-                <img src="IMG_4119.jpeg" alt="Tool storage for audit readiness" loading="lazy">
+                <img src="IMG_4119.jpeg" alt="Tool storage solutions" loading="lazy">
                 <h3>Storage & Organization</h3>
-                <p>Modular chests and workstations — CIF-turn-in ready.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>Modular toolboxes and workstations — built for job site efficiency.</p>
             </div>
             <div class="card">
-                <img src="IMG_4175.jpeg" alt="Safety PPE for flightline and motor pool" loading="lazy">
+                <img src="IMG_4175.jpeg" alt="Safety PPE for contractors" loading="lazy">
                 <h3>Safety & PPE</h3>
-                <p>Gloves, eyewear, and hearing protection — meets AR 385-10.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>Gloves, eyewear, and hearing protection meeting OSHA standards.</p>
             </div>
         </div>
+        <!-- Only CTA #2 (Middle) -->
+        <p style="text-align:center; margin-top:2rem;">
+            <a href="#contact" class="btn">Request a Custom Quote</a>
+        </p>
     </section>
 
     <section id="ladders">
-        <h2>OSHA-Compliant Ladders & Access</h2>
-        <p>Fiberglass and aluminum ladders — delivered to your flightline or construction site.</p>
+        <h2>OSHA-Compliant Ladders & Access Equipment</h2>
+        <p>Safe, reliable fiberglass and aluminum ladders for construction and maintenance.</p>
         <div class="grid">
             <div class="card">
-                <img src="IMG_4140.jpeg" alt="Professional ladders for base use" loading="lazy">
+                <img src="IMG_4140.jpeg" alt="Professional ladders for job sites" loading="lazy">
                 <h3>Professional Ladders</h3>
-                <p>OSHA-compliant, non-conductive — safe for hangar and motor pool.</p>
-                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Add to Quote</a></p>
+                <p>OSHA-compliant access solutions for any work environment.</p>
             </div>
         </div>
     </section>
 
     <section id="about">
         <h2>About Yorktown Tools</h2>
-        <p>Founded by a 20-year U.S. Army First Sergeant who managed $5.6M in aviation logistics. We understand your supply chain, your urgency, and your standards.</p>
+        <p>Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors nationwide.</p>
         <div class="about-grid">
             <div style="text-align:center;">
-                <img src="IMG_1549.jpeg" alt="Zachary Barber, U.S. Army Veteran Founder" class="founder-photo" loading="lazy">
+                <img src="IMG_1549.jpeg" alt="Zachary Barber, Founder of Yorktown Tools" class="founder-photo" loading="lazy">
                 <h3 style="margin:1rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
                 <p style="font-style:italic; color:#555;">Founder & Owner</p>
                 <p style="margin-top:0.75rem; font-size:0.95rem;">
-                    20-year U.S. Army veteran (1SG).<br>
-                    B.S. Project Management, Embry-Riddle ’23.<br>
-                    Active Secret clearance. Base access approved.
+                    20-year U.S. Army veteran.<br>
+                    B.S. Project Management, Embry-Riddle.<br>
+                    Active base access and clearance.
                 </p>
             </div>
             <div class="mission-box">
                 <h3>Our Mission</h3>
-                <p>Deliver <strong>mission-critical tools and PPE</strong> to contractors who can’t wait — on time, every time.</p>
-                <p><strong>Free delivery. No red tape. We speak MIL-SPEC.</strong></p>
-                <p style="margin-top:1rem;">
-                    <a href="#contact" class="btn" style="font-size:0.9rem; padding:0.6rem 1.2rem;">Start Your Quote</a>
-                </p>
+                <p>Deliver <strong>mission-critical tools and PPE</strong> that contractors depend on — on time, every time.</p>
+                <p><strong>Free delivery. SAM.gov registered. Veteran-owned.</strong></p>
             </div>
         </div>
     </section>
 
     <section id="contact" class="contact-form">
         <h2>Get Your Quote in 24 Hours</h2>
-        <p>Add items below — we’ll respond with pricing, availability, and delivery to your base or job site.</p>
+        <p>List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options.</p>
         <form action="https://formspree.io/f/xanlvyan" method="POST">
             <div class="form-group">
                 <label for="name">Name *</label>
                 <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="company">Unit / Company *</label>
-                <input type="text" id="company" name="company" required placeholder="e.g., 128th Aviation, ABC Construction">
+                <label for="company">Company / Organization *</label>
+                <input type="text" id="company" name="company" required>
             </div>
             <div class="form-group">
                 <label for="email">Email *</label>
@@ -455,23 +445,24 @@
                 <input type="tel" id="phone" name="phone">
             </div>
             <div class="form-group">
-                <label for="delivery">Delivery Location</label>
-                <input type="text" id="delivery" name="delivery" placeholder="e.g., Langley AFB Hangar 3, Fort Eustis Motor Pool">
+                <label for="delivery">Delivery Location (Optional)</label>
+                <input type="text" id="delivery" name="delivery" placeholder="e.g., Langley AFB, job site address">
             </div>
             <div class="form-group">
-                <label>Requested Items</label>
+                <label>Requested Items (Optional)</label>
                 <div id="item-list">
                     <div class="item-row">
-                        <input type="text" name="item_name[]" placeholder="Item Name (e.g., 1/2' Torque Wrench)" required>
-                        <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" required>
+                        <input type="text" name="item_name[]" placeholder="Item Name">
+                        <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1">
                     </div>
                 </div>
                 <button type="button" class="add-item" onclick="addItem()">+ Add Another Item</button>
             </div>
             <div class="form-group">
-                <label for="message">Notes (PO #, urgency, etc.)</label>
-                <textarea id="message" name="message" rows="3" placeholder="e.g., Need by Friday for FTX. PO# 12345."></textarea>
+                <label for="message">Additional Notes</label>
+                <textarea id="message" name="message" rows="3"></textarea>
             </div>
+            <!-- Only CTA #3 (End) -->
             <button type="submit" class="btn">Send Quote Request</button>
         </form>
     </section>
@@ -486,13 +477,11 @@
         <p>Yorktown, Virginia – Free Delivery to All Hampton Roads Bases</p>
     </div>
     <div class="gov-ids">
-        <p><strong>Unique Entity ID (UEI):</strong> SMYXDLJDJMZ4</p>
-        <p><strong>CAGE/NCAGE Code:</strong> 16LD9</p>
+        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9 | <strong>SAM.gov Registered</strong></p>
     </div>
     <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.<br>
-       <small>Last updated: November 11, 2025 09:53 AM EST</small></p>
+       <small>Last updated: November 11, 2025 10:11 AM EST</small></p>
     <img src="IMG_4121.jpeg" alt="Veteran-Owned Small Business Badge" class="vosb-badge" loading="lazy">
-    <p style="margin-top:1rem;"><a href="#contact" class="btn">Get Quote – Free Base Delivery</a></p>
 </footer>
 
 <script>
@@ -514,8 +503,8 @@
         const row = document.createElement('div');
         row.className = 'item-row';
         row.innerHTML = `
-            <input type="text" name="item_name[]" placeholder="Item Name" required>
-            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" required>
+            <input type="text" name="item_name[]" placeholder="Item Name">
+            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1">
         `;
         container.appendChild(row);
     }
