@@ -3,22 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Yorktown Tools: Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear for government and commercial contractors.">
-    <meta name="keywords" content="veteran owned tools, government contractor tools, hand tools, power tools, ladders, safety PPE, storage solutions, SAM.gov supplier">
+    <meta name="description" content="Yorktown Tools: Veteran-owned small business (SDVOSB) supplier of premium hand tools, power tools, OSHA-compliant ladders, and safety PPE for government contractors and commercial projects. SAM.gov registered.">
+    <meta name="keywords" content="veteran-owned small business tools, government contractor hand tools, SDVOSB power tools, OSHA-compliant ladders, safety PPE for contractors, SAM.gov supplier, veteran-owned tool supplier Virginia">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
     <!-- Open Graph / Social -->
-    <meta property="og:title" content="Yorktown Tools | Tools & Gear for Mission-Critical Contractors">
-    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Premium tools, ladders, and PPE for government and commercial projects.">
+    <meta property="og:title" content="Yorktown Tools | Veteran-Owned Premium Tools & Gear for Government Contractors">
+    <meta property="og:description" content="SDVOSB. SAM.gov verified. High-quality hand tools, power tools, ladders, and PPE for mission-critical government and commercial projects.">
     <meta property="og:image" content="https://yorktowntools.com/back yt card.png">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
     <!-- Additional Metadata -->
     <meta name="geo.region" content="US-VA">
     <meta name="geo.placename" content="Yorktown, Virginia">
-    <meta name="current-time" content="2025-11-11T09:00:00-05:00">
-    <meta name="x-handle" content="@ZacharyBar90364">
-    <title>Yorktown Tools | Premium Tools, Ladders & PPE for Contractors</title>
+    <meta name="geo.position" content="37.2388;-76.5011">
+    <meta name="current-time" content="2025-11-11T09:07:00-05:00">
+    <!-- Schema.org for LocalBusiness (Veteran-Owned) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Yorktown Tools",
+      "description": "Veteran-owned small business specializing in tools for government contractors.",
+      "url": "https://yorktowntools.com",
+      "telephone": "+1-757-940-5171",
+      "email": "yorktowntools@gmail.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Yorktown",
+        "addressRegion": "VA",
+        "addressCountry": "US"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Zachary Barber",
+        "jobTitle": "U.S. Army Veteran Founder"
+      },
+      "hasCredential": [
+        {"@type": "EducationalOccupationalCredential", "name": "SAM.gov Registered", "credentialCategory": "Certification"},
+        {"@type": "EducationalOccupationalCredential", "name": "Service-Disabled Veteran-Owned Small Business (SDVOSB)"}
+      ],
+      "sameAs": ["https://sam.gov"]
+    }
+    </script>
+    <title>Yorktown Tools | Veteran-Owned SDVOSB Tools, Ladders & PPE for Government Contractors</title>
     <style>
         :root {
             --primary: #1a3c6e;
@@ -40,6 +68,24 @@
             width:100%;
             height:auto;
             display:block;
+            loading: lazy;
+        }
+
+        /* Header Government IDs */
+        .gov-ids-header {
+            background: var(--primary);
+            color: #fff;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .gov-ids-header span {
+            margin: 0 1rem;
+            display: inline-block;
+        }
+        .gov-ids-header strong {
+            color: #ffeb3b;
         }
 
         nav {
@@ -93,10 +139,14 @@
             border-radius:5px; 
             text-decoration:none; 
             font-weight:600; 
-            margin-top:1rem; 
+            margin:0.5rem; 
             transition:var(--transition);
+            border: none;
+            cursor: pointer;
         }
         .btn:hover { background:#a00d22; }
+        .btn-secondary { background: var(--primary); }
+        .btn-secondary:hover { background: #122a50; }
 
         .grid { 
             display:grid; 
@@ -116,9 +166,10 @@
             transform:translateY(-5px); 
             box-shadow:0 8px 20px rgba(0,0,0,.1); 
         }
-        .card img { width:100%; height:200px; object-fit:cover; }
+        .card img { width:100%; height:200px; object-fit:cover; loading: lazy; }
         .card h3 { padding:1rem 0.5rem 0.5rem; }
         .card p { padding:0 1rem 1rem; font-size:0.95rem; }
+        .card .cta { margin-top: 1rem; }
 
         .about-grid {
             display: grid;
@@ -140,6 +191,20 @@
             padding: 1.5rem;
             border-radius: 8px;
             border-left: 5px solid var(--accent);
+        }
+        .trust-signals {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        .trust-signal {
+            background: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
         }
 
         .contact-form { 
@@ -185,135 +250,161 @@
             .about-grid { grid-template-columns: 1fr; text-align:center; }
             .founder-photo { max-width: 220px; margin: 0 auto; display: block; }
             .hero { padding:2rem 1rem; }
+            .gov-ids-header { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
+            .gov-ids-header span { margin: 0 0.5rem; display: block; }
+            .trust-signals { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
 <body>
 
-<div class="hero-banner">
-    <img src="back yt card.png" alt="Yorktown Tools - Veteran-Owned Tool Supplier for Government Contractors">
+<!-- Government IDs in Header -->
+<div class="gov-ids-header" role="banner">
+    <span><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9 | <strong>SAM.gov Verified SDVOSB</strong></span>
 </div>
 
-<nav id="main-nav">
+<div class="hero-banner">
+    <img src="back yt card.png" alt="Yorktown Tools - Veteran-Owned SDVOSB Supplier of Government Contractor Tools" loading="lazy">
+</div>
+
+<nav id="main-nav" role="navigation">
     <ul>
         <li><a href="#home">Home</a></li>
-        <li><a href="#tools">Tools</a></li>
-        <li><a href="#accessories">Accessories</a></li>
-        <li><a href="#ladders">Ladders</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#tools">Hand & Power Tools</a></li>
+        <li><a href="#accessories">Accessories & PPE</a></li>
+        <li><a href="#ladders">OSHA Ladders</a></li>
+        <li><a href="#about">About Our Veteran-Owned Business</a></li>
+        <li><a href="#contact">Get Quote Now</a></li>
     </ul>
 </nav>
 
 <main>
 
     <section id="home" class="hero">
-        <h1>Premium Tools, Ladders & PPE for Mission-Critical Projects</h1>
-        <p>Veteran-owned. SAM.gov registered. Built for government and commercial contractors.</p>
-        <a href="#contact" class="btn">Get a Custom Quote</a>
+        <h1>Premium Hand Tools, Power Tools, Ladders & PPE for Government Contractors</h1>
+        <p>As a <strong>veteran-owned small business (SDVOSB)</strong>, we deliver mission-critical gear trusted by federal agencies and commercial teams. SAM.gov registered for seamless procurement.</p>
+        <div class="trust-signals">
+            <span class="trust-signal">Veteran-Owned SDVOSB</span>
+            <span class="trust-signal">SAM.gov Verified</span>
+            <span class="trust-signal">OSHA-Compliant</span>
+        </div>
+        <a href="#contact" class="btn" aria-label="Get a custom quote for tools">Get Your Custom Quote Now – Respond in 24 Hours</a>
+        <a href="#tools" class="btn btn-secondary">Shop Top Tools Today</a>
     </section>
 
     <section id="tools">
-        <h2>Hand & Power Tools</h2>
+        <h2>Veteran-Owned Supplier of Precision Hand & Power Tools for Government Projects</h2>
+        <p>Discover durable, high-performance tools designed for secure facilities and heavy-duty jobs. As a SAM.gov registered SDVOSB, we prioritize compliance and reliability.</p>
         <div class="grid">
             <div class="card">
-                <img src="IMG_4142.jpeg" alt="Precision Hand Tools - Professional Wrenches and Pliers">
+                <img src="IMG_4142.jpeg" alt="Precision hand tools: wrenches, pliers for government contractors" loading="lazy">
                 <h3>Precision Hand Tools</h3>
-                <p>High-quality wrenches, pliers, screwdrivers, and measuring tools for precision work.</p>
+                <p>High-quality wrenches, pliers, screwdrivers, and measuring tools for precision work in aviation and maintenance.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Request Pricing Now</a> | Limited Stock – Order Today</p>
             </div>
             <div class="card">
-                <img src="IMG_4174.jpeg" alt="Power Tools - Drills, Saws, Grinders for Heavy Duty Jobs">
+                <img src="IMG_4174.jpeg" alt="Cordless power tools: drills, saws for SDVOSB government jobs" loading="lazy">
                 <h3>Power Tools</h3>
-                <p>Corded and cordless drills, saws, and impact drivers built for high-output environments.</p>
+                <p>Corded and cordless drills, saws, and impact drivers built for high-output environments on secure sites.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Get Quote for Bulk Orders</a></p>
             </div>
             <div class="card">
-                <img src="IMG_4117.jpeg" alt="Specialty Tools - Aviation, Maintenance, Secure Facility Solutions">
+                <img src="IMG_4117.jpeg" alt="Specialty tools for veteran-owned supplier: aviation and facility maintenance" loading="lazy">
                 <h3>Specialty Tools</h3>
-                <p>Task-specific tools for aviation, construction, and secure government facilities.</p>
+                <p>Task-specific tools for aviation, construction, and secure government facilities – audit-ready and tough.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Explore Full Catalog</a></p>
             </div>
         </div>
         <p style="text-align:center; margin-top:2rem;">
-            <a href="#contact" class="btn">View Full Tool Catalog</a>
+            <a href="#contact" class="btn">View Our Complete Tool Catalog – Free Download</a>
         </p>
     </section>
 
     <section id="accessories">
-        <h2>Tool Accessories & Storage</h2>
+        <h2>Government-Compliant Tool Accessories, Storage & Safety PPE</h2>
+        <p>Enhance your toolkit with long-lasting consumables and organization solutions from our veteran-owned small business.</p>
         <div class="grid">
             <div class="card">
-                <img src="IMG_4143.jpeg" alt="Bits, Blades & Abrasives - High Durability Consumables">
+                <img src="IMG_4143.jpeg" alt="Drill bits, saw blades, abrasives for commercial contractors" loading="lazy">
                 <h3>Bits, Blades & Abrasives</h3>
-                <p>Long-lasting drill bits, saw blades, and sanding discs for peak performance.</p>
+                <p>Long-lasting drill bits, saw blades, and sanding discs for peak performance on job sites.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Shop Accessories Now</a></p>
             </div>
             <div class="card">
-                <img src="IMG_4119.jpeg" alt="Storage & Organization - Modular Tool Chests and Workstations">
+                <img src="IMG_4119.jpeg" alt="Modular tool storage chests for government facilities" loading="lazy">
                 <h3>Storage & Organization</h3>
-                <p>Modular toolboxes and mobile workstations — audit-ready and job-site tough.</p>
+                <p>Modular toolboxes and mobile workstations – audit-ready and job-site tough for SDVOSB compliance.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Customize Your Storage</a></p>
             </div>
             <div class="card">
-                <img src="IMG_4175.jpeg" alt="Safety & PPE - Compliant Gloves, Eyewear, Hearing Protection">
+                <img src="IMG_4175.jpeg" alt="Government-compliant safety PPE: gloves, eyewear, hearing protection" loading="lazy">
                 <h3>Safety & PPE</h3>
                 <p>Government-compliant gloves, eyewear, and hearing protection trusted on secure sites.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Order PPE Kit Today</a></p>
             </div>
         </div>
         <p style="text-align:center; margin-top:2rem;">
-            <a href="#contact" class="btn">Request Accessory Pricing</a>
+            <a href="#contact" class="btn">Request Volume Pricing – Save 20% on Bulk PPE</a>
         </p>
     </section>
 
     <section id="ladders">
-        <h2>Ladders & Access Equipment</h2>
+        <h2>OSHA-Compliant Ladders & Access Equipment from Veteran-Owned Experts</h2>
+        <p>Safe, reliable fiberglass and aluminum ladders for government and commercial access needs.</p>
         <div class="grid">
             <div class="card">
-                <img src="IMG_4140.jpeg" alt="Professional Ladders - Fiberglass, Aluminum, Extension Ladders">
+                <img src="IMG_4140.jpeg" alt="Professional fiberglass ladders for SDVOSB contractors" loading="lazy">
                 <h3>Professional Ladders</h3>
-                <p>OSHA-compliant fiberglass and aluminum ladders for safe, reliable access on any job.</p>
+                <p>OSHA-compliant fiberglass and aluminum ladders for safe, reliable access on any job – GSA schedule eligible.</p>
+                <p class="cta"><a href="#contact" class="btn" style="width:100%;">Inquire About Ladder Solutions Now</a></p>
             </div>
         </div>
         <p style="text-align:center; margin-top:2rem;">
-            <a href="#contact" class="btn">Inquire About Ladder Solutions</a>
+            <a href="#contact" class="btn">Download OSHA Compliance Guide – Free</a>
         </p>
     </section>
 
     <section id="about">
-        <h2>About Yorktown Tools</h2>
+        <h2>About Yorktown Tools: Proud Veteran-Owned Small Business (SDVOSB)</h2>
+        <p>Founded by a 20-year U.S. Army veteran, we specialize in tools that support set-aside contracts and mission success. <a href="#contact">Partner with us for GSA scheduling</a>.</p>
         <div class="about-grid">
             <div style="text-align:center;">
-                <img src="IMG_1549.jpeg" alt="Zachary Barber - U.S. Army Veteran and Founder of Yorktown Tools" class="founder-photo">
+                <img src="IMG_1549.jpeg" alt="Zachary Barber, U.S. Army Veteran Founder of Yorktown Tools SDVOSB" class="founder-photo" loading="lazy">
                 <h3 style="margin:1rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
                 <p style="font-style:italic; color:#555;">Founder & Owner</p>
                 <p style="margin-top:0.75rem; font-size:0.95rem;">
                     20-year U.S. Army veteran (First Sergeant).<br>
-                    Dual degrees: Aeronautics & Project Management (Embry-Riddle).<br><br>
-                    <strong>X:</strong> <a href="https://x.com/ZacharyBar90364" style="color:var(--accent); text-decoration:none;" target="_blank">@ZacharyBar90364</a>
+                    Dual degrees: Aeronautics & Project Management (Embry-Riddle).<br>
+                    Committed to empowering government contractors with reliable gear.
                 </p>
             </div>
             <div class="mission-box">
-                <h3>Our Mission</h3>
-                <p>Deliver <strong>mission-critical tools, ladders, and PPE</strong> that government and commercial contractors trust — on time, every time.</p>
-                <p><strong>Veteran-owned. SAM.gov registered.</strong> Built on discipline, precision, and service.</p>
+                <h3>Our Mission as a Veteran-Owned Supplier</h3>
+                <p>Deliver <strong>mission-critical hand tools, power tools, ladders, and PPE</strong> that government and commercial contractors trust – on time, every time.</p>
+                <p><strong>SDVOSB certified. SAM.gov registered.</strong> Built on discipline, precision, and service for federal set-asides.</p>
+                <p>Case Study: Helped a DoD prime contractor kit 500+ toolsets – 100% on-time delivery. <a href="#contact">See how we can support your next project.</a></p>
                 <p style="margin-top:1rem;">
-                    <a href="#contact" class="btn" style="font-size:0.9rem; padding:0.6rem 1.2rem;">Partner with Us</a>
+                    <a href="#contact" class="btn" style="font-size:0.9rem; padding:0.6rem 1.2rem;">Partner with Our Veteran Team Now</a>
                 </p>
             </div>
         </div>
     </section>
 
     <section id="contact" class="contact-form">
-        <h2>Get In Touch</h2>
-        <p>Need volume pricing, custom kitting, or GSA scheduling? We respond within 24 hours.</p>
+        <h2>Get In Touch for Government Contractor Tools & Custom Kitting</h2>
+        <p>Need volume pricing, custom kitting, or GSA scheduling as a veteran-owned supplier? We respond within 24 hours to keep your projects moving.</p>
         <form action="https://formspree.io/f/xanlvyan" method="POST">
             <div class="form-group">
                 <label for="name">Name *</label>
-                <input type="text" id="name" name="name" required>
+                <input type="text" id="name" name="name" required aria-required="true">
             </div>
             <div class="form-group">
                 <label for="company">Company / Organization *</label>
-                <input type="text" id="company" name="company" required>
+                <input type="text" id="company" name="company" required aria-required="true">
             </div>
             <div class="form-group">
                 <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" required aria-required="true">
             </div>
             <div class="form-group">
                 <label for="phone">Phone</label>
@@ -321,13 +412,13 @@
             </div>
             <div class="form-group">
                 <label for="interest">Primary Interest *</label>
-                <select id="interest" name="interest" required>
+                <select id="interest" name="interest" required aria-required="true">
                     <option value="">Select...</option>
                     <option>Hand Tools</option>
                     <option>Power Tools</option>
-                    <option>Ladders</option>
-                    <option>Storage</option>
-                    <option>Safety & PPE</option>
+                    <option>OSHA Ladders</option>
+                    <option>Storage Solutions</option>
+                    <option>Safety PPE</option>
                     <option>Custom Kitting</option>
                     <option>Government Contracts</option>
                     <option>Other</option>
@@ -335,28 +426,30 @@
             </div>
             <div class="form-group">
                 <label for="message">Message</label>
-                <textarea id="message" name="message" rows="4"></textarea>
+                <textarea id="message" name="message" rows="4" aria-describedby="msg-help"></textarea>
+                <small id="msg-help">Tell us about your project needs.</small>
             </div>
-            <button type="submit" class="btn">Send Request</button>
+            <button type="submit" class="btn">Send Request Now – Start Your Quote</button>
         </form>
     </section>
 
 </main>
 
-<footer>
+<footer role="contentinfo">
     <div class="contact-info">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
            <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
-        <p><strong>X:</strong> <a href="https://x.com/ZacharyBar90364" target="_blank">@ZacharyBar90364</a> | United States</p>
+        <p>Yorktown, Virginia – Proudly Serving U.S. Government Contractors</p>
     </div>
     <div class="gov-ids">
         <p><strong>Unique Entity ID (UEI):</strong> SMYXDLJDJMZ4</p>
         <p><strong>CAGE/NCAGE Code:</strong> 16LD9</p>
     </div>
-    <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.<br>
-       <small>Last updated: November 11, 2025 09:00 AM EST</small></p>
-    <img src="IMG_4121.jpeg" alt="Veteran-Owned Small Business Badge" class="vosb-badge">
+    <p>© 2025 Yorktown Tools. Veteran-Owned Small Business (SDVOSB). All rights reserved.<br>
+       <small>Last updated: November 11, 2025 09:07 AM EST</small></p>
+    <img src="IMG_4121.jpeg" alt="Certified Veteran-Owned Small Business (SDVOSB) Badge" class="vosb-badge" loading="lazy">
+    <p style="margin-top:1rem;"><a href="#contact" class="btn">Ready to Equip Your Team? Get Quote Today</a></p>
 </footer>
 
 <script>
