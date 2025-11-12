@@ -269,7 +269,10 @@
         }
         .gov-ids strong { color: #fff; }
 
-        @media (max-width:768px) {
+        /* =============================================
+           MOBILE: Center headings + paragraphs + spacing
+           ============================================= */
+        @media (max-width: 768px) {
             nav { padding:0.6rem 0; }
             nav a { font-size:0.9rem; }
             nav ul { gap:1rem; }
@@ -279,6 +282,28 @@
             .gov-ids-header { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
             .free-delivery-banner { font-size: 0.9rem; }
             .item-row { grid-template-columns: 1fr; }
+
+            /* Center the 4 section headings + first paragraph */
+            #tools h2,
+            #tools > p:first-of-type,
+            #accessories h2,
+            #accessories > p:first-of-type,
+            #ladders h2,
+            #ladders > p:first-of-type,
+            #about h2,
+            #about > p:first-of-type {
+                text-align: center;
+                display: block;
+                margin-bottom: 1.5rem; /* extra space before images/grid */
+            }
+
+            /* Optional: center the card grids */
+            #tools .grid,
+            #accessories .grid,
+            #ladders .grid,
+            #about .about-grid {
+                justify-content: center;
+            }
         }
     </style>
 </head>
