@@ -24,7 +24,7 @@
             --transition: all 0.3s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; position:relative; }
+        body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
 
         .free-delivery-banner {
             background: var(--success);
@@ -53,33 +53,35 @@
         .hero {
             position: relative;
             text-align:center;
-            padding:6rem 1rem 5rem;
+            padding:5.5rem 1rem 5rem;
             background:var(--light);
             border-radius:12px;
             overflow:hidden;
         }
+        /* Subtle watermark */
         .hero::before {
             content:"";
             position:absolute;
             top:50%; left:50%;
             transform:translate(-50%,-50%);
-            width:720px;
-            height:720px;
+            width:700px;
+            height:700px;
             background:url('george-mascot.png') center/contain no-repeat;
             opacity:0.05;
             pointer-events:none;
             z-index:0;
         }
+        /* Smaller George in bottom-right — no longer covers text */
         .hero-mascot-embedded {
             position: absolute;
-            top: -50px;
+            bottom: 20px;
             right: 20px;
-            width: 240px;
-            z-index: 3;
-            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25));
+            width: 140px;
+            z-index: 2;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
         }
         @media (max-width:768px) {
-            .hero-mascot-embedded { width:160px; top:-30px; right:10px; }
+            .hero-mascot-embedded { width:100px; bottom:15px; right:15px; }
             .hero::before { width:500px; height:500px; }
         }
 
@@ -119,7 +121,7 @@
 
         .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(290px,1fr)); gap:2rem; }
         .card { background:#fff; border:1px solid #ddd; border-radius:10px; overflow:hidden; text-align:center; transition:0.3s; box-shadow:0 3px 10px rgba(0,0,0,0.08); }
-        .card:hover { transform:translateY(-6px); box-shadow:0 0 12px 25px rgba(0,0,0,.15); }
+        .card:hover { transform:translateY(-6px); box-shadow:0 12px 25px rgba(0,0,0,.15); }
         .card img { width:100%; height:210px; object-fit:cover; loading: lazy; }
 
         .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start; }
@@ -129,42 +131,38 @@
         .contact-form { background:var(--light); padding:3rem 2.5rem; border-radius:12px; margin-top:2rem; }
 
         footer { background:var(--dark); color:#fff; text-align:center; padding:3rem 1rem; margin-top:6rem; }
-        .contact-info a { color:var(--accent); text-decoration:none; font-weight:600; }
 
-        /* GEORGE WASHINGTON CALL BUTTON */
+        /* Smaller, cleaner call button */
         .call-button {
             position:fixed;
-            right:20px;
-            bottom:20px;
+            right:18px;
+            bottom:18px;
             background:#fff;
-            border:5px solid var(--accent);
-            border-radius:18px;
-            width:140px;
-            padding:14px 10px 10px;
-            box-shadow:0 10px 35px rgba(0,0,0,0.3);
+            border:4px solid var(--accent);
+            border-radius:14px;
+            width:105px;
+            padding:10px 8px 6px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.3);
             text-align:center;
             z-index:999;
-            animation:float 4s ease-in-out infinite;
         }
         .call-button img {
-            width:80px;
-            height:80px;
+            width:58px;
+            height:58px;
             border-radius:50%;
-            border:3px solid var(--accent);
         }
         .call-button span {
             display:block;
-            margin-top:8px;
+            margin-top:5px;
             color:var(--accent);
             font-weight:800;
-            font-size:1.2rem;
-            letter-spacing:1px;
+            font-size:1rem;
+            letter-spacing:0.5px;
         }
-        .call-button:hover { transform:translateY(-8px); }
-        @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
+        .call-button:hover { transform:scale(1.05); }
         @media (max-width:480px) {
-            .call-button { width:120px; right:15px; bottom:15px; }
-            .call-button img { width:70px; height:70px; }
+            .call-button { width:95px; right:12px; bottom:12px; }
+            .call-button img { width:52px; height:52px; }
         }
 
         /* Quote Form */
@@ -191,7 +189,7 @@
 </head>
 <body>
 
-    <!-- George Washington Call Button -->
+    <!-- Smaller, clean call button -->
     <div class="call-button">
         <a href="tel:757-940-5171">
             <img src="george-mascot.png" alt="Call Yorktown Tools">
@@ -226,7 +224,8 @@
 
     <main>
         <section id="home" class="hero">
-            <img src="george-mascot.png" alt="George Washington - Yorktown Tools Mascot" class="hero-mascot-embedded" loading="lazy">
+            <!-- George now small in bottom-right — never covers text -->
+            <img src="george-mascot.png" alt="George Washington Mascot" class="hero-mascot-embedded" loading="lazy">
 
             <h1>Build Better with Yorktown Tools</h1>
             <p>Veteran-owned • Free delivery to Langley AFB, Fort Eustis, NAS Oceana, and all Hampton Roads installations.</p>
@@ -247,6 +246,7 @@
             <a href="#contact" class="btn">Get Your Quote in 24 Hours</a>
         </section>
 
+        <!-- All your sections below (100% complete) -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p>Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -385,7 +385,6 @@
     </footer>
 
     <script>
-        // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -398,16 +397,14 @@
             lastScroll = currentScroll;
         });
 
-        // Rotating taglines
         const taglines = document.querySelectorAll('.tagline');
-        let current = 0;
+        let current = 0
         setInterval(() => {
             taglines[current].classList.remove('active');
             current = (current + 1) % taglines.length;
             taglines[current].classList.add('active');
         }, 8000);
 
-        // Add new item row
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
