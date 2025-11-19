@@ -9,7 +9,7 @@
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Delivery">
     <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all of Hampton Roads contractors.">
-    <meta property="og:image" content="https://yorktowntools.com/george-mascot.png">
+    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.png">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
     <title>Yorktown Tools | Build Better with Yorktown Tools</title>
@@ -22,8 +22,8 @@
             --dark: #222;
             --success: #2e7d32;
             --transition: all 0.3s ease;
-            --glass: rgba(255,255,255,0.12);
-            --glass-border: rgba(255,255,255,0.2);
+            --glass: rgba(255,255,255,0.15);
+            --glass-border: rgba(255,255,255,0.25);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -36,28 +36,28 @@
             position: relative;
         }
 
-        /* Solid white shield so watermark never shows at the top */
+        /* Clean white top shield */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 380px;               /* Covers green + blue + logo + nav completely */
+            height: 340px;
             background: #fff;
             z-index: 0;
         }
 
-        /* Watermark starts only AFTER the black nav */
+        /* George watermark starts right after nav */
         body::after {
             content: "";
             position: fixed;
-            top: 380px; left: 0; right: 0; bottom: 0;
-            background: url('george-mascot.png') center top / 1000px auto no-repeat;
-            opacity: 0.07;
+            top: 280px;
+            left: 0; right: 0; bottom: 0;
+            background: url('george-mascot.png') center top / 900px auto no-repeat;
+            opacity: 0.08;
             pointer-events: none;
             z-index: -1;
         }
 
-        /* Top banners – glass + clean */
         .free-delivery-banner {
             background: rgba(46, 125, 50, 0.95);
             color: #fff;
@@ -93,12 +93,17 @@
             position: relative;
             z-index: 2;
         }
-        .hero-banner img { width:100%; height:auto; display:block; }
+        .hero-banner img { 
+            width:100%; 
+            height:auto; 
+            display:block; 
+            max-height: 500px;
+            object-fit: cover;
+        }
 
-        /* BLACK NAV – now ultra-compact, never more than 2 lines */
         nav {
             background: rgba(34,34,34,0.96);
-            padding: 0.45rem 0;                  /* Reduced from 0.65rem */
+            padding: 0.45rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -109,7 +114,7 @@
             list-style: none;
             display: flex;
             justify-content: center;
-            gap: 0.9rem;                         /* Tighter gap */
+            gap: 0.9rem;
             flex-wrap: wrap;
             max-width: 1200px;
             margin: 0 auto;
@@ -119,8 +124,8 @@
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.89rem;                  /* Slightly smaller */
-            padding: 0.4rem 0.65rem;             /* Slimmer buttons */
+            font-size: 0.89rem;
+            padding: 0.4rem 0.65rem;
             border-radius: 6px;
             transition: var(--transition);
             white-space: nowrap;
@@ -138,8 +143,6 @@
             background:var(--light);
             border-radius:12px;
             margin: 2rem 0;
-            position: relative;
-            z-index: 1;
         }
         .hero h1 { font-size:3rem; margin-bottom:1rem; color:var(--primary); }
         .hero > p { font-size:1.3rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; font-weight:500; }
@@ -175,15 +178,32 @@
         .card:hover {
             transform: translateY(-8px);
             box-shadow: 0 16px 32px rgba(0,0,0,0.18);
-            background: rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.25);
         }
         .card img { width:100%; height:210px; object-fit:cover; border-bottom:1px solid var(--glass-border); loading: lazy; }
         .card h3 { padding:1rem 0 0.5rem; font-size:1.25rem; color:var(--primary); }
         .card p { padding:0 1rem 1.5rem; font-size:0.95rem; }
 
-        .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start; }
-        .founder-photo { max-width:300px; border-radius:12px; border:4px solid var(--primary); box-shadow:0 6px 15px rgba(0,0,0,0.1); }
-        .mission-box { background:var(--light); padding:2rem; border-radius:10px; border-left:6px solid var(--accent); }
+        /* ABOUT SECTION – perfect on mobile */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+        .founder-photo { 
+            max-width: 300px; 
+            border-radius: 12px; 
+            border: 4px solid var(--primary); 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
+            justify-self: center;
+        }
+        .mission-box { 
+            background: var(--light); 
+            padding: 2rem; 
+            border-radius: 10px; 
+            border-left: 6px solid var(--accent); 
+        }
 
         .contact-form { background:var(--light); padding:3rem 2.5rem; border-radius:12px; margin-top:2rem; }
 
@@ -235,11 +255,17 @@
         .add-item-btn { align-self:flex-start; background:transparent; color:var(--primary); border:2px solid var(--primary); padding:0.7rem 1.4rem; border-radius:8px; font-weight:600; cursor:pointer; }
         .add-item-btn:hover { background:var(--primary); color:#fff; }
 
-        /* Mobile – even tighter nav */
         @media (max-width: 768px) {
-            body::before { height: 420px; }
-            body::after { top: 420px; }
-            .hero h1 { font-size: 2.4rem; }
+            body::before { height: 380px; }
+            body::after { top: 260px; }
+            .hero h1 { font-size: 2.6rem; }
+            .hero-banner img { max-height: 380px; }
+            .about-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .founder-photo { justify-self: center; }
+            .mission-box { align-self: stretch; }
             nav { padding: 0.4rem 0; }
             nav ul { gap: 0.7rem; }
             nav a { font-size: 0.86rem; padding: 0.35rem 0.55rem; }
@@ -265,7 +291,7 @@
     </div>
 
     <div class="hero-banner">
-        <img src="back yt card.png" alt="Yorktown Tools" loading="lazy">
+        <img src="hero-artwork.png" alt="Yorktown Tools – George Washington with Sawblade" loading="lazy">
     </div>
 
     <nav id="main-nav">
@@ -300,7 +326,6 @@
             <a href="#contact" class="btn">Get Your Quote</a>
         </section>
 
-        <!-- All your other sections remain exactly as you had them -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p>Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -364,9 +389,9 @@
             <h2>About Yorktown Tools</h2>
             <p>Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors.</p>
             <div class="about-grid">
-                <div style="text-align:center;">
+                <div>
                     <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
-                    <h3 style="margin:1rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
+                    <h3 style="margin:1.5rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
                     <p style="font-style:italic; color:#555;">Founder & Owner</p>
                     <p style="margin-top:0.75rem; font-size:0.95rem;">
                         A.S. Aeronautics | B.S. Project Management.<br>
@@ -439,7 +464,7 @@
     </footer>
 
     <script>
-        const nav = document.getElementById('mainn-nav');
+        const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
