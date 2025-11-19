@@ -8,7 +8,7 @@
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Delivery">
-    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all Hampton Roads contractors.">
+    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all of Hampton Roads contractors.">
     <meta property="og:image" content="https://yorktowntools.com/george-mascot.png">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
@@ -24,7 +24,25 @@
             --transition: all 0.3s ease;
         }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; }
+
+        /* Full-page George Washington watermark – slightly darker */
+        body {
+            font-family:'Segoe UI',Arial,sans-serif;
+            line-height:1.6;
+            color:var(--dark);
+            background: #fff;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('george-mascot.png') center center / 1000px auto no-repeat;
+            opacity: 0.07;          /* ← a little darker, still subtle */
+            pointer-events: none;
+            z-index: -1;
+        }
 
         .free-delivery-banner {
             background: var(--success);
@@ -50,28 +68,15 @@
         .hero-banner { width:100%; overflow:hidden; border-bottom:6px solid var(--accent); }
         .hero-banner img { width:100%; height:auto; display:block; loading: lazy; }
 
-        /* Subtle George watermark across entire hero */ }
         .hero {
-            position: relative;
             text-align:center;
             padding:5.5rem 1rem;
             background:var(--light);
             border-radius:12px;
-            overflow:hidden;
+            margin: 2rem 0;
+            position: relative;
+            z-index: 1;
         }
-        .hero::before {
-            content:"";
-            position:absolute;
-            top:50%; left:50%;
-            transform:translate(-50%,-50%);
-            width:800px;
-            height:800px;
-            background:url('george-mascot.png') center/contain no-repeat;
-            opacity:0.04;
-            pointer-events:none;
-            z-index:0;
-        }
-        @media (max-width:768px) { .hero::before { width:500px; height:500px; } }
 
         nav {
             background:var(--dark);
@@ -87,12 +92,12 @@
         nav a { color:#fff; text-decoration:none; font-weight:600; font-size:1rem; transition:var(--transition); }
         nav a:hover { color:var(--accent); }
 
-        main { max-width:1200px; margin:0 auto; padding:0 1rem; }
+        main { max-width:1200px; margin:0 auto; padding:0 1rem; position:relative; z-index:1; }
 
-        .hero h1 { font-size:3rem; margin-bottom:1rem; color:var(--primary); position:relative; z-index:2; }
-        .hero > p { font-size:1.3rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; position:relative; z-index:2; font-weight:500; }
+        .hero h1 { font-size:3rem; margin-bottom:1rem; color:var(--primary); }
+        .hero > p { font-size:1.3rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; font-weight:500; }
 
-        .tagline-rotator { min-height:160px; margin:3rem auto; max-width:1000px; position:relative; z-index:2; }
+        .tagline-rotator { min-height:160px; margin:3rem auto; max-width:1000px; position:relative; }
         .tagline { font-size:1.6rem; font-weight:600; color:var(--primary); opacity:0; position:absolute; left:50%; transform:translateX(-50%); transition:opacity 1.2s ease; width:90%; }
         .tagline.active { opacity:1; position:relative; left:auto; transform:none; }
 
@@ -100,7 +105,7 @@
 
         .btn { 
             display:inline-block; background:var(--accent); color:#fff; padding:1.1rem 2.5rem; border-radius:8px; text-decoration:none; font-weight:600; font-size:1.15rem;
-            transition:var(--transition); box-shadow:0 6px 15px rgba(200,16,46,0.2); position:relative; z-index:2;
+            transition:var(--transition); box-shadow:0 6px 15px rgba(200,16,46,0.2);
         }
         .btn:hover { background:#a00d22; transform:translateY(-3px); }
 
@@ -118,9 +123,22 @@
 
         .contact-form { background:var(--light); padding:3rem 2.5rem; border-radius:12px; margin-top:2rem; }
 
-        footer { background:var(--dark); color:#fff; text-align:center; padding:3rem 1rem; margin-top:6rem; }
+        footer {
+            background:var(--dark);
+            color:#fff;
+            text-align:center;
+            padding:3rem 1rem;
+            margin-top:6rem;
+        }
+        /* Footer links – now pure white */
+        .contact-info a {
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .contact-info a:hover { text-decoration: underline; }
 
-        /* Clean classic phone call button */
+        /* Clean phone button */
         .call-button {
             position:fixed;
             right:20px;
@@ -144,9 +162,6 @@
             0% { box-shadow:0 0 0 0 rgba(200,16,46,0.6); }
             70% { box-shadow:0 0 0 16px rgba(200,16,46,0); }
             100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
-        }
-        @media (max-width:480px) {
-            .call-button { width:55px; height:55px; font-size:28px; right:15px; bottom:15px; }
         }
 
         /* Quote Form */
@@ -181,7 +196,7 @@
     </div>
 
     <div class="gov-ids-header">
-        <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
+        <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span>
         <span><strong>CAGE:</strong> 16LD9</span>
         <span><strong>SAM.gov Registered</strong></span>
     </div>
@@ -323,7 +338,7 @@
                 </div>
                 <div class="form-group">
                     <label for="delivery">Delivery Location <small>(Optional)</small></label>
-                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234, or job site address">
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Langley AFB, Bldg 1234, or job site address">
                 </div>
                 <div class="form-group">
                     <label>Requested Items <small>(Optional)</small></label>
@@ -360,7 +375,6 @@
     </footer>
 
     <script>
-        // Nav scroll hide/show
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -373,7 +387,6 @@
             lastScroll = currentScroll;
         });
 
-        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let current = 0;
         setInterval(() => {
@@ -382,7 +395,6 @@
             taglines[current].classList.add('active');
         }, 8000);
 
-        // Add item row
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
