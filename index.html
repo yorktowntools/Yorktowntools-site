@@ -7,12 +7,14 @@
     <meta name="keywords" content="veteran owned tools, commercial contractor tools, government contractor tools, hand tools, power tools, OSHA ladders, safety PPE, tool storage, free delivery, military installation access">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
+    <!-- Open Graph -->
     <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Delivery">
     <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all of Hampton Roads contractors.">
     <meta property="og:image" content="https://yorktowntools.com/george-mascot.png">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
     <title>Yorktown Tools | Build Better with Yorktown Tools</title>
+
     <style>
         :root {
             --primary: #1a3c6e;
@@ -25,7 +27,6 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI',Arial,sans-serif; line-height:1.6; color:var(--dark); background:#fff; position:relative; padding-bottom:80px; }
 
-        /* Subtle patriotic touches */
         .free-delivery-banner {
             background: var(--success);
             color: #fff;
@@ -33,31 +34,9 @@
             padding: 0.9rem 1rem;
             font-weight: 600;
             font-size: 1.1rem;
-            letter-spacing: 0.5px;
         }
-        .free-delivery-banner::before { content: "★ "; }
-        .free-delivery-banner::after { content: " ★"; }
-
-        .section-divider { text-align:center; margin:2.5rem 0; color:#ccc; font-size:1.2rem; }
-        
-        .hero-banner { width:100%; overflow:hidden; border-bottom:6px solid var(--accent); position:relative; }
-        .hero-banner img { width:100%; height:auto; display:block; }
-
-        /* George Washington as subtle hero background */
-        .hero::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: url('george-mascot.png') center/contain no-repeat;
-            opacity: 0.07;
-            pointer-events: none;
-            z-index: 0;
-        }
-        @media (max-width: 768px) { .hero::before { width:400px; height:400px; } }
+        .free-delivery-banner::before { content:"★ "; }
+        .free-delivery-banner::after { content:" ★"; }
 
         .gov-ids-header {
             background: var(--primary);
@@ -69,6 +48,32 @@
         }
         .gov-ids-header strong { color: #ffeb3b; }
 
+        .hero-banner { width:100%; overflow:hidden; border-bottom:6px solid var(--accent); }
+        .hero-banner img { width:100%; height:auto; display:block; loading: lazy; }
+
+        /* Subtle George Washington watermark */
+        .hero {
+            position: relative;
+            text-align:center;
+            padding:5rem 1rem;
+            background:var(--light);
+            border-radius:12px;
+            overflow:hidden;
+        }
+        .hero::before {
+            content:"";
+            position:absolute;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            width:650px;
+            height:650px;
+            background:url('george-mascot.png') center/contain no-repeat;
+            opacity:0.06;
+            pointer-events:none;
+            z-index:0;
+        }
+        @media (max-width:768px) { .hero::before { width:450px; height:450px; } }
+
         nav {
             background:var(--dark);
             padding:0.9rem 0;
@@ -76,50 +81,27 @@
             top:0;
             z-index:1000;
             box-shadow:0 2px 10px rgba(0,0,0,0.1);
+            transition:transform 0.3s ease;
         }
+        nav.hidden { transform:translateY(-100%); }
         nav ul { list-style:none; display:flex; justify-content:center; gap:1.8rem; flex-wrap:wrap; }
         nav a { color:#fff; text-decoration:none; font-weight:600; font-size:1rem; transition:var(--transition); }
         nav a:hover { color:var(--accent); }
 
         main { max-width:1200px; margin:0 auto; padding:0 1rem; position:relative; z-index:1; }
 
-        .hero { 
-            text-align:center; 
-            padding:5rem 1rem; 
-            background:var(--light); 
-            border-radius:12px; 
-            position:relative;
-            z-index:1;
-            overflow:hidden;
-        }
         .hero h1 { font-size:3rem; margin-bottom:1rem; color:var(--primary); position:relative; z-index:2; }
-        .hero > p { font-size:1.3rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; position:relative; z-index:2; }
+        .hero > p { font-size:1.3rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; position:relative; z-index:2; font-weight:500; }
 
         .tagline-rotator { min-height:160px; margin:3rem auto; max-width:1000px; position:relative; z-index:2; }
-        .tagline {
-            font-size:1.6rem;
-            font-weight:600;
-            color:var(--primary);
-            opacity:0;
-            position:absolute;
-            left:50%;
-            transform:translateX(-50%);
-            transition:opacity 1.2s ease;
-            width:90%;
-        }
+        .tagline { font-size:1.6rem; font-weight:600; color:var(--primary); opacity:0; position:absolute; left:50%; transform:translateX(-50%); transition:opacity 1.2s ease; width:90%; }
         .tagline.active { opacity:1; position:relative; left:auto; transform:none; }
 
+        .section-divider { text-align:center; margin:2.5rem 0; color:#ddd; font-size:1.3rem; }
+
         .btn { 
-            display:inline-block; 
-            background:var(--accent); 
-            color:#fff; 
-            padding:1.1rem 2.5rem; 
-            border-radius:8px; 
-            text-decoration:none; 
-            font-weight:600; 
-            font-size:1.15rem;
-            transition:var(--transition);
-            box-shadow:0 6px 15px rgba(200,16,46,0.2);
+            display:inline-block; background:var(--accent); color:#fff; padding:1.1rem 2.5rem; border-radius:8px; text-decoration:none; font-weight:600; font-size:1.15rem;
+            transition:var(--transition); box-shadow:0 6px 15px rgba(200,16,46,0.2); position:relative; z-index:2;
         }
         .btn:hover { background:#a00d22; transform:translateY(-3px); }
 
@@ -129,72 +111,40 @@
         .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(290px,1fr)); gap:2rem; }
         .card { background:#fff; border:1px solid #ddd; border-radius:10px; overflow:hidden; text-align:center; transition:0.3s; box-shadow:0 3px 10px rgba(0,0,0,0.08); }
         .card:hover { transform:translateY(-6px); box-shadow:0 12px 25px rgba(0,0,0,.15); }
-        .card img { width:100%; height:210px; object-fit:cover; }
+        .card img { width:100%; height:210px; object-fit:cover; loading: lazy; }
 
         .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start; }
         .founder-photo { max-width:300px; border-radius:12px; border:4px solid var(--primary); box-shadow:0 6px 15px rgba(0,0,0,0.1); }
         .mission-box { background:var(--light); padding:2rem; border-radius:10px; border-left:6px solid var(--accent); }
 
-        .contact-form { background:var(--light); padding:3rem 2.5rem; border-radius:12px; }
+        .contact-form { background:var(--light); padding:3rem 2.5rem; border-radius:12px; margin-top:2rem; }
 
         footer { background:var(--dark); color:#fff; text-align:center; padding:3rem 1rem; margin-top:6rem; }
         .contact-info a { color:var(--accent); text-decoration:none; font-weight:600; }
 
         /* Floating Phone Button */
         .phone-bubble {
-            position:fixed;
-            right:20px;
-            bottom:20px;
-            background:var(--accent);
-            color:#fff;
-            width:62px;
-            height:62px;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:30px;
-            box-shadow:0 8px 25px rgba(200,16,46,0.4);
-            z-index:999;
-            animation:pulse 2s infinite;
+            position:fixed; right:20px; bottom:20px; background:var(--accent); color:#fff; width:62px; height:62px;
+            border-radius:50%; display:flex; align-items:center;justify-content:center; font-size:30px; box-shadow:0 8px 25px rgba(200,16,46,0.4);
+            z-index:999; animation:pulse 2s infinite;
         }
         .phone-bubble a { color:#fff; display:block; width:100%; height:100%; text-align:center; line-height:62px; }
-        @keyframes pulse {
-            0% { box-shadow:0 0 0 0 rgba(200,16,46,0.6); }
-            70% { box-shadow:0 0 0 16px rgba(200,16,46,0); }
-            100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
-        }
+        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.6); } 70% { box-shadow:0 0 0 16px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
 
-        /* Floating George Mascot (subtle, bottom-left) */
+        /* Floating George Badge */
         .mascot-badge {
-            position:fixed;
-            left:20px;
-            bottom:90px;
-            width:110px;
-            z-index:998;
-            opacity:0.9;
-            filter:drop-shadow(0 4px 10px rgba(0,0,0,0.2));
-            animation:float 6s ease-in-out infinite;
+            position:fixed; left:20px; bottom:90px; width:110px; z-index:998; opacity:0.92;
+            filter:drop-shadow(0 4px 10px rgba(0,0,0,0.2)); animation:float 6s ease-in-out infinite;
         }
         @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-12px); } }
         @media (max-width:640px) { .mascot-badge { display:none; } }
 
-        /* Improved Quote Form (same as before) */
+        /* Quote Form */
         .quote-form { display:flex; flex-direction:column; gap:1.6rem; }
         .form-group label { font-weight:600; margin-bottom:0.5rem; color:var(--primary); }
         .required { color:var(--accent); }
-        .quote-form input, .quote-form textarea {
-            padding:1rem;
-            border:2px solid #ccc;
-            border-radius:8px;
-            font-size:1rem;
-            transition:border 0.3s;
-        }
-        .quote-form input:focus, .quote-form textarea:focus {
-            outline:none;
-            border-color:var(--primary);
-            box-shadow:0 0 0 4px rgba(26,60,110,0.15);
-        }
+        .quote-form input, .quote-form textarea { padding:1rem; border:2px solid #ccc; border-radius:8px; font-size:1rem; transition:border 0.3s; width:100%; }
+        .quote-form input:focus, .quote-form textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 4px rgba(26,60,110,0.15); }
         #item-list { display:flex; flex-direction:column; gap:0.9rem; margin-top:0.6rem; }
         .item-row { display:flex; gap:0.8rem; align-items:center; flex-wrap:wrap; }
         .item-name { flex:3; min-width:200px; }
@@ -218,8 +168,8 @@
 </head>
 <body>
 
-    <!-- Floating Phone & Subtle George -->
-    <div class="phone-bubble"><a href="tel:757-940-5171">📞</a></div>
+    <!-- Floating Elements -->
+    <div class="phone-bubble"><a href="tel:757-940-5171" aria-label="Call Yorktown Tools">📞</a></div>
     <img src="george-mascot.png" alt="George Washington - Yorktown Tools Mascot" class="mascot-badge" loading="lazy">
 
     <div class="free-delivery-banner">
@@ -268,28 +218,109 @@
             <a href="#contact" class="btn">Get Your Quote in 24 Hours</a>
         </section>
 
-        <!-- All your original sections below (100% unchanged content) -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
+            <p>Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
             <div class="grid">
-                <div class="card"><img src="IMG_4142.jpeg" alt=""><div style="padding:1.5rem"><h3>Precision Hand Tools</h3><p>Wrenches, pliers, and measuring tools to work as hard as you do.</p></div></div>
-                <div class="card"><img src="IMG_4174.jpeg" alt=""><div style="padding:1.5rem"><h3>Power Tools</h3><p>Corded and cordless drills, saws, and impact drivers for demanding environments.</p></div></div>
-                <div class="card"><img src="IMG_4117.jpeg" alt=""><div style="padding:1.5rem"><h3>Specialty Tools</h3><p>Task-specific solutions for scheduled and unscheduled operations.</p></div></div>
+                <div class="card">
+                    <img src="IMG_4142.jpeg" alt="Precision hand tools for contractors" loading="lazy">
+                    <h3>Precision Hand Tools</h3>
+                    <p>Wrenches, pliers, and measuring tools to work as hard as you do.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4174.jpeg" alt="Power tools for heavy-duty jobs" loading="lazy">
+                    <h3>Power Tools</h3>
+                    <p>Corded and cordless drills, saws, and impact drivers for demanding environments.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4117.jpeg" alt="Specialty tools for secure facilities" loading="lazy">
+                    <h3>Specialty Tools</h3>
+                    <p>Task-specific solutions for scheduled and unscheduled operations.</p>
+                </div>
             </div>
         </section>
 
-        <!-- ... (all other sections exactly as before - accessories, ladders, about, contact with improved form) ... -->
+        <section id="accessories">
+            <h2>Tool Accessories, Storage & Safety Gear</h2>
+            <p>Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4143.jpeg" alt="Drill bits and blades" loading="lazy">
+                    <h3>Bits, Blades & Abrasives</h3>
+                    <p>High-durability consumables for consistent performance.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4119.jpeg" alt="Tool storage solutions" loading="lazy">
+                    <h3>Storage & Organization</h3>
+                    <p>Modular toolboxes and workstations — built for job site efficiency and security.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4175.jpeg" alt="Safety PPE for contractors" loading="lazy">
+                    <h3>Safety & PPE</h3>
+                    <p>Gloves, eyewear, and hearing protection meeting OSHA standards.</p>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:2rem;">
+                <a href="#contact" class="btn">Request a Custom Quote</a>
+            </p>
+        </section>
+
+        <section id="ladders">
+            <h2>OSHA-Compliant Ladders & Access Equipment</h2>
+            <p>Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4140.jpeg" alt="Professional ladders for job sites" loading="lazy">
+                    <h3>Professional Ladders</h3>
+                    <p>OSHA-compliant access solutions for any work environment.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About Yorktown Tools</h2>
+            <p>Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors.</p>
+            <div class="about-grid">
+                <div style="text-align:center;">
+                    <img src="IMG_1549.jpeg" alt="Zachary Barber, Founder of Yorktown Tools" class="founder-photo" loading="lazy">
+                    <h3 style="margin:1rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
+                    <p style="font-style:italic; color:#555;">Founder & Owner</p>
+                    <p style="margin-top:0.75rem; font-size:0.95rem;">
+                        A.S. Aeronautics | B.S. Project Management.<br>
+                        Embry-Riddle Aeronautical University
+                    </p>
+                </div>
+                <div class="mission-box">
+                    <h3>Our Mission</h3>
+                    <p>Deliver <strong>mission-critical tools and PPE</strong> that contractors depend on — on time, every time.</p>
+                </div>
+            </div>
+        </section>
 
         <section id="contact" class="contact-form">
             <h2>Get Your Quote in 24 Hours</h2>
             <p>List the tools and quantities you need — we’ll respond with pricing, availability, and delivery options.</p>
             <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
-                <!-- Full improved form from before -->
-                <div class="form-group"><label for="name">Name <span class="required">*</span></label><input type="text" id="name" name="name" required placeholder="John Doe"></div>
-                <div class="form-group"><label for="company">Company / Organization <span class="required">*</span></label><input type="text" id="company" name="company" required placeholder="ABC Contractors"></div>
-                <div class="form-group"><label for="email">Email <span class="required">*</span></label><input type="email" id="email" name="email" required placeholder="john@abccontractors.com"></div>
-                <div class="form-group"><label for="phone">Phone</label><input type="tel" id="phone" name="phone" placeholder="(757) 555-1234"></div>
-                <div class="form-group"><label for="delivery">Delivery Location <small>(Optional)</small></label><input type="text" id="delivery" name="delivery" placeholder="e.g., Langley AFB, Bldg 1234"></div>
+                <div class="form-group">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="company">Company / Organization <span class="required">*</span></label>
+                    <input type="text" id="company" name="company" required placeholder="ABC Contractors">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="john@abccontractors.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Langley AFB, Bldg 1234, or job site address">
+                </div>
                 <div class="form-group">
                     <label>Requested Items <small>(Optional)</small></label>
                     <div id="item-list">
@@ -301,28 +332,64 @@
                     </div>
                     <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
                 </div>
-                <div class="form-group"><label for="message">Additional Notes</label><textarea id="message" name="message" rows="4" placeholder="Anything else we should know?"></textarea></div>
+                <div class="form-group">
+                    <label for="message">Additional Notes or Special Requirements</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Anything else we should know? (e.g., urgent delivery, specific brands, etc.)"></textarea>
+                </div>
                 <button type="submit" class="btn">Send Quote Request</button>
             </form>
         </section>
     </main>
 
-    <footer>
-        <!-- Your original footer -->
+    <footer role="contentinfo">
+        <div class="contact-info">
+            <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+               <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
+               <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
+            <p>Yorktown, Virginia – Veteran-Owned & SAM.gov Registered</p>
+        </div>
+        <div class="gov-ids">
+            <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        </div>
+        <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.<br>
+           <small>Last updated: November 19, 2025</small></p>
     </footer>
 
     <script>
-        // Your original scripts (nav hide, tagline rotator, addItem function)
+        // Hide/show nav on scroll
+        const nav = document.getElementById('main-nav');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > lastScroll && currentScroll > 150) {
+                nav.classList.add('hidden');
+            } else if (currentScroll < lastScroll) {
+                nav.classList.remove('hidden');
+            }
+            lastScroll = currentScroll;
+        });
+
+        // Rotating taglines
+        const taglines = document.querySelectorAll('.tagline');
+        let current = 0;
+        setInterval(() => {
+            taglines[current].classList.remove('active');
+            current = (current + 1) % taglines.length;
+            taglines[current].classList.add('active');
+        }, 8000);
+
+        // Add item row
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
             row.className = 'item-row';
-            row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>`;
+            row.innerHTML = `
+                <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+            `;
             container.appendChild(row);
         }
-        // ... rest of your scripts
     </script>
 </body>
 </html>
