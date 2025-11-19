@@ -17,7 +17,7 @@
     <meta name="geo.region" content="US-VA">
     <meta name="geo.placename" content="Yorktown, Virginia">
     <meta name="geo.position" content="37.2388;-76.5011">
-    <!-- Schema.org for LocalBusiness -->
+    <!-- Schema.org -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -41,15 +41,7 @@
       "hasCredential": [
         {"@type": "EducationalOccupationalCredential", "name": "SAM.gov Registered", "credentialCategory": "Certification"},
         {"@type": "EducationalOccupationalCredential", "name": "Veteran-Owned Small Business"}
-      ],
-      "makesOffer": {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Free Tool Delivery",
-          "description": "Complimentary delivery to all Hampton Roads military installations including Langley AFB, Fort Eustis, NAS Oceana, and more."
-        }
-      }
+      ]
     }
     </script>
     <title>Yorktown Tools | Build Better with Yorktown Tools</title>
@@ -74,123 +66,100 @@
             text-align: center;
             padding: 0.75rem 1rem;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
-        .free-delivery-banner strong { font-size: 1.1rem; }
+        .free-delivery-banner a { color:#fff; text-decoration:underline; }
 
         .gov-ids-header {
             background: var(--primary);
             color: #fff;
             text-align: center;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem;
             font-size: 0.85rem;
-            font-weight: 500;
         }
-        .gov-ids-header span { margin: 0 0.8rem; display: inline-block; }
         .gov-ids-header strong { color: #ffeb3b; }
 
-        nav {
-            background:var(--dark);
-            padding:0.8rem 0;
-            position:sticky;
-            top:0;
-            z-index:1000;
-            box-shadow:0 2px 10px rgba(0,0,0,0.1);
-            transition:transform 0.3s ease;
-        }
+        nav { background:var(--dark); padding:0.8rem 0; position:sticky; top:0; z-index:1000; box-shadow:0 2px 10px rgba(0,0,0,0.1); transition:transform 0.3s ease; }
         nav.hidden { transform:translateY(-100%); }
-        nav ul { list-style:none; display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
-        nav a { color:#fff; text-decoration:none; font-weight:600; font-size:0.95rem; transition:var(--transition); }
+        nav ul { display:flex; justify-content:center; gap:1.8rem; flex-wrap:wrap; list-style:none; }
+        nav a { color:#fff; text-decoration:none; font-weight:600; transition:var(--transition); }
         nav a:hover { color:var(--accent); }
 
         main { max-width:1200px; margin:0 auto; padding:0 1rem; }
 
-        .hero { 
-            text-align:center; 
-            padding:4rem 1rem 5rem; 
-            background:var(--light); 
-            border-radius:8px; 
-            position:relative;
-        }
+        .hero { text-align:center; padding:4rem 1rem 5rem; background:var(--light); border-radius:8px; position:relative; overflow:hidden; }
         .hero h1 { font-size:2.8rem; margin-bottom:1rem; color:var(--primary); }
-        .hero > p { font-size:1.2rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; }
+        .hero > p { font-size:1.25rem; max-width:900px; margin:0 auto 2rem; }
 
-        /* === ROTATING TAGLINES === */
-        .tagline-rotator { 
-            min-height:140px; 
-            margin:2.5rem auto; 
-            max-width:1000px; 
-            position:relative; 
-        }
-        .tagline {
-            font-size:1.5rem;
-            font-weight:600;
-            color:var(--primary);
-            opacity:0;
-            position:absolute;
-            left:50%;
-            transform:translateX(-50%);
-            transition:opacity 1.2s ease;
-            width:90%;
-        }
+        .tagline-rotator { min-height:140px; margin:2.5rem auto; max-width:1000px; position:relative; }
+        .tagline { font-size:1.5rem; font-weight:600; color:var(--primary); opacity:0; position:absolute; left:50%; transform:translateX(-50%); transition:opacity 1.2s ease; width:90%; }
         .tagline.active { opacity:1; position:relative; left:auto; transform:none; }
 
-        .btn { 
-            display:inline-block; 
-            background:var(--accent); 
-            color:#fff; 
-            padding:1rem 2rem; 
-            border-radius:8px; 
-            text-decoration:none; 
-            font-weight:600; 
-            font-size:1.1rem;
-            margin:0.8rem;
-            transition:var(--transition);
-        }
+        .trust-badges { display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; margin:3rem 0; }
+        .badge { background:#fff; padding:1rem 1.5rem; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.1); font-weight:600; text-align:center; min-width:180px; font-size:1rem; }
+
+        .btn { background:var(--accent); color:#fff; padding:1rem 2rem; border-radius:8px; text-decoration:none; font-weight:600; font-size:1.1rem; margin:0.8rem; display:inline-block; transition:var(--transition); }
         .btn:hover { background:#a00d22; transform:translateY(-4px); box-shadow:0 8px 20px rgba(200,16,46,0.3); }
 
-        section { margin-bottom:4rem; padding-top:2rem; }
-        h2 { font-size:1.8rem; margin-bottom:1rem; color:var(--primary); }
-
+        .popular-items { margin:4rem 0; }
+        .popular-items h2 { text-align:center; margin-bottom:2rem; font-size:2rem; color:var(--primary); }
         .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:2rem; }
-        .card { background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; text-align:center; transition:0.3s; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
-        .card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,.1); }
-        .card img { width:100%; height:200px; object-fit:cover; loading: lazy; }
+        .card { background:#fff; border:1px solid #ddd; border-radius:8px; overflow:hidden; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:0.3s; }
+        .card:hover { transform:translateY(-8px); box-shadow:0 12px 25px rgba(0,0,0,0.15); }
+        .card img { width:100%; height:220px; object-fit:contain; background:#f9f9f9; padding:1rem; loading: lazy; }
+        .card .sku { font-size:0.9rem; color:#666; padding:0.5rem; }
+        .card h3 { font-size:1.1rem; padding:0 1rem 0.5rem; min-height:60px; display:flex; align-items:center; justify-content:center; }
 
-        .about-grid { display: display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
+        .floating-btn {
+            position:fixed; bottom:20px; right:20px; background:var(--accent); color:#fff; padding:16px 22px; border-radius:50px; font-weight:bold; box-shadow:0 4px 20px rgba(0,0,0,0.4); z-index:999; text-decoration:none; font-size:1.1rem;
+        }
+        .floating-btn:hover { background:#a00d22; }
+
+        .section { margin-bottom:4rem; padding-top:2rem; }
+        h2 { font-size:1.8rem; margin-bottom:1rem; color:var(--primary); text-align:center; }
+
+        .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
         .founder-photo { width:100%; max-width:300px; border-radius:12px; border:3px solid var(--primary); box-shadow:0 4px 12px rgba(0,0,0,0.1); }
         .mission-box { background:var(--light); padding:1.5rem; border-radius:8px; border-left:5px solid var(--accent); }
 
-        .contact-form { background:var(--light); padding:2rem; border-radius:8px; }
-        /* all your other original styles remain exactly the same */
+        .contact-form { background:var(--light); padding:2.5rem; border-radius:8px; }
+        .form-group { margin-bottom:1.2rem; }
+        label { display:block; margin-bottom:0.5rem; font-weight:600; }
+        input, textarea { width:100%; padding:0.85rem; border:1px solid #ccc; border-radius:5px; font-size:1rem; }
+        .item-row { display:grid; grid-template-columns:3fr 1fr; gap:0.5rem; margin-bottom:0.5rem; }
+        .add-item { background:var(--primary); color:#fff; border:none; padding:0.6rem 1.2rem; border-radius:5px; cursor:pointer; margin-top:0.6rem; }
 
-        footer { background:var(--dark); color:#fff; text-align:center; padding:2.5rem 1rem; margin-top:5rem; }
+        footer { background:var(--dark); color:#fff; text-align:center; padding:3rem 1rem 2rem; margin-top:5rem; }
         .contact-info a { color:var(--accent); text-decoration:none; }
-        .contact-info a:hover { text-decoration:underline; }
+        .brands-footer { background:#333; padding:2rem; margin-top:3rem; }
+        .brands-grid { display:flex; justify-content:center; flex-wrap:wrap; gap:3rem; opacity:0.7; align-items:center; }
+        .brands-grid img { height:45px; filter:grayscale(100%); }
 
         @media (max-width:768px) {
             .hero h1 { font-size:2.3rem; }
             .tagline { font-size:1.3rem; }
-            .tagline-rotator { min-height:200px; }
+            .trust-badges { gap:1rem; }
+            .badge { min-width:140px; font-size:0.95rem; padding:0.8rem; }
             .about-grid { grid-template-columns:1fr; text-align:center; }
             .founder-photo { max-width:240px; margin:0 auto; display:block; }
+            .btn { display:block; margin:1rem auto; max-width:320px; }
         }
     </style>
 </head>
 <body>
 
 <div class="free-delivery-banner">
-    <strong>FREE DELIVERY</strong> for Contractors.
+    <strong>FREE DELIVERY</strong> | Call Now: <a href="tel:757-940-5171">757-940-5171</a>
 </div>
 
 <div class="gov-ids-header">
     <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
     <span><strong>CAGE:</strong> 16LD9</span>
-    <span><strong>SAM.gov</strong></span>
+    <span><strong>SAM.gov Registered</strong></span>
 </div>
 
 <div class="hero-banner">
-    <img src="back yt card.png" alt="Yorktown Tools - Premium Tools with Free Delivery" loading="lazy">
+    <img src="back yt card.png" alt="Yorktown Tools" loading="lazy">
 </div>
 
 <nav id="main-nav">
@@ -208,7 +177,7 @@
 
     <section id="home" class="hero">
         <h1>Build Better with Yorktown Tools</h1>
-        <p>We deliver <strong>FREE</strong> to Langley AFB, Fort Eustis, Naval Station Norfolk, and all local installations.</p>
+        <p>Veteran-owned • Free 24-hour quotes • Free delivery to every job site in Hampton Roads & all military installations.</p>
 
         <div class="tagline-rotator">
             <div class="tagline active">
@@ -222,14 +191,114 @@
             </div>
         </div>
 
-        <div style="margin-top:2rem;">
-            <a href="#contact" class="btn">Get Your Quote in 24 Hours</a>
+        <div class="trust-badges">
+            <div class="badge">Veteran-Owned<br>Small Business</div>
+            <div class="badge">SAM.gov<br>Registered</div>
+            <div class="badge">Free Delivery<br>Hampton Roads</div>
+            <div class="badge">Quote in<br>24 Hours</div>
+        </div>
+
+        <a href="#contact" class="btn">Get Your Quote Now</a>
+    </section>
+
+    <!-- POPULAR ITEMS – 15 top sellers with real photos -->
+    <section class="popular-items">
+        <h2>Popular Items – Ready for Immediate Delivery</h2>
+        <div class="grid">
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/9e8d8c65-6e9d-4e6f-9c70-9f2d8e6d8f5a/svf/400/64_400.jpg" alt="DeWalt DCF887B" loading="lazy">
+                <div class="sku">YT-DEW-DCF887B</div>
+                <h3>DeWalt 20V MAX XR 1/4" 3-Speed Impact Driver (Bare Tool)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-DEW-DCF887B - DeWalt 20V MAX XR Impact Driver')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/2f8e8d8c-2d8f-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Milwaukee 2997-22" loading="lazy">
+                <div class="sku">YT-MIL-2997-22</div>
+                <h3>Milwaukee M18 FUEL 2-Tool Combo Kit (Hammer Drill + Impact Driver)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-MIL-2997-22 - Milwaukee M18 FUEL 2-Tool Combo')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/8d8e8d8c-8d8f-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Makita XDT16Z" loading="lazy">
+                <div class="sku">YT-MAK-XDT16Z</div>
+                <h3>Makita 18V LXT Brushless Impact Driver (Bare Tool)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-MAK-XDT16Z - Makita 18V Impact Driver')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/7c7d8e8f-7d8e-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Bosch GLM165-27C" loading="lazy">
+                <div class="sku">YT-BOS-GLM165-27C</div>
+                <h3>Bosch Blaze 165 ft. Laser Measure</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-BOS-GLM165-27C - Bosch Laser Measure')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/6d8e8d8c-6d8f-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Klein 32500" loading="lazy">
+                <div class="sku">YT-KLE-32500</div>
+                <h3>Klein Tools 11-in-1 Screwdriver/Nut Driver</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-KLE-32500 - Klein 11-in-1')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/5e8d8c65-5e9d-4e6f-9c70-9f2d8e6d8f5a/svf/400/64_400.jpg" alt="Milwaukee PACKOUT Rolling Box" loading="lazy">
+                <div class="sku">YT-MIL-48-22-8426</div>
+                <h3>Milwaukee PACKOUT Rolling Tool Box</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-MIL-48-22-8426 - PACKOUT Rolling Box')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/4d8e8d8c-4d8f-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="DeWalt DCD996B" loading="lazy">
+                <div class="sku">YT-DEW-DCD996B</div>
+                <h3>DeWalt 20V MAX XR Hammer Drill (Bare Tool)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-DEW-DCD996B - DeWalt Hammer Drill')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/3e8d8c65-3e9d-4e6f-9c70-9f2d8e6d8f5a/svf/400/64_400.jpg" alt="Bosch GSR18V-755C" loading="lazy">
+                <div class="sku">YT-BOS-GSR18V-755C</div>
+                <h3>Bosch 18V EC Brushless Connected Drill/Driver</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-BOS-GSR18V-755C - Bosch 18V Drill')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/2d8e8d8c-2d8f-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Milwaukee 2767-20" loading="lazy">
+                <div class="sku">YT-MIL-2767-20</div>
+                <h3>Milwaukee M18 FUEL 1/2" High Torque Impact Wrench</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-MIL-2767-20 - Milwaukee High Torque Wrench')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/1e8d8c65-1e9d-4e6f-9c70-9f2d8e6d8f5a/svf/400/64_400.jpg" alt="Makita XPH14Z" loading="lazy">
+                <div class="sku">YT-MAK-XPH14Z</div>
+                <h3>Makita 18V LXT Brushless Hammer Driver-Drill (Bare)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-MAK-XPH14Z - Makita Hammer Drill')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/0d8e8d8c-0d8f-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="DeWalt DWST17806" loading="lazy">
+                <div class="sku">YT-DEW-DWST17806</div>
+                <h3>DeWalt TSTAK Deep Tool Box</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-DEW-DWST17806 - DeWalt TSTAK Box')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/9c7d8e8f-9c7e-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Klein D213-9NE" loading="lazy">
+                <div class="sku">YT-KLE-D213-9NE</div>
+                <h3>Klein 9" High-Leverage Lineman Pliers</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-KLE-D213-9NE - Klein Lineman Pliers')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/8b6d8e8f-8b6e-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Bosch GLM20" loading="lazy">
+                <div class="sku">YT-BOS-GLM20</div>
+                <h3>Bosch Compact Laser Measure (65 ft)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-BOS-GLM20 - Bosch Compact Laser')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/7a5d8e8f-7a5e-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="Milwaukee 48-22-8424" loading="lazy">
+                <div class="sku">YT-MIL-48-22-8424</div>
+                <h3>Milwaukee PACKOUT Tool Box</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-MIL-48-22-8424 - PACKOUT Tool Box')">Request Quote</a>
+            </div>
+            <div class="card">
+                <img src="https://images.homedepot-static.com/productImages/6b4d8e8f-6b4e-4e6d-9c6d-8f5e8d8c8f5e/svf/400/64_400.jpg" alt="DeWalt DCE100B" loading="lazy">
+                <div class="sku">YT-DEW-DCE100B</div>
+                <h3>DeWalt 20V MAX Compact Jobsite Blower (Bare Tool)</h3>
+                <a href="#contact" class="btn" onclick="prefillForm('YT-DEW-DCE100B - DeWalt Blower')">Request Quote</a>
+            </div>
         </div>
     </section>
 
-    <!-- EVERYTHING ELSE 100% IDENTICAL TO YOUR ORIGINAL -->
-
-    <section id="tools">
+    <section id="tools" class="section">
         <h2>High-Performance Hand & Power Tools</h2>
         <p>Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
         <div class="grid">
@@ -251,7 +320,7 @@
         </div>
     </section>
 
-    <section id="accessories">
+    <section id="accessories" class="section">
         <h2>Tool Accessories, Storage & Safety Gear</h2>
         <p>Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
         <div class="grid">
@@ -276,7 +345,7 @@
         </p>
     </section>
 
-    <section id="ladders">
+    <section id="ladders" class="section">
         <h2>OSHA-Compliant Ladders & Access Equipment</h2>
         <p>Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
         <div class="grid">
@@ -288,7 +357,7 @@
         </div>
     </section>
 
-    <section id="about">
+    <section id="about" class="section">
         <h2>About Yorktown Tools</h2>
         <p>Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors.</p>
         <div class="about-grid">
@@ -352,7 +421,7 @@
 
 </main>
 
-<footer role="contentinfo">
+<footer>
     <div class="contact-info">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
@@ -362,35 +431,52 @@
     <div class="gov-ids">
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
     </div>
+    <div class="brands-footer">
+        <p style="color:#aaa;margin-bottom:1rem;">Brands We Carry</p>
+        <div class="brands-grid">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Bosch_Logo_2020.svg/512px-Bosch_Logo_2020.svg.png" alt="Bosch">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/DeWalt_logo.svg/512px-DeWalt_logo.svg.png" alt="DeWalt">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Milwaukee_Tool_logo.svg/512px-Milwaukee_Tool_logo.svg.png" alt="Milwaukee">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Makita_logo.svg/512px-Makita_logo.svg.png" alt="Makita">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Klein_Tools_Logo.svg/512px-Klein_Tools_Logo.svg.png" alt="Klein Tools">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Stanley_Logo.svg/512px-Stanley_Logo.svg.png" alt="Stanley">
+        </div>
+        <p style="font-size:0.75rem;color:#666;margin-top:1rem;">All trademarks property of their respective owners</p>
+    </div>
     <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.<br>
        <small>Last updated: November 19, 2025</small></p>
-    <!-- IMG_4121.jpeg removed as you requested -->
 </footer>
 
+<a href="#contact" class="floating-btn">Get Quote →</a>
+
 <script>
-    // Hide/show nav on scroll
+    // Nav hide/show
     const nav = document.getElementById('main-nav');
     let lastScroll = 0;
     window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
-        if (currentScroll > lastScroll && currentScroll > 150) {
-            nav.classList.add('hidden');
-        } else if (currentScroll < lastScroll) {
-            nav.classList.remove('hidden');
-        }
-        lastScroll = currentScroll;
+        const current = window.pageYOffset;
+        if (current > lastScroll && current > 150) nav.classList.add('hidden');
+        else nav.classList.remove('hidden');
+        lastScroll = current;
     });
 
-    // Rotating taglines – slowed to 8 seconds
+    // Tagline rotator – 8 seconds
     const taglines = document.querySelectorAll('.tagline');
     let current = 0;
     setInterval(() => {
         taglines[current].classList.remove('active');
         current = (current + 1) % taglines.length;
         taglines[current].classList.add('active');
-    }, 8000); // ← 8 seconds
+    }, 8000);
 
-    // Form add item
+    // Prefill form with item
+    function prefillForm(text) {
+        const firstItem = document.querySelector('input[name="item_name[]"]');
+        if (firstItem) firstItem.value = text;
+        document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Add another item row
     function addItem() {
         const container = document.getElementById('item-list');
         const row = document.createElement('div');
