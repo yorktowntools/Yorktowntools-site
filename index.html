@@ -54,8 +54,9 @@
             margin-top: -80px;
         }
 
+        /* Back to original rich blue banner */
         .free-delivery-banner {
-            background: rgba(46, 125, 50, 0.97);
+            background: rgba(26, 60, 110, 0.97);
             color: #fff;
             text-align: center;
             padding: 0.75rem 1rem;
@@ -67,7 +68,7 @@
         .free-delivery-banner::after { content:" ★"; }
 
         .gov-ids-header {
-            background: rgba(26, 60, 110, 0 loadings:0.97);
+            background: rgba(46, 125, 50, 0.97);
             color: #fff;
             text-align: center;
             padding: 0.55rem 1rem;
@@ -138,10 +139,9 @@
             font-weight:500; 
         }
 
-        /* FIXED: Taglines never get cut off – dynamic height + better wrapping */
         .tagline-rotator {
             position: relative;
-            min-height: 160px;          /* prevents layout shift */
+            min-height: 160px;
             margin: 3rem auto;
             max-width: 1000px;
             overflow: hidden;
@@ -300,8 +300,7 @@
         .add-item-btn:hover { background:var(--primary); color:#fff; }
 
         @media (max-width: 480px) {
-            .free-delivery-banner { font-size: 1rem; padding: 0.65rem; }
-            .gov-ids-header { font-size: 0.85rem; }
+            .free-delivery-banner, .gov-ids-header { font-size: 1rem; padding: 0.65rem; }
             nav a { font-size: 0.9rem; padding: 0.5rem 0.7rem; }
         }
     </style>
@@ -312,6 +311,7 @@
         <img src="george-mascot.png" alt="Call George">
     </a>
 
+    <!-- Top banner back to original blue -->
     <div class="free-delivery-banner">
         <strong>Free Delivery. Free Quote. No Hassle.</strong>
     </div>
@@ -319,7 +319,7 @@
     <div class="gov-ids-header">
         <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span> | 
         <span><strong>CAGE:</strong> 16LD9</span> | 
-        <span><strong>SAM.gov</strong></span>
+        <span><strong>SAM.gov Registered</strong></span>
     </div>
 
     <div class="logo-header">
@@ -358,6 +358,7 @@
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
+        <!-- All other sections unchanged – perfect on mobile -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2rem;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
