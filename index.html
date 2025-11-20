@@ -55,7 +55,7 @@
             margin-top: -80px;
         }
 
-        /* RED banner at the very top */
+        /* RED banner at the very top - now rotating */
         .top-red-banner {
             background: var(--red);
             color: var(--white);
@@ -64,6 +64,21 @@
             font-weight: 700;
             font-size: 1.1rem;
             letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            min-height: 54px;
+        }
+        .banner-text {
+            position: absolute;
+            width: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .banner-text.active {
+            opacity: 1;
         }
 
         /* Blue banner directly under red, sandwiching the logo */
@@ -201,7 +216,6 @@
             gap: clamp(1.8rem, 4.5vw, 3rem); 
         }
 
-        /* Clean modern cards with subtle patriotic accent */
         .card {
             background: var(--white);
             border-radius: var(--radius);
@@ -269,7 +283,7 @@
         footer a { color: #ffffff !important; text-decoration: underline; }
         footer a:hover { opacity: 0.85; }
 
-        /* FIXED & IMPROVED Call Button */
+        /* FIXED Call Button */
         .call-button {
             position: fixed;
             right: clamp(16px, 4vw, 24px);
@@ -353,9 +367,11 @@
         <img src="george-mascot.png" alt="George">
     </a>
 
-    <!-- Red banner at the very top -->
+    <!-- Rotating Red banner at the very top -->
     <div class="top-red-banner">
-        <strong>Free Delivery. Free Quote. No Hassle.</strong>
+        <div class="banner-text active">Free Delivery.</div>
+        <div class="banner-text">Free Quote.</div>
+        <div class="banner-text">No Hassle.</div>
     </div>
 
     <!-- Blue banner sandwiching the logo -->
@@ -375,7 +391,7 @@
             <li><a href="#tools">Hand & Power Tools</a></li>
             <li><a href="#accessories">Accessories & PPE</a></li>
             <li><a href="#ladders">Ladders</a></li>
-inky            <li><a href="#about">About</a></li>
+            <li><a href="#about">About</a></li>
             <li><a href="#contact">Get Quote</a></li>
         </ul>
     </nav>
@@ -401,7 +417,7 @@ inky            <li><a href="#about">About</a></li>
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- Clean modern cards with red accent bar -->
+        <!-- Rest of your sections unchanged -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -536,6 +552,7 @@ inky            <li><a href="#about">About</a></li>
     </footer>
 
     <script>
+        // Sticky nav hide/show on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -548,14 +565,25 @@ inky            <li><a href="#about">About</a></li>
             lastScroll = current;
         });
 
+        // Hero tagline rotator
         const taglines = document.querySelectorAll('.tagline');
-        let current = 0;
+        let currentTagline = 0;
         setInterval(() => {
-            taglines[current].classList.remove('active');
-            current = (current + 1) % taglines.length;
-            taglines[current].classList.add('active');
+            taglines[currentTagline].classList.remove('active');
+            currentTagline = (currentTagline + 1) % taglines.length;
+            taglines[currentTagline].classList.add('active');
         }, 8000);
 
+        // Top red banner rotator
+        const bannerTexts = document.querySelectorAll('.banner-text');
+        let currentBanner = 0;
+        setInterval(() => {
+            bannerTexts[currentBanner].classList.remove('active');
+            currentBanner = (currentBanner + 1) % bannerTexts.length;
+            bannerTexts[currentBanner].classList.add('active');
+        }, 5000);
+
+        // Add item row in form
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
