@@ -36,24 +36,29 @@
             position: relative;
         }
 
-        /* George Washington watermark - now darker and more visible */
+        /* George Washington watermark – now perfectly centered, head always visible, stronger but classy */
         body::after {
             content: "";
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: url('george-mascot.png') center center / 1400px auto no-repeat;
-            opacity: 0.18;        /* was 0.07 → much more noticeable but still subtle */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1400px;
+            height: 1400px;
+            background: url('george-mascot.png') center center / contain no-repeat;
+            opacity: 0.22;           /* clearly visible */
             pointer-events: none;
             z-index: -1;
+            margin-top: -100px;      /* slight upward shift so head is perfectly in view */
         }
 
         .free-delivery-banner {
             background: rgba(46, 125, 50, 0.95);
             color: #fff;
             text-align: center;
-            padding: 0.55rem 1rem;
+            padding: 0.6rem 1rem;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.02rem;
             backdrop-filter: blur(10px);
             position: relative;
             z-index: 2;
@@ -66,29 +71,27 @@
             color: #fff;
             text-align: center;
             padding: 0.45rem 1rem;
-            font-size: 0.85rem;
+            font-size: 0.87rem;
             font-weight: 500;
             backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 2;
         }
         .gov-ids-header strong { color: #ffeb3b; }
 
-        /* YT logo - reduced size and better spacing */
+        /* Super tight spacing around logo – looks sharp and professional */
         .logo-header {
             text-align: center;
-            padding: 1.5rem 1rem 1.8rem;   /* reduced vertical padding */
+            padding: 0.8rem 1rem 1rem;   /* dramatically reduced */
             background: #fff;
         }
         .logo-header img {
-            max-width: 200px;     /* roughly half of original 380px */
+            max-width: 210px;    /* ~half original size */
             width: 90%;
             height: auto;
         }
 
         nav {
             background: rgba(34,34,34,0.96);
-            padding: 0.45rem 0;
+            padding: 0.5rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -99,7 +102,7 @@
             list-style: none;
             display: flex;
             justify-content: center;
-            gap: 0.9rem;
+            gap: 1rem;
             flex-wrap: wrap;
             max-width: 1200px;
             margin: 0 auto;
@@ -109,11 +112,10 @@
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.89rem;
-            padding: 0.4rem 0.65rem;
+            font-size: 0.9rem;
+            padding: 0.45rem 0.7rem;
             border-radius: 6px;
             transition: var(--transition);
-            white-space: nowrap;
         }
         nav a:hover { 
             background: rgba(255,255,255,0.18); 
@@ -122,79 +124,85 @@
 
         main { max-width:1200px; margin:0 auto; padding:0 1rem; position:relative; z-index:1; }
 
-        .hero { text-align:center; padding:4.5rem 1rem; background:var(--light); border-radius:12px; margin: 2rem 0; }
+        .hero { 
+            text-align:center; 
+            padding:4.5rem 1rem; 
+            background:var(--light); 
+            border-radius:12px; 
+            margin: 2rem 0; 
+        }
         .hero h1 { font-size:3rem; margin-bottom:1rem; color:var(--primary); }
-        .hero > p { font-size:1.3rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; font-weight:500; }
+        .hero > p { font-size:1.32rem; margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; font-weight:500; }
 
-        /* Rotating taglines now have a visible background card */
+        /* Tagline rotator with premium glass card */
         .tagline-rotator {
             min-height: 180px;
             margin: 3rem auto;
             max-width: 1000px;
             position: relative;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
         }
         .tagline-rotator::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.82);
-            border: 1px solid rgba(26, 60, 110, 0.15);
-            border-radius: 16px;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(26, 60, 110, 0.18);
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             z-index: -1;
         }
         .tagline {
-            font-size: 1.6rem;
+            font-size: 1.65rem;
             font-weight: 600;
             color: var(--primary);
             opacity: 0;
             position: absolute;
             left: 50%;
-            transform: translateX(-50%);
+            top: 50%;
+            transform: translate(-50%, -50%);
             transition: opacity 1.2s ease;
-            width: 90%;
-            z-index: 1;
+            width: 92%;
+            text-align: center;
         }
         .tagline.active {
             opacity: 1;
             position: relative;
             left: auto;
+            top: auto;
             transform: none;
         }
 
-        .section-divider { text-align:center; margin:2.5rem 0; color:#ddd; font-size:1.3rem; }
+        .section-divider { text-align:center; margin:2.8rem 0; color:#ccc; font-size:1.4rem; }
 
         .btn { 
-            display:inline-block; background:var(--accent); color:#fff; padding:1.1rem 2.5rem; border-radius:8px; text-decoration:none; font-weight:600; font-size:1.15rem;
-            transition:var(--transition); box-shadow:0 6px 15px rgba(200,16,46,0.2);
+            display:inline-block; background:var(--accent); color:#fff; padding:1.2rem 2.8rem; border-radius:8px; text-decoration:none; font-weight:700; font-size:1.2rem;
+            transition:var(--transition); box-shadow:0 8px 20px rgba(200,16,46,0.25);
         }
-        .btn:hover { background:#a00d22; transform:translateY(-3px); }
+        .btn:hover { background:#a00d22; transform:translateY(-4px); }
 
-        /* rest of your styles remain unchanged */
         section { margin-bottom:4rem; padding-top:2rem; }
-        h2 { font-size:2rem; margin-bottom:1.5rem; color:var(--primary); text-align:center; }
+        h2 { font-size:2.1rem; margin-bottom:1.5rem; color:var(--primary); text-align:center; }
 
-        .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(290px,1fr)); gap:2rem; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:2rem; }
 
         .card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
             text-align: center;
             transition: var(--transition);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
         }
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 32px rgba(0,0,0,0.18);
-            background: rgba(255,255,255,0.25);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.3);
         }
-        .card img { width:100%; height:210px; object-fit:cover; border-bottom:1px solid var(--glass-border); loading: lazy; }
+        .card img { width:100%; height:220px; object-fit:cover; border-bottom:1px solid var(--glass-border); }
 
         .about-grid {
             display: grid;
@@ -202,52 +210,50 @@
             gap: 3rem;
             align-items: start;
         }
-        .founder-photo { max-width: 300px; border-radius: 12px; border: 4px solid var(--primary); box-shadow: 0 6px 15px rgba(0,0,0,0.1); justify-self: center; }
-        .mission-box { background: var(--light); padding: 2rem; border-radius: 10px; border-left: 6px solid var(--accent); }
+        .founder-photo { max-width: 320px; border-radius: 14px; border: 5px solid var(--primary); box-shadow: 0 8px 20px rgba(0,0,0,0.12); justify-self: center; }
+        .mission-box { background: var(--light); padding: 2.5rem; border-radius: 12px; border-left: 8px solid var(--accent); }
 
-        .contact-form { background:var(--light); padding:3rem 2.5rem; border-radius:12px; margin-top:2rem; }
+        .contact-form { background:var(--light); padding:3.5rem 3rem; border-radius:14px; margin-top:2rem; }
 
         footer {
             background:var(--dark);
             color:#fff;
             text-align:center;
-            padding:4rem 1rem 3rem;
-            margin-top:6rem;
-            position: relative;
+            padding:5rem 1rem 3rem;
+            margin-top:7rem;
         }
         .footer-artwork {
             max-width: 900px;
             width: 95%;
-            margin: 0 auto 2rem;
+            margin: 0 auto 2.5rem;
             display: block;
-            opacity: 0.9;
+            opacity: 0.92;
         }
-        .contact-info a { color: #ffffff !important; text-decoration: none; font-weight: 600; }
-        .contact-info a:hover { text-decoration: underline; }
 
         .call-button {
             position:fixed;
             right:20px;
             bottom:20px;
-            width:80px;
-            height:80px;
+            width:82px;
+            height:82px;
             z-index:999;
-            animation:pulse 2s infinite;
+            animation:pulse 2.2s infinite;
         }
         .call-button img {
             width:100%;
             height:auto;
             border-radius: 50%;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
-            transition: transform 0.3s;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.6));
         }
-        .call-button:hover img { transform:scale(1.15); }
+        .call-button:hover img { transform:scale(1.18); }
+
         @keyframes pulse {
-            0% { box-shadow:0 0 0 0 rgba(200,16,46,0.6); }
-            70% { box-shadow:0 0 0 20px rgba(200,16,46,0); }
+            0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); }
+            70% { box-shadow:0 0 0 22px rgba(200,16,46,0); }
             100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
         }
 
+        /* Form styles (unchanged) */
         .quote-form { display:flex; flex-direction:column; gap:1.6rem; }
         .form-group label { font-weight:600; margin-bottom:0.5rem; color:var(--primary); }
         .required { color:var(--accent); }
@@ -263,18 +269,16 @@
 
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.6rem; }
+            .tagline { font-size: 1.45rem; }
             .about-grid { grid-template-columns: 1fr; text-align: center; }
-            .mission-box { align-self: stretch; }
-            .logo-header img { max-width: 160px; }
-            .footer-artwork { max-width: 700px; }
+            .logo-header img { max-width: 170px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Floating call button = George mascot -->
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
-        <img src="george-mascot.png" alt="George Mascot">
+        <img src="george-mascot.png" alt="Call George">
     </a>
 
     <div class="free-delivery-banner">
@@ -282,12 +286,11 @@
     </div>
 
     <div class="gov-ids-header">
-        <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span>
-        <span><strong>CAGE:</strong> 16LD9</span>
-        <span><strong>SAM.gov</strong></span>
+        <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span> | 
+        <span><strong>CAGE:</strong> 16LD9</span> | 
+        <span><strong>SAM.gov Registered</strong></span>
     </div>
 
-    <!-- YT logo - now smaller -->
     <div class="logo-header">
         <img src="yt-logo.PNG" alt="Yorktown Tools">
     </div>
@@ -321,13 +324,10 @@
             </div>
 
             <div class="section-divider">★ ★ ★</div>
-            <a href="#contact" class="btn">Get Your Quote</a>
+            <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- All your existing sections remain 100% unchanged below -->
-        <!-- (tools, accessories, ladders, about, contact, footer, scripts) -->
-        <!-- I've kept them exactly as you had them to avoid any accidental changes -->
-
+        <!-- ALL SECTIONS FULLY RESTORED BELOW -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p>Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -350,10 +350,104 @@
             </div>
         </section>
 
-        <!-- ... rest of your sections (accessories, ladders, about, contact) exactly the same ... -->
+        <section id="accessories">
+            <h2>Tool Accessories, Storage & Safety Gear</h2>
+            <p>Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4143.jpeg" alt="Bits & Blades" loading="lazy">
+                    <h3>Bits, Blades & Abrasives</h3>
+                    <p>High-durability consumables for consistent performance.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4119.jpeg" alt="Storage" loading="lazy">
+                    <h3>Storage & Organization</h3>
+                    <p>Modular toolboxes and workstations — built for job site efficiency and security.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4175.jpeg" alt="PPE" loading="lazy">
+                    <h3>Safety & PPE</h3>
+                    <p>Gloves, eyewear, and hearing protection meeting OSHA standards.</p>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:2rem;">
+                <a href="#contact" class="btn">Request a Custom Quote</a>
+            </p>
+        </section>
+
+        <section id="ladders">
+            <h2>OSHA-Compliant Ladders & Access Equipment</h2>
+            <p>Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4140.jpeg" alt="Ladders" loading="lazy">
+                    <h3>Professional Ladders</h3>
+                    <p>OSHA-compliant access solutions for any work environment.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About Yorktown Tools</h2>
+            <p>Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors.</p>
+            <div class="about-grid">
+                <div>
+                    <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
+                    <h3 style="margin:1.5rem 0 0.5rem; color:var(--primary);">Zachary Barber</h3>
+                    <p style="font-style:italic; color:#555;">Founder & Owner</p>
+                    <p style="margin-top:0.75rem; font-size:0.95rem;">
+                        A.S. Aeronautics | B.S. Project Management.<br>
+                        Embry-Riddle Aeronautical University
+                    </p>
+                </div>
+                <div class="mission-box">
+                    <h3>Our Mission</h3>
+                    <p>Deliver <strong>mission-critical tools</strong> that contractors depend on — on time, every time.</p>
+                </div>
+            </div>
+        </section>
 
         <section id="contact" class="contact-form">
-            <!-- your full form here - unchanged -->
+            <h2>Get Your Quote Today</h2>
+            <p>List the tools and quantities you need — we’ll respond with pricing, availability, and delivery options in 24 hours or less.</p>
+            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
+                <div class="form-group">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="company">Company / Organization <span class="required">*</span></label>
+                    <input type="text" id="company" name="company" required placeholder="ABC Contractors">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="john@abccontractors.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234, or job site address">
+                </div>
+                <div class="form-group">
+                    <label>Requested Items <small>(Optional)</small></label>
+                    <div id="item-list">
+                        <div class="item-row">
+                            <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
+                </div>
+                <div class="form-group">
+                    <label for="message">Additional Notes or Special Requirements</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Anything else we should know? (e.g., urgent delivery, specific brands, etc.)"></textarea>
+                </div>
+                <button type="submit" class="btn">Send Quote Request</button>
+            </form>
         </section>
     </main>
 
@@ -373,18 +467,20 @@
     </footer>
 
     <script>
+        // Nav hide on scroll down
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
             const currentScroll = window.pageYOffset;
             if (currentScroll > lastScroll && currentScroll > 150) {
-                nav.classList.add('hidden');
-            } else if (currentScroll < lastScroll) {
-                nav.classList.remove('hidden');
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                nav.style.transform = 'translateY(0)';
             }
             lastScroll = currentScroll;
         });
 
+        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let current = 0;
         setInterval(() => {
@@ -393,6 +489,7 @@
             taglines[current].classList.add('active');
         }, 8000);
 
+        // Add item row in form
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
