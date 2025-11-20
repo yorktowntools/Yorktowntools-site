@@ -9,7 +9,7 @@
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Delivery">
     <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all of Hampton Roads contractors.">
-    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.png">
+    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
     <title>Yorktown Tools | Build Better with Yorktown Tools</title>
@@ -40,7 +40,7 @@
             position: relative;
         }
 
-        /* George Washington watermark – visible but professional */
+        /* George Washington watermark */
         body::after {
             content: "";
             position: fixed;
@@ -149,41 +149,42 @@
             font-weight:500; 
         }
 
+        /* Fixed rotating taglines – now perfectly clean, one at a time */
         .tagline-rotator {
-            min-height: 160px;
+            position: relative;
+            min-height: 140px;
             margin: 3rem auto;
             max-width: 1000px;
-            position: relative;
-            padding: 2rem 1.5rem;
+            overflow: hidden;
         }
         .tagline-rotator::before {
             content: "";
             position: absolute;
             inset: 0;
             background: rgba(255, 255, 255, 0.88);
-            border: 1px solid rgba(26, 60, 110, 0.18);
+            border: 1px solid rgba(26,60,110,0.18);
             border-radius: 18px;
             backdrop-filter: blur(12px);
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             z-index: -1;
         }
         .tagline {
-            font-size: clamp(1.45rem, 4.8vw, 1.75rem);
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(1.45rem, 4.5vw, 1.75rem);
             font-weight: 600;
             color: var(--primary);
             opacity: 0;
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
+            transition: opacity 1s ease;
             text-align: center;
-            transition: opacity 1.2s ease;
+            padding: 1.5rem;
         }
         .tagline.active {
             opacity: 1;
-            position: relative;
+            z-index: 1;
         }
 
         .section-divider { text-align:center; margin:2.8rem 0; color:#ccc; font-size:1.4rem; }
@@ -244,8 +245,9 @@
             gap: 3rem;
             align-items: start;
         }
+        /* Smaller founder photo */
         .founder-photo { 
-            max-width: 340px; 
+            max-width: 260px; 
             border-radius: 14px; 
             border: 5px solid var(--primary); 
             box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
@@ -279,6 +281,14 @@
             margin: 0 auto 2.5rem;
             display: block;
             opacity: 0.92;
+        }
+        /* Footer links now pure white */
+        footer a {
+            color: #ffffff !important;
+            text-decoration: underline;
+        }
+        footer a:hover {
+            opacity: 0.8;
         }
 
         .call-button {
@@ -374,13 +384,13 @@
 
             <div class="tagline-rotator">
                 <div class="tagline active">
-                    <strong>Stop wasting hours hunting tools.</strong> Get back to the job site fast — with free quotes in 24 hours and free delivery straight to your site.
+                    Stop wasting hours hunting tools. Get back to the job fast — free quotes in 24 hours and free delivery straight to your site.
                 </div>
                 <div class="tagline">
-                    <strong>Never run out. Never overpay. Never leave the job.</strong> Yorktown Tools delivers the premium gear you need, exactly when you need it — free.
+                    Never run out. Never overpay. Never leave the job. Premium gear delivered free — exactly when you need it.
                 </div>
                 <div class="tagline">
-                    <strong>You build the project. We handle the tools.</strong> Free quotes, free delivery, zero hassle.
+                    You build the project. We handle the tools. Free quotes, free delivery, zero hassle.
                 </div>
             </div>
 
@@ -388,6 +398,7 @@
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
+        <!-- All your original sections below (unchanged except better mobile) -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2rem;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -526,18 +537,18 @@
     </main>
 
     <footer role="contentinfo">
-        <img src="hero-artwork.png" alt="Yorktown Tools Artwork" class="footer-artwork" loading="lazy">
+        <img src="hero-artwork.jpg" alt="Yorktown Tools Artwork" class="footer-artwork" loading="lazy">
         <div class="contact-info">
             <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
                <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
-               <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
+               <strong>Web:</strong> <a href="https://yorktowntools.com">yorktown tools.com</a></p>
             <p>Yorktown, Virginia – Veteran-Owned & SAM.gov Registered</p>
         </div>
         <div class="gov-ids">
             <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         </div>
         <p>© 2025 Yorktown Tools. Veteran-Owned Small Business. All rights reserved.<br>
-           <small>Last updated: November 19, 2025</small></p>
+           <small>Last updated: November 20, 2025</small></p>
     </footer>
 
     <script>
@@ -554,7 +565,7 @@
             lastScroll = current;
         });
 
-        // Tagline rotator
+        // Tagline rotator – clean fade
         const taglines = document.querySelectorAll('.tagline');
         let current = 0;
         setInterval(() => {
