@@ -2,32 +2,25 @@
 <html lang="en" hreflang="en-us">
 <head>
     <meta charset="UTF-8">
-    <!-- Fixes for iPhone Safari vs Chrome consistency -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Yorktown Tools: Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear for commercial and government contractors. Free delivery to all of Hampton Roads contractors.">
     <meta name="keywords" content="veteran owned tools, commercial contractor tools, government contractor tools, hand tools, power tools, OSHA ladders, safety PPE, tool storage, free delivery, military installation access">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph -->
     <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Delivery">
     <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all of Hampton Roads contractors.">
     <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
-
     <title>Yorktown Tools | Build Better with Yorktown Tools</title>
 
-    <!-- Favicon -->
-    <link rel="icon" href="/Yt-logo.PNG" type="image/png">
-    <link rel="shortcut icon" href="/Yt-logo.PNG" type="image/png">
-    <link rel="apple-touch-icon" href="/Yt-logo.PNG">
+    <!-- FAVICONS – Updated to use your Yt-logo.PNG (Google loves these) -->
+    <link rel="icon" href="Yt-logo.PNG" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="Yt-logo.PNG">
+    <link rel="icon" type="image/png" sizes="32x32" href="Yt-logo.PNG">
+    <link rel="icon" type="image/png" sizes="16x16" href="Yt-logo.PNG">
+    <link rel="manifest" href="/site.webmanifest">
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -52,7 +45,6 @@
             background: var(--white);
             min-height: 100vh;
             position: relative;
-            -webkit-text-size-adjust: 100%;
         }
 
         /* Subtle George watermark */
@@ -70,7 +62,7 @@
             margin-top: -80px;
         }
 
-        /* RED banner at the very top - rotating */
+        /* RED banner at the very top - now rotating */
         .top-red-banner {
             background: var(--red);
             color: var(--white);
@@ -92,9 +84,11 @@
             opacity: 0;
             transition: opacity 1s ease;
         }
-        .banner-text.active { opacity: 1; }
+        .banner-text.active {
+            opacity: 1;
+        }
 
-        /* Blue banner */
+        /* Blue banner directly under red, sandwiching the logo */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
@@ -218,7 +212,7 @@
         h2 { 
             font-size: clamp(2.1rem, 6.5vw, 2.7rem); 
             margin-bottom:2rem; 
-            color: var(--navy); 
+            color:var(--navy); 
             text-align:center; 
             font-weight: 700;
         }
@@ -296,7 +290,7 @@
         footer a { color: #ffffff !important; text-decoration: underline; }
         footer a:hover { opacity: 0.85; }
 
-        /* FIXED Call Button – NO MORE "Phone" text bubble */
+        /* FIXED Call Button */
         .call-button {
             position: fixed;
             right: clamp(16px, 4vw, 24px);
@@ -318,7 +312,23 @@
             width: 68%;
             height: auto;
             border-radius: 50%;
-            border: 4px solid var(--white);
+            border: 3px solid var(--white);
+        }
+        .call-button::after {
+            content: "Phone";
+            position: absolute;
+            font-size: 1.8rem;
+            top: -10px;
+            right: -10px;
+            background: var(--white);
+            color: var(--red);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
         @keyframes pulse {
@@ -352,26 +362,26 @@
         .add-item-btn:hover { background:var(--navy); color:#fff; }
 
         @media (max-width: 480px) {
-            .top-red-banner, .gov-ids-header { font-size: 1rem; padding: 0.75rem; }
+            .top-red-banner, .gov-ids-header { font-size: 1.02rem; padding: 0.75rem; }
             nav a { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Clean Floating Call Button (no text overlay) -->
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools at 757-940-5171">
-        <img src="Yt-logo.PNG" alt="Call Yorktown Tools">
+    <!-- FIXED Call Button with George + phone emoji -->
+    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools Now">
+        <img src="Yt-logo.PNG" alt="George">
     </a>
 
-    <!-- Rotating Red banner -->
+    <!-- Rotating Red banner at the very top -->
     <div class="top-red-banner">
         <div class="banner-text active">Free Delivery.</div>
         <div class="banner-text">Free Quote.</div>
         <div class="banner-text">No Hassle.</div>
     </div>
 
-    <!-- Blue banner -->
+    <!-- Blue banner sandwiching the logo -->
     <div class="gov-ids-header">
         <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span> | 
         <span><strong>CAGE:</strong> 16LD9</span> | 
@@ -379,7 +389,7 @@
     </div>
 
     <div class="logo-header">
-        <img src="yt-logo.PNG" alt="Yorktown Tools Logo">
+        <img src="yt-logo.PNG" alt="Yorktown Tools">
     </div>
 
     <nav id="main-nav">
@@ -414,45 +424,143 @@
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- Add the rest of your sections here exactly as you had them before -->
-        <!-- Example placeholders – replace with your real content -->
-        <!--
+        <!-- All other sections remain unchanged -->
         <section id="tools">
-            <h2>Hand & Power Tools</h2>
-            <div class="grid"> ... your cards ... </div>
+            <h2>High-Performance Hand & Power Tools</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4142.jpeg" alt="Precision hand tools" loading="lazy">
+                    <h3>Precision Hand Tools</h3>
+                    <p>Wrenches, pliers, and measuring tools to work as hard as you do.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4174.jpeg" alt="Power tools" loading="lazy">
+                    <h3>Power Tools</h3>
+                    <p>Corded and cordless drills, saws, and impact drivers for demanding environments.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4117.jpg" alt="Specialty tools" loading="lazy">
+                    <h3>Specialty Tools</h3>
+                    <p>Task-specific solutions for scheduled and unscheduled operations.</p>
+                </div>
+            </div>
         </section>
 
         <section id="accessories">
-            <h2>Accessories & PPE</h2>
-            <div class="grid"> ... your cards ... </div>
+            <h2>Tool Accessories, Storage & Safety Gear</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4143.jpeg" alt="Bits & Blades" loading="lazy">
+                    <h3>Bits, Blades & Abrasives</h3>
+                    <p>High-durability consumables for consistent performance.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4119.jpg" alt="Storage" loading="lazy">
+                    <h3>Storage & Organization</h3>
+                    <p>Modular toolboxes and workstations — built for job site efficiency and security.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4175.jpg" alt="PPE" loading="lazy">
+                    <h3>Safety & PPE</h3>
+                    <p>Gloves, eyewear, and hearing protection meeting OSHA standards.</p>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:3.5rem;">
+                <a href="#contact" class="btn">Request a Custom Quote</a>
+            </p>
         </section>
 
         <section id="ladders">
-            <h2>OSHA-Compliant Ladders</h2>
-            <div class="grid"> ... your cards ... </div>
+            <h2>OSHA-Compliant Ladders & Access Equipment</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="IMG_4140.jpeg" alt="Ladders" loading="lazy">
+                    <h3>Professional Ladders</h3>
+                    <p>OSHA-compliant access solutions for any work environment.</p>
+                </div>
+            </div>
         </section>
 
-        <section id="about" class="about-grid">
-            <img src="founder.jpg" alt="Founder" class="founder-photo">
-            <div class="mission-box"> ... your about text ... </div>
+        <section id="about">
+            <h2>About Yorktown Tools</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2rem;color:#555;">Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors who keep America going.</p>
+            <div class="about-grid">
+                <div style="text-align:center;">
+                    <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
+                    <h3 style="margin:1.8rem 0 0.6rem; color:var(--navy);font-size:1.6rem;">Zachary Barber</h3>
+                    <p style="font-style:italic; color:#666;">Founder & Owner</p>
+                    <p style="margin-top:0.8rem; font-size:0.98rem;">
+                        A.S. Aeronautics | B.S. Project Management.<br>
+                        Embry-Riddle Aeronautical University
+                    </p>
+                </div>
+                <div class="mission-box">
+                    <h3>Our Mission</h3>
+                    <p>Deliver <strong>mission-critical tools</strong> that contractors depend on — on time, every time — with the reliability America was built on.</p>
+                </div>
+            </div>
         </section>
 
-        <section id="contact">
-            <h2>Get Your Free Quote</h2>
-            <div class="contact-form"> ... your form ... </div>
+        <section id="contact" class="contact-form">
+            <h2>Get Your Quote Today</h2>
+            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options in 24 hours or less.</p>
+            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
+                <div class="form-group">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="company">Company / Organization <span class="required">*</span></label>
+                    <input type="text" id="company" name="company" required placeholder="ABC Contractors">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="john@abccontractors.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234">
+                </div>
+                <div class="form-group">
+                    <label>Requested Items <small>(Optional)</small></label>
+                    <div id="item-list">
+                        <div class="item-row">
+                            <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
+                </div>
+                <div class="form-group">
+                    <label for="message">Additional Notes</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Urgent delivery? Specific brands? Let us know."></textarea>
+                </div>
+                <button type="submit" class="btn">Send Quote Request</button>
+            </form>
         </section>
-        -->
-
     </main>
 
     <footer>
-        <img src="footer-artwork.png" alt="" class="footer-artwork">
-        <p>© 2025 Yorktown Tools • Veteran Owned • UEI: SMYXDLJDJDJMZ4 • CAGE: 16LD9</p>
-        <p><a href="tel:757-940-5171">757-940-5171</a> • <a href="mailto:info@yorktowntools.com">info@yorktowntools.com</a></p>
+        <!-- Footer banner renamed to lowercase .png as requested -->
+        <img src="hero-artwork.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
+           <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.<br><small>Last updated: December 2025</small></p>
     </footer>
 
     <script>
-        // Nav hide/show on scroll
+        // Sticky nav hide/show on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -465,7 +573,7 @@
             lastScroll = current;
         });
 
-        // Tagline rotator
+        // Hero tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let currentTagline = 0;
         setInterval(() => {
@@ -483,10 +591,9 @@
             bannerTexts[currentBanner].classList.add('active');
         }, 2000);
 
-        // Add item row in quote form (if you have one)
+        // Add item row in form
         function addItem() {
             const container = document.getElementById('item-list');
-            if (!container) return;
             const row = document.createElement('div');
             row.className = 'item-row';
             row.innerHTML = `
