@@ -315,7 +315,7 @@
             border: 3px solid var(--white);
         }
         .call-button::after {
-            content: "Phone";
+            content: "📞";
             position: absolute;
             font-size: 1.8rem;
             top: -10px;
@@ -365,6 +365,13 @@
             .top-red-banner, .gov-ids-header { font-size: 1.02rem; padding: 0.75rem; }
             nav a { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
         }
+
+        /* Fix for iOS Safari footer being hidden behind bottom bar */
+        @supports (-webkit-touch-callout: none) {
+            footer {
+                padding-bottom: 8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -389,7 +396,7 @@
     </div>
 
     <div class="logo-header">
-        <img src="yt-logo.PNG" alt="Yorktown Tools">
+        <img src="Yt-logo.PNG" alt="Yorktown Tools">
     </div>
 
     <nav id="main-nav">
@@ -556,7 +563,7 @@
            <strong>Web:</strong> <a href="https://yorktowntools.com">yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
         <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
-        <p>© 2025 Yorktown Tools. All rights reserved.<br><small>Last updated: December 2025</small></p>
+        <p>© 2025 Yorktown Tools. All rights reserved.<br><small>Last updated: December 06, 2025</small></p>
     </footer>
 
     <script>
@@ -606,3 +613,4 @@
     </script>
 </body>
 </html>
+```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
