@@ -3,323 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Can We Pour Today? | Yorktown Tools</title>
+    <title>Can We Pour Today? • Yorktown Tools</title>
     <link rel="icon" href="Yorktown.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --navy: #0b1e3f;
             --red: #c8102e;
-            --white: #ffffff;
-            --light-gray: #f8f9fa;
             --green: #2e7d32;
             --yellow: #b07100;
-            --red-dark: #c62828;
+            --light: #f8f9fa;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', system-ui, sans-serif;
             background: #fff;
-            color: #212529;
-            line-height: 1.5;
+            color: #1a1a1a;
+            line-height: 1.6;
             min-height: 100dvh;
             display: flex;
             flex-direction: column;
-            position: relative;
-            overflow-x: hidden;
         }
-
-        /* Subtle animated background mascot */
         body::before {
             content: "";
             position: fixed;
             inset: 0;
             background: url('george-mascot.PNG') center / contain no-repeat;
-            opacity: 0.08;
+            opacity: 0.07;
             pointer-events: none;
             z-index: -1;
-            animation: float 40s ease-in-out infinite;
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.05); }
-        }
-
-        .top-banner {
+        .banner {
             background: var(--red);
             color: white;
             text-align: center;
             padding: 1rem;
             font-weight: 800;
-            font-size: clamp(1.1rem, 4vw, 1.3rem);
-            letter-spacing: 0.5px;
+            font-size: 1.25rem;
         }
-
-        .gov-id {
+        .gov {
             background: var(--navy);
             color: white;
             text-align: center;
-            padding: 0.6rem;
-            font-size: 0.9rem;
+            padding: 0.5rem;
+            font-size: 0.95rem;
         }
-
-        .gov-id strong { color: #ffeb3b; font-weight: 700; }
-
+        .gov strong { color: #ffeb3b; }
         .logo {
             text-align: center;
-            padding: 2.5rem 1rem 1.5rem;
-            background: white;
+            padding: 2rem 1rem 1rem;
         }
-
-        .logo img {
-            max-width: 280px;
-            width: 90%;
-            height: auto;
-        }
-
-        main {
-            flex: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-            text-align: center;
-        }
-
+        .logo img { max-width: 280px; width: 90%; height: auto; }
+        main { flex: 1; max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
         h1 {
-            font-size: clamp(2.8rem, 8vw, 4.5rem);
+            font-size: clamp(2.8rem, 8vw, 4.8rem);
             font-weight: 900;
             color: var(--navy);
-            margin-bottom: 0.5rem;
-            line-height: 1.1;
+            text-align: center;
+            margin: 1rem 0 0.5rem;
         }
-
-        .subtitle {
-            font-size: 1.35rem;
-            color: #555;
-            margin-bottom: 3rem;
-            font-weight: 500;
+        .tagline {
+            text-align: center;
+            font-size: 1.4rem;
+            color: #444;
+            margin-bottom: 2.5rem;
         }
-
-        .status-light {
-            width: 240px;
-            height: 240px;
+        .big-light {
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
-            margin: 3rem auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 2rem auto;
+            display: grid;
+            place-items: center;
             font-size: 160px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-            animation: glow 4s ease-in-out infinite alternate;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.3);
+            transition: all 0.6s ease;
         }
-
-        @keyframes glow {
-            from { box-shadow: 0 25px 60px rgba(0,0,0,0.25); }
-            to { box-shadow: 0 30px 80px rgba(0,0,0,0.35); }
-        }
-
         .green { background: #4CAF50; color: white; }
         .yellow { background: #FFCA28; color: #000; }
         .red { background: #D32F2F; color: white; }
 
         .verdict {
-            font-size: clamp(2.2rem, 7vw, 3.2rem);
+            font-size: clamp(2.2rem, 7vw, 3.4rem);
             font-weight: 900;
-            margin: 2rem 0 3rem;
-            min-height: 80px;
+            text-align: center;
+            margin: 1.5rem 0;
         }
+        .explanation {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 1.8rem;
+            margin: 2.5rem auto;
+            max-width: 800px;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            border-left: 6px solid var(--red);
+        }
+        .explanation strong { color: var(--navy); }
 
-        .city-row {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
+        .cities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
             margin: 4rem 0;
-            font-size: clamp(2.4rem, 8vw, 4.8rem);
-            font-weight: 800;
-            line-height: 1.3;
+            text-align: center;
         }
-
-        .city {
-            padding: 0.5rem 1rem;
+        .city-card {
+            background: white;
+            padding: 1.5rem 1rem;
             border-radius: 12px;
-            background: rgba(11, 30, 63, 0.08);
-            min-width: 140px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            font-weight: 700;
+            font-size: 1.4rem;
         }
+        .city-name { font-size: 1.1rem; color: #555; margin-bottom: 0.5rem; }
+        .go { color: var(--green); }
+        .caution { color: var(--yellow); }
+        .no { color: #c62828; }
 
         footer {
             background: var(--navy);
             color: white;
             padding: 4rem 1.5rem 3rem;
-            margin-top: 5rem;
-        }
-
-        .footer-content {
-            max-width: 1000px;
-            margin: 0 auto;
             text-align: center;
-            font-size: 1.45rem;
+            font-size: 1.5rem;
         }
-
-        .footer-content strong {
-            font-size: 1.8rem;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .call-cta {
-            margin-top: 1.5rem;
-        }
-
-        .call-cta a {
+        footer strong { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+        .cta-button {
             display: inline-block;
+            margin-top: 1.5rem;
             background: var(--red);
             color: white;
-            font-size: 2rem;
-            font-weight: 800;
-            text-decoration: none;
-            padding: 1rem 2rem;
+            padding: 1.2rem 2.5rem;
             border-radius: 50px;
-            margin-top: 1rem;
+            font-size: 1.8rem;
+            font-weight: 800 1.8rem/1 'Inter';
+            text-decoration: none;
             box-shadow: 0 10px 30px rgba(200,16,46,0.4);
             transition: transform 0.2s;
         }
+        .cta-button:hover { transform: translateY(-4px); }
 
-        .call-cta a:hover {
-            transform: scale(1.05);
-        }
-
-        /* Floating Call Button */
         .fab {
             position: fixed;
             right: clamp(16px, 4vw, 28px);
             bottom: clamp(16px, 4vw, 28px);
-            width: clamp(70px, 16vw, 90px);
-            height: clamp(70px, 16vw, 90px);
+            width: clamp(70px, 16vw, 92px);
+            height: clamp(70px, 16vw, 92px);
             background: var(--red);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 35px rgba(200,16,46,0.6);
+            display: grid;
+            place-items: center;
+            box-shadow: 0 12px 40px rgba(200,16,46,0.6);
             z-index: 1000;
-            animation: pulse 2.5s infinite;
-            transition: transform 0.3s;
+            animation: pulse 2.8s infinite;
         }
-
-        .fab:hover {
-            transform: scale(1.1);
-        }
-
-        .fab img {
-            width: 68%;
-            border: 4px solid white;
-            border-radius: 50%;
-        }
-
+        .fab img { width: 68%; border: 4px solid white; border-radius: 50%; }
         @keyframes pulse {
-            0% { box-shadow: 0 10px 35px rgba(200,16,46,0.6); }
-            70% { box-shadow: 0 10px 55px rgba(200,16,46,0.9); }
-            100% { box-shadow: 0 10px 35px rgba(200,16,46,0.6); }
+            0%,100% { box-shadow: 0 12px 40px rgba(200,16,46,0.6); }
+            70% { box-shadow: 0 16px 60px rgba(200,16,46,0.9); }
         }
 
-        /* Responsive adjustments */
+        .loading { opacity: 0.6; }
+        .error { color: #c62828; font-style: italic; }
+
         @media (max-width: 640px) {
-            .status-light { width: 200px; height: 200px; font-size: 130px; }
-            .city-row { gap: 1.2rem; }
-            .city { font-size: 2rem; }
+            .big-light { width: 200px; height: 200px; font-size: 120px; }
+            .explanation { padding: 1.4rem; font-size: 1.05rem; }
         }
     </style>
 </head>
 <body>
 
-    <a href="tel:757-940-5171" class="fab" aria-label="Call Yorktown Tools">
-        <img src="Yorktown.PNG" alt="">
-    </a>
+<a href="tel:757-940-5171" class="fab" aria-label="Call Yorktown Tools">
+    <img src="Yorktown.PNG" alt="Call">
+</a>
 
-    <header>
-        <div class="top-banner">
-            Can We Pour Today? – Live Forecast from Richmond to Virginia Beach
-        </div>
-        <div class="gov-id">
-            <strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned Business
-        </div>
-        <div class="logo">
-            <img src="Yorktown.PNG" alt="Yorktown Tools Logo">
-        </div>
-    </header>
+<div class="banner">Can We Pour Concrete Today? • Live NOAA/NWS Forecast</div>
+<div class="gov"><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned</div>
+<div class="logo"><img src="Yorktown.PNG" alt="Yorktown Tools"></div>
 
-    <main>
-        <h1>Can We Pour Today?</h1>
-        <p class="subtitle">Richmond → Williamsburg → Yorktown → Hampton Roads → Virginia Beach</p>
+<main>
+    <h1>Can We Pour Today?</h1>
+    <p class="tagline">Richmond to Virginia Beach — updated every 15 minutes from NOAA</p>
 
-        <div class="status-light green" id="mainLight">Loading…</div>
-        <div class="verdict green-text" id="mainText">Checking live weather data…</div>
+    <div class="big-light green loading" id="light">🟢</div>
+    <div class="verdict green loading" id="verdict">Loading live data...</div>
 
-        <div class="city-row" id="cityRow">
-            <!-- Will be populated by JS -->
-        </div>
+    <div class="explanation" id="explanation">
+        <strong>How we decide (based on ACI guidelines):</strong><br>
+        We pull live NOAA/NWS data and check the next 8 hours for:
+        <ul style="margin-top:0.8rem; text-align:left; max-width:600px; margin-left:auto; margin-right:auto;">
+            <li>Rain probability &gt; 30% → <span style="color:#c62828;font-weight:800">NO-GO</span></li>
+            <li>Temperature &lt; 40°F or &gt; 90°F → <span style="color:#b07100;font-weight:800">CAUTION</span> (use special mixes)</li>
+            <li>Wind gusts &gt; 20 mph → <span style="color:#b07100;font-weight:800">CAUTION</span></li>
+            <li>Everything else → <span style="color:#2e7d32;font-weight:800">GOOD TO POUR</span></li>
+        </ul>
+        <small id="lastUpdate" style="display:block; margin-top:1rem; color:#666;">Last updated: Never</small>
+    </div>
 
-        <footer>
-            <div class="footer-content">
-                <strong>Yorktown Tools</strong>
-                <div>Never Run Out. Never Overpay.</div>
-                <div>Premium Tools Delivered Free – Same-Day</div>
-                <div class="call-cta">
-                    <a href="tel:757-940-5171">📞 757-940-5171</a>
-                </div>
-            </div>
-        </footer>
-    </main>
+    <div class="cities loading" id="cities">
+        <div class="city-card">Fetching live NOAA data...</div>
+    </div>
 
-    <script>
-        // Simple live mock data (replace with real weather API later)
-        const cities = [
-            { name: "Richmond", pour: true },
-            { name: "Williamsburg", pour: true },
-            { name: "Yorktown", pour: true },
-            { name: "Newport News", pour: false },
-            { name: "Hampton", pour: true },
-            { name: "Norfolk", pour: true },
-            { name: "Va Beach", pour: true }
-        ];
+    <footer>
+        <strong>Yorktown Tools</strong><br>
+        Never Run Out. Never Overpay.<br>
+        Premium concrete tools &amp; rebar delivered FREE — same day.<br>
+        <a href="tel:757-940-5171" class="cta-button">757-940-5171 → Call or Text</a>
+    </footer>
+</main>
 
-        const mainLight = document.getElementById('mainLight');
-        const mainText = document.getElementById('mainText');
-        const cityRow = document.getElementById('cityRow');
+<script>
+    const locations = [
+        { name: "Richmond", lat: 37.5407, lng: -77.4360 },
+        { name: "Williamsburg", lat: 37.2707, lng: -76.7075 },
+        { name: "Yorktown", lat: 37.2394, lng: -76.5041 },
+        { name: "Newport News", lat: 37.0871, lng: -76.4730 },
+        { name: "Hampton", lat: 37.0299, lng: -76.3452 },
+        { name: "Norfolk", lat: 36.8508, lng: -76.2852 },
+        { name: "Virginia Beach", lat: 36.8529, lng: -75.9780 }
+    ];
 
-        // Simulate decision logic (you'd replace this with actual NWS/NOAA API data)
-        const canPourOverall = cities.filter(c => c.pour).length >= cities.length * 0.7;
+    const light = document.getElementById('light');
+    const verdict = document.getElementById('verdict');
+    const citiesContainer = document.getElementById('cities');
+    const explanation = document.getElementById('explanation');
+    const lastUpdate = document.getElementById('lastUpdate');
 
-        if (canPourOverall) {
-            mainLight.classList.replace('green', 'green');
-            mainLight.innerHTML = '🟢';
-            mainText.textContent = 'YES – GO POUR!';
-            mainText.className = 'verdict green-text';
-        } else if (cities.some(c => !c.pour)) {
-            mainLight.classList.replace('green', 'yellow');
-            mainLight.innerHTML = '🟡';
-            mainText.textContent = 'CAUTION – Check Cities';
-            mainText.className = 'verdict yellow-text';
-        } else {
-            mainLight.classList.replace('green', 'red');
-            mainLight.innerHTML = '🔴';
-            mainText.textContent = 'NO – Too Wet';
-            mainText.className = 'verdict red-text';
+    async function fetchForecast(lat, lng) {
+        try {
+            const pointResponse = await fetch(`https://api.weather.gov/points/${lat},${lng}`, {
+                headers: { 'User-Agent': 'YorktownToolsPourChecker (contact@yorktowntools.com)' }
+            });
+            if (!pointResponse.ok) throw new Error('Point fetch failed');
+            const pointData = await pointResponse.json();
+            const forecastUrl = pointData.properties.forecast;
+            const forecastResponse = await fetch(forecastUrl, {
+                headers: { 'User-Agent': 'YorktownToolsPourChecker (contact@yorktowntools.com)' }
+            });
+            if (!forecastResponse.ok) throw new Error('Forecast fetch failed');
+            const forecastData = await forecastResponse.json();
+            const periods = forecastData.properties.periods;
+            const now = new Date();
+            const next8Hours = now.getTime() + (8 * 60 * 60 * 1000);
+            const relevantPeriods = periods.filter(p => {
+                const startTime = new Date(p.startTime).getTime();
+                return startTime >= now.getTime() && startTime <= next8Hours;
+            });
+            const maxRain = Math.max(...relevantPeriods.map(p => p.probabilityOfPrecipitation?.value || 0));
+            const temps = relevantPeriods.map(p => p.temperature);
+            const minTemp = Math.min(...temps);
+            const maxTemp = Math.max(...temps);
+            const windSpeeds = relevantPeriods.map(p => parseInt(p.windSpeed?.split(' ')[0]) || 0);
+            const maxWind = Math.max(...windSpeeds);
+            return { maxRain, minTemp, maxTemp, maxWind, periods: relevantPeriods };
+        } catch (error) {
+            console.error(`Error fetching for ${lat},${lng}:`, error);
+            return { error: true, maxRain: 0, minTemp: 50, maxTemp: 70, maxWind: 10 };
         }
+    }
 
-        // Populate cities
-        cityRow.innerHTML = cities.map(city => `
-            <div class="city ${city.pour ? 'green-text' : 'red-text'}">
-                ${city.name} ${city.pour ? '✅' : '❌'}
-            </div>
-        `).join('');
-    </script>
+    function assessStatus({ maxRain, minTemp, maxTemp, maxWind }) {
+        let issues = [];
+        if (maxRain > 30) issues.push('Rain >30%');
+        if (minTemp < 40 || maxTemp > 90) issues.push('Temp extreme');
+        if (maxWind > 20) issues.push('High wind');
+        if (issues.length >= 2) return { status: 'no', text: 'Do Not Pour', issues };
+        if (issues.length === 1) return { status: 'caution', text: 'Use Caution', issues };
+        return { status: 'go', text: 'Good to Pour', issues: [] };
+    }
+
+    function updateUI() {
+        const promises = locations.map(async (loc) => {
+            const data = await fetchForecast(loc.lat, loc.lng);
+            const status = assessStatus(data);
+            return { ...loc, ...data, ...status };
+        });
+
+        Promise.all(promises).then(locationsData => {
+            const hasNo = locationsData.some(d => d.status === 'no');
+            const hasCaution = locationsData.some(d => d.status === 'caution');
+            const overallStatus = hasNo ? 'no' : (hasCaution ? 'caution' : 'go');
+            const overallText = hasNo ? 'NO — HOLD THE POUR' : (hasCaution ? 'CAUTION — Check Conditions' : 'YES — POUR WITH CONFIDENCE');
+
+            light.className = `big-light ${overallStatus}`;
+            light.innerHTML = overallStatus === 'go' ? '🟢' : (overallStatus === 'caution' ? '🟡' : '🔴');
+            verdict.textContent = overallText;
+            verdict.className = `verdict ${overallStatus}`;
+            verdict.style.color = overallStatus === 'go' ? '#2e7d32' : (overallStatus === 'caution' ? '#b07100' : '#c62828');
+
+            citiesContainer.innerHTML = locationsData.map(loc => `
+                <div class="city-card">
+                    <div class="city-name">${loc.name}</div>
+                    <div class="${loc.status}">${loc.text}</div>
+                    <small>${loc.minTemp}°–${loc.maxTemp}°F • ${loc.maxRain}% rain • ${loc.maxWind} mph wind</small>
+                    ${loc.issues.length ? `<div style="font-size:0.9rem; color:${loc.status === 'no' ? '#c62828' : '#b07100'};"><strong>Issues:</strong> ${loc.issues.join(', ')}</div>` : ''}
+                </div>
+            `).join('');
+
+            lastUpdate.textContent = `Last updated: ${new Date().toLocaleString()}`;
+        }).catch(error => {
+            citiesContainer.innerHTML = '<div class="city-card error">Error loading data. Please refresh.</div>';
+            console.error('Update failed:', error);
+        });
+
+        // Remove loading class after first update
+        document.body.classList.remove('loading');
+    }
+
+    // Initial load
+    updateUI();
+
+    // Auto-update every 15 minutes
+    setInterval(updateUI, 15 * 60 * 1000);
+</script>
 </body>
 </html>
