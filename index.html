@@ -14,7 +14,7 @@
     <meta property="og:type" content="website">
     <title>Yorktown Tools | Build Better with Yorktown Tools</title>
 
-    <!-- FAVICONS – Updated to use your Yt-logo.PNG (Google loves these) -->
+    <!-- FAVICONS -->
     <link rel="icon" href="Yorktown.PNG" type="image/png">
     <link rel="apple-touch-icon" sizes="180x180" href="Yt-logo.PNG">
     <link rel="icon" type="image/png" sizes="32x32" href="Yt-logo.PNG">
@@ -268,7 +268,7 @@
         .mission-box { 
             background: var(--light); 
             padding: 3rem; 
-            border-radius: var(--radius); 
+            border-radius: var(--radius);
             border-left: 10px solid var(--red); 
         }
 
@@ -314,22 +314,6 @@
             border-radius: 50%;
             border: 3px solid var(--white);
         }
-        .call-button::after {
-            content: ;
-            position: absolute;
-            font-size: 1.8rem;
-            top: -10px;
-            right: -10px;
-            background: var(--white);
-            color: var(--red);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
 
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); }
@@ -361,16 +345,31 @@
         .add-item-btn { align-self:flex-start; background:transparent; color:var(--navy); border:2px solid var(--navy); padding:0.8rem 1.6rem; border-radius:12px; font-weight:600; cursor:pointer; }
         .add-item-btn:hover { background:var(--navy); color:#fff; }
 
+        /* NEW “CAN WE POUR TODAY?” BUTTON STYLING */
+        .pour-btn {
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            padding: 1.5rem 4rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+            transition: all 0.35s ease;
+        }
+        .pour-btn:hover {
+            background: #a00d22;
+            transform: translateY(-5px);
+        }
+
         @media (max-width: 480px) {
             .top-red-banner, .gov-ids-header { font-size: 1.02rem; padding: 0.75rem; }
             nav a { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
         }
 
-        /* Fix for iOS Safari footer being hidden behind bottom bar */
         @supports (-webkit-touch-callout: none) {
-            footer {
-                padding-bottom: 8rem;
-            }
+            footer { padding-bottom: 8rem; }
         }
     </style>
 </head>
@@ -427,11 +426,17 @@
                 </div>
             </div>
 
+            <!-- ←←← THIS IS THE ONLY NEW THING ←←← -->
+            <div style="text-align:center; margin: 3rem 0;">
+                <a href="/Yorktowntools-site/Can-we-pour-today.html" class="pour-btn">
+                    Can We Pour Today? – Live Richmond to Virginia Beach Forecast
+                </a>
+            </div>
+
             <div style="height:3.5rem;"></div>
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- All other sections remain unchanged -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -556,7 +561,6 @@
     </main>
 
     <footer>
-        <!-- Footer banner renamed to lowercase .png as requested -->
         <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a> | 
@@ -613,4 +617,3 @@
     </script>
 </body>
 </html>
-```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
