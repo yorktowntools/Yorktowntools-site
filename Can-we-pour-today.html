@@ -3,243 +3,363 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Live NOAA concrete pouring forecast for Richmond to Virginia Beach. Updated every 15 minutes. Yorktown Tools — Veteran-owned concrete tools & rebar delivery.">
     <title>Can We Pour Today? • Yorktown Tools</title>
     <link rel="icon" href="Yorktown.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --navy: #0b1e3f;
             --red: #c8102e;
             --green: #2e7d32;
             --yellow: #b07100;
+            --blue-header: #1565c0;
+            --white: #ffffff;
             --light: #f8f9fa;
+            --gray: #f1f3f5;
+            --transition: all 0.35s ease;
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: #fff;
-            color: #1a1a1a;
-            line-height: 1.6;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-        }
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: url('george-mascot.PNG') center / contain no-repeat;
-            opacity: 0.07;
-            pointer-events: none;
-            z-index: -1;
-        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        /* 1. New scrolling banner with live update time */
-        .ticker {
-            background: var(--red);
-            color: white;
-            padding: 0.9rem 1rem;
-            font-weight: 800;
-            font-size: 1.25rem;
-            overflow: hidden;
-            white-space: nowrap;
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background: var(--white);
+            min-height: 100vh;
             position: relative;
         }
-        .ticker span {
-            display: inline-block;
-            padding-left: 100%;
-            animation: scroll 35s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
 
-        .gov {
-            background: var(--navy);
-            color: white;
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.95rem;
-        }
-        .gov strong { color: #ffeb3b; }
-
-        .logo { text-align: center; padding: 2rem 1rem 1rem; }
-        .logo img { max-width: 280px; width: 90%; height: auto; }
-
-        main { flex: 1; max-width: 1100px; margin: 0 auto; padding: 1rem 1.5rem 4rem; }
-
-        h1 {
-            font-size: clamp(2.8rem, 8vw, 4.8rem);
-            font-weight: 900;
-            color: var(--navy);
-            text-align: center;
-            margin: 1rem 0 0.5rem;
-        }
-        .tagline {
-            text-align: center;
-            font-size: 1.4rem;
-            color: #444;
-            margin-bottom: 2.5rem;
-        }
-
-        /* Concrete photo section */
-        .concrete-photo {
-            text-align: center;
-            margin: 3rem 0;
-        }
-        .concrete-photo img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 16px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        }
-
-        .big-light {
-            width: 260px; height: 260px; border-radius: 50%;
-            margin: 2rem auto; display: grid; place-items: center;
-            font-size: 160px; box-shadow: 0 30px 70px rgba(0,0,0,0.3);
-            transition: all 0.6s ease;
-        }
-        .green { background: #4CAF50; color: white; }
-        .yellow { background: #FFCA28; color: #000; }
-        .red { background: #D32F2F; color: white; }
-
-        .verdict {
-            font-size: clamp(2.2rem, 7vw, 3.4rem);
-            font-weight: 900;
-            text-align: center;
-            margin: 1.5rem 0;
-        }
-        .explanation {
-            background: var(--light);
-            border-radius: 16px;
-            padding: 1.8rem;
-            margin: 2.5rem auto;
-            max-width: 800px;
-            font-size: 1.15rem;
-            line-height: 1.7;
-            border-left: 6px solid var(--red);
-        }
-        .explanation strong { color: var(--navy); }
-
-        /* 3. City cards – red outline + darker look */
-        .cities {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 4rem 0;
-        }
-        .city-card {
-            background: #1a1a1a;
-            color: white;
-            padding: 1.6rem 1.2rem;
-            border-radius: 12px;
-            border: 3px solid var(--red);
-            box-shadow: 0 10px 30px rgba(200,16,46,0.25);
-            text-align: center;
-            font-weight: 700;
-            font-size: 1.35rem;
-        }
-        .city-name { font-size: 1.1rem; color: #ccc; margin-bottom: 0.6rem; }
-        .go { color: var(--green); }
-        .caution { color: var(--yellow); }
-        .no { color: #ff5252; }
-        .city-card small { display: block; margin-top: 0.8rem; font-size: 0.9rem; opacity: 0.9; }
-
-        /* 4. Smaller footer, no big phone button */
-        footer {
-            background: var(--navy);
-            color: #ddd;
-            padding: 3rem 1.5rem 2rem;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-        footer strong { font-size: 1.6rem; display: block; margin-bottom: 0.4rem; color: white; }
-        footer a { color: var(--red); text-decoration: none; font-weight: 700; }
-
-        .fab {
+        /* George watermark */
+        body::after {
+            content: "";
             position: fixed;
-            right: clamp(16px, 4vw, 28px);
-            bottom: clamp(16px, 4vw, 28px);
-            width: clamp(70px, 16vw, 92px);
-            height: clamp(70px, 16vw, 92px);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw; height: 140vw;
+            max-width: 1400px; max-height: 1400px;
+            background: url('george-mascot.PNG') center / contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            margin-top: -80px;
+        }
+
+        /* Rotating red banner - Fixed */
+        .top-red-banner {
             background: var(--red);
+            color: var(--white);
+            text-align: center;
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            min-height: 54px;
+            white-space: nowrap;
+        }
+        .banner-wrapper {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: slide 18s infinite;
+        }
+        .banner-text {
+            display: inline-block;
+            padding: 0 2rem;
+        }
+        @keyframes slide {
+            0%, 10%   { transform: translateX(100%); }
+            15%, 30%  { transform: translateX(0); }
+            35%, 45%  { transform: translateX(0); }
+            50%, 60%  { transform: translateX(-100%); }
+            65%, 80%  { transform: translateX(-100%); }
+            85%, 100% { transform: translateX(100%); }
+        }
+
+        .gov-ids-header {
+            background: var(--navy);
+            color: var(--white);
+            text-align: center;
+            padding: 0.65rem 1rem;
+            font-size: 0.94rem;
+            font-weight: 500;
+        }
+        .gov-ids-header strong { color: #ffeb3b; }
+
+        .logo-header {
+            text-align: center;
+            padding: 1.8rem 1rem 1.4rem;
+            background: var(--white);
+        }
+        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+
+        nav {
+            background: var(--navy);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: clamp(1.2rem, 3.5vw, 2.2rem);
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.02rem;
+            padding: 0.7rem 1.1rem;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+        nav a:hover { background: rgba(255,255,255,0.18); color: var(--red); }
+
+        main { max-width:1200px; margin:0 auto; padding:0 1.4rem 6rem; }
+
+        .hero { 
+            text-align:center; 
+            padding: clamp(4rem, 13vw, 7rem) 1rem 5rem; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius:var(--radius); 
+            margin: 3rem 0; 
+            box-shadow: var(--shadow);
+        }
+        .hero h1 { 
+            font-size: clamp(3rem, 9vw, 4.6rem); 
+            margin-bottom:1.2rem; 
+            color: var(--navy); 
+            font-weight: 900;
+        }
+        .hero > p { 
+            font-size: clamp(1.3rem, 4.8vw, 1.5rem); 
+            max-width:900px; 
+            margin: 0 auto 3rem; 
+            color:#495057;
+        }
+
+        /* Big Circle - Now uses proper symbols */
+        .big-light {
+            width: 280px;
+            height: 280px;
             border-radius: 50%;
+            margin: 3rem auto;
             display: grid;
             place-items: center;
-            box-shadow: 0 12px 40px rgba(200,16,46,0.6);
-            z-index: 1000;
-            animation: pulse 2.8s infinite;
+            font-size: 160px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+            transition: all 0.6s ease;
+            background: #4CAF50;
         }
-        .fab img { width: 68%; border: 4px solid white; border-radius: 50%; }
+        .big-light.green { background: #4CAF50; }
+        .big-light.yellow { background: #FFCA28; color: #000; }
+        .big-light.red { background: #D32F2F; }
+
+        .verdict {
+            font-size: clamp(2.8rem, 8vw, 4.2rem);
+            font-weight: 900;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .grid {
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+            gap: clamp(1.8rem, 4.5vw, 3rem);
+            margin: 4rem 0;
+        }
+
+        /* City Cards - Now bright with blue header + red trim */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 3px solid transparent;
+        }
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 55px rgba(0,0,0,0.18);
+        }
+        .card-header {
+            background: var(--blue-header);
+            color: white;
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1.4rem;
+            border-bottom: 5px solid var(--red);
+        }
+        .card-body {
+            padding: 1.6rem 1.4rem 2rem;
+            text-align: center;
+            background: #fafcff;
+        }
+        .status {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0.8rem 0;
+        }
+        .go { color: var(--green); }
+        .caution { color: var(--yellow); }
+        .no { color: #c62828; }
+        .card p {
+            color: #333;
+            font-size: 1.05rem;
+            margin: 0.8rem 0;
+        }
+        .issues {
+            color: #c62828;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 0.8rem;
+        }
+
+        .explanation {
+            background: var(--light);
+            padding: 3rem;
+            border-radius: var(--radius);
+            margin: 4rem auto;
+            max-width: 900px;
+            border-left: 10px solid var(--red);
+            box-shadow: var(--shadow);
+            font-size: 1.15rem;
+            line-height: 1.8;
+        }
+
+        footer {
+            background: var(--navy);
+            color: var(--white);
+            text-align:center;
+            padding:6.5rem 1rem 3rem;
+            margin-top:8rem;
+        }
+        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+        footer a { color: #ffffff !important; text-decoration: underline; }
+        footer a:hover { opacity: 0.85; }
+
+        .call-button {
+            position: fixed;
+            right: clamp(16px, 4vw, 24px);
+            bottom: clamp(16px, 4vw, 24px);
+            width: clamp(72px, 16vw, 88px);
+            height: clamp(72px, 16vw, 88px);
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            z-index: 999;
+            animation: pulse 2.6s infinite;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .call-button img {
+            width: 68%;
+            border-radius: 50%;
+            border: 3px solid var(--white);
+        }
         @keyframes pulse {
-            0%,100% { box-shadow: 0 12px 40px rgba(200,16,46,0.6); }
-            70% { box-shadow: 0 16px 60px rgba(200,16,46,0.9); }
+            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); }
+            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); }
         }
 
         .loading { opacity: 0.6; }
-        .error { color: #ff5252; font-style: italic; }
-
-        @media (max-width: 640px) {
-            .big-light { width: 200px; height: 200px; font-size: 120px; }
-            .explanation { padding: 1.4rem; font-size: 1.05rem; }
-            .ticker { font-size: 1.1rem; }
-        }
     </style>
 </head>
 <body>
 
-<a href="tel:757-940-5171" class="fab" aria-label="Call Yorktown Tools">
+<a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
     <img src="Yorktown.PNG" alt="Call">
 </a>
 
-<!-- 1. New scrolling ticker with live update time -->
-<div class="ticker">
-    <span id="tickerText">Can We Pour Concrete Today? • Live NOAA/NWS Forecast • Last updated: <span id="liveTime">Never</span></span>
+<div class="top-red-banner">
+    <div class="banner-wrapper">
+        <div class="banner-text">Can We Pour Concrete Today? • Live NOAA/NWS Forecast • Last updated: <span id="liveTime">Never</span></div>
+        <div class="banner-text">Free Delivery • Veteran-Owned • SAM.gov Registered</div>
+        <div class="banner-text">Premium Concrete Tools & Rebar — Same-Day Delivery</div>
+    </div>
 </div>
 
-<div class="gov"><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned</div>
-<div class="logo"><img src="Yorktown.PNG" alt="Yorktown Tools"></div>
+<div class="gov-ids-header">
+    <strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned
+</div>
+
+<div class="logo-header">
+    <img src="Yorktown.PNG" alt="Yorktown Tools">
+</div>
+
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#tools">Tools</a></li>
+        <li><a href="/#ladders">Ladders</a></li>
+        <li><a href="/#about">About</a></li>
+        <li><a href="/#contact">Get Quote</a></li>
+    </ul>
+</nav>
 
 <main>
-    <h1>Can We Pour Today?</h1>
-    <p class="tagline">Richmond to Virginia Beach — updated every 15 minutes from NOAA</p>
+    <section class="hero">
+        <h1>Can We Pour Today?</h1>
+        <p>Live NOAA forecast for Richmond to Virginia Beach<br>Updated every 15 minutes</p>
 
-    <!-- 5. Concrete photo section – replace concrete.jpg with your own image -->
-    <div class="concrete-photo">
-        <img src="concrete.jpg" alt="Fresh concrete pour in progress">
-    </div>
+        <div class="big-light green loading" id="light">Green Circle</div>
+        <div class="verdict green loading" id="verdict">Loading live data...</div>
+    </section>
 
-    <div class="big-light green loading" id="light">Green Circle</div>
-    <div class="verdict green loading" id="verdict">Loading live data...</div>
+    <section style="margin: 4rem 0;">
+        <img src="concrete.jpg" alt="Fresh concrete pour" style="width:100%; border-radius:var(--radius); box-shadow:var(--shadow);">
+    </section>
 
-    <div class="explanation" id="explanation">
-        <strong>How we decide (based on ACI guidelines):</strong><br>
-        We pull live NOAA/NWS data and check the next 8 hours for:
-        <ul style="margin-top:0.8rem; text-align:left; max-width:600px; margin-left:auto; margin-right:auto;">
-            <li>Rain probability &gt; 30% → <span style="color:#c62828;font-weight:800">NO-GO</span></li>
-            <li>Temperature &lt; 40°F or &gt; 90°F → <span style="color:#b07100;font-weight:800">CAUTION</span> (use special mixes)</li>
-            <li>Wind gusts &gt; 20 mph → <span style="color:#b07100;font-weight:800">CAUTION</span></li>
-            <li>Everything else → <span style="color:#2e7d32;font-weight:800">GOOD TO POUR</span></li>
+    <section class="explanation">
+        <strong>How we decide (ACI guidelines):</strong><br>
+        We check the next 8 hours of NOAA data for:
+        <ul style="margin:1.5rem 0; text-align:left; max-width:600px; margin-left:auto; margin-right:auto;">
+            <li>Rain probability > 30% → <span style="color:#c62828;font-weight:800">NO-GO</span></li>
+            <li>Temperature < 40°F or > 90°F → <span style="color:#b07100;font-weight:800">CAUTION</span></li>
+            <li>Wind gusts > 20 mph → <span style="color:#b07100;font-weight:800">CAUTION</span></li>
+            <li>All clear → <span style="color:#2e7d32;font-weight:800">GOOD TO POUR</span></li>
         </ul>
-        <small id="lastUpdate" style="display:block; margin-top:1rem; color:#666;">Last updated: Never</small>
-    </div>
+        <small id="lastUpdate">Last updated: Never</small>
+    </section>
 
-    <div class="cities loading" id="cities">
-        <div class="city-card">Fetching live NOAA data...</div>
-    </div>
-
-    <!-- 4. Smaller footer without giant button -->
-    <footer>
-        <strong>Yorktown Tools</strong><br>
-        Never Run Out. Never Overpay.<br>
-        Premium concrete tools &amp; rebar delivered FREE — same day.<br><br>
-        <a href="tel:757-940-5171">757-940-5171</a> • Call or Text Anytime
-    </footer>
+    <section>
+        <h2 style="text-align:center; margin-bottom:3rem; font-size:clamp(2.2rem,6vw,2.8rem); color:var(--navy);">
+            Current Conditions by City
+        </h2>
+        <div class="grid loading" id="cities">
+            <div class="card"><p>Fetching live NOAA data...</p></div>
+        </div>
+    </section>
 </main>
+
+<footer>
+    <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+    <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+       <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+    <p>Yorktown, Virginia — Veteran-Owned Small Business & SAM.gov Registered</p>
+    <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+    <p>© 2025 Yorktown Tools. All rights reserved.</p>
+</footer>
 
 <script>
     const locations = [
@@ -260,87 +380,85 @@
 
     async function fetchForecast(lat, lng) {
         try {
-            const pointResponse = await fetch(`https://api.weather.gov/points/${lat},${lng}`, {
+            const pointRes = await fetch(`https://api.weather.gov/points/${lat},${lng}`, {
                 headers: { 'User-Agent': 'YorktownToolsPourChecker (contact@yorktowntools.com)' }
             });
-            if (!pointResponse.ok) throw new Error('Point fetch failed');
-            const pointData = await pointResponse.json();
-            const forecastUrl = pointData.properties.forecast;
-            const forecastResponse = await fetch(forecastUrl, {
+            const point = await pointRes.json();
+            const forecastRes = await fetch(point.properties.forecast, {
                 headers: { 'User-Agent': 'YorktownToolsPourChecker (contact@yorktowntools.com)' }
             });
-            if (!forecastResponse.ok) throw new Error('Forecast fetch failed');
-            const forecastData = await forecastResponse.json();
-            const periods = forecastData.properties.periods;
+            const forecast = await forecastRes.json();
+            const periods = forecast.properties.periods;
             const now = new Date();
-            const next8Hours = now.getTime() + (8 * 60 * 60 * 1000);
-            const relevantPeriods = periods.filter(p => {
-                const startTime = new Date(p.startTime).getTime();
-                return startTime >= now.getTime() && startTime <= next8Hours;
-            });
-            const maxRain = Math.max(...relevantPeriods.map(p => p.probabilityOfPrecipitation?.value || 0));
-            const temps = relevantPeriods.map(p => p.temperature);
+            const next8h = now.getTime() + 8*60*60*1000;
+
+            const relevant = periods.filter(p => new Date(p.startTime) >= now && new Date(p.startTime) <= next8h);
+            const maxRain = Math.max(...relevant.map(p => p.probabilityOfPrecipitation?.value || 0));
+            const temps = relevant.map(p => p.temperature);
             const minTemp = Math.min(...temps);
             const maxTemp = Math.max(...temps);
-            const windSpeeds = relevantPeriods.map(p => parseInt(p.windSpeed?.split(' ')[0]) || 0);
-            const maxWind = Math.max(...windSpeeds);
-            return { maxRain, minTemp, maxTemp, maxWind, periods: relevantPeriods };
-        } catch (error) {
-            console.error(`Error fetching for ${lat},${lng}:`, error);
-            return { error: true, maxRain: 0, minTemp: 50, maxTemp: 70, maxWind: 10 };
+            const winds = relevant.map(p => parseInt(p.windSpeed.split(' ')[0]) || 0);
+            const maxWind = Math.max(...winds);
+
+            return { maxRain, minTemp, maxTemp, maxWind };
+        } catch (e) {
+            console.error(e);
+            return { maxRain: 0, minTemp: 50, maxTemp: 70, maxWind: 10 };
         }
     }
 
-    function assessStatus({ maxRain, minTemp, maxTemp, maxWind }) {
-        let issues = [];
-        if (maxRain > 30) issues.push('Rain >30%');
-        if (minTemp < 40 || maxTemp > 90) issues.push('Temp extreme');
-        if (maxWind > 20) issues.push('High wind');
+    function assess({ maxRain, minTemp, maxTemp, maxWind }) {
+        const issues = [];
+        if (maxRain > 30) issues.push('Rain');
+        if (minTemp < 40 || maxTemp > 90) issues.push('Temp');
+        if (maxWind > 20) issues.push('Wind');
         if (issues.length >= 2) return { status: 'no', text: 'Do Not Pour', issues };
         if (issues.length === 1) return { status: 'caution', text: 'Use Caution', issues };
         return { status: 'go', text: 'Good to Pour', issues: [] };
     }
 
     function updateUI() {
-        const promises = locations.map(async (loc) => {
-            const data = await fetchForecast(loc.lat, loc.lng);
-            const status = assessStatus(data);
-            return { ...loc, ...data, ...status };
-        });
+        Promise.all(locations.map(loc => fetchForecast(loc.lat, loc.lng).then(data => ({ ...loc, ...data }))))
+            .then(data => data.map(loc => ({ ...loc, ...assess(loc) })))
+            .then(locationsData => {
+                const hasNo = locationsData.some(l => l.status === 'no');
+                const hasCaution = locationsData.some(l => l.status === 'caution');
+                const overall = hasNo ? 'no' : hasCaution ? 'caution' : 'go';
+                const overallText = hasNo ? 'NO — HOLD THE POUR' : hasCaution ? 'CAUTION — Check Conditions' : 'YES — POUR WITH CONFIDENCE';
 
-        Promise.all(promises).then(locationsData => {
-            const hasNo = locationsData.some(d => d.status === 'no');
-            const hasCaution = locationsData.some(d => d.status === 'caution');
-            const overallStatus = hasNo ? 'no' : (hasCaution ? 'caution' : 'go');
-            const overallText = hasNo ? 'NO — HOLD THE POUR' : (hasCaution ? 'CAUTION — Check Conditions' : 'YES — POUR WITH CONFIDENCE');
+                // Update big circle
+                light.className = `big-light ${overall}`;
+                light.textContent = overall === 'go' ? 'Green Circle' : overall === 'caution' ? 'Yellow Circle' : 'Red Circle';
 
-            light.className = `big-light ${overallStatus}`;
-            light.innerHTML = overallStatus === 'go' ? 'Green Circle' : (overallStatus === 'caution' ? 'Yellow Circle' : 'Red Circle');
-            verdict.textContent = overallText;
-            verdict.className = `verdict ${overallStatus}`;
-            verdict.style.color = overallStatus === 'go' ? '#2e7d32' : (overallStatus === 'caution' ? '#b07100' : '#c62828');
+                verdict.textContent = overallText;
+                verdict.className = `verdict ${overall}`;
 
-            citiesContainer.innerHTML = locationsData.map(loc => `
-                <div class="city-card">
-                    <div class="city-name">${loc.name}</div>
-                    <div class="${loc.status}">${loc.text}</div>
-                    <small>${loc.minTemp}°–${loc.maxTemp}°F • ${loc.maxRain}% rain • ${loc.maxWind} mph wind</small>
-                    ${loc.issues.length ? `<div style="font-size:0.9rem;margin-top:0.5rem;"><strong>Issues:</strong> ${loc.issues.join(', ')}</div>` : ''}
-                </div>
-            `).join('');
+                citiesContainer.innerHTML = locationsData.map(l => `
+                    <div class="card">
+                        <div class="card-header">${l.name}</div>
+                        <div class="card-body">
+                            <div class="status ${l.status}">${l.text}</div>
+                            <p>${l.minTemp}°–${l.maxTemp}°F • ${l.maxRain}% rain • ${l.maxWind} mph wind</p>
+                            ${l.issues.length ? `<div class="issues"><strong>Issues:</strong> ${l.issues.join(', ')}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
 
-            const now = new Date().toLocaleString();
-            lastUpdate.textContent = `Last updated: ${now}`;
-            liveTime.textContent = now;   // Updates the scrolling ticker too
-        }).catch(error => {
-            citiesContainer.innerHTML = '<div class="city-card error">Error loading data. Please refresh.</div>';
-            console.error('Update failed:', error);
-        });
+                const now = new Date().toLocaleString();
+                lastUpdate.textContent = `Last updated: ${now}`;
+                liveTime.textContent = now;
 
-        document.body.classList.remove('loading');
+                // Remove loading class
+                citiesContainer.classList.remove('loading');
+                light.classList.remove('loading');
+                verdict.classList.remove('loading');
+            })
+            .catch(() => {
+                citiesContainer.innerHTML = '<div class="card"><p>Error loading data. Please refresh.</p></div>';
+            });
     }
 
-    // Initial load
+    // Start the data update
     updateUI();
     setInterval(updateUI, 15 * 60 * 1000);
 </script>
