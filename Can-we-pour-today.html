@@ -1,208 +1,325 @@
 <!DOCTYPE html>
-<html lang="en" hreflang="en-us">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Live concrete pour forecast for Richmond to Virginia Beach. Green = Pour all day. Yellow = Finish early. Red = No pour. Brought to you by Yorktown Tools – free same-day delivery in Hampton Roads.">
-    <meta name="keywords" content="can we pour concrete today, hampton roads concrete forecast, richmond concrete weather, virginia beach pour day">
     <title>Can We Pour Today? | Yorktown Tools</title>
-
-    <!-- FAVICONS -->
-    <link rel="icon" href="Yorktown.PNG" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="Yt-logo.PNG">
-
+    <link rel="icon" href="Yorktown.PNG">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --navy: #0b1e3f;
             --red: #c8102e;
             --white: #ffffff;
-            --light: #f8f9fa;
+            --light-gray: #f8f9fa;
+            --green: #2e7d32;
+            --yellow: #b07100;
+            --red-dark: #c62828;
         }
-        * { margin:0; padding:0; box-sizing:border-box; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--white);
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #fff;
             color: #212529;
-            min-height: 100vh;
+            line-height: 1.5;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
             position: relative;
+            overflow-x: hidden;
         }
-        /* George watermark */
-        body::after {
+
+        /* Subtle animated background mascot */
+        body::before {
             content: "";
             position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140vw; height: 140vw;
-            background: url('george-mascot.PNG') center/contain no-repeat;
-            opacity: 0.12;
+            inset: 0;
+            background: url('george-mascot.PNG') center / contain no-repeat;
+            opacity: 0.08;
             pointer-events: none;
             z-index: -1;
+            animation: float 40s ease-in-out infinite;
         }
 
-        /* Top red banner */
-        .top-red-banner {
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        .top-banner {
             background: var(--red);
-            color: var(--white);
+            color: white;
             text-align: center;
-            padding: 0.9rem;
-            font-weight: 700;
-            font-size: 1.15rem;
-        }
-
-        .gov-ids-header {
-            background: var(--navy);
-            color: var(--white);
-            text-align: center;
-            padding: 0.7rem;
-            font-size: 0.95rem;
-        }
-        .gov-ids-header strong { color: #ffeb3b; }
-
-        .logo-header {
-            text-align: center;
-            padding: 2rem 1rem 1.6rem;
-            background: var(--white);
-        }
-        .logo-header img { max-width: 260px; width: 92%; }
-
-        /* Main content */
-        .pour-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 1.4rem;
-            text-align: center;
-        }
-        h1 {
-            font-size: clamp(2.6rem, 8vw, 3.8rem);
-            color: var(--navy);
-            margin: 1.5rem 0;
+            padding: 1rem;
             font-weight: 800;
-        }
-        .subtitle {
-            font-size: 1.4rem;
-            color: #495057;
-            margin-bottom: 3rem;
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
+            letter-spacing: 0.5px;
         }
 
-        .big-light {
-            width: 220px;
-            height: 220px;
+        .gov-id {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+        }
+
+        .gov-id strong { color: #ffeb3b; font-weight: 700; }
+
+        .logo {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+            background: white;
+        }
+
+        .logo img {
+            max-width: 280px;
+            width: 90%;
+            height: auto;
+        }
+
+        main {
+            flex: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(2.8rem, 8vw, 4.5rem);
+            font-weight: 900;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.35rem;
+            color: #555;
+            margin-bottom: 3rem;
+            font-weight: 500;
+        }
+
+        .status-light {
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
-            margin: 2.5rem auto;
+            margin: 3rem auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 140px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            font-size: 160px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+            animation: glow 4s ease-in-out infinite alternate;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .green { background: #4CAF50; }
+
+        @keyframes glow {
+            from { box-shadow: 0 25px 60px rgba(0,0,0,0.25); }
+            to { box-shadow: 0 30px 80px rgba(0,0,0,0.35); }
+        }
+
+        .green { background: #4CAF50; color: white; }
         .yellow { background: #FFCA28; color: #000; }
-        .red { background: #D32F2F; }
+        .red { background: #D32F2F; color: white; }
 
         .verdict {
-            font-size: clamp(2rem, 7vw, 2.8rem);
-            font-weight: 800;
-            margin: 1.5rem 0;
+            font-size: clamp(2.2rem, 7vw, 3.2rem);
+            font-weight: 900;
+            margin: 2rem 0 3rem;
+            min-height: 80px;
         }
-        .green-text { color: #2e7d32; }
-        .yellow-text { color: #b07100; }
-        .red-text { color: #c62828; }
 
         .city-row {
-            font-size: clamp(2.2rem, 9vw, 4.5rem);
-            margin: 3rem 0;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 1.5rem 2.5rem;
-            line-height: 1.4;
+            gap: 2rem;
+            margin: 4rem 0;
+            font-size: clamp(2.4rem, 8vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.3;
         }
 
-        /* Your exact footer */
-        .pour-footer {
+        .city {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            background: rgba(11, 30, 63, 0.08);
+            min-width: 140px;
+        }
+
+        footer {
             background: var(--navy);
-            color: var(--white);
-            padding: 3rem 1.5rem;
+            color: white;
+            padding: 4rem 1.5rem 3rem;
             margin-top: 5rem;
-            font-size: 1.4rem;
-        }
-        .pour-footer strong { font-size: 1.6rem; }
-        .pour-footer a {
-            color: #ffffff;
-            font-size: 2rem;
-            text-decoration: underline;
-            font-weight: 700;
         }
 
-        /* Floating call button (same as homepage) */
-        .call-button {
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.45rem;
+        }
+
+        .footer-content strong {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .call-cta {
+            margin-top: 1.5rem;
+        }
+
+        .call-cta a {
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            font-size: 2rem;
+            font-weight: 800;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            margin-top: 1rem;
+            box-shadow: 0 10px 30px rgba(200,16,46,0.4);
+            transition: transform 0.2s;
+        }
+
+        .call-cta a:hover {
+            transform: scale(1.05);
+        }
+
+        /* Floating Call Button */
+        .fab {
             position: fixed;
-            right: clamp(16px, 4vw, 24px);
-            bottom: clamp(16px, 4vw, 24px);
-            width: clamp(72px, 16vw, 88px);
-            height: clamp(72px, 16vw, 88px);
+            right: clamp(16px, 4vw, 28px);
+            bottom: clamp(16px, 4vw, 28px);
+            width: clamp(70px, 16vw, 90px);
+            height: clamp(70px, 16vw, 90px);
             background: var(--red);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
-            z-index: 999;
-            animation: pulse 2.6s infinite;
+            box-shadow: 0 10px 35px rgba(200,16,46,0.6);
+            z-index: 1000;
+            animation: pulse 2.5s infinite;
+            transition: transform 0.3s;
         }
-        .call-button img { width: 68%; border: 4px solid white; border-radius: 50%; }
+
+        .fab:hover {
+            transform: scale(1.1);
+        }
+
+        .fab img {
+            width: 68%;
+            border: 4px solid white;
+            border-radius: 50%;
+        }
+
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); }
-            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); }
-            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); }
+            0% { box-shadow: 0 10px 35px rgba(200,16,46,0.6); }
+            70% { box-shadow: 0 10px 55px rgba(200,16,46,0.9); }
+            100% { box-shadow: 0 10px 35px rgba(200,16,46,0.6); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .status-light { width: 200px; height: 200px; font-size: 130px; }
+            .city-row { gap: 1.2rem; }
+            .city { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Floating Call Button -->
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
-        <img src="Yorktown.PNG" alt="George">
+    <a href="tel:757-940-5171" class="fab" aria-label="Call Yorktown Tools">
+        <img src="Yorktown.PNG" alt="">
     </a>
 
-    <!-- Top red banner -->
-    <div class="top-red-banner">Can We Pour Today? – Live Richmond to Virginia Beach</div>
+    <header>
+        <div class="top-banner">
+            Can We Pour Today? – Live Forecast from Richmond to Virginia Beach
+        </div>
+        <div class="gov-id">
+            <strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned Business
+        </div>
+        <div class="logo">
+            <img src="Yorktown.PNG" alt="Yorktown Tools Logo">
+        </div>
+    </header>
 
-    <!-- Navy ID bar -->
-    <div class="gov-ids-header">
-        <strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned & SAM.gov Registered
-    </div>
-
-    <!-- Logo -->
-    <div class="logo-header">
-        <img src="Yorktown.PNG" alt="Yorktown Tools">
-    </div>
-
-    <div class="pour-container">
+    <main>
         <h1>Can We Pour Today?</h1>
         <p class="subtitle">Richmond → Williamsburg → Yorktown → Hampton Roads → Virginia Beach</p>
 
-        <!-- Big Traffic Light (example – will auto-update later) -->
-        <div class="big-light green">GREEN</div>
-        <div class="verdict green-text">GREEN LIGHT – POUR ALL DAY!</div>
+        <div class="status-light green" id="mainLight">Loading…</div>
+        <div class="verdict green-text" id="mainText">Checking live weather data…</div>
 
-        <!-- City verdicts -->
-        <div class="city-row">
-            Richmond GREEN Williamsburg GREEN Yorktown GREEN Newport News GREEN Norfolk GREEN Chesapeake GREEN Virginia Beach GREEN
+        <div class="city-row" id="cityRow">
+            <!-- Will be populated by JS -->
         </div>
 
-        <!-- Your exact footer text -->
-        <div class="pour-footer">
-            <strong>Yorktown Tools</strong><br>
-            Never Run Out. Never Overpay.<br>
-            Premium Tools Delivered for Free. same-day.<br>
-            <a href="tel:757-940-5171">Text 757-940-5171</a>
-        </div>
-    </div>
+        <footer>
+            <div class="footer-content">
+                <strong>Yorktown Tools</strong>
+                <div>Never Run Out. Never Overpay.</div>
+                <div>Premium Tools Delivered Free – Same-Day</div>
+                <div class="call-cta">
+                    <a href="tel:757-940-5171">📞 757-940-5171</a>
+                </div>
+            </div>
+        </footer>
+    </main>
 
+    <script>
+        // Simple live mock data (replace with real weather API later)
+        const cities = [
+            { name: "Richmond", pour: true },
+            { name: "Williamsburg", pour: true },
+            { name: "Yorktown", pour: true },
+            { name: "Newport News", pour: false },
+            { name: "Hampton", pour: true },
+            { name: "Norfolk", pour: true },
+            { name: "Va Beach", pour: true }
+        ];
+
+        const mainLight = document.getElementById('mainLight');
+        const mainText = document.getElementById('mainText');
+        const cityRow = document.getElementById('cityRow');
+
+        // Simulate decision logic (you'd replace this with actual NWS/NOAA API data)
+        const canPourOverall = cities.filter(c => c.pour).length >= cities.length * 0.7;
+
+        if (canPourOverall) {
+            mainLight.classList.replace('green', 'green');
+            mainLight.innerHTML = '🟢';
+            mainText.textContent = 'YES – GO POUR!';
+            mainText.className = 'verdict green-text';
+        } else if (cities.some(c => !c.pour)) {
+            mainLight.classList.replace('green', 'yellow');
+            mainLight.innerHTML = '🟡';
+            mainText.textContent = 'CAUTION – Check Cities';
+            mainText.className = 'verdict yellow-text';
+        } else {
+            mainLight.classList.replace('green', 'red');
+            mainLight.innerHTML = '🔴';
+            mainText.textContent = 'NO – Too Wet';
+            mainText.className = 'verdict red-text';
+        }
+
+        // Populate cities
+        cityRow.innerHTML = cities.map(city => `
+            <div class="city ${city.pour ? 'green-text' : 'red-text'}">
+                ${city.name} ${city.pour ? '✅' : '❌'}
+            </div>
+        `).join('');
+    </script>
 </body>
 </html>
