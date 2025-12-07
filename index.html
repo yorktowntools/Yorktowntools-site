@@ -84,11 +84,9 @@
             opacity: 0;
             transition: opacity 1s ease;
         }
-        .banner-text.active {
-            opacity: 1;
-        }
+        .banner-text.active { opacity: 1; }
 
-        /* Blue banner directly under red, sandwiching the logo */
+        /* Blue banner directly under red */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
@@ -345,27 +343,29 @@
         .add-item-btn { align-self:flex-start; background:transparent; color:var(--navy); border:2px solid var(--navy); padding:0.8rem 1.6rem; border-radius:12px; font-weight:600; cursor:pointer; }
         .add-item-btn:hover { background:var(--navy); color:#fff; }
 
-        /* NEW “CAN WE POUR TODAY?” BUTTON STYLING */
+        /* “CAN WE POUR TODAY?” BUTTON */
         .pour-btn {
             display: inline-block;
             background: var(--red);
             color: white;
-            padding: 1.5rem 4rem;
+            padding: 1.6rem 4.5rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.5rem;
-            box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+            font-size: 1.55rem;
+            box-shadow: 0 12px 35px rgba(200,16,46,0.4);
             transition: all 0.35s ease;
         }
         .pour-btn:hover {
             background: #a00d22;
-            transform: translateY(-5px);
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(200,16,46,0.5);
         }
 
         @media (max-width: 480px) {
             .top-red-banner, .gov-ids-header { font-size: 1.02rem; padding: 0.75rem; }
             nav a { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
+            .pour-btn { font-size: 1.35rem; padding: 1.4rem 3rem; }
         }
 
         @supports (-webkit-touch-callout: none) {
@@ -375,7 +375,7 @@
 </head>
 <body>
 
-    <!-- FIXED Call Button with George + phone emoji -->
+    <!-- FIXED Call Button with George + phone emoji
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools Now">
         <img src="Yorktown.PNG" alt="George">
     </a>
@@ -426,9 +426,9 @@
                 </div>
             </div>
 
-            <!-- ←←← THIS IS THE ONLY NEW THING ←←← -->
-            <div style="text-align:center; margin: 3rem 0;">
-                <a href="/Yorktowntools-site/Can-we-pour-today.html" class="pour-btn">
+            <!-- FIXED & IMPROVED “CAN WE POUR TODAY?” BUTTON -->
+            <div style="text-align:center; margin: 3.5rem 0;">
+                <a href="/Can-we-pour-today.html" class="pour-btn" target="_blank" rel="noopener">
                     Can We Pour Today? – Live Richmond to Virginia Beach Forecast
                 </a>
             </div>
@@ -437,6 +437,7 @@
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
+        <!-- Rest of your sections (unchanged) -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
