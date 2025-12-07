@@ -13,40 +13,41 @@
             --red: #c8102e;
             --green: #2e7d32;
             --yellow: #b07100;
-            --blue: #1565c0;
             --white: #ffffff;
             --light: #f8f9fa;
-            --radius: 20px;
-            --shadow: 0 12px 35px rgba(0,0,0,0.12);
+            --radius: 24px;
+            --shadow: 0 15px 40px rgba(0,0,0,0.12);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: white;
             color: #222;
-            line-height: 1.6;
+            line-height: 1.7;
         }
 
-        /* Fixed scrolling red banner */
+        /* Super smooth continuous scrolling banner */
         .top-banner {
             background: var(--red);
             color: white;
-            padding: 14px 0;
+            padding: 16px 0;
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             overflow: hidden;
             white-space: nowrap;
             position: relative;
         }
-        .banner-content {
+        .banner-track {
             display: inline-block;
-            animation: scroll-left 35s linear infinite;
+            animation: scroll 48s linear infinite;
+            padding-left: 100%;
         }
-        .banner-content span {
-            padding: 0 60px;
+        .banner-track span {
+            padding: 0 80px;
+            display: inline-block;
         }
-        @keyframes scroll-left {
-            0% { transform: translateX(100%); }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
 
@@ -54,27 +55,27 @@
             background: var(--navy);
             color: white;
             text-align: center;
-            padding: 10px;
-            font-size: 0.9rem;
+            padding: 11px;
+            font-size: 0.95rem;
         }
         .gov-bar strong { color: #ffeb3b; }
 
-        .logo { text-align: center; padding: 24px 16px 12px; }
-        .logo img { max-width: 240px; width: 88%; }
+        .logo { text-align: center; padding: 28px 16px 14px; }
+        .logo img { max-width: 260px; width: 90%; }
 
         nav {
             background: var(--navy);
-            padding: 14px 0;
+            padding: 16px 0;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(11,30,63,0.22);
+            box-shadow: 0 6px 25px rgba(11,30,63,0.25);
         }
         nav ul {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 22px;
             list-style: none;
             padding: 0 16px;
         }
@@ -82,141 +83,185 @@
             color: white;
             text-decoration: none;
             font-weight: 600;
-            padding: 9px 16px;
-            border-radius: 10px;
+            padding: 10px 18px;
+            border-radius: 12px;
             transition: 0.3s;
         }
-        nav a:hover { background: rgba(255,255,255,0.2); }
+        nav a:hover { background: rgba(255,255,255,0.22); color: var(--red); }
 
-        main { max-width: 1200px; margin: 0 auto; padding: 0 16px 80px; }
+        main { max-width: 1240px; margin: 0 auto; padding: 0 16px 100px; }
 
         .hero {
             text-align: center;
-            padding: 70px 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
+            padding: 80px 20px 60px;
+            background: linear-gradient(to bottom, #f8f9fa 0%, white 70%);
             border-radius: var(--radius);
-            margin: 32px 0;
+            margin: 36px 0;
             box-shadow: var(--shadow);
         }
         .hero h1 {
-            font-size: clamp(2.8rem, 9vw, 4.2rem);
+            font-size: clamp(3rem, 10vw, 4.6rem);
             color: var(--navy);
             font-weight: 900;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
         }
         .hero p {
-            font-size: 1.18rem;
+            font-size: 1.22rem;
             color: #444;
-            margin-bottom: 40px;
+            margin-bottom: 44px;
         }
 
-        /* Pure colored circles — NO TEXT INSIDE */
+        /* Pure colored circle */
         .big-circle {
-            width: 260px;
-            height: 260px;
-            margin: 0 auto 30px;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 36px;
             border-radius: 50%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.32);
         }
         .green { background: #4CAF50; }
         .yellow { background: #FFCA28; }
         .red { background: #D32F2F; }
 
         .verdict {
-            font-size: clamp(2.4rem, 8vw, 3.4rem);
+            font-size: clamp(2.6rem, 9vw, 3.8rem);
             font-weight: 900;
             margin: 10px 0 0;
         }
 
-        /* City Cards */
+        /* Beautiful concrete hero image */
+        .concrete-hero {
+            margin: 60px 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .concrete-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Modern ACI explanation box */
+        .aci-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
+            border-left: 8px solid var(--red);
+            border-radius: var(--radius);
+            padding: 40px 32px;
+            margin: 70px auto;
+            max-width: 900px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .aci-box h3 {
+            font-size: 1.8rem;
+            color: var(--navy);
+            margin-bottom: 24px;
+            font-weight: 800;
+        }
+        .aci-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .aci-item {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        .aci-item strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .aci-item span {
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        /* City cards - now using your original navy */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 26px;
-            margin: 60px 0;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+            margin: 70px 0;
         }
         .city-card {
             background: white;
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
+            transition: transform 0.35s ease;
         }
-        .city-card:hover { transform: translateY(-10px); }
+        .city-card:hover { transform: translateY(-12px); }
         .city-header {
-            background: var(--blue);
+            background: var(--navy);
             color: white;
-            padding: 18px;
+            padding: 20px;
             text-align: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            border-bottom: 6px solid var(--red);
+            border-bottom: 7px solid var(--red);
         }
         .city-body {
-            padding: 22px 18px;
+            padding: 28px 20px;
             text-align: center;
             background: #fafcff;
         }
         .status {
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             font-weight: 800;
-            margin: 12px 0;
+            margin: 14px 0;
         }
         .go { color: var(--green); }
         .caution { color: var(--yellow); }
         .no { color: #d32f2f; }
-        .details { color: #333; margin: 10px 0; font-size: 1rem; }
-        .issues { color: #d32f2f; font-weight: 600; margin-top: 10px; font-size: 0.95rem; }
-
-        .explanation {
-            background: var(--light);
-            padding: 34px;
-            border-radius: var(--radius);
-            margin: 60px auto;
-            max-width: 800px;
-            border-left: 8px solid var(--red);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
+        .details { color: #333; margin: 12px 0; font-size: 1.05rem; }
+        .issues { color: #d32f2f; font-weight: 600; margin-top: 12px; }
 
         footer {
             background: var(--navy);
             color: white;
             text-align: center;
-            padding: 70px 20px 40px;
-            margin-top: 80px;
+            padding: 80px 20px 40px;
+            margin-top: 100px;
         }
-        footer img { max-width: 90%; margin-bottom: 20px; opacity: 0.9; }
+        footer img { max-width: 90%; margin-bottom: 24px; opacity: 0.92; }
         footer a { color: white; text-decoration: underline; }
 
         .call-btn {
             position: fixed;
-            right: 18px;
-            bottom: 18px;
-            width: 70px;
-            height: 70px;
+            right: 20px;
+            bottom: 20px;
+            width: 72px;
+            height: 72px;
             background: var(--red);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            box-shadow: 0 10px 35px rgba(200,16,46,0.55);
             z-index: 999;
-            animation: pulse 2.5s infinite;
+            animation: pulse 2.8s infinite;
         }
         .call-btn img {
-            width: 62%;
-            border: 3px solid white;
+            width: 64%;
+            border: 4px solid white;
             border-radius: 50%;
         }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); }
-            70% { box-shadow: 0 0 0 22px rgba(200,16,46,0); }
+            70% { box-shadow: 0 0 0 24px rgba(200,16,46,0); }
             100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); }
         }
 
         @media (max-width: 480px) {
-            .big-circle { width: 220px; height: 220px; }
+            .big-circle { width: 230px; height: 230px; }
+            .aci-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -226,13 +271,13 @@
     <img src="Yorktown.PNG" alt="Call">
 </a>
 
-<!-- Fixed Scrolling Red Banner -->
+<!-- Smooth, slow, continuous red banner -->
 <div class="top-banner">
-    <div class="banner-content">
+    <div class="banner-track">
         <span>Can We Pour Concrete Today? • Live NOAA Forecast • Updated: <span id="liveTime">Never</span></span>
         <span>Free Delivery • Veteran-Owned • SAM.gov Registered</span>
         <span>Premium Concrete Tools & Rebar — Same-Day Delivery in Hampton Roads</span>
-        <span>Can We Pour Concrete Today? • Live NOAA Forecast • Updated: <span id="liveTime">Never</span></span>
+        <span>Call 757-940-5171 for Rebar, Tools & Ladders</span>
     </div>
 </div>
 
@@ -259,31 +304,47 @@
         <h1>Can We Pour Today?</h1>
         <p>Live NOAA forecast • Richmond to Virginia Beach<br>Updated every 15 minutes</p>
 
-        <!-- Pure colored circle — no text! -->
         <div class="big-circle green" id="mainCircle"></div>
-
         <div class="verdict" id="mainVerdict">Loading live data...</div>
     </section>
 
-    <section class="explanation">
-        <strong>How we decide (ACI guidelines):</strong><br><br>
-        We check the next 8 hours of NOAA data for:<br>
-        <ul style="text-align:left; max-width:600px; margin:24px auto; line-height:1.9;">
-            <li>Rain > 30% → <strong style="color:#d32f2f">NO-GO</strong></li>
-            <li>Temp < 40°F or > 90°F → <strong style="color:#b07100">CAUTION</strong></li>
-            <li>Wind gusts > 20 mph → <strong style="color:#b07100">CAUTION</strong></li>
-            <li>All clear → <strong style="color:#2e7d32">GOOD TO POUR</strong></li>
-        </ul>
-        <small id="lastUpdate">Last updated: Never</small>
-    </section>
+    <!-- Concrete Pour Image -->
+    <div class="concrete-hero">
+        <img src="concrete.jpg" alt="Professional concrete pour in progress">
+    </div>
 
-    <h2 style="text-align:center; font-size:2.4rem; margin:60px 0 30px; color:var(--navy);">
+    <!-- Modern ACI Guidelines -->
+    <div class="aci-box">
+        <h3>How We Decide — ACI 305/306 Guidelines</h3>
+        <p>We analyze the next 8 hours of NOAA data for these critical factors:</p>
+        <div class="aci-grid">
+            <div class="aci-item">
+                <strong>Rain Risk</strong>
+                <span style="color:#d32f2f">>30% = NO-GO</span>
+            </div>
+            <div class="aci-item">
+                <strong>Temperature</strong>
+                <span style="color:#b07100"><40°F or >90°F = CAUTION</span>
+            </div>
+            <div class="aci-item">
+                <strong>Wind Gusts</strong>
+                <span style="color:#b07100">>20 mph = CAUTION</span>
+            </div>
+            <div class="aci-item">
+                <strong>All Clear</strong>
+                <span style="color:#2e7d32">GOOD TO POUR</span>
+            </div>
+        </div>
+        <p style="margin-top: 24px; font-size: 0.95rem; color: #555;">
+            <small id="lastUpdate">Last updated: Never</small>
+        </p>
+    </div>
+
+    <h2 style="text-align:center; font-size:2.6rem; margin:70px 0 40px; color:var(--navy); font-weight:900;">
         Current Conditions by City
     </h2>
 
-    <div class="grid" id="cityGrid">
-        <!-- Filled by JS -->
-    </div>
+    <div class="grid" id="cityGrid"></div>
 </main>
 
 <footer>
@@ -291,7 +352,7 @@
     <p><strong>757-940-5171</strong> | yorktowntools@gmail.com</p>
     <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
     <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
-    <p>© 2025 Yorktown Tools</p>
+    <p>© 2025 Yorktown Tools. All rights reserved.</p>
 </footer>
 
 <script>
@@ -333,7 +394,7 @@
     function assess(data) {
         const issues = [];
         if (data.rain > 30) issues.push("Rain");
-        if (data.tempMin < 40 || data.tempMax > 90) issues.push("Temperature");
+        if (data.tempMin < 40 || data.tempMax > 90) issues.push("Temp");
         if (data.wind > 20) issues.push("Wind");
 
         if (issues.length >= 2) return { status: "no", text: "Do Not Pour", issues };
@@ -349,7 +410,6 @@
                 const hasCaution = cities.some(c => c.status === 'caution');
                 const overall = hasNo ? 'no' : hasCaution ? 'caution' : 'go';
 
-                // Update main circle (pure color, no text)
                 mainCircle.className = `big-circle ${overall === 'go' ? 'green' : overall === 'caution' ? 'yellow' : 'red'}`;
 
                 mainVerdict.textContent = overall === 'go' ? 'YES — POUR WITH CONFIDENCE' :
@@ -361,7 +421,7 @@
                         <div class="city-header">${c.name}</div>
                         <div class="city-body">
                             <div class="status ${c.status}">${c.text}</div>
-                            <div class="details">${c.tempMin}–${c.tempMax}°F • ${c.rain}% rain • ${c.wind} mph</div>
+                            <div class="details">${c.tempMin}–${c.tempMax}°F • ${c.rain}% rain • ${c.wind} mph wind</div>
                             ${c.issues.length ? `<div class="issues">Issue: ${c.issues.join(', ')}</div>` : ''}
                         </div>
                     </div>
