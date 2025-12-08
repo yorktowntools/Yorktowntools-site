@@ -11,8 +11,6 @@
         :root {
             --navy: #0b1e3f;
             --red: #c8102e;
-            --green: #2e7d32;
-            --yellow: #b07100;
             --white: #ffffff;
             --light: #f8f9fa;
             --radius: 24px;
@@ -28,7 +26,7 @@
             position: relative;
         }
 
-        /* Transparent George background */
+        /* Transparent George (hidden behind solid areas) */
         body::after {
             content: "";
             position: fixed;
@@ -36,7 +34,7 @@
             transform: translate(-50%, -50%);
             width: 140vw; height: 140vw;
             max-width: 1400px; max-height: 1400px;
-            background: url('george-mascot.PNG') center / contain no-repeat;
+            background: url('george-mascot.PNG') center/contain no-repeat;
             opacity: 0.15;
             pointer-events: none;
             z-index: -1;
@@ -49,7 +47,7 @@
             color: white;
             padding: 16px 0;
             font-weight: 700;
-            font-size: 1.1.1rem;
+            font-size: 1.1rem;
             overflow: hidden;
             white-space: nowrap;
         }
@@ -70,8 +68,13 @@
             font-weight: 700;
         }
 
-        .logo { text-align: center; padding: 28px 16px 14px; }
-        .logo img { max-width: 260px; width: 90%; }
+        /* Solid white block so George doesn't bleed through logo */
+        .logo-area {
+            background: white;
+            padding: 32px 16px 20px;
+            text-align: center;
+        }
+        .logo-area img { max-width: 260px; width: 90%; }
 
         nav {
             background: var(--navy);
@@ -108,16 +111,8 @@
             margin: 36px 0;
             box-shadow: var(--shadow);
         }
-        .hero h1 {
-            font-size: clamp(3rem, 10vw, 4.6rem);
-            color: var(--navy);
-            font-weight: 900;
-            margin-bottom: 16px;
-        }
-        .hero p {
-            font-size: 1.22rem;
-            color: #444;
-        }
+        .hero h1 { font-size: clamp(3rem, 10vw, 4.6rem); color: var(--navy); font-weight: 900; margin-bottom: 16px; }
+        .hero p { font-size: 1.22rem; color: #444; }
 
         .calculator-box {
             background: white;
@@ -135,12 +130,7 @@
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             margin-bottom: 32px;
         }
-        label {
-            font-weight: 600;
-            color: var(--navy);
-            display: block;
-            margin-bottom: 0.6rem;
-        }
+        label { font-weight: 600; color: var(--navy); display: block; margin-bottom: 0.6rem; }
         select {
             padding: 1rem;
             border: 2px solid #ddd;
@@ -148,10 +138,7 @@
             font-size: 1.1rem;
             width: 100%;
         }
-        select:focus {
-            outline: none;
-            border-color: var(--navy);
-        }
+        select:focus { outline: none; border-color: var(--navy); }
 
         .calc-button {
             display: block;
@@ -167,10 +154,7 @@
             box-shadow: 0 12px 35px rgba(200,16,46,0.4);
             transition: all 0.3s;
         }
-        .calc-button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 18px 45px rgba(200,16,46,0.5);
-        }
+        .calc-button:hover { transform: translateY(-4px); box-shadow: 0 18px 45px rgba(200,16,46,0.5); }
 
         .big-circle {
             width: 300px;
@@ -197,18 +181,19 @@
             margin-top: 20px;
         }
 
-        /* NEW: What to do next section */
+        /* What’s Next section – you said you love it */
         .next-steps {
             margin-top: 50px;
-            padding: 32px;
+            padding: 36px;
             background: var(--light);
             border-radius: var(--radius);
-            border-left: 6px solid var(--red);
+            border-left: 8px solid var(--red);
             text-align: center;
+            display: none; /* shown only after calculation */
         }
         .next-steps h3 {
             color: var(--navy);
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             margin-bottom: 16px;
         }
         .next-steps p {
@@ -220,47 +205,45 @@
             display: inline-block;
             background: var(--red);
             color: white;
-            padding: 14px 32px;
+            padding: 16px 40px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.2rem;
-            box-shadow: 0 8px 25px rgba(200,16,46,0.3);
+            font-size: 1.3rem;
+            box-shadow: 0 10px 30px rgba(200,16,46,0.35);
             transition: 0.3s;
         }
         .next-steps a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(200,16,46,0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(200,16,46,0.45);
         }
 
         footer {
             background: var(--navy);
             color: white;
             text-align: center;
-            padding: 80px 20px 40px;
-            margin-top: 100px;
+            padding: 90px 20px 40px;
+            margin-top: 120px;
         }
 
-        /* NEW: Solid white background behind logo in footer */
         .footer-logo {
             background: white;
-            padding: 32px;
+            padding: 36px;
             border-radius: 20px;
             display: inline-block;
-            margin-bottom: 32px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 36px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
         }
         .footer-logo img {
             max-width: 280px;
             width: 90%;
-            display: block;
         }
 
-        /* Make phone number PURE WHITE and bold */
+        /* Phone number = pure bright white */
         footer p strong {
             color: #ffffff !important;
             font-weight: 900;
-            font-size: 1.4rem;
+            font-size: 1.55rem;
         }
 
         .call-btn {
@@ -299,11 +282,10 @@
     </div>
 </div>
 
-<div class="gov-bar">
-    Free Tool for the Trade
-</div>
+<div class="gov-bar">Free Tool for the Trade</div>
 
-<div class="logo">
+<!-- Solid white behind logo -->
+<div class="logo-area">
     <img src="Yorktown.PNG" alt="Yorktown Tools">
 </div>
 
@@ -322,44 +304,32 @@
 
     <div class="calculator-box">
         <div class="form-grid">
-            <div>
-                <label>Rebar Size</label>
-                <select id="size">
-                    <option value="3">#3</option>
-                    <option value="4">#4</option>
-                    <option value="5" selected>#5</option>
-                    <option value="6">#6</option>
-                    <option value="7">#7</option>
-                    <option value="8">#8</option>
-                    <option value="9">#9</option>
-                    <option value="10">#10</option>
-                    <option value="11">#11</option>
-                </select>
-            </div>
-            <div>
-                <label>Concrete Strength</label>
-                <select id="fcm">
-                    <option value="3000">3,000 psi</option>
-                    <option value="4000" selected>4,000 psi</option>
-                    <option value="5000">5,000 psi</option>
-                    <option value="6000">6,000 psi</option>
-                    <option value="8000">8,000 psi</option>
-                </select>
-            </div>
-            <div>
-                <label>Grade</label>
-                <select id="grade">
-                    <option value="60" selected>Grade 60</option>
-                    <option value="80">Grade 80</option>
-                </select>
-            </div>
-            <div>
-                <label>Coating & Location</label>
-                <select id="coating">
-                    <option value="1">Uncoated & not top-cast</option>
-                    <option value="1.3">Epoxy-coated or top-cast</option>
-                </select>
-            </div>
+            <div><label>Rebar Size</label><select id="size">
+                <option value="3">#3</option>
+                <option value="4">#4</option>
+                <option value="5" selected>#5</option>
+                <option value="6">#6</option>
+                <option value="7">#7</option>
+                <option value="8">#8</option>
+                <option value="9">#9</option>
+                <option value="10">#10</option>
+                <option value="11">#11</option>
+            </select></div>
+            <div><label>Concrete Strength</label><select id="fcm">
+                <option value="3000">3,000 psi</option>
+                <option value="4000" selected>4,000 psi</option>
+                <option value="5000">5,000 psi</option>
+                <option value="6000">6,000 psi</option>
+                <option value="8000">8,000 psi</option>
+            </select></div>
+            <div><label>Grade</label><select id="grade">
+                <option value="60" selected>Grade 60</option>
+                <option value="80">Grade 80</option>
+            </select></div>
+            <div><label>Coating & Location</label><select id="coating">
+                <option value="1">Uncoated & not top-cast</option>
+                <option value="1.3">Epoxy-coated or top-cast</option>
+            </select></div>
         </div>
 
         <button class="calc-button" onclick="calculate()">Calculate Lap Length</button>
@@ -372,13 +342,12 @@
             Results appear here after you hit the button
         </div>
 
-        <!-- NEW: What to do with this info -->
-        <div class="next-steps" id="nextSteps" style="display:none;">
-            <h3>What's Next? Use Your Lap Length!</h3>
-            <p><strong>Class B (${classB}" recommended)</strong> is the safe default unless your structural engineer approves Class A.</p>
-            <p>This calculator follows ACI 318-19 Section 25.5.2 — perfect for contractors, inspectors, and engineers in the field.</p>
-            <p>Need rebar, ties, dowels, or custom fab? We've got you covered.</p>
-            <a href="tel:757-940-5171">Call 757-940-5171 for a Fast Quote</a>
+        <!-- You said you love this section — it's back and better -->
+        <div class="next-steps" id="nextSteps">
+            <h3>What's Next After You Get Your Lap Length?</h3>
+            <p><strong>Class B is the safe default</strong> unless your engineer approves Class A.</p>
+            <p>Need this rebar cut, bent, or delivered tomorrow? We ship nationwide.</p>
+            <a href="tel:757-940-5171">Call 757-940-5171 for Instant Pricing</a>
         </div>
     </div>
 </main>
@@ -412,29 +381,23 @@
         const g = gradeFactor[grade.value];
         const coat = parseFloat(coating.value);
 
-        // Basic development length calculation (simplified per ACI 318-19)
         let ld = (d * d * parseInt(fcm.value) * psi * g * coat) / 25;
-        ld = Math.max(ld, 12); // minimum 12"
+        ld = Math.max(ld, 12);
 
         const classA = Math.round(ld * 10) / 10;
         const classB = Math.round(ld * 1.3 * 10) / 10;
 
-        // Update results
         resultCircle.style.background = 'var(--red)';
-        resultCircle.innerHTML = `
-            <div>${classB}"</div>
-            <div class="class-a">Class A: ${classA}"</div>
-        `;
+        resultCircle.innerHTML = `<div>${classB}"</div><div class="class-a">Class A: ${classA}"</div>`;
 
         resultDetails.innerHTML = `
             <strong>#${bar} Grade ${grade.value}</strong> in ${fcm.value.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} psi concrete<br>
             Class B = 1.3 × development length • Use unless engineer approves Class A<br>
-            Minimum lap = 12" per ACI 318-19
+            Minimum lap = 12" (ACI 318-19)
         `;
 
-        // Show "Next Steps" box with dynamic Class B value
+        // Show the “What’s Next” box
         nextSteps.style.display = 'block';
-        nextSteps.querySelector('strong').textContent = `Class B (${classB}" recommended)`;
     }
 </script>
 </body>
