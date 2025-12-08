@@ -64,13 +64,13 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.85rem 1rem;
+            padding: 0.8rem 1rem;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
-            min-height: 54px;
+            min-height: 52px;
         }
         .banner-text {
             position: absolute;
@@ -83,20 +83,20 @@
         }
         .banner-text.active { opacity: 1; }
 
-        /* UEI / CAGE / SAM — ALWAYS ONE LINE */
+        /* UEI / CAGE / SAM — ALWAYS ONE LINE + LOGO */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
             text-align: center;
-            padding: 0.75rem 1rem;
-            font-size: 0.94rem;
+            padding: 0.65rem 1rem;
+            font-size: 0.92rem;
             font-weight: 500;
             white-space: nowrap;
         }
         .gov-items {
             display: inline-flex;
             align-items: center;
-            gap: 1.8rem;
+            gap: 1.6rem;
             flex-wrap: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
@@ -105,27 +105,28 @@
         }
         .gov-items::-webkit-scrollbar { display: none; }
         .gov-items strong { color: #ffeb3b; }
+        .gov-items img { height: 26px; vertical-align: middle; margin-right: 6px; }
         .gov-items span:not(:last-child)::after {
             content: " | ";
-            margin-left: 1.8rem;
+            margin-left: 1.6rem;
             opacity: 0.7;
         }
 
         .logo-header {
             text-align: center;
-            padding: 1.8rem 1rem 1.4rem;
+            padding: 1.6rem 1rem 1.2rem;
             background: var(--white);
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
-        /* MAIN NAVIGATION — SMOOTH HIDE/SHOW */
+        /* COMPACT & SMOOTH NAVIGATION */
         nav {
             background: var(--navy);
             position: sticky;
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(11,30,63,0.18);
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: transform;
         }
         nav.hidden { transform: translateY(-100%); }
@@ -135,20 +136,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.8rem;
+            gap: 0.35rem;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 1rem;
+            padding: 0.75rem 1rem;
         }
         nav a {
             color: var(--white);
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.9rem 1.4rem;
-            border-radius: 12px;
+            font-size: 1rem;
+            padding: 0.7rem 1.2rem;
+            border-radius: 10px;
             transition: var(--transition);
-            width: 90%;
+            width: 88%;
             text-align: center;
             display: block;
         }
@@ -157,18 +158,19 @@
             color: var(--red);
         }
 
-        /* Desktop nav */
+        /* Desktop: horizontal */
         @media (min-width: 768px) {
             nav ul {
                 flex-direction: row;
                 justify-content: center;
                 flex-wrap: wrap;
-                gap: clamp(1.2rem, 3.5vw, 2.4rem);
+                gap: clamp(1rem, 3vw, 2rem);
+                padding: 0.9rem 1rem;
             }
             nav a {
                 width: auto;
-                font-size: 1.02rem;
-                padding: 0.7rem 1.2rem;
+                font-size: 0.98rem;
+                padding: 0.65rem 1.1rem;
             }
         }
 
@@ -284,23 +286,6 @@
             background: rgba(255,255,255,0.22);
             transform: translateY(-6px);
         }
-        .free-resource-card .icon {
-            font-size: 1.8rem;
-            font-weight: 700;
-            opacity: 0.9;
-        }
-        .free-resource-card h3 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            margin: 0;
-            line-height: 1.3;
-        }
-        .free-resource-card p {
-            font-size: 0.89rem;
-            opacity: 0.85;
-            margin: 0;
-            line-height: 1.4;
-        }
 
         section { margin-bottom:5.5rem; }
         h2 { font-size: clamp(2.1rem, 6.5vw, 2.7rem); margin-bottom:2rem; color:var(--navy); text-align:center; font-weight: 700; }
@@ -355,7 +340,7 @@
         .add-item-btn:hover { background:var(--navy); color:#fff; }
 
         @media (max-width: 480px) {
-            .top-red-banner { font-size: 1.02rem; padding: 0.75rem; }
+            .top-red-banner { font-size: 1rem; padding: 0.7rem; }
         }
     </style>
 </head>
@@ -371,11 +356,15 @@
         <div class="banner-text">No Hassle.</div>
     </div>
 
+    <!-- FIXED: Always one line + SAM.gov logo -->
     <div class="gov-ids-header">
         <div class="gov-items">
             <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span>
             <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.gov</strong></span>
+            <span>
+                <img src="https://sam.gov/img/sam-logo.svg" alt="SAM.gov">
+                <strong>SAM.gov</strong>
+            </span>
         </div>
     </div>
 
@@ -562,16 +551,16 @@
     </footer>
 
     <script>
-        // Smooth nav hide/show
+        // Smooth hide/show nav
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         let ticking = false;
 
         function updateNav() {
             const current = window.pageYOffset;
-            if (current > lastScroll && current > 150) {
+            if (current > lastScroll && current > 160) {
                 nav.classList.add('hidden');
-            } else if (current < lastScroll) {
+            } else {
                 nav.classList.remove('hidden');
             }
             lastScroll = current;
@@ -587,20 +576,20 @@
 
         // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
-        let currentTagline = 0;
+        let current = 0;
         setInterval(() => {
-            taglines[currentTagline].classList.remove('active');
-            currentTagline = (currentTagline + 1) % taglines.length;
-            taglines[currentTagline].classList.add('active');
+            taglines[current].classList.remove('active');
+            current = (current + 1) % taglines.length;
+            taglines[current].classList.add('active');
         }, 7000);
 
-        // Top banner rotator
-        const bannerTexts = document.querySelectorAll('.banner-text');
-        let currentBanner = 0;
+        // Banner rotator
+        const banners = document.querySelectorAll('.banner-text');
+        let bannerIndex = 0;
         setInterval(() => {
-            bannerTexts[currentBanner].classList.remove('active');
-            currentBanner = (currentBanner + 1) % bannerTexts.length;
-            bannerTexts[currentBanner].classList.add('active');
+            banners[bannerIndex].classList.remove('active');
+            bannerIndex = (bannerIndex + 1) % banners.length;
+            banners[bannerIndex].classList.add('active');
         }, 2000);
 
         // Add item row
