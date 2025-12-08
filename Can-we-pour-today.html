@@ -26,7 +26,7 @@
             line-height: 1.7;
         }
 
-        /* Super smooth continuous scrolling banner */
+        /* Clean red scrolling banner – only weather info */
         .top-banner {
             background: var(--red);
             color: white;
@@ -39,7 +39,7 @@
         }
         .banner-track {
             display: inline-block;
-            animation: scroll 48s linear infinite;
+            animation: scroll 36s linear infinite;
             padding-left: 100%;
         }
         .banner-track span {
@@ -51,14 +51,16 @@
             100% { transform: translateX(-100%); }
         }
 
+        /* New navy slogan bar */
         .gov-bar {
             background: var(--navy);
             color: white;
             text-align: center;
             padding: 11px;
-            font-size: 0.95rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .gov-bar strong { color: #ffeb3b; }
 
         .logo { text-align: center; padding: 28px 16px 14px; }
         .logo img { max-width: 260px; width: 90%; }
@@ -112,7 +114,6 @@
             margin-bottom: 44px;
         }
 
-        /* Pure colored circle */
         .big-circle {
             width: 280px;
             height: 280px;
@@ -130,7 +131,29 @@
             margin: 10px 0 0;
         }
 
-        /* Beautiful concrete hero image */
+        /* New description section */
+        .hero-description {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(to bottom, #f8f9fa 0%, white 70%);
+            border-radius: var(--radius);
+            margin: 0 0 70px;
+            box-shadow: var(--shadow);
+        }
+        .hero-description h2 {
+            font-size: 2.4rem;
+            color: var(--navy);
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+        .hero-description p {
+            font-size: 1.25rem;
+            color: #444;
+            max-width: 860px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
         .concrete-hero {
             margin: 60px 0;
             border-radius: var(--radius);
@@ -143,7 +166,6 @@
             display: block;
         }
 
-        /* Modern ACI explanation box */
         .aci-box {
             background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
             border-left: 8px solid var(--red);
@@ -183,7 +205,6 @@
             font-size: 1.4rem;
         }
 
-        /* City cards - now using your original navy */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -271,18 +292,17 @@
     <img src="Yorktown.PNG" alt="Call">
 </a>
 
-<!-- Smooth, slow, continuous red banner -->
+<!-- Clean red banner – only live weather message -->
 <div class="top-banner">
     <div class="banner-track">
-        <span>Can We Pour Concrete Today? • Live NOAA Forecast • Updated: <span id="liveTime">Never</span></span>
-        <span>Free Delivery • Veteran-Owned • SAM.gov Registered</span>
-        <span>Premium Concrete Tools & Rebar — Same-Day Delivery in Hampton Roads</span>
-        <span>Call 757-940-5171 for Rebar, Tools & Ladders</span>
+        <span>Can We Pour Concrete Today? • Live NOAA Forecast for Hampton Roads • Updated: <span id="liveTime">Never</span></span>
+        <span>Can We Pour Concrete Today? • Live NOAA Forecast for Hampton Roads • Updated: <span id="liveTime">Never</span></span>
     </div>
 </div>
 
+<!-- New slogan bar -->
 <div class="gov-bar">
-    <strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned
+    FREE DELIVERY • FREE QUOTE • NO HASSLE
 </div>
 
 <div class="logo">
@@ -308,12 +328,22 @@
         <div class="verdict" id="mainVerdict">Loading live data...</div>
     </section>
 
-    <!-- Concrete Pour Image -->
+    <!-- Clear description of what this tool does -->
+    <section class="hero-description">
+        <h2>Virginia’s Fastest Concrete Pour Decision Tool</h2>
+        <p>
+            Instantly know if it’s safe to pour concrete anywhere from Richmond to Virginia Beach. 
+            We pull live NOAA data every 15 minutes and automatically apply ACI 305/306 hot- and cold-weather concreting guidelines 
+            (rain >30%, temperature <40°F or >90°F, wind gusts >20 mph). 
+            <strong>Green = pour with confidence • Yellow = proceed with caution • Red = hold the pour.</strong> 
+            No guesswork—just one glance and you’re ready to schedule crews or order concrete.
+        </p>
+    </section>
+
     <div class="concrete-hero">
         <img src="concrete.jpg" alt="Professional concrete pour in progress">
     </div>
 
-    <!-- Modern ACI Guidelines -->
     <div class="aci-box">
         <h3>How We Decide — ACI 305/306 Guidelines</h3>
         <p>We analyze the next 8 hours of NOAA data for these critical factors:</p>
@@ -351,7 +381,6 @@
     <img src="hero.png" alt="Yorktown Tools" loading="lazy">
     <p><strong>757-940-5171</strong> | yorktowntools@gmail.com</p>
     <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
-    <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
     <p>© 2025 Yorktown Tools. All rights reserved.</p>
 </footer>
 
@@ -383,10 +412,11 @@
 
             const rain = Math.max(...periods.map(p => p.probabilityOfPrecipitation?.value || 0));
             const temps = periods.map(p => p.temperature);
-            const wind = Math.max(...periods.map(p => parseInt(p.windSpeed) || 0));
+            const wind = Math.max(...periods.map(p => parseInt(p.windSpeed.split(' ')[0]) || 0));
 
             return { rain, tempMin: Math.min(...temps), tempMax: Math.max(...temps), wind };
         } catch (e) {
+            console.error(e);
             return { rain: 0, tempMin: 55, tempMax: 75, wind: 8 };
         }
     }
@@ -434,7 +464,7 @@
     }
 
     update();
-    setInterval(update, 15 * 60 * 1000);
+    setInterval(update, 15 * 60 * 1000); // every 15 minutes
 </script>
 </body>
 </html>
