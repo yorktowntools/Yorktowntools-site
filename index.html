@@ -30,7 +30,7 @@
             --red: #c8102e;
             --white: #ffffff;
             --light: #f8f9fa;
-            --transition: all 0.35s ease;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             --radius: 20px;
             --shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
@@ -83,7 +83,7 @@
         }
         .banner-text.active { opacity: 1; }
 
-        /* UEI / CAGE / SAM.gov — ALWAYS ONE LINE */
+        /* UEI / CAGE / SAM — ALWAYS ONE LINE */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
@@ -91,18 +91,23 @@
             padding: 0.75rem 1rem;
             font-size: 0.94rem;
             font-weight: 500;
+            white-space: nowrap;
         }
         .gov-items {
-            display: flex;
-            justify-content: center;
+            display: inline-flex;
             align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+            gap: 1.8rem;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 0 1rem;
         }
+        .gov-items::-webkit-scrollbar { display: none; }
         .gov-items strong { color: #ffeb3b; }
         .gov-items span:not(:last-child)::after {
             content: " | ";
-            margin-left: 1.5rem;
+            margin-left: 1.8rem;
             opacity: 0.7;
         }
 
@@ -113,15 +118,18 @@
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
-        /* MAIN NAVIGATION — STACKED ON MOBILE */
+        /* MAIN NAVIGATION — SMOOTH HIDE/SHOW */
         nav {
             background: var(--navy);
-            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
         }
+        nav.hidden { transform: translateY(-100%); }
+
         nav ul {
             list-style: none;
             display: flex;
@@ -130,7 +138,7 @@
             gap: 0.8rem;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 1rem 1rem;
         }
         nav a {
             color: var(--white);
@@ -142,13 +150,14 @@
             transition: var(--transition);
             width: 90%;
             text-align: center;
+            display: block;
         }
         nav a:hover {
             background: rgba(255,255,255,0.18);
             color: var(--red);
         }
 
-        /* Desktop: horizontal nav */
+        /* Desktop nav */
         @media (min-width: 768px) {
             nav ul {
                 flex-direction: row;
@@ -235,7 +244,6 @@
         }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
 
-        /* FREE RESOURCES — SMALL & CLEAN */
         #free-resources {
             background: var(--navy);
             color: white;
@@ -294,7 +302,6 @@
             line-height: 1.4;
         }
 
-        /* Rest of your styles (unchanged) */
         section { margin-bottom:5.5rem; }
         h2 { font-size: clamp(2.1rem, 6.5vw, 2.7rem); margin-bottom:2rem; color:var(--navy); text-align:center; font-weight: 700; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: clamp(1.8rem, 4.5vw, 3rem); }
@@ -364,7 +371,6 @@
         <div class="banner-text">No Hassle.</div>
     </div>
 
-    <!-- UEI banner — always one line -->
     <div class="gov-ids-header">
         <div class="gov-items">
             <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span>
@@ -377,7 +383,6 @@
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
-    <!-- MAIN NAV — STACKED ON MOBILE -->
     <nav id="main-nav">
         <ul>
             <li><a href="#home">Home</a></li>
@@ -391,7 +396,6 @@
     </nav>
 
     <main>
-        <!-- All your sections below are 100% unchanged and fully functional -->
         <section id="home" class="hero">
             <h1>Build Better with Yorktown Tools</h1>
             <p>Veteran-owned • Free delivery to Langley AFB, Fort Eustis, Naval Station Norfolk, and to all of Hampton Roads.</p>
@@ -424,9 +428,6 @@
                 </a>
             </div>
         </section>
-
-        <!-- Tools, Accessories, Ladders, About, Contact, Footer — all exactly as before -->
-        <!-- (Included below for completeness) -->
 
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
@@ -561,15 +562,30 @@
     </footer>
 
     <script>
+        // Smooth nav hide/show
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
-        window.addEventListener('scroll', () => {
+        let ticking = false;
+
+        function updateNav() {
             const current = window.pageYOffset;
-            if (current > lastScroll && current > 120) nav.style.transform = 'translateY(-110%)';
-            else if (current < lastScroll) nav.style.transform = 'translateY(0)';
+            if (current > lastScroll && current > 150) {
+                nav.classList.add('hidden');
+            } else if (current < lastScroll) {
+                nav.classList.remove('hidden');
+            }
             lastScroll = current;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(updateNav);
+                ticking = true;
+            }
         });
 
+        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let currentTagline = 0;
         setInterval(() => {
@@ -578,6 +594,7 @@
             taglines[currentTagline].classList.add('active');
         }, 7000);
 
+        // Top banner rotator
         const bannerTexts = document.querySelectorAll('.banner-text');
         let currentBanner = 0;
         setInterval(() => {
@@ -586,13 +603,15 @@
             bannerTexts[currentBanner].classList.add('active');
         }, 2000);
 
+        // Add item row
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
             row.className = 'item-row';
-            row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
+            row.innerHTML = `
+                <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
             container.appendChild(row);
         }
     </script>
