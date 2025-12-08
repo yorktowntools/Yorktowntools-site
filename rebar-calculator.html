@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Free Rebar Lap Splice Calculator – ACI 318-19 instant results. Yorktown Tools – Veteran-owned rebar & concrete tools with same-day delivery.">
+    <title>Rebar Lap Splice Calculator • Yorktown Tools</title>
+    <link rel="icon" href="Yorktown.PNG">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0b1e3f;
+            --red: #c8102e;
+            --green: #2e7d32;
+            --yellow: #b07100;
+            --white: #ffffff;
+            --light: #f8f9fa;
+            --transition: all 0.35s ease;
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw; height: 140vw;
+            max-width: 1400px; max-height: 1400px;
+            background: url('george-mascot.PNG') center / contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            margin-top: -80px;
+        }
+
+        .top-red-banner {
+            background: var(--red);
+            color: var(--white);
+            text-align: center;
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            min-height: 54px;
+        }
+        .banner-text { position: absolute; width: 100%; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 1s ease; }
+        .banner-text.active { opacity: 1; }
+
+        .gov-ids-header {
+            background: var(--navy);
+            color: var(--white);
+            text-align: center;
+            padding: 0.65rem 1rem;
+            font-size: 0.94rem;
+        }
+        .gov-ids-header strong { color: #ffeb3b; }
+
+        .logo-header { text-align: center; padding: 1.8rem 1rem 1.4rem; background: white; }
+        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+
+        nav {
+            background: var(--navy);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: clamp(1.2rem, 3.5vw, 2.2rem);
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.02rem;
+            padding: 0.7rem 1.1rem;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+        nav a:hover { background: rgba(255,255,255,0.18); color: var(--red); }
+
+        main { max-width:1200px; margin:0 auto; padding:0 1.4rem 6rem; }
+
+        .hero { 
+            text-align:center; 
+            padding: clamp(4rem, 13vw, 7rem) 1rem 5rem; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius:var(--radius); 
+            margin: 3rem 0; 
+            box-shadow: var(--shadow);
+        }
+        .hero h1 { 
+            font-size: clamp(3rem, 9vw, 4.6rem); 
+            margin-bottom:1.2rem; 
+            color: var(--navy); 
+            font-weight: 900;
+        }
+        .hero p { 
+            font-size: clamp(1.3rem, 4.8vw, 1.5rem); 
+            max-width:900px; 
+            margin: 0 auto 3rem; 
+            color:#495057;
+        }
+
+        .calculator {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 4rem auto;
+            border-top: 8px solid var(--red);
+        }
+        .form-grid {
+            display: grid;
+            gap: 1.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            margin-bottom: 2rem;
+        }
+        label { font-weight: 600; color: var(--navy); display: block; margin-bottom: 0.6rem; }
+        select, input { padding: 1rem; border: 2px solid #ddd; border-radius: 12px; font-size: 1.1rem; width: 100%; }
+        select:focus, input:focus { outline: none; border-color: var(--navy); }
+
+        .result {
+            background: var(--light);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin: 2rem 0;
+            border-left: 10px solid var(--red);
+            box-shadow: var(--shadow);
+        }
+        .result span { color: var(--red); }
+
+        .stock-box {
+            background: #fff8e1;
+            padding: 1.8rem;
+            border-radius: var(--radius);
+            text-align: center;
+            margin: 3rem 0;
+            border: 3px dashed var(--yellow);
+            font-size: 1.15rem;
+        }
+
+        .big-cta {
+            display: block;
+            margin: 3rem auto;
+            background: var(--red);
+            color: white;
+            padding: 1.6rem 4rem;
+            font-size: 1.6rem;
+            font-weight: 800;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 12px 35px rgba(200,16,46,0.4);
+            max-width: 90%;
+        }
+        .big-cta:hover { transform: translateY(-6px); box-shadow: 0 18px 45px rgba(200,16,46,0.5); }
+
+        footer {
+            background: var(--navy);
+            color: var(--white);
+            text-align:center;
+            padding:6.5rem 1rem 3rem;
+            margin-top:8rem;
+        }
+        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+
+        .call-button {
+            position: fixed;
+            right: clamp(16px, 4vw, 24px);
+            bottom: clamp(16px, 4vw, 24px);
+            width: clamp(72px, 16vw, 88px);
+            height: clamp(72px, 16vw, 88px);
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            z-index: 999;
+            animation: pulse 2.6s infinite;
+        }
+        .call-button img { width: 68%; border-radius: 50%; border: 3px solid white; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
+    </style>
+</head>
+<body>
+
+<a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
+    <img src="Yorktown.PNG" alt="Call">
+</a>
+
+<div class="top-red-banner">
+    <div class="banner-text active">Free Rebar Lap Calculator • Instant ACI 318 Results • Same-Day Delivery</div>
+    <div class="banner-text">Veteran-Owned • Free Delivery Hampton Roads</div>
+    <div class="banner-text">#5 Grade 60 × 20' — In Stock — Call 757-940-5171</div>
+</div>
+
+<div class="gov-ids-header">
+    <strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9 | Veteran-Owned
+</div>
+
+<div class="logo-header">
+    <img src="Yorktown.PNG" alt="Yorktown Tools">
+</div>
+
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#tools">Tools</a></li>
+        <li><a href="/#ladders">Ladders</a></li>
+        <li><a href="/Can-we-pour-today.html">Can We Pour?</a></li>
+        <li><a href="/#contact">Get Quote</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section class="hero">
+        <h1>Rebar Lap Splice Calculator</h1>
+        <p>Instant ACI 318-19 results — no code book needed</p>
+    </section>
+
+    <div class="calculator">
+        <div class="form-grid">
+            <div>
+                <label>Rebar Size</label>
+                <select id="size">
+                    <option value="3">#3</option>
+                    <option value="4">#4</option>
+                    <option value="5" selected>#5</option>
+                    <option value="6">#6</option>
+                    <option value="7">#7</option>
+                    <option value="8">#8</option>
+                    <option value="9">#9</option>
+                    <option value="10">#10</option>
+                    <option value="11">#11</option>
+                </select>
+            </div>
+            <div>
+                <label>Concrete Strength (psi)</label>
+                <select id="fcm">
+                    <option value="3000">3,000 psi</option>
+                    <option value="4000" selected>4,000 psi</option>
+                    <option value="5000">5,000 psi</option>
+                    <option value="6000">6,000 psi</option>
+                    <option value="8000">8,000 psi</option>
+                </select>
+            </div>
+            <div>
+                <label>Grade</label>
+                <select id="grade">
+                    <option value="60" selected>Grade 60</option>
+                    <option value="80">Grade 80</option>
+                </select>
+            </div>
+            <div>
+                <label>Coating & Location</label>
+                <select id="coating">
+                    <option value="1">Uncoated & not top-cast</option>
+                    <option value="1.3">Epoxy-coated or top-cast</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="result" id="result">
+            Select options above → instant lap length
+        </div>
+
+        <div class="stock-box">
+            <strong>Most-Ordered Today:</strong><br>
+            #5 × 20' Grade 60 → $1.12/ft — 2,400 ft on truck right now<br>
+            <em>Free same-day delivery before 2 p.m.</em>
+        </div>
+
+        <a href="tel:757-940-5171" class="big-cta">
+            Need This Rebar Today? Call/Text 757-940-5171 → Free Same-Day Delivery
+        </a>
+    </div>
+</main>
+
+<footer>
+    <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+    <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+       <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+    <p>Yorktown, Virginia — Veteran-Owned Small Business & SAM.gov Registered</p>
+    <p><strong>UEI:</strong> SMYXDLJDJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+    <p>© 2025 Yorktown Tools. All rights reserved.</p>
+</footer>
+
+<script>
+    const size = document.getElementById('size');
+    const fcm = document.getElementById('fcm');
+    const grade = document.getElementById('grade');
+    const coating = document.getElementById('coating');
+    const result = document.getElementById('result');
+
+    // ACI 318-19 Table 25.5.2.1 multipliers
+    const db = {3:0.375,4:0.5,5:0.625,6:0.75,7:0.875,8:1,9:1.128,10:1.27,11:1.41};
+    const psiFactor = {3000:1.4,4000:1.2,5000:1.0,6000:0.9,8000:0.82};
+    const gradeFactor = {60:1,80:0.85};
+
+    function calculate() {
+        const bar = parseInt(size.value);
+        const d = db[bar];
+        const psi = psiFactor[fcm.value];
+        const g = gradeFactor[grade.value];
+        const coat = parseFloat(coating.value);
+
+        let ld =  (d * d * fcm.value * psi * g * coat) / 25;
+        ld = Math.max(ld, 12); // minimum 12"
+
+        const classA = Math.round(ld * 10) / 10;
+        const classB = Math.round(ld * 1.3 * 10) / 10;
+
+        result.innerHTML = `
+            <div>#${bar} Grade ${grade.value} in ${fcm.value} psi concrete</div>
+            <div style="margin:1.5rem 0;font-size:3rem;color:var(--red);">
+                Class A: <span>${classA}"</span>  Class B: <span>${classB}"</span>
+            </div>
+            <div style="font-size:1.2rem;color:#555;">
+                (Class B = 1.3 × Class A — use unless engineer approves Class A)
+            </div>
+        `;
+    }
+
+    size.addEventListener('change', calculate);
+    fcm.addEventListener('change', calculate);
+    grade.addEventListener('change', calculate);
+    coating.addEventListener('change', calculate);
+
+    // Initial calculation
+    calculate();
+
+    // Banner rotator
+    const banners = document.querySelectorAll('.banner-text');
+    let i = 0;
+    setInterval(() => {
+        banners[i].classList.remove('active');
+        i = (i + 1) % banners.length;
+        banners[i].classList.add('active');
+    }, 4500);
+</script>
+</body>
+</html>
