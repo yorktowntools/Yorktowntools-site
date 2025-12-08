@@ -26,7 +26,7 @@
             line-height: 1.7;
         }
 
-        /* Clean red scrolling banner – only weather info */
+        /* Red scrolling banner */
         .top-banner {
             background: var(--red);
             color: white;
@@ -51,7 +51,7 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* New navy slogan bar */
+        /* Navy slogan bar */
         .gov-bar {
             background: var(--navy);
             color: white;
@@ -65,6 +65,7 @@
         .logo { text-align: center; padding: 28px 16px 14px; }
         .logo img { max-width: 260px; width: 90%; }
 
+        /* Simplified navigation — only Home link */
         nav {
             background: var(--navy);
             padding: 16px 0;
@@ -76,7 +77,6 @@
         nav ul {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
             gap: 22px;
             list-style: none;
             padding: 0 16px;
@@ -85,7 +85,7 @@
             color: white;
             text-decoration: none;
             font-weight: 600;
-            padding: 10px 18px;
+            padding: 10px 22px;
             border-radius: 12px;
             transition: 0.3s;
         }
@@ -131,7 +131,6 @@
             margin: 10px 0 0;
         }
 
-        /* New description section */
         .hero-description {
             text-align: center;
             padding: 50px 20px;
@@ -292,7 +291,7 @@
     <img src="Yorktown.PNG" alt="Call">
 </a>
 
-<!-- Clean red banner – only live weather message -->
+<!-- Red banner — clean & focused -->
 <div class="top-banner">
     <div class="banner-track">
         <span>Live NOAA Forecast for Hampton Roads • Updated: <span id="liveTime">Never</span></span>
@@ -300,7 +299,7 @@
     </div>
 </div>
 
-<!-- New slogan bar -->
+<!-- Navy slogan bar -->
 <div class="gov-bar">
     FREE DELIVERY • FREE QUOTE
 </div>
@@ -309,13 +308,10 @@
     <img src="Yorktown.PNG" alt="Yorktown Tools">
 </div>
 
+<!-- Minimal navigation — only Home -->
 <nav>
     <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="/#tools">Tools</a></li>
-        <li><a href="/#ladders">Ladders</a></li>
-        <li><a href="/#about">About</a></li>
-        <li><a href="/#contact">Quote</a></li>
     </ul>
 </nav>
 
@@ -328,7 +324,6 @@
         <div class="verdict" id="mainVerdict">Loading live data...</div>
     </section>
 
-    <!-- Clear description of what this tool does -->
     <section class="hero-description">
         <h2>Virginia’s Fastest Concrete Pour Decision Tool</h2>
         <p>
@@ -338,6 +333,7 @@
         </p>
     </section>
 
+    <!-- Concrete hero image — confirmed filename -->
     <div class="concrete-hero">
         <img src="concrete.jpg" alt="Professional concrete pour in progress">
     </div>
@@ -426,7 +422,7 @@
         if (data.wind > 20) issues.push("Wind");
 
         if (issues.length >= 2) return { status: "no", text: "Do Not Pour", issues };
-        if (issues.length === 1) return { status: "caution", text: "Use Caution", issues };
+        if (issues.length === 1) return { status: "caution",  text: "Use Caution", issues };
         return { status: "go", text: "Good to Pour", issues: [] };
     }
 
@@ -462,7 +458,7 @@
     }
 
     update();
-    setInterval(update, 15 * 60 * 1000); // every 15 minutes
+    setInterval(update, 15 * 60 * 1000);
 </script>
 </body>
 </html>
