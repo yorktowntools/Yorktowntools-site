@@ -30,7 +30,6 @@
             --red: #c8102e;
             --white: #ffffff;
             --light: #f8f9fa;
-            --gray: #f1f3f5;
             --transition: all 0.35s ease;
             --radius: 20px;
             --shadow: 0 12px 40px rgba(0,0,0,0.1);
@@ -187,35 +186,6 @@
         }
         .tagline.active { opacity: 1; z-index: 1; }
 
-        /* COMPACT FREE TOOLS BAR — ONE PLACE ONLY */
-        .free-tools-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            justify-content: center;
-            margin: 3rem 0 2rem;
-        }
-        .free-tool-btn {
-            background: var(--white);
-            color: var(--navy);
-            padding: 1.2rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border: 3px solid var(--navy);
-            transition: var(--transition);
-            min-width: 280px;
-            text-align: center;
-        }
-        .free-tool-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.18);
-        }
-        .free-tool-btn.red { background: var(--red); color: white; border-color: var(--red); }
-        .free-tool-btn.navy { background: var(--navy); color: white; }
-
         .btn { 
             display:inline-block; 
             background:var(--red); 
@@ -229,6 +199,48 @@
             box-shadow:0 10px 30px rgba(200,16,46,0.3);
         }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
+
+        /* FREE RESOURCES BAR — ONE PLACE ONLY */
+        #free-resources {
+            background: var(--navy);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            border-radius: var(--radius);
+            margin: 4rem auto;
+            text-align: center;
+        }
+        #free-resources h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        .free-resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .free-resource-card {
+            background: rgba(255,255,255,0.12);
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+        .free-resource-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-8px);
+        }
+        .free-resource-card .icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+        .free-resource-card h3 {
+            font-size: 1.4rem;
+            margin: 0.8rem 0;
+        }
 
         section { margin-bottom:5.5rem; }
         h2 { 
@@ -368,7 +380,6 @@
         @media (max-width: 480px) {
             .top-red-banner, .gov-ids-header { font-size: 1.02rem; padding: 0.75rem; }
             nav a { font-size: 0.95rem; padding: 0.6rem 0.9rem; }
-            .free-tool-btn { font-size: 1rem; padding: 1rem 1.5rem; }
         }
     </style>
 </head>
@@ -401,8 +412,7 @@
             <li><a href="#accessories">Accessories & PPE</a></li>
             <li><a href="#ladders">Ladders</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="/Can-we-pour-today.html">Can We Pour?</a></li>
-            <li><a href="/rebar-calculator.html">Rebar Calculator</a></li>
+            <li><a href="#free-resources">Free Resources</a></li>
             <li><a href="#contact">Get Quote</a></li>
         </ul>
     </nav>
@@ -424,20 +434,27 @@
                 </div>
             </div>
 
-            <!-- ONE PLACE ONLY: Compact free tools bar -->
-            <div class="free-tools-bar">
-                <a href="/Can-we-pour-today.html" class="free-tool-btn red" target="_blank">
-                    Can We Pour Today? — Live Forecast
-                </a>
-                <a href="/rebar-calculator.html" class="free-tool-btn navy" target="_blank">
-                    Rebar Lap Calculator — ACI 318 Instant
-                </a>
-            </div>
-
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- Rest of your sections (Tools, Accessories, Ladders, About, Contact) — 100% unchanged -->
+        <!-- FREE RESOURCES — ONE NAVY BAR WITH BOTH TOOLS -->
+        <section id="free-resources">
+            <h2>Free Resources for Contractors</h2>
+            <div class="free-resources-grid">
+                <a href="/Can-we-pour-today.html" target="_blank" class="free-resource-card">
+                    <div class="icon">Weather</div>
+                    <h3>Can We Pour Today?</h3>
+                    <p>Live concrete pouring forecast — Richmond to Virginia Beach</p>
+                </a>
+                <a href="/rebar-calculator.html" target="_blank" class="free-resource-card">
+                    <div class="icon">Rebar</div>
+                    <h3>Rebar Lap Splice Calculator</h3>
+                    <p>Instant ACI 318 lap lengths — no code book needed</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- TOOLS -->
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -460,19 +477,106 @@
             </div>
         </section>
 
-        <!-- Accessories, Ladders, About, Contact — all 100% intact -->
-        <!-- (Same as your original — not repeated here to save space) -->
+        <!-- ACCESSORIES & PPE -->
+        <section id="accessories">
+            <h2>Tool Accessories, Storage & Safety Gear</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="Blades.PNG" alt="Bits & Blades" loading="lazy">
+                    <h3>Bits, Blades & Abrasives</h3>
+                    <p>High-durability consumables for consistent performance.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4119.jpg" alt="Storage" loading="lazy">
+                    <h3>Storage & Organization</h3>
+                    <p>Modular toolboxes and workstations — built for job site efficiency and security.</p>
+                </div>
+                <div class="card">
+                    <img src="IMG_4175.jpg" alt="PPE" loading="lazy">
+                    <h3>Safety & PPE</h3>
+                    <p>Gloves, eyewear, and hearing protection meeting OSHA standards.</p>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:3.5rem;">
+                <a href="#contact" class="btn">Request a Custom Quote</a>
+            </p>
+        </section>
 
+        <!-- LADDERS -->
+        <section id="ladders">
+            <h2>OSHA-Compliant Ladders & Access Equipment</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
+            <div class="grid">
+                <div class="card">
+                    <img src="Ladders.PNG" alt="Ladders" loading="lazy">
+                    <h3>Professional Ladders</h3>
+                    <p>OSHA-compliant access solutions for any work environment.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT -->
+        <section id="about">
+            <h2>About Yorktown Tools</h2>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2rem;color:#555;">Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors who keep America going.</p>
+            <div class="about-grid">
+                <div style="text-align:center;">
+                    <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
+                    <h3 style="margin:1.8rem 0 0.6rem; color:var(--navy);font-size:1.6rem;">Zachary Barber</h3>
+                    <p style="font-style:italic; color:#666;">Founder & Owner</p>
+                    <p style="margin-top:0.8rem; font-size:0.98rem;">
+                        A.S. Aeronautics | B.S. Project Management.<br>
+                        Embry-Riddle Aeronautical University
+                    </p>
+                </div>
+                <div class="mission-box">
+                    <h3>Our Mission</h3>
+                    <p>Deliver <strong>mission-critical tools</strong> that contractors depend on — on time, every time — with the reliability America was built on.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
         <section id="contact" class="contact-form">
             <h2>Get Your Quote Today</h2>
             <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options in 24 hours or less.</p>
             <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
-                <!-- Your full form here — unchanged -->
                 <div class="form-group">
                     <label for="name">Name <span class="required">*</span></label>
                     <input type="text" id="name" name="name" required placeholder="John Doe">
                 </div>
-                <!-- ... all other fields ... -->
+                <div class="form-group">
+                    <label for="company">Company / Organization <span class="required">*</span></label>
+                    <input type="text" id="company" name="company" required placeholder="ABC Contractors">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="john@abccontractors.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234">
+                </div>
+                <div class="form-group">
+                    <label>Requested Items <small>(Optional)</small></label>
+                    <div id="item-list">
+                        <div class="item-row">
+                            <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
+                </div>
+                <div class="form-group">
+                    <label for="message">Additional Notes</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Urgent delivery? Specific brands? Let us know."></textarea>
+                </div>
                 <button type="submit" class="btn">Send Quote Request</button>
             </form>
         </section>
@@ -488,7 +592,6 @@
     </footer>
 
     <script>
-        // All your original JS — fully working
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
