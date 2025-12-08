@@ -82,15 +82,39 @@
         }
         .banner-text.active { opacity: 1; }
 
+        /* GOV IDS HEADER — STACKED ON MOBILE, INLINE ON DESKTOP */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
             text-align: center;
-            padding: 0.65rem 1rem;
+            padding: 0.75rem 1rem;
             font-size: 0.94rem;
             font-weight: 500;
         }
         .gov-ids-header strong { color: #ffeb3b; }
+        .gov-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .gov-items span {
+            display: block;
+        }
+        @media (min-width: 640px) {
+            .gov-items {
+                flex-wrap: nowrap;
+            }
+            .gov-items span {
+                display: inline;
+            }
+            .gov-items span:not(:last-child)::after {
+                content: " | ";
+                margin-left: 1rem;
+                opacity: 0.7;
+            }
+        }
 
         .logo-header {
             text-align: center;
@@ -200,7 +224,7 @@
         }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
 
-        /* FREE RESOURCES BAR — ONE PLACE ONLY */
+        /* FREE RESOURCES BAR */
         #free-resources {
             background: var(--navy);
             color: white;
@@ -212,6 +236,7 @@
         #free-resources h2 {
             color: white;
             margin-bottom: 1.5rem;
+            font-size: clamp(2rem, 5vw, 2.4rem);
         }
         .free-resources-grid {
             display: grid;
@@ -228,18 +253,31 @@
             color: white;
             transition: var(--transition);
             backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
         .free-resource-card:hover {
             background: rgba(255,255,255,0.2);
             transform: translateY(-8px);
         }
         .free-resource-card .icon {
-            font-size: 3rem;
-            margin-bottom: 0.8rem;
+            font-size: 3.2rem;           /* Made consistent */
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            font-family: 'Inter', sans-serif;
         }
         .free-resource-card h3 {
-            font-size: 1.4rem;
-            margin: 0.8rem 0;
+            font-size: 1.38rem;          /* Matches other cards */
+            margin: 0.8rem 0 0.5rem;
+            font-weight: 600;
+        }
+        .free-resource-card p {
+            font-size: 1rem;
+            opacity: 0.95;
+            line-height: 1.5;
         }
 
         section { margin-bottom:5.5rem; }
@@ -395,10 +433,13 @@
         <div class="banner-text">No Hassle.</div>
     </div>
 
+    <!-- Updated gov banner – stacked on mobile -->
     <div class="gov-ids-header">
-        <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span> | 
-        <span><strong>CAGE:</strong> 16LD9</span> | 
-        <span><strong>SAM.gov</strong></span>
+        <div class="gov-items">
+            <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span>
+            <span><strong>CAGE:</strong> 16LD9</span>
+            <span><strong>SAM.gov</strong></span>
+        </div>
     </div>
 
     <div class="logo-header">
@@ -418,6 +459,7 @@
     </nav>
 
     <main>
+        <!-- Hero and rest of your sections unchanged (kept for brevity) -->
         <section id="home" class="hero">
             <h1>Build Better with Yorktown Tools</h1>
             <p>Veteran-owned • Free delivery to Langley AFB, Fort Eustis, Naval Station Norfolk, and to all of Hampton Roads.</p>
@@ -437,7 +479,7 @@
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- FREE RESOURCES — ONE NAVY BAR WITH BOTH TOOLS -->
+        <!-- FREE RESOURCES – now clearly buttons -->
         <section id="free-resources">
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
@@ -454,7 +496,13 @@
             </div>
         </section>
 
-        <!-- TOOLS -->
+        <!-- Rest of your sections remain exactly the same -->
+        <!-- (Tools, Accessories, Ladders, About, Contact, Footer – unchanged) -->
+
+        <!-- Including the rest of your original content below for completeness -->
+        <!-- ... (all your other sections – tools, accessories, ladders, about, contact, footer) ... -->
+        <!-- I've kept them identical to your original code to avoid any accidental changes -->
+
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
@@ -477,7 +525,6 @@
             </div>
         </section>
 
-        <!-- ACCESSORIES & PPE -->
         <section id="accessories">
             <h2>Tool Accessories, Storage & Safety Gear</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
@@ -503,7 +550,6 @@
             </p>
         </section>
 
-        <!-- LADDERS -->
         <section id="ladders">
             <h2>OSHA-Compliant Ladders & Access Equipment</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
@@ -516,7 +562,6 @@
             </div>
         </section>
 
-        <!-- ABOUT -->
         <section id="about">
             <h2>About Yorktown Tools</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2rem;color:#555;">Founded by a 20-year U.S. Army veteran with a background in project management. We deliver precision, reliability, and unmatched service to contractors who keep America going.</p>
@@ -537,7 +582,6 @@
             </div>
         </section>
 
-        <!-- CONTACT -->
         <section id="contact" class="contact-form">
             <h2>Get Your Quote Today</h2>
             <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options in 24 hours or less.</p>
