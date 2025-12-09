@@ -45,7 +45,6 @@
             margin-top:-80px;
         }
 
-        /* Header */
         .top-red-banner { background:var(--red); color:white; text-align:center; padding:0.8rem; font-weight:700; font-size:1.05rem; }
         .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
         .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; padding:0.4rem; }
@@ -53,7 +52,6 @@
         .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
         .logo-header img { max-width:260px; width:92%; height:auto; }
 
-        /* Sticky Nav */
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); }
         .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; align-items:center; justify-content:center; }
@@ -76,27 +74,27 @@
             margin: -1.5rem auto 3rem; max-width:1000px; font-weight:600;
         }
 
-        /* Brand Logos Grid - Responsive & Future-Proof */
+        /* Brand Logos – Responsive Grid */
         .brand-selector {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 2rem 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 2.2rem 1.8rem;
             margin: 4rem 0 5rem;
             justify-items: center;
             align-items: center;
-            padding: 1rem;
+            padding: 0 1rem;
         }
         .brand-selector img {
-            height: 52px;
+            height: 54px;
             opacity: 0.88;
             transition: var(--transition);
-            filter: grayscale(15%) drop-shadow(0 2px 6px rgba(0,0,0,0.1));
+            filter: grayscale(12%) drop-shadow(0 2px 6px rgba(0,0,0,0.12));
             object-fit: contain;
         }
         .brand-selector img:hover {
             opacity: 1;
-            filter: grayscale(0%) drop-shadow(0 4px 12px rgba(0,0,0,0.2));
-            transform: scale(1.14);
+            filter: grayscale(0);
+            transform: scale(1.15);
         }
 
         .btn-text {
@@ -142,7 +140,6 @@
         .used-for { color: #444; font-size: 0.98rem; }
         .category-card .btn-group { margin-top: auto; text-align:center; }
 
-        /* Floating Call Button */
         .call-button {
             position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
             width:clamp(72px,16vw,88px); height:clamp(72px,16vw,88px);
@@ -159,7 +156,6 @@
 </head>
 <body>
 
-    <!-- Floating Call Button -->
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="Call George">
     </a>
@@ -176,10 +172,9 @@
         <a href="/"><img src="Yorktown.PNG" alt="Yorktown Tools"></a>
     </div>
 
-    <!-- Navigation -->
     <nav id="main-nav">
         <div class="mobile-nav">
-            <a href/"/">Home</a>
+            <a href="/">Home</a>
             <a href="#wrenches">Wrenches</a>
             <a href="#pliers">Pliers</a>
             <a href="#measuring">Measuring</a>
@@ -199,37 +194,36 @@
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- BRAND LOGOS - Easy to add more in the future -->
+        <!-- BRAND LOGOS – Exact filenames you provided (no folder) -->
         <div class="brand-selector">
-            <a href="#wrenches"><img src="logos/snapon.png" alt="Snap-on"></a>
-            <a href="#wrenches"><img src="logos/gearwrench.png" alt="GearWrench"></a>
-            <a href="#wrenches"><img src="logos/wright.png" alt="Wright Tool"></a>
-            <a href="#wrenches"><img src="logos/tekton.png" alt="Tekton"></a>
-            <a href="#wrenches"><img src="logos/milwaukee.png" alt="Milwaukee"></a>
-            <a href="#wrenches"><img src="logos/dewalt.png" alt="DeWalt"></a>
+            <a href="#wrenches"><img src="snapon.png" alt="Snap-on"></a>
+            <a href="#wrenches"><img src="gearwrench.png" alt="GearWrench"></a>
+            <a href="#wrenches"><img src="wright.png" alt="Wright Tool"></a>
+            <a href="#wrenches"><img src="Tekton.PNG" alt="Tekton"></a>
+            <a href="#wrenches"><img src="Milwaukee.PNG" alt="Milwaukee"></a>
+            <a href="#wrenches"><img src="Dewalt.PNG" alt="DeWalt"></a>
 
-            <a href="#pliers"><img src="logos/knipex.png" alt="Knipex"></a>
-            <a href="#pliers"><img src="logos/channellock.png" alt="Channellock"></a>
-            <a href="#pliers"><img src="logos/kleintools.png" alt="Klein Tools"></a>
+            <a href="#pliers"><img src="Knipex.PNG" alt="Knipex"></a>
+            <a href="#pliers"><img src="channellock.png" alt="Channellock"></a>
+            <a href="#pliers"><img src="Kleintools.png" alt="Klein Tools"></a>
 
-            <a href="#screwdrivers"><img src="logos/wiha.png" alt="Wiha"></a>
+            <a href="#screwdrivers"><img src="wiha.png" alt="Wiha"></a>
 
-            <a href="#measuring"><img src="logos/mitutoyo.png" alt="Mitutoyo"></a>
-            <a href="#measuring"><img src="logos/starrett.png" alt="Starrett"></a>
+            <a href="#measuring"><img src="mitutoyo.png" alt="Mitutoyo"></a>
+            <a href="#measuring"><img src="starrett.png" alt="Starrett"></a>
 
-            <a href="#specialty"><img src="logos/bosch.webp" alt="Bosch"></a>
+            <a href="#specialty"><img src="Bosch.WEBP" alt="Bosch"></a>
         </div>
 
-        <!-- Category Grid -->
         <section class="category-grid">
 
             <article class="category-card" id="wrenches">
-                <img src="wrenches.jpg" alt="Snap-on, Wright, Milwaukee torque wrenches" loading="lazy">
+                <img src="wrenches.jpg" alt="Torque wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Wrenches</h2>
-                    <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, Tekton, Milwaukee, DeWalt, CDI.</p>
+                    <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, Tekton, Milwaukee, DeWalt.</p>
                     <p class="used-for">Aircraft maintenance, shipyard, heavy equipment, and anywhere exact torque is critical.</p>
                     <div class="btn-group">
                         <a href="sms:7579405171?body=Need%20pricing%20on%20wrenches..." class="btn-text">Text for Quote</a>
@@ -238,7 +232,7 @@
             </article>
 
             <article class="category-card" id="pliers">
-                <img src="pliers.jpg" alt="Knipex, Klein Tools, Channellock pliers" loading="lazy">
+                <img src="pliers.jpg" alt="Pliers and cutters" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
@@ -246,13 +240,13 @@
                     <p class="what-is"><strong>What it is:</strong> Knipex, Klein Tools, Channellock, Irwin – linesman, needle-nose, snap-ring, diagonal cutters.</p>
                     <p class="used-for">Electrical, aviation safety wire, wire pulling, and daily heavy-duty gripping.</p>
                     <div class="btn-group">
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20Knipex%20or%20Klein%20pliers..." class="btn-text">Text for Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20pliers..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
 
             <article class="category-card" id="measuring">
-                <img src="measuring.jpg" alt="Mitutoyo calipers and Starrett tools" loading="lazy">
+                <img src="measuring.jpg" alt="Calipers and micrometers" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
@@ -265,7 +259,7 @@
             </article>
 
             <article class="category-card" id="screwdrivers">
-                <img src="screwdrivers.jpg" alt="Wiha and Wera precision screwdrivers" loading="lazy">
+                <img src="screwdrivers.jpg" alt="Precision screwdrivers" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Screwdrivers & Nut Drivers</h2>
@@ -278,7 +272,7 @@
             </article>
 
             <article class="category-card" id="hex-torx">
-                <img src="hex-torx.jpg" alt="Bondhus and Wiha hex and torx keys" loading="lazy">
+                <img src="hex-torx.jpg" alt="Hex and Torx keys" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
@@ -291,7 +285,7 @@
             </article>
 
             <article class="category-card" id="specialty">
-                <img src="specialty.jpg" alt="Picks, hooks, Bosch bits, inspection mirrors" loading="lazy">
+                <img src="specialty.jpg" alt="Specialty tools" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
@@ -319,7 +313,6 @@
     </footer>
 
     <script>
-        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 if (this.getAttribute('href').startsWith('#') && this.getAttribute('href') !== '#') {
@@ -332,7 +325,6 @@
             });
         });
 
-        // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -342,7 +334,6 @@
             lastScroll = current;
         });
 
-        // Active nav link highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
