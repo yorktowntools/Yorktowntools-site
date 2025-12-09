@@ -45,13 +45,15 @@
             margin-top:-80px;
         }
 
-        .top-red-banner { background:var(--red); color:white; text-align:center; padding:0.8rem; font-weight:700; font-size:1.05rem; }
+        /* Header */
+        .top-red-banner { background:var(--red); color:white; text-align:center; text-align:center; padding:0.8rem; font-weight:700; font-size:1.05rem; }
         .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
         .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; padding:0.4rem; }
         .gov-items strong { color:#ffeb3b; }
         .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
         .logo-header img { max-width:260px; width:92%; height:auto; }
 
+        /* Sticky Nav */
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); }
         .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; align-items:center; justify-content:center; }
@@ -85,7 +87,7 @@
             padding: 0 1rem;
         }
         .brand-selector img {
-            height: 54px;
+            height: 56px;
             opacity: 0.88;
             transition: var(--transition);
             filter: grayscale(12%) drop-shadow(0 2px 6px rgba(0,0,0,0.12));
@@ -106,7 +108,7 @@
         .category-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 2.5rem;
+            gap: gap 2.5rem;
             margin: 4rem 0;
         }
         .category-card {
@@ -137,9 +139,11 @@
         .category-card h2 { font-size: 1.55rem; color: var(--navy); margin-bottom: 0.8rem; }
         .what-is, .used-for { margin-bottom: 1rem; line-height: 1.6; }
         .what-is strong { color: var(--red); }
+        }
         .used-for { color: #444; font-size: 0.98rem; }
         .category-card .btn-group { margin-top: auto; text-align:center; }
 
+        /* Floating Call Button */
         .call-button {
             position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
             width:clamp(72px,16vw,88px); height:clamp(72px,16vw,88px);
@@ -156,6 +160,7 @@
 </head>
 <body>
 
+    <!-- Floating Call Button -->
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="Call George">
     </a>
@@ -172,6 +177,7 @@
         <a href="/"><img src="Yorktown.PNG" alt="Yorktown Tools"></a>
     </div>
 
+    <!-- Clean Navigation -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="/">Home</a>
@@ -194,7 +200,7 @@
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- BRAND LOGOS – Exact filenames you provided (no folder) -->
+        <!-- BRAND LOGOS – EXACT FILENAMES YOU PROVIDED (no folder) -->
         <div class="brand-selector">
             <a href="#wrenches"><img src="snapon.png" alt="Snap-on"></a>
             <a href="#wrenches"><img src="gearwrench.png" alt="GearWrench"></a>
@@ -218,12 +224,12 @@
         <section class="category-grid">
 
             <article class="category-card" id="wrenches">
-                <img src="wrenches.jpg" alt="Torque wrenches" loading="lazy">
+                <img src="wrenches.jpg" alt="Snap-on and Wright torque wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Wrenches</h2>
-                    <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, Tekton, Milwaukee, DeWalt.</p>
+                    <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, Tekton, Milwaukee, DeWalt, CDI.</p>
                     <p class="used-for">Aircraft maintenance, shipyard, heavy equipment, and anywhere exact torque is critical.</p>
                     <div class="btn-group">
                         <a href="sms:7579405171?body=Need%20pricing%20on%20wrenches..." class="btn-text">Text for Quote</a>
@@ -232,21 +238,21 @@
             </article>
 
             <article class="category-card" id="pliers">
-                <img src="pliers.jpg" alt="Pliers and cutters" loading="lazy">
+                <img src="pliers.jpg" alt="Knipex and Channellock pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="what-is"><strong>What it is:</strong> Knipex, Klein Tools, Channellock, Irwin – linesman, needle-nose, snap-ring, diagonal cutters.</p>
+                    <p class="what-is"><strong>What it is:</strong> Knipex, Channellock, Klein Tools, Irwin, Klein – linesman, needle-nose, snap-ring, diagonal cutters.</p>
                     <p class="used-for">Electrical, aviation safety wire, wire pulling, and daily heavy-duty gripping.</p>
                     <div class="btn-group">
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20pliers..." class="btn-text">Text for Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20Knipex%20pliers..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
 
             <article class="category-card" id="measuring">
-                <img src="measuring.jpg" alt="Calipers and micrometers" loading="lazy">
+                <img src="measuring.jpg" alt="Mitutoyo calipers and Starrett tools" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
@@ -259,7 +265,7 @@
             </article>
 
             <article class="category-card" id="screwdrivers">
-                <img src="screwdrivers.jpg" alt="Precision screwdrivers" loading="lazy">
+                <img src="screwdrivers.jpg" alt="Wiha and Wera precision screwdrivers" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Screwdrivers & Nut Drivers</h2>
@@ -272,7 +278,7 @@
             </article>
 
             <article class="category-card" id="hex-torx">
-                <img src="hex-torx.jpg" alt="Hex and Torx keys" loading="lazy">
+                <img src="hex-torx.jpg" alt="Bondhus and Wiha hex and torx keys" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
@@ -285,11 +291,11 @@
             </article>
 
             <article class="category-card" id="specialty">
-                <img src="specialty.jpg" alt="Specialty tools" loading="lazy">
+                <img src="specialty.jpg" alt="Picks, hooks, inspection mirrors" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
-                    <p class="what-is"><strong>What it is:</strong> Picks, hooks, files, pry bars, inspection mirrors, Bosch bits, magnetic trays.</p>
+                    <p class="what-is"><strong>What it is:</strong> Picks, hooks, files, pry bars, inspection mirrors, magnetic trays, Bosch bits.</p>
                     <p class="used-for">O-ring removal, gasket work, retrieving dropped parts, detailed inspection.</p>
                     <div class="btn-group">
                         <a href="sms:7579405171?body=Need%20specialty%20tools..." class="btn-text">Text for Quote</a>
@@ -313,6 +319,7 @@
     </footer>
 
     <script>
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 if (this.getAttribute('href').startsWith('#') && this.getAttribute('href') !== '#') {
@@ -325,6 +332,7 @@
             });
         });
 
+        // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -334,6 +342,7 @@
             lastScroll = current;
         });
 
+        // Active nav link highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
