@@ -28,7 +28,7 @@
             position: relative;
         }
 
-        /* Transparent George (hidden behind solid areas) */
+        /* Transparent George */
         body::after {
             content: "";
             position: fixed;
@@ -43,7 +43,7 @@
             margin-top: -80px;
         }
 
-        /* Red scrolling banner */
+        /* Red banner */
         .top-banner {
             background: var(--red);
             color: white;
@@ -70,7 +70,6 @@
             font-weight: 700;
         }
 
-        /* Solid white block so George doesn't bleed through logo */
         .logo-area {
             background: white;
             padding: 32px 16px 20px;
@@ -126,13 +125,7 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .concrete-hero img {
-            width: 100%;
-            height: auto;
-            display: block;
-            max-height: 420px;
-            object-fit: cover;
-        }
+        .concrete-hero img { width: 100%; height: auto; display: block; max-height: 420px; object-fit: cover; }
 
         .decision-box {
             background: white;
@@ -143,13 +136,8 @@
             box-shadow: var(--shadow);
             border-top: 8px solid var(--red);
         }
-        .decision-box h3 {
-            font-size: 2.4rem;
-            color: var(--navy);
-            text-align: center;
-            margin-bottom: 40px;
-            font-weight: 900;
-        }
+        .decision-box h3 { font-size: 2.4rem; color: var(--navy); text-align: center; margin-bottom: 40px; font-weight: 900; }
+
         .limits {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -163,11 +151,8 @@
             text-align: center;
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         }
-        .limit strong {
-            font-size: 1.4rem;
-            display: block;
-            margin-bottom: 12px;
-        }
+        .limit strong { font-size: 1.4rem; display: block; margin-bottom: 12px; }
+
         .go { color: var(--green); }
         .caution { color: var(--yellow); }
         .no { color: #d32f2f; }
@@ -178,13 +163,7 @@
             gap: 28px;
             margin: 80px 0;
         }
-        .city-card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.35s ease;
-        }
+        .city-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.35s ease; }
         .city-card:hover { transform: translateY(-12px); }
         .city-header {
             background: var(--navy);
@@ -195,52 +174,54 @@
             font-weight: 700;
             border-bottom: 7px solid var(--red);
         }
-        .city-body {
-            padding: 28px 20px;
-            text-align: center;
-            background: #fafcff;
-        }
+        .city-body { padding: 28px 20px; text-align: center; background: #fafcff; }
         .status { font-size: 1.9rem; font-weight: 800; margin: 14px 0; }
-        .go { color: var(--green); }
-        .caution { color: var(--yellow); }
-        .no { color: #d32f2f; }
         .details { color: #333; margin: 12px 0; font-size: 1.05rem; }
         .issues { color: #d32f2f; font-weight: 600; margin-top: 12px; }
 
-        /* FIXED FOOTER – No white background removed, phone number now bright white */
+        /* ========== FIXED FOOTER ========== */
         footer {
             background: var(--navy);
-            color: #bbbbbb;
+            color: #ccc;
             text-align: center;
-            padding: 100px 20px 50px;
+            padding: 100px 20px 60px;
             margin-top: 120px;
         }
 
-        /* Logo now sits directly on navy background – transparent background */
-        .footer-logo img {
-            max-width: 300px;
-            width: 90%;
+        /* Logo directly on navy – no white box */
+        footer .footer-logo {
+            margin-bottom: 30px;
+        }
+        footer .footer-logo img {
+            max-width: 320px;
+            width: 92%;
             height: auto;
-            filter: brightness(0) invert(1); /* Optional: makes logo pure white if it's dark */
-            margin-bottom: 32px;
+            /* Remove this line if your hero.png is already white/light */
+            /* filter: brightness(0) invert(1); */
         }
 
-        /* Phone & email – now bright white and bold */
+        /* Phone & email – bright white, same Inter font, perfectly visible */
+        footer .contact-line {
+            margin: 20px 0;
+            font-size: 1.65rem;
+            font-weight: 900;
+        }
+        footer .contact-line a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        footer .contact-line a:hover {
+            color: var(--red);
+        }
+
         footer p {
             margin: 12px 0;
             font-size: 1.1rem;
         }
-        footer p strong,
-        footer a {
-            color: #ffffff !important;
-            font-weight: 900;
-            font-size: 1.65rem;
-            text-decoration: none;
-        }
-        footer p:last-of-type {
-            margin-top: 20px;
-            font-size: 1rem;
-            color: #aaaaaa;
+        footer p:last-child {
+            margin-top: 30px;
+            font-size: 0.95rem;
+            color: #999;
         }
 
         .call-btn {
@@ -281,7 +262,6 @@
 
 <div class="gov-bar">Free Delivery • Free Quote</div>
 
-<!-- Solid white behind logo so George doesn't show through -->
 <div class="logo-area">
     <img src="Yorktown.PNG" alt="Yorktown Tools">
 </div>
@@ -294,6 +274,7 @@
 </nav>
 
 <main>
+    <!-- (all your existing main content stays exactly the same) -->
     <section class="hero">
         <h1>Can We Pour Today?</h1>
         <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach Corridor</div>
@@ -311,18 +292,9 @@
         </p>
 
         <div class="limits">
-            <div class="limit">
-                <strong class="go">GOOD TO POUR</strong>
-                <div>All conditions within safe limits</div>
-            </div>
-            <div class="limit">
-                <strong class="caution">CAUTION</strong>
-                <div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div>
-            </div>
-            <div class="limit">
-                <strong class="no">DO NOT POUR</strong>
-                <div>Rain probability greater than 30%<br>OR 2+ caution factors</div>
-            </div>
+            <div class="limit"><strong class="go">GOOD TO POUR</strong><div>All conditions within safe limits</div></div>
+            <div class="limit"><strong class="caution">CAUTION</strong><div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div></div>
+            <div class="limit"><strong class="no">DO NOT POUR</strong><div>Rain probability greater than 30%<br>OR 2+ caution factors</div></div>
         </div>
 
         <p style="text-align:center; margin-top:32px; color:#555; font-size:0.95rem;">
@@ -337,16 +309,22 @@
     <div class="grid" id="cityGrid"></div>
 </main>
 
-<!-- CLEAN & FIXED FOOTER -->
+<!-- FINAL FIXED FOOTER -->
 <footer>
     <div class="footer-logo">
         <img src="hero.png" alt="Yorktown Tools" loading="lazy">
     </div>
-    <p><strong><a href="tel:757-940-5171">757-940-5171</a></strong> | <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+
+    <p class="contact-line">
+        <a href="tel:757-940-5171">757-940-5171</a> | 
+        <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a>
+    </p>
+
     <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
     <p>© 2025 Yorktown Tools. All rights reserved.</p>
 </footer>
 
+<!-- Your existing script stays 100% unchanged -->
 <script>
     const locations = [
         { name: "Richmond", lat: 37.5407, lng: -77.4360 },
