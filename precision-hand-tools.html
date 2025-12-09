@@ -27,7 +27,6 @@
             line-height:1.65;
             color:#212529;
             background:var(--white);
-            position:relative;
             overflow-x:hidden;
         }
         body::after {
@@ -44,7 +43,7 @@
             margin-top:-80px;
         }
 
-        /* MOBILE-FRIENDLY DUAL-ROW LOGO MARQUEE */
+        /* TOP RED SCROLLING LOGO MARQUEE — ONLY LOGO SECTION */
         .logo-marquee-container {
             background: var(--red);
             padding: 16px 0;
@@ -53,16 +52,16 @@
         .marquee-row {
             display: flex;
             align-items: center;
-            gap: clamp(24px, 6vw, 60px);
-            animation: scroll 40s linear infinite;
+            gap: clamp(28px, 7vw, 70px);
+            animation: scroll 42s linear infinite;
             width: max-content;
         }
-        .marquee-row.reverse { animation-direction: reverse; animation-duration: 36s; }
+        .marquee-row.reverse { animation-direction: reverse; animation-duration: 38s; }
         .marquee-row img {
-            height: clamp(38px, 8vw, 52px);
+            height: clamp(40px, 8.5vw, 56px);
             width: auto;
             flex-shrink: 0;
-            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.35));
         }
         .logo-marquee-container:hover .marquee-row { animation-play-state: paused; }
         @keyframes scroll {
@@ -74,65 +73,54 @@
         .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; }
         .gov-items strong { color:#ffeb3b; }
 
-        .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
-        .logo-header img { max-width:260px; width:92%; height:auto; }
+        .logo-header { text-align:center; padding:1.6rem 1rem 1.2rem; background:white; }
+        .logo-header img { max-width:280px; width:92%; height:auto; }
 
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); }
-        .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; justify-content:center; align-items:center; }
+        .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; justify-content:center; }
         .mobile-nav::-webkit-scrollbar { display:none; }
-        .mobile-nav a { color:white; padding:0.65rem 1.2rem; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.94rem; white-space:nowrap; transition:var(--transition); flex-shrink:0; }
+        .mobile-nav a { color:white; padding:0.7rem 1.3rem; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.95rem; white-space:nowrap; flex-shrink:0; transition:var(--transition); }
         .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.18); color:var(--red); }
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
 
         .hero { text-align:center; padding:clamp(4rem,13vw,7rem) 1rem 4rem; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:3rem 0 4rem; box-shadow:var(--shadow); }
-        .hero h1 { font-size:clamp(2.8rem,9vw,3.9rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
-        .hero p { font-size:clamp(1.2rem,4vw,1.45rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
+        .hero h1 { font-size:clamp(2.8rem,9vw,4rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
+        .hero p { font-size:clamp(1.2rem,4vw,1.5rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
 
-        .gsa-banner { background:var(--navy); color:white; text-align:center; padding:1rem; border-radius:var(--radius); margin:2rem auto 4rem; max-width:1000px; font-weight:600; }
-
-        .brand-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 2rem;
-            margin: 4rem 0 5rem;
-            justify-items: center;
-            padding: 0 1rem;
-        }
-        .brand-selector img {
-            height: 58px;
-            width: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
-            transition: var(--transition);
-        }
-        .brand-selector img:hover { transform: scale(1.18); filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25)); }
+        .gsa-banner { background:var(--navy); color:white; text-align:center; padding:1.1rem; border-radius:var(--radius); margin:2rem auto 4rem; max-width:1000px; font-weight:600; font-size:1.02rem; }
 
         .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:2.5rem; margin:4rem 0; }
         .category-card {
-            background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow);
-            border-top:6px solid var(--red); display:flex; flex-direction:column; position:relative;
+            background:white; border-radius:var(--radius); overflow:hidden; overflow:hidden; box-shadow:var(--shadow);
+            border-top:7px solid var(--red); display:flex; flex-direction:column; position:relative;
             transition:var(--transition); scroll-margin-top:120px;
         }
-        .category-card:hover { transform:translateY(-12px); box-shadow:0 20px 50px rgba(0,0,0,0.18); }
+        .category-card:hover { transform:translateY(-12px); box-shadow:0 22px 50px rgba(0,0,0,0.2); }
         .category-card img { width:100%; height:240px; object-fit:cover; }
 
         .badge-popular {
             position:absolute; top:12px; right:12px; background:var(--red); color:white;
-            padding:0.4rem 0.9rem; border-radius:20px; font-size:0.85rem; font-weight:800; z-index:2;
+            padding:0.5rem 1rem; border-radius:20px; font-size:0.85rem; font-weight:800; z-index:2;
         }
 
-        .category-content { padding:1.8rem; flex-grow:1; display:flex; flex-direction:column; }
-        .category-card h2 { font-size:1.55rem; color:var(--navy); margin-bottom:0.8rem; }
+        .category-content { padding:2rem; flex-grow:1; display:flex; flex-direction:column; }
+        .category-card h2 { font-size:1.65rem; color:var(--navy); margin-bottom:0.8rem; }
+        .category-desc {
+            color:#444;
+            margin: 1rem 0 1.4rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
         .tool-select {
-            width:100%; padding:0.9rem 1rem; border:2px solid #e9ecef;
-            border-radius:12px; font-size:0.98rem; margin:1.2rem 0 1.5rem;
+            width:100%; padding:0.95rem 1.1rem; border:2px solid #e9ecef;
+            border-radius:12px; font-size:1rem; margin:1.4rem 0;
             background:white;
         }
         .quote-btn {
             margin-top:auto; background:var(--red); color:white; text-align:center;
-            padding:1rem; border-radius:12px; font-weight:700; text-decoration:none;
+            padding:1.1rem; border-radius:12px; font-weight:700; text-decoration:none;
             transition:var(--transition);
         }
         .quote-btn:hover { background:#a00d24; transform:translateY(-3px); }
@@ -143,8 +131,8 @@
             background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center;
             box-shadow:0 8px 30px rgba(200,16,46,0.5); z-index:999; animation:pulse 2.6s infinite;
         }
-        .call-button img { width:68%; border-radius:50%; border:3px solid white; }
-        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(200,16,46,0.7)} 70%{box-shadow:0 0 0 25px rgba(200,16,46,0)} 100%{box-shadow:0 0 0 0 rgba(200,16,46,0)} }
+        .call-button img { width:68%; border-radius:50%; border:4px solid white; }
+        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(200,16,46,0.7)} 70%{box-shadow:0 0 0 25px rgba(200,16,46,0)}100%{box-shadow:0 0 0 0 rgba(200,16,46,0)} }
 
         footer { background:var(--navy); color:white; text-align:center; padding:6rem 1rem 3rem; margin-top:8rem; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 3rem; opacity:0.95; }
@@ -157,7 +145,7 @@
         <img src="Yorktown.PNG" alt="Call">
     </a>
 
-    <!-- MOBILE-FRIENDLY SCROLLING LOGO MARQUEE -->
+    <!-- ONLY LOGO SECTION — TOP RED SCROLLING MARQUEE -->
     <div class="logo-marquee-container">
         <div class="marquee-row">
             <img src="GearWrench-transparent.png" alt="GearWrench">
@@ -171,7 +159,7 @@
             <img src="Klein-transparent.png" alt="Klein Tools">
             <img src="Bondhus-transparent.png" alt="Bondhus">
             <img src="Bosch-transparent.png" alt="Bosch">
-            <!-- Duplicate set for seamless loop -->
+            <!-- Duplicate for seamless loop -->
             <img src="GearWrench-transparent.png" alt="GearWrench">
             <img src="Knipex-transparent.png" alt="Knipex">
             <img src="Milwaukee-transparent.png" alt="Milwaukee">
@@ -237,49 +225,31 @@
     <main>
         <section class="hero" id="top">
             <h1>Precision Hand Tools</h1>
-            <p>Professional-grade tools from the brands you trust. Free next-day delivery across Hampton Roads.</p>
+            <p>Professional-grade tools from the brands you trust.<br class="hero-br">Free next-day delivery across Hampton Roads.</p>
         </section>
 
         <div class="gsa-banner">
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- Brand Logos Grid -->
-        <div class="brand-selector">
-            <a href="#wrenches"><img src="GearWrench.JPG" alt="GearWrench"></a>
-            <a href="#wrenches"><img src="Crescenttools.JPG" alt="Crescent"></a>
-            <a href="#wrenches"><img src="Craftsman.JPG" alt="Craftsman"></a>
-            <a href="#wrenches"><img src="Tekton.PNG" alt="Tekton"></a>
-            <a href="#wrenches"><img src="Milwaukee.PNG" alt="Milwaukee"></a>
-            <a href="#wrenches"><img src="Dewalt-logo.PNG" alt="DeWalt"></a>
-            <a href="#pliers"><img src="Knipex.PNG" alt="Knipex"></a>
-            <a href="#pliers"><img src="Channellock.WEBP" alt="Channellock"></a>
-            <a href="#pliers"><img src="Kleintools.png" alt="Klein Tools"></a>
-            <a href="#hex-torx"><img src="Bondhus.AVIF" alt="Bondhus"></a>
-            <a href="#specialty"><img src="Bosch.WEBP" alt="Bosch"></a>
-        </div>
-
         <section class="category-grid">
 
             <!-- Wrenches -->
             <article class="category-card" id="wrenches">
-                <img src="GearWrenchset.jpg" alt="GearWrench wrenches" loading="lazy">
+                <img src="GearWrenchset.jpg" alt="Ratcheting wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
-                    <h2>Wrenches</h2>
-                    <p class="what-is"><strong>GearWrench • Crescent • Craftsman • Tekton • Milwaukee • DeWalt • CDI</strong></p>
+                    <h2>Wrenches & Torque</h2>
+                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches (CDI/Snap-on), flare nut, and specialty wrenches. SAE & metric, 90-tooth and XL lengths available. Perfect for aviation, automotive, and industrial work.</p>
                     <select class="tool-select" onchange="updateQuote(this,'wrenches')">
                         <option value="">— Choose a wrench —</option>
-                        <option>GearWrench 90T Ratcheting Combo Set (8-19mm)</option>
+                        <option>GearWrench 90T Ratcheting Set (8-19mm)</option>
                         <option>GearWrench XL Ratcheting SAE Set</option>
                         <option>Crescent 12" Adjustable Wrench</option>
-                        <option>Craftsman 26-pc Combo Set</option>
                         <option>Tekton Ratcheting Combo Set</option>
-                        <option>Milwaukee MaxBite Ratcheting Set</option>
-                        <option>DeWalt 8-pc Ratcheting Set</option>
+                        <option>Milwaukee MaxBite Set</option>
                         <option>CDI 1/2" Torque Wrench (50-250 ft-lb)</option>
-                        <option>CDI 3/8" Micrometer Torque Wrench</option>
-                        <option>Other / Custom Quote</option>
+                        <option>Other / Custom</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote →</a>
                 </div>
@@ -291,17 +261,15 @@
                 <div class="badge-popular">Most Requested</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="what-is"><strong>Knipex • Channellock • Klein Tools • Irwin</strong></p>
+                    <p class="category-desc">Knipex Cobra & Pliers Wrenches, TwinGrip, high-leverage cutters, Channellock tongue-and-groove, Klein linesman and insulated pliers, and Irwin Vise-Grip tools. Built to last a lifetime.</p>
                     <select class="tool-select" onchange="updateQuote(this,'pliers')">
                         <option value="">— Choose pliers —</option>
                         <option>Knipex Cobra 10"</option>
-                        <option>Knipex TwinGrip</option>
                         <option>Knipex Pliers Wrench 10"</option>
+                        <option>Knipex TwinGrip</option>
                         <option>Knipex Diagonal Cutters</option>
-                        <option>Channellock 430 Tongue & Groove</option>
-                        <option>Klein 9" Linesman Pliers</option>
-                        <option>Klein Electrician Set</option>
-                        <option>Irwin GrooveLock Set</option>
+                        <option>Channellock 430</option>
+                        <option>Klein 9" Linesman</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote →</a>
@@ -310,18 +278,17 @@
 
             <!-- Measuring -->
             <article class="category-card" id="measuring">
-                <img src="Bosch-laser.jpg" alt="Bosch laser" loading="lazy">
+                <img src="Bosch-laser.jpg" alt="Laser measure" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
-                    <p class="what-is"><strong>Bosch • Stabila • Fowler • Lufkin • Empire</strong></p>
+                    <p class="category-desc">Bosch laser distance measurers and cross-line lasers, Stabila digital levels, Fowler digital calipers, Lufkin tapes, Empire torpedo levels — everything you need for precise layout and measurement.</p>
                     <select class="tool-select" onchange="updateQuote(this,'measuring')">
                         <option value="">— Choose measuring tool —</option>
                         <option>Bosch GLM 50 C Laser Measure</option>
                         <option>Bosch GLL30 Cross-Line Laser</option>
-                        <option>Stabila 48" Level</option>
+                        <option>Stabila 48" Digital Level</option>
                         <option>Fowler 6" Digital Caliper</option>
                         <option>Lufkin 25ft Tape</option>
-                        <option>Empire Torpedo Level</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote →</a>
@@ -330,10 +297,10 @@
 
             <!-- Screwdrivers -->
             <article class="category-card" id="screwdrivers">
-                <img src="Kleintools-screwdrivers.jpg" alt="Klein screwdrivers" loading="lazy">
+                <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
                 <div class="category-content">
                     <h2>Screwdrivers & Nut Drivers</h2>
-                    <p class="what-is"><strong>Klein • Wera • Wiha • Milwaukee • Craftsman</strong></p>
+                    <p class="category-desc">1000V insulated sets, multi-bit drivers, precision electronics sets, cushion-grip, and torque-limiting screwdrivers from Klein, Wera, Wiha, and Milwaukee.</p>
                     <select class="tool-select" onchange="updateQuote(this,'screwdrivers')">
                         <option value="">— Choose screwdriver —</option>
                         <option>Klein 11-in-1 Multi-Bit</option>
@@ -341,7 +308,6 @@
                         <option>Wera Kraftform 6-pc Set</option>
                         <option>Wiha Insulated Set</option>
                         <option>Milwaukee Cushion Grip Set</option>
-                        <option>Craftsman 12-pc Set</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
@@ -350,17 +316,16 @@
 
             <!-- Hex & Torx -->
             <article class="category-card" id="hex-torx">
-                <img src="Bondhus-hex.jpg" alt="Bondhus hex keys" loading="lazy">
+                <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
-                    <p class="what-is"><strong>Bondhus • Eklind • Wiha • Tekton</strong></p>
+                    <p class="category-desc">Bondhus ball-end and T-handle hex keys, Eklind fold-up sets, Wiha Torx and security bits — the toughest, most precise keys made in the USA.</p>
                     <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
                         <option value="">— Choose hex/torx —</option>
                         <option>Bondhus Ball-End Metric Set</option>
                         <option>Bondhus GorillaGrip Fold-Up</option>
                         <option>Eklind Ball-Hex-L Set</option>
                         <option>Wiha Torx Security Bits</option>
-                        <option>Tekton Star Key Set</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
@@ -372,11 +337,11 @@
                 <img src="Texton-pics.jpg" alt="Specialty tools" loading="lazy">
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
-                    <p class="what-is"><strong>Picks • Hooks • Mirrors • Bosch Bits • Pry Bars</strong></p>
+                    <p class="category-desc">Pick & hook sets, telescoping mirrors, magnetic trays, pry bars, impact bit sets, inspection tools, and more — everything the pros reach for every day.</p>
                     <select class="tool-select" onchange="updateQuote(this,'specialty')">
-                        <option value="">— Choose specialty —</option>
+                        <option value="">— Choose specialty tool —</option>
                         <option>9-pc Pick & Hook Set</option>
-                        <option>Telescoping Mirror</option>
+                        <option>Telescoping Mirror + Magnet</option>
                         <option>Bosch 91-pc Impact Bit Set</option>
                         <option>Mayhew Pry Bar Set</option>
                         <option>Magnetic Tray</option>
@@ -390,7 +355,7 @@
 
         <section style="text-align:center;margin:6rem 0;">
             <p style="font-size:1.4rem;margin-bottom:1.5rem;">Need something specific or GSA pricing?</p>
-            <a href="sms:7579405171?body=Hi%2C%20need%20a%20quote" class="btn-text" style="display:inline-block;background:#0066cc;color:white;padding:1.2rem 3rem;border-radius:50px;font-size:1.3rem;font-weight:700;">Text Us Now</a>
+            <a href="sms:7579405171?body=Hi%2C%20need%20a%20quote" style="display:inline-block;background:#0066cc;color:white;padding:1.2rem 3rem;border-radius:50px;font-size:1.3rem;font-weight:700;text-decoration:none;">Text Us Now</a>
         </section>
     </main>
 
@@ -413,7 +378,7 @@
             }
         }
 
-        // Smooth scroll
+        // Smooth scroll, nav hide/show, active state (unchanged)
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 if (a.getAttribute('href').startsWith('#') && a.getAttribute('href') !== '#') {
@@ -423,7 +388,6 @@
             });
         });
 
-        // Hide/show sticky nav
         const nav = document.getElementById('main-nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -433,7 +397,6 @@
             last = cur;
         });
 
-        // Active nav highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
