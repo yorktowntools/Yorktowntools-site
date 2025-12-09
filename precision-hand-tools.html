@@ -53,7 +53,7 @@
         .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
         .logo-header img { max-width:260px; width:92%; height:auto; }
 
-        /* Sticky Nav – Now with phone + text always visible */
+        /* Sticky Nav */
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); }
         .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:0.9rem; scrollbar-width:none; align-items:center; }
@@ -78,13 +78,11 @@
         .hero h1 { font-size:clamp(2.8rem,9vw,3.9rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
         .hero p { font-size:clamp(1.2rem,4vw,1.45rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
 
-        /* GSA Banner */
         .gsa-banner {
             background:#0b1e3f; color:white; text-align:center; padding:1rem; border-radius:var(--radius);
             margin: -1.5rem auto 3rem; max-width:1000px; font-weight:600;
         }
 
-        /* Quick Brand Selector – 100% fair-use text only */
         .brand-selector {
             display:flex; flex-wrap:wrap; justify-content:center; gap:1.2rem; margin:3rem 0 4rem;
             font-size:1.1rem; font-weight:600;
@@ -100,7 +98,6 @@
         .btn-text { background:#0066cc; margin-left:0.8rem; }
         .btn-text:hover { background:#004499; }
 
-        /* Category Grid */
         .category-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -121,10 +118,7 @@
         }
         .category-card:hover { transform: translateY(-12px); box-shadow: 0 20px 50px rgba(0,0,0,0.18); }
         .category-card img { width: 100%; height: 240px; object-fit: cover; }
-        .category-content { padding: 1.8rem; flex-grow: 1; display: flex; flex-direction: column; }
-        .category-card h2 { font-size: 1.55rem; color: var(--navy); margin-bottom: 0.8rem; }
 
-        /* Badges */
         .badge-popular {
             position:absolute; top:12px; right:12px; background:var(--red); color:white;
             padding:0.4rem 0.9rem; border-radius:20px; font-size:0.85rem; font-weight:800; z-index:2;
@@ -134,12 +128,13 @@
             padding:0.4rem 0.8rem; border-radius:20px; font-size:0.8rem; font-weight:700;
         }
 
+        .category-content { padding: 1.8rem; flex-grow: 1; display: flex; flex-direction: column; }
+        .category-card h2 { font-size: 1.55rem; color: var(--navy); margin-bottom: 0.8rem; }
         .what-is, .used-for { margin-bottom: 1rem; line-height: 1.6; }
         .what-is strong { color: var(--red); }
         .used-for { color: #444; font-size: 0.98rem; }
         .category-card .btn-group { margin-top: auto; display:flex; gap:0.6rem; flex-wrap:wrap; }
 
-        /* Floating Call Button */
         .call-button {
             position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
             width:clamp(72px,16vw,88px); height:clamp(72px,16vw,88px);
@@ -172,7 +167,6 @@
         <a href="/"><img src="Yorktown.PNG" alt="Yorktown Tools"></a>
     </div>
 
-    <!-- Sticky Nav with phone & text always visible -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="/">Home</a>
@@ -182,8 +176,8 @@
             <a href="#screwdrivers">Screwdrivers</a>
             <a href="#hex-torx">Hex & Torx</a>
             <a href="#specialty">Specialty</a>
-            <a href="tel:757-940-5171" class="phone">📞 757-940-5171</a>
-            <a href="sms:7579405171?body=Hi%20Yorktown%20Tools%2C%20I%20need%20pricing%20on..." class="phone">✉️ Text Us</a>
+            <a href="tel:757-940-5171" class="phone">757-940-5171</a>
+            <a href="sms:7579405171?body=Hi%20Yorktown%20Tools%2C%20I%20need%20pricing%20on..." class="phone">Text Us</a>
         </div>
     </nav>
 
@@ -197,12 +191,10 @@
             </div>
         </section>
 
-        <!-- GSA / Government banner -->
         <div class="gsa-banner">
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- Quick Brand Selector – text only = 100% legal -->
         <div class="brand-selector">
             <a href="#wrenches">Snap-on</a>
             <a href="#wrenches">GearWrench</a>
@@ -216,7 +208,6 @@
 
         <section class="category-grid">
 
-            <!-- 1. Wrenches -->
             <article class="category-card" id="wrenches">
                 <img src="wrenches.jpg" alt="Snap-on and Wright torque wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -232,7 +223,6 @@
                 </div>
             </article>
 
-            <!-- 2. Pliers & Cutters -->
             <article class="category-card" id="pliers">
                 <img src="pliers.jpg" alt="Knipex and Channellock pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
@@ -248,7 +238,6 @@
                 </div>
             </article>
 
-            <!-- 3. Measuring & Layout -->
             <article class="category-card" id="measuring">
                 <img src="measuring.jpg" alt="Mitutoyo calipers and Starrett tools" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
@@ -263,7 +252,6 @@
                 </div>
             </article>
 
-            <!-- 4. Screwdrivers & Nut Drivers -->
             <article class="category-card" id="screwdrivers">
                 <img src="screwdrivers.jpg" alt="Wiha and Wera precision screwdrivers" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
@@ -278,7 +266,6 @@
                 </div>
             </article>
 
-            <!-- 5. Hex Keys & Torx -->
             <article class="category-card" id="hex-torx">
                 <img src="hex-torx.jpg" alt="Bondhus and Wiha hex and torx keys" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
@@ -293,7 +280,6 @@
                 </div>
             </article>
 
-            <!-- 6. Specialty Hand Tools -->
             <article class="category-card" id="specialty">
                 <img src="specialty.jpg" alt="Picks, hooks, inspection mirrors" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
@@ -327,7 +313,6 @@
     </footer>
 
     <script>
-        // Smooth scroll + active state
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 if (this.getAttribute('href').startsWith('#')) {
@@ -340,7 +325,6 @@
             });
         });
 
-        // Hide/show nav
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -350,7 +334,6 @@
             lastScroll = current;
         });
 
-        // Active section highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
