@@ -7,7 +7,7 @@
     <meta name="description" content="Premium hand tools for contractors & government: GearWrench, Knipex, Crescent, Craftsman, Tekton, Milwaukee, DeWalt, Bondhus, Bosch. Free next-day delivery in Hampton Roads.">
     <meta name="keywords" content="precision hand tools, gearwrench knipex crescent craftsman tekton milwaukee dewalt bondhus torque wrenches veteran owned gsa pricing">
 
-    <link rel="icon" href="Yorktown.PNG" type="imageگی/png">
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
             --navy: #0b1e3f;
             --red: #c8102e;
             --white: #ffffff;
+            --yellow: #ffeb3b;
             --transition: all 0.35s ease;
             --radius: 20px;
             --shadow: 0 12px 40px rgba(0,0,0,0.1);
@@ -43,24 +44,27 @@
             margin-top:-80px;
         }
 
-        /* SINGLE-LINE RED SCROLLING MARQUEE */
+        /* IMPROVED RED SCROLLING MARQUEE – brighter white icons + better spacing */
         .logo-marquee-container {
             background: var(--red);
-            padding: 18px 0;
+            padding: 20px 0;
             overflow: hidden;
             white-space: nowrap;
         }
         .marquee-single {
             display: inline-flex;
-            gap: clamp(32px, 7vw, 80px);
-            animation: scroll-left 50s linear infinite;
-            will-change: transform;
+            gap: clamp(40px, 8vw, 100px);
+            animation: scroll-left 45s linear infinite;
         }
         .marquee-single img {
-            height: clamp(44px, 9vw, 62px);
+            height: clamp(50px, 10vw, 70px);
             width: auto;
             flex-shrink: 0;
-            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.35));
+            filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0,0,0,0.5));
+            transition: transform 0.3s;
+        }
+        .marquee-single img:hover {
+            transform: scale(1.15);
         }
         .logo-marquee-container:hover .marquee-single {
             animation-play-state: paused;
@@ -70,27 +74,33 @@
             100% { transform: translateX(-50%); }
         }
 
-        .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
-        .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; }
-        .gov-items strong { color:#ffeb3b; }
+        .gov-ids-header { 
+            background:var(--navy); 
+            color:white; 
+            padding:0.6rem 0; 
+            font-size:0.94rem; 
+            text-align:center; 
+        }
+        .gov-items { display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; align-items:center; }
+        .gov-items strong { color:var(--yellow); font-weight:800; }
 
-        .logo-header { text-align:center; padding:1.6rem 1rem 1.2rem; background:white; }
-        .logo-header img { max-width:280px; width:92%; height:auto; }
+        .logo-header { text-align:center; padding:1.8rem 1rem 1.4rem; background:white; }
+        .logo-header img { max-width:300px; width:92%; height:auto; }
 
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); transition:transform 0.35s ease; }
         .mobile-nav { 
-            display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; 
+            display:flex; overflow-x:auto; padding:0.85rem 0; gap:1.2rem; 
             scrollbar-width:none; justify-content:center;
         }
         .mobile-nav::-webkit-scrollbar { display:none; }
         .mobile-nav a { 
-            color:white; padding:0.7rem 1.3rem; border-radius:30px; 
-            text-decoration:none; font-weight:600; font-size:0.95rem; 
+            color:white; padding:0.8rem 1.5rem; border-radius:30px; 
+            text-decoration:none; font-weight:600; font-size:0.98rem; 
             white-space:nowrap; flex-shrink:0; transition:var(--transition); 
         }
         .mobile-nav a:hover, .mobile-nav a.active { 
-            background:rgba(255,255,255,0.18); color:var(--red); 
+            background:rgba(255,255,255,0.2); color:var(--red); 
         }
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
@@ -101,12 +111,12 @@
             border-radius:var(--radius); margin:3rem 0 4rem; box-shadow:var(--shadow); 
         }
         .hero h1 { font-size:clamp(2.8rem,9vw,4rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
-        .hero p { font-size:clamp(1.2rem,4vw,1.5rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
+        .hero p { font-size:clamp(1.2rem,4vw,1.55rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
 
         .gsa-banner { 
             background:var(--navy); color:white; text-align:center; 
-            padding:1.1rem; border-radius:var(--radius); margin:2rem auto 4rem; 
-            max-width:1000px; font-weight:600; font-size:1.02rem; 
+            padding:1.3rem; border-radius:var(--radius); margin:2rem auto 4.5rem; 
+            max-width:1000px; font-weight:700; font-size:1.08rem; 
         }
 
         .category-grid { 
@@ -115,32 +125,32 @@
         }
         .category-card {
             background:white; border-radius:var(--radius); overflow:hidden; 
-            box-shadow:var(--shadow); border-top:7px solid var(--red); 
+            box-shadow:var(--shadow); border-top:8px solid var(--red); 
             display:flex; flex-direction:column; position:relative;
-            transition:var(--transition); scroll-margin-top:120px;
+            transition:var(--transition); scroll-margin-top:130px;
         }
         .category-card:hover { 
-            transform:translateY(-12px); box-shadow:0 22px 50px rgba(0,0,0,0.2); 
+            transform:translateY(-14px); box-shadow:0 24px 55px rgba(0,0,0.22); 
         }
-        .category-card img { width:100%; height:240px; object-fit:cover; }
+        .category-card img { width:100%; height:250px; object-fit:cover; }
         .badge-popular {
-            position:absolute; top:12px; right:12px; background:var(--red); 
-            color:white; padding:0.5rem 1rem; border-radius:20px; 
-            font-size:0.85rem; font-weight:800; z-index:2;
+            position:absolute; top:14px; right:14px; background:var(--red); 
+            color:white; padding:0.6rem 1.1rem; border-radius:25px; 
+            font-size:0.88rem; font-weight:800; z-index:2;
         }
-        .category-content { padding:2rem; flex-grow:1; display:flex; flex-direction:column; }
-        .category-card h2 { font-size:1.65rem; color:var(--navy); margin-bottom:0.8rem; }
-        .category-desc { color:#444; margin:1rem 0 1.4rem; line-height:1.6; flex-grow:1; }
+        .category-content { padding:2.2rem; flex-grow:1; display:flex; flex-direction:column; }
+        .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:0.9rem; }
+        .category-desc { color:#444; margin:1rem 0 1.5rem; line-height:1.6; flex-grow:1; }
         .tool-select {
-            width:100%; padding:0.95rem 1.1rem; border:2px solid #e9ecef;
-            border-radius:12px; font-size:1rem; margin:1.4rem 0; background:white;
+            width:100%; padding:1rem 1.2rem; border:2px solid #e9ecef;
+            border-radius:14px; font-size:1.02rem; margin:1.5rem 0; background:white;
         }
         .quote-btn {
             margin-top:auto; background:var(--red); color:white; text-align:center;
-            padding:1.1rem; border-radius:12px; font-weight:700; text-decoration:none;
+            padding:1.2rem; border-radius:14px; font-weight:700; text-decoration:none;
             transition:var(--transition);
         }
-        .quote-btn:hover { background:#a00d24; transform:translateY(-3px); }
+        .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
         .call-button {
             position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
@@ -150,10 +160,10 @@
             box-shadow:0 8px 30px rgba(200,16,46,0.5); z-index:999; 
             animation:pulse 2.6s infinite;
         }
-        .call-button img { width:68%; border-radius:50%; border:4px solid white; }
+        .call-button img { width:68%; border-radius:50%; border:5px solid white; }
         @keyframes pulse { 
             0%   { box-shadow:0 0 0 0 rgba(200,16,46,0.7); }
-            70%  { box-shadow:0 0 0 25px rgba(200,16,46,0); }
+            70%  { box-shadow:0 0 0 28px rgba(200,16,46,0); }
             100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
         }
 
@@ -168,7 +178,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- SINGLE-LINE RED SCROLLING MARQUEE -->
+    <!-- RED SCROLLING MARQUEE – white icons -->
     <div class="logo-marquee-container">
         <div class="marquee-single">
             <img src="GearWrench.JPG" alt="GearWrench">
@@ -177,7 +187,7 @@
             <img src="Dewalt-logo.PNG" alt="DeWalt">
             <img src="Craftsman.PNG" alt="Craftsman">
             <img src="Tekton.PNG" alt="Tekton">
-            <img src="Crescenttools .JPG" alt="Crescent">
+            <img src="Crescenttools.JPG" alt="Crescent">
             <img src="Channellock.WEBP" alt="Channellock">
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.AVIF" alt="Bondhus">
@@ -189,7 +199,7 @@
             <img src="Dewalt-logo.PNG" alt="DeWalt">
             <img src="Craftsman.PNG" alt="Craftsman">
             <img src="Tekton.PNG" alt="Tekton">
-            <img src="Crescenttools .JPG" alt="Crescent">
+            <img src="Crescenttools.JPG" alt="Crescent">
             <img src="Channellock.WEBP" alt="Channellock">
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.AVIF" alt="Bondhus">
@@ -197,11 +207,10 @@
         </div>
     </div>
 
+    <!-- UEI / CAGE in white + yellow -->
     <div class="gov-ids-header">
         <div class="gov-items">
-            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
-            <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.gov</strong></span>
+            <span>Stop hunting tools for hours</span>
         </div>
     </div>
 
@@ -227,124 +236,148 @@
             <p>Professional-grade tools from the brands you trust.<br class="hero-br">Free next-day delivery across Hampton Roads.</p>
         </section>
 
+        <!-- Updated GSA banner – removed old UEI line -->
         <div class="gsa-banner">
-            ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
+            ★ GSA pricing • Same-day quotes for .gov & DoD • <strong style="color:#ffeb3b">UEI: SMYXDLJDJMZ4 • CAGE: 16LD9 • SAM.gov</strong>
         </div>
 
         <section class="category-grid">
 
-            <!-- Wrenches -->
+            <!-- 1. Wrenches & Torque (10 most popular, no Snap-on mention) -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Ratcheting wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
                     <h2>Wrenches & Torque</h2>
-                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches (CDI/Snap-on), flare nut, and specialty wrenches. SAE & metric, 90-tooth and XL lengths available. Perfect for aviation, automotive, and industrial work.</p>
+                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty wrenches. SAE & metric, 90-tooth and XL lengths available. Perfect for aviation, automotive, and industrial work.</p>
                     <select class="tool-select" onchange="updateQuote(this,'wrenches')">
                         <option value="">— Choose a wrench —</option>
-                        <option>GearWrench 90T Ratcheting Set (8-19mm)</option>
-                        <option>GearWrench XL Ratcheting SAE Set</option>
-                        <option>Crescent 12" Adjustable Wrench</option>
-                        <option>Tekton Ratcheting Combo Set</option>
-                        <option>Milwaukee MaxBite Set</option>
+                        <option>GearWrench 90T Ratcheting Metric Set (8-19mm)</option>
+                        <option>GearWrench 90T Ratcheting SAE Set</option>
+                        <option>GearWrench XL Combination Ratcheting Set</option>
+                        <option>Tekton Ratcheting Combination Set (Metric)</option>
+                        <option>Tekton Ratcheting Combination Set (SAE)</option>
+                        <option>Crescent X10 12" Adjustable Wrench</option>
+                        <option>Milwaukee Max Bite 15-pc Set</option>
                         <option>CDI 1/2" Torque Wrench (50-250 ft-lb)</option>
-                        <option>Other / Custom</option>
+                        <option>Precision Instruments 3/8" Split-Beam Torque</option>
+                        <option>Other / Custom Request</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Pliers -->
+            <!-- 2. Pliers & Cutters (10 most popular) -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Knipex pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="category-desc">Knipex Cobra & Pliers Wrenches, TwinGrip, high-leverage cutters, Channellock tongue-and-groove, Klein linesman and insulated pliers, and Irwin Vise-Grip tools. Built to last a lifetime.</p>
+                    <p class="category-desc">Knipex Cobra & Pliers Wrenches, TwinGrip, high-leverage cutters, Channellock tongue-and-groove, Klein linesman and insulated pliers.</p>
                     <select class="tool-select" onchange="updateQuote(this,'pliers')">
                         <option value="">— Choose pliers —</option>
-                        <option>Knipex Cobra 10"</option>
-                        <option>Knipex Pliers Wrench 10"</option>
-                        <option>Knipex TwinGrip</option>
-                        <option>Knipex Diagonal Cutters</option>
-                        <option>Channellock 430</option>
-                        <option>Klein 9" Linesman</option>
-                        <option>Other</option>
+                        <option>Knipex Cobra 10" (87 01 250)</option>
+                        <option>Knipex Pliers Wrench 10" (86 03 250)</option>
+                        <option>Knipex TwinGrip Slip-Joint Pliers</option>
+                        <option>Knipex High-Leverage Diagonal Cutters 8"</option>
+                        <option>Knipex Cobra XS 4"</option>
+                        <option>Channellock 430 Tongue & Groove 10"</option>
+                        <option>Channellock 460 16" BigAzz</option>
+                        <option>Klein 9" High-Leverage Linesman</option>
+                        <option>Klein D213-9NE 9" Side Cutters</option>
+                        <option>Other / Custom</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Measuring -->
+            <!-- 3. Measuring & Layout (10 most popular) -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Laser measure" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
-                    <p class="category-desc">Bosch laser distance measurers and cross-line lasers, Stabila digital levels, Fowler digital calipers, Lufkin tapes, Empire torpedo levels — everything you need for precise layout and measurement.</p>
+                    <p class="category-desc">Bosch laser distance measurers, cross-line lasers, Stabila digital levels, Fowler calipers, Lufkin tapes, Empire levels.</p>
                     <select class="tool-select" onchange="updateQuote(this,'measuring')">
                         <option value="">— Choose measuring tool —</option>
-                        <option>Bosch GLM 50 C Laser Measure</option>
-                        <option>Bosch GLL30 Cross-Line Laser</option>
+                        <option>Bosch GLM 50 C Bluetooth Laser Measure</option>
+                        <option>Bosch GLM 20 Laser Measure</option>
+                        <option>Bosch GLL 55 Cross-Line Laser</option>
+                        <option>Bosch GLL30 Self-Leveling Cross-Line</option>
                         <option>Stabila 48" Digital Level</option>
                         <option>Fowler 6" Digital Caliper</option>
-                        <option>Lufkin 25ft Tape</option>
+                        <option>Empire 9" Magnetic Torpedo Level</option>
+                        <option>Lufkin 25ft Shockforce Tape</option>
+                        <option>Tajima 25ft G-Series Tape</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Screwdrivers -->
+            <!-- 4. Screwdrivers & Nut Drivers (10 most popular) -->
             <article class="category-card" id="screwdrivers">
                 <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
                 <div class="category-content">
                     <h2>Screwdrivers & Nut Drivers</h2>
-                    <p class="category-desc">1000V insulated sets, multi-bit drivers, precision electronics sets, cushion-grip, and torque-limiting screwdrivers from Klein, Wera, Wiha, and Milwaukee.</p>
+                    <p class="category-desc">1000V insulated sets, multi-bit drivers, precision sets, cushion-grip from Klein, Milwaukee, Wera, Wiha.</p>
                     <select class="tool-select" onchange="updateQuote(this,'screwdrivers')">
                         <option value="">— Choose screwdriver —</option>
-                        <option>Klein 11-in-1 Multi-Bit</option>
-                        <option>Klein 1000V Insulated Set</option>
-                        <option>Wera Kraftform 6-pc Set</option>
-                        <option>Wiha Insulated Set</option>
-                        <option>Milwaukee Cushion Grip Set</option>
+                        <option>Klein 11-in-1 Multi-Bit Screwdriver</option>
+                        <option>Klein 8-pc 1000V Insulated Set</option>
+                        <option>Milwaukee 14-in-1 Multi-Bit</option>
+                        <option>Milwaukee Cushion Grip 6-pc Set</option>
+                        <option>Wera Kraftform Plus 6-pc Set</option>
+                        <option>Wiha 6-pc Insulated SlimLine Set</option>
+                        <option>Megapro 24-in-1 Multi-Bit</option>
+                        <option>Klein 7-pc Nut Driver Set (Hollow Shaft)</option>
+                        <option>Felo Smart 13-pc Set</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Hex & Torx -->
+            <!-- 5. Hex Keys & Torx (10 most popular) -->
             <article class="category-card" id="hex-torx">
                 <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
-                    <p class="category-desc">Bondhus ball-end and T-handle hex keys, Eklind fold-up sets, Wiha Torx and security bits — the toughest, most precise keys made in the USA.</p>
+                    <p class="category-desc">Bondhus ball-end and T-handle hex keys, Wiha Torx, Eklind fold-ups – USA-made precision.</p>
                     <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
                         <option value="">— Choose hex/torx —</option>
-                        <option>Bondhus Ball-End Metric Set</option>
-                        <option>Bondhus GorillaGrip Fold-Up</option>
-                        <option>Eklind Ball-Hex-L Set</option>
-                        <option>Wiha Torx Security Bits</option>
+                        <option>Bondhus Ball-End Metric Long Set</option>
+                        <option>Bondhus Ball-End SAE Long Set</option>
+                        <option>Bondhus GorillaGrip Fold-Up Metric</option>
+                        <option>Bondhus GorillaGrip Fold-Up SAE</option>
+                        <option>Bondhus T-Handle Metric Set (w/ Stand)</option>
+                        <option>Bondhus T-Handle SAE Set (w/ Stand)</option>
+                        <option>Wiha Torx T-Handle Set</option>
+                        <option>Wiha Security Torx Bit Set</option>
+                        <option>Eklind Ball-Hex-L Key Set</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Specialty -->
+            <!-- 6. Specialty Hand Tools (10 most popular) -->
             <article class="category-card" id="specialty">
-                <img src="Texton-pics.jpg" alt="Specialty tools" loading="lazy">
+                <img src="Tekton-pics.jpg" alt="Specialty tools" loading="lazy">
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
-                    <p class="category-desc">Pick & hook sets, telescoping mirrors, magnetic trays, pry bars, impact bit sets, inspection tools, and more — everything the pros reach for every day.</p>
+                    <p class="category-desc">Pick & hook sets, telescoping mirrors, magnetic trays, pry bars, impact bit sets, inspection tools.</p>
                     <select class="tool-select" onchange="updateQuote(this,'specialty')">
                         <option value="">— Choose specialty tool —</option>
-                        <option>9-pc Pick & Hook Set</option>
-                        <option>Telescoping Mirror + Magnet</option>
-                        <option>Bosch 91-pc Impact Bit Set</option>
-                        <option>Mayhew Pry Bar Set</option>
-                        <option>Magnetic Tray</option>
-                        <option>Other</option>
+                        <option>Tekton 9-pc Pick & Hook Set</option>
+                        <option>Tekton Telescoping Inspection Mirror + Magnet</option>
+                        <option>Milwaukee 48-22-92100 100-pc Impact Bit Set</option>
+                        <option>Bosch 91-pc Drilling & Driving Set</option>
+                        <option>Mayhew 6-pc Dominator Pry Bar Set</option>
+                        <option>Tekton 3-pc Magnetic Tray Set</option>
+                        <option>Lang 5-pc Mini Pick & Hook Set</option>
+                        <option>Ullman Telescoping Magnetic Pickup Tool</option>
+                        <option>Performance Tool 8-pc Impact Adapter Set</option>
+                        <option>Other / Custom</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote →</a>
                 </div>
