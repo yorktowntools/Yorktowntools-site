@@ -24,27 +24,28 @@
             background: white;
             color: #222;
             line-height: 1.7;
+            position: relative;
         }
 
-        /* Faint George background — starts only after the header */
+        /* Solid white zone that covers the entire header (red banner + logo + navy nav) */
+        .solid-header {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 245px;           /* Adjust only if you change header height */
+            background: white;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* George Washington background — starts EXACTLY after the navy nav bar */
         .gw-bg {
             position: fixed;
-            top: 300px;        /* Starts well below the navy nav bar */
+            top: 245px;              /* Same value as .solid-header height */
             left: 0; right: 0; bottom: 0;
             background: url('george-mascot.PNG') center top no-repeat;
             background-size: cover;
             opacity: 0.11;
             z-index: -1;
-            pointer-events: none;
-        }
-
-        /* Full solid white header zone — guarantees pure white from top to bottom of nav */
-        .header-white {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 320px;           /* Covers everything above main content */
-            background: white;
-            z-index: 10;
             pointer-events: none;
         }
 
@@ -84,6 +85,7 @@
         .logo {
             text-align: center;
             padding: 28px 16px 14px;
+            background: white;
             position: relative;
             z-index: 30;
         }
@@ -117,18 +119,18 @@
         main {
             max-width: 1240px;
             margin: 0 auto;
-            padding: 0 16px 100px;
+            padding: 60px 16px 100px;
             position: relative;
             z-index: 2;
         }
 
-        /* Big headline section */
+        /* Hero headline section */
         .hero-header {
             text-align: center;
             padding: 80px 20px 60px;
             background: white;
             border-radius: var(--radius);
-            margin: 40px 0;
+            margin: 0 0 50px 0;
             box-shadow: var(--shadow);
         }
         .hero-header h1 {
@@ -150,6 +152,7 @@
             margin: 0 auto;
         }
 
+        /* Rest of your styles (unchanged) */
         .concrete-hero {
             margin: 50px 0;
             border-radius: var(--radius);
@@ -270,19 +273,15 @@
             70% { box-shadow: 0 0 0 24px rgba(200,16,46,0); }
             100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); }
         }
-
-        @media (max-width: 480px) {
-            .limits { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Faint George starts only below header -->
-    <div class="gw-bg"></div>
+    <!-- Full solid white header (covers red banner + logo + navy nav) -->
+    <div class="solid-header"></div>
 
-    <!-- Solid white header zone (guarantees 100% white background) -->
-    <div class="header-white"></div>
+    <!-- George background starts directly under the navy nav bar -->
+    <div class="gw-bg"></div>
 
     <a href="tel:757-940-5171" class="call-btn" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="Call">
@@ -306,7 +305,6 @@
     </nav>
 
     <main>
-        <!-- Clean, clear hero header (no big circle) -->
         <section class="hero-header">
             <h1>Can We Pour Today?</h1>
             <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach Corridor</div>
@@ -330,11 +328,11 @@
                 </div>
                 <div class="limit">
                     <strong class="caution">CAUTION</strong>
-                    <div>Temp &lt;40°F or &gt;90°F<br>OR Wind gusts &gt;20 mph</div>
+                    <div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div>
                 </div>
                 <div class="limit">
                     <strong class="no">DO NOT POUR</strong>
-                    <div>Rain probability &gt;30%<br>OR 2+ caution factors</div>
+                    <div>Rain probability greater than 30%<br>OR 2+ caution factors</div>
                 </div>
             </div>
 
