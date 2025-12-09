@@ -44,29 +44,29 @@
             margin-top:-80px;
         }
 
-        /* IMPROVED RED SCROLLING MARQUEE – brighter white icons + better spacing */
+        /* SINGLE-LINE SEAMLESS RED MARQUEE */
         .logo-marquee-container {
             background: var(--red);
             padding: 20px 0;
             overflow: hidden;
             white-space: nowrap;
         }
-        .marquee-single {
+        .marquee-track {
             display: inline-flex;
             gap: clamp(40px, 8vw, 100px);
-            animation: scroll-left 45s linear infinite;
+            animation: scroll-left 48s linear infinite;
         }
-        .marquee-single img {
+        .marquee-track img {
             height: clamp(50px, 10vw, 70px);
             width: auto;
             flex-shrink: 0;
             filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0,0,0,0.5));
             transition: transform 0.3s;
         }
-        .marquee-single img:hover {
+        .marquee-track img:hover {
             transform: scale(1.15);
         }
-        .logo-marquee-container:hover .marquee-single {
+        .logo-marquee-container:hover .marquee-track {
             animation-play-state: paused;
         }
         @keyframes scroll-left {
@@ -74,15 +74,17 @@
             100% { transform: translateX(-50%); }
         }
 
+        /* BLUE BANNER – ALL CAPS */
         .gov-ids-header { 
             background:var(--navy); 
             color:white; 
-            padding:0.6rem 0; 
-            font-size:0.94rem; 
+            padding:0.9rem 0; 
+            font-size:1rem; 
             text-align:center; 
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.8px;
         }
-        .gov-items { display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; align-items:center; }
-        .gov-items strong { color:var(--yellow); font-weight:800; }
 
         .logo-header { text-align:center; padding:1.8rem 1rem 1.4rem; background:white; }
         .logo-header img { max-width:300px; width:92%; height:auto; }
@@ -115,9 +117,10 @@
 
         .gsa-banner { 
             background:var(--navy); color:white; text-align:center; 
-            padding:1.3rem; border-radius:var(--radius); margin:2rem auto 4.5rem; 
-            max-width:1000px; font-weight:700; font-size:1.08rem; 
+            padding:1.5rem; border-radius:var(--radius); margin:2rem auto 4.5rem; 
+            max-width:1000px; font-weight:700; font-size:1.1rem; line-height:1.9;
         }
+        .gsa-banner .highlight { color: var(--yellow); }
 
         .category-grid { 
             display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); 
@@ -130,7 +133,7 @@
             transition:var(--transition); scroll-margin-top:130px;
         }
         .category-card:hover { 
-            transform:translateY(-14px); box-shadow:0 24px 55px rgba(0,0,0.22); 
+            transform:translateY(-14px); box-shadow:0 24px 55px rgba(0,0,0,.22); 
         }
         .category-card img { width:100%; height:250px; object-fit:cover; }
         .badge-popular {
@@ -178,9 +181,9 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- RED SCROLLING MARQUEE – white icons -->
+    <!-- SINGLE-LINE RED MARQUEE -->
     <div class="logo-marquee-container">
-        <div class="marquee-single">
+        <div class="marquee-track">
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukee.WEBP" alt="Milwaukee">
@@ -192,7 +195,7 @@
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.AVIF" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- Duplicated for seamless loop -->
+            <!-- Duplicate for seamless loop -->
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukee.WEBP" alt="Milwaukee">
@@ -207,11 +210,9 @@
         </div>
     </div>
 
-    <!-- UEI / CAGE in white + yellow -->
+    <!-- ALL CAPS BLUE BANNER -->
     <div class="gov-ids-header">
-        <div class="gov-items">
-            <span>Stop hunting tools for hours</span>
-        </div>
+        STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
     </div>
 
     <div class="logo-header">
@@ -236,14 +237,17 @@
             <p>Professional-grade tools from the brands you trust.<br class="hero-br">Free next-day delivery across Hampton Roads.</p>
         </section>
 
-        <!-- Updated GSA banner – removed old UEI line -->
+        <!-- GSA BANNER – yellow labels -->
         <div class="gsa-banner">
-            ★ GSA pricing • Same-day quotes for .gov & DoD • <strong style="color:#ffeb3b">UEI: SMYXDLJDJMZ4 • CAGE: 16LD9 • SAM.gov</strong>
+            ★ GSA PRICING • SAME-DAY QUOTES FOR .GOV & DOD • 
+            <span class="highlight">UEI:</span> SMYXDLJDJMZ4 • 
+            <span class="highlight">CAGE:</span> 16LD9 • 
+            <span class="highlight">SAM.GOV</span> REGISTERED
         </div>
 
         <section class="category-grid">
 
-            <!-- 1. Wrenches & Torque (10 most popular, no Snap-on mention) -->
+            <!-- 1. Wrenches & Torque -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Ratcheting wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -263,11 +267,11 @@
                         <option>Precision Instruments 3/8" Split-Beam Torque</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote</a>
                 </div>
             </article>
 
-            <!-- 2. Pliers & Cutters (10 most popular) -->
+            <!-- 2. Pliers & Cutters -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Knipex pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
@@ -287,11 +291,11 @@
                         <option>Klein D213-9NE 9" Side Cutters</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote</a>
                 </div>
             </article>
 
-            <!-- 3. Measuring & Layout (10 most popular) -->
+            <!-- 3. Measuring & Layout -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Laser measure" loading="lazy">
                 <div class="category-content">
@@ -310,11 +314,11 @@
                         <option>Tajima 25ft G-Series Tape</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote</a>
                 </div>
             </article>
 
-            <!-- 4. Screwdrivers & Nut Drivers (10 most popular) -->
+            <!-- 4. Screwdrivers & Nut Drivers -->
             <article class="category-card" id="screwdrivers">
                 <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
                 <div class="category-content">
@@ -333,11 +337,11 @@
                         <option>Felo Smart 13-pc Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote</a>
                 </div>
             </article>
 
-            <!-- 5. Hex Keys & Torx (10 most popular) -->
+            <!-- 5. Hex Keys & Torx -->
             <article class="category-card" id="hex-torx">
                 <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
                 <div class="category-content">
@@ -356,11 +360,11 @@
                         <option>Eklind Ball-Hex-L Key Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote</a>
                 </div>
             </article>
 
-            <!-- 6. Specialty Hand Tools (10 most popular) -->
+            <!-- 6. Specialty Hand Tools -->
             <article class="category-card" id="specialty">
                 <img src="Tekton-pics.jpg" alt="Specialty tools" loading="lazy">
                 <div class="category-content">
@@ -379,7 +383,7 @@
                         <option>Performance Tool 8-pc Impact Adapter Set</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote</a>
                 </div>
             </article>
 
