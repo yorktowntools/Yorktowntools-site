@@ -207,23 +207,41 @@
         .details { color: #333; margin: 12px 0; font-size: 1.05rem; }
         .issues { color: #d32f2f; font-weight: 600; margin-top: 12px; }
 
+        /* FIXED FOOTER – No white background removed, phone number now bright white */
         footer {
             background: var(--navy);
-            color: white;
+            color: #bbbbbb;
             text-align: center;
-            padding: 90px 20px 40px;
+            padding: 100px 20px 50px;
             margin-top: 120px;
         }
-        .footer-logo {
-            background: white;
-            padding: 36px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 36px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+
+        /* Logo now sits directly on navy background – transparent background */
+        .footer-logo img {
+            max-width: 300px;
+            width: 90%;
+            height: auto;
+            filter: brightness(0) invert(1); /* Optional: makes logo pure white if it's dark */
+            margin-bottom: 32px;
         }
-        .footer-logo img { max-width: 280px; width: 90%; }
-        footer p strong { color: #ffffff !important; font-weight: 900; font-size: 1.55rem; }
+
+        /* Phone & email – now bright white and bold */
+        footer p {
+            margin: 12px 0;
+            font-size: 1.1rem;
+        }
+        footer p strong,
+        footer a {
+            color: #ffffff !important;
+            font-weight: 900;
+            font-size: 1.65rem;
+            text-decoration: none;
+        }
+        footer p:last-of-type {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #aaaaaa;
+        }
 
         .call-btn {
             position: fixed;
@@ -319,11 +337,12 @@
     <div class="grid" id="cityGrid"></div>
 </main>
 
+<!-- CLEAN & FIXED FOOTER -->
 <footer>
     <div class="footer-logo">
         <img src="hero.png" alt="Yorktown Tools" loading="lazy">
     </div>
-    <p>757-940-5171 | yorktowntools@gmail.com</p>
+    <p><strong><a href="tel:757-940-5171">757-940-5171</a></strong> | <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
     <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
     <p>© 2025 Yorktown Tools. All rights reserved.</p>
 </footer>
