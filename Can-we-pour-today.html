@@ -6,7 +6,7 @@
     <meta name="description" content="Live NOAA concrete pouring forecast for Richmond to Virginia Beach. Updated every 15 minutes.">
     <title>Can We Pour Today? • Yorktown Tools</title>
     <link rel="icon" href="Yorktown.PNG">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --navy: #0b1e3f;
@@ -28,7 +28,7 @@
             position: relative;
         }
 
-        /* Transparent George mascot */
+        /* Transparent George (hidden behind solid areas) */
         body::after {
             content: "";
             position: fixed;
@@ -43,6 +43,7 @@
             margin-top: -80px;
         }
 
+        /* Red scrolling banner */
         .top-banner {
             background: var(--red);
             color: white;
@@ -69,6 +70,7 @@
             font-weight: 700;
         }
 
+        /* Solid white block so George doesn't bleed through logo */
         .logo-area {
             background: white;
             padding: 32px 16px 20px;
@@ -82,7 +84,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 6px 25px rgba(11,30,63,0.25);
+            box-shadow: 0 0 6px 25px rgba(11,30,63,0.25);
         }
         nav ul {
             display: flex;
@@ -124,7 +126,13 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .concrete-hero img { width: 100%; height: auto; display: block; max-height: 420px; object-fit: cover; }
+        .concrete-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            max-height: 420px;
+            object-fit: cover;
+        }
 
         .decision-box {
             background: white;
@@ -135,8 +143,13 @@
             box-shadow: var(--shadow);
             border-top: 8px solid var(--red);
         }
-        .decision-box h3 { font-size: 2.4rem; color: var(--navy); text-align: center; margin-bottom: 40px; font-weight: 900; }
-
+        .decision-box h3 {
+            font-size: 2.4rem;
+            color: var(--navy);
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 900;
+        }
         .limits {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -150,8 +163,11 @@
             text-align: center;
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         }
-        .limit strong { font-size: 1.4rem; display: block; margin-bottom: 12px; }
-
+        .limit strong {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 12px;
+        }
         .go { color: var(--green); }
         .caution { color: var(--yellow); }
         .no { color: #d32f2f; }
@@ -162,81 +178,77 @@
             gap: 28px;
             margin: 80px 0;
         }
-        .city-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.35s ease; }
+        .city-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.35s ease;
+        }
         .city-card:hover { transform: translateY(-12px); }
         .city-header {
-            { background: var(--navy); color: white; padding: 20px; text-align: center; font-size: 1.5rem; font-weight: 700; border-bottom: 7px solid var(--red); }
-        .city-body { padding: 28px 20px; text-align: center; background: #fafcff; }
+            background: var(--navy);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-bottom: 7px solid var(--red);
+        }
+        .city-body {
+            padding: 28px 20px;
+            text-align: center;
+            background: #fafcff;
+        }
         .status { font-size: 1.9rem; font-weight: 800; margin: 14px 0; }
+        .go { color: var(--green); }
+        .caution { color: var(--yellow); }
+        .no { color: #d32f2f; }
         .details { color: #333; margin: 12px 0; font-size: 1.05rem; }
         .issues { color: #d32f2f; font-weight: 600; margin-top: 12px; }
 
-        /* BEAUTIFUL, CLEAN, MOBILE-PERFECT FOOTER */
+        /* ONLY THE FOOTER IS FIXED BELOW */
         footer {
             background: var(--navy);
-            color: #cccccc;
+            color: white;
             text-align: center;
-            padding: 100px 20px 60px;
+            padding: 90px 20px 40px;
             margin-top: 120px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', sans-serif; /* ← forces same font */
         }
 
+        /* Remove white box behind logo */
         .footer-logo {
-            margin-bottom: 40px;
+            margin-bottom: 36px;
         }
         .footer-logo img {
-            max-width: 320px;
-            width: 92%;
-            height: auto;
+            max-width: 280px;
+            width: 90%;
         }
 
-        .footer-contact {
-            margin: 20px 0;
-            font-size: 1.8rem;
-            font-weight: 900;
-            line-height: 1.5;
-            color: #ffffff;
+        /* Phone + email = pure white, bold, same font */
+        footer p:nth-child(2) {
+            font-size: 1.65rem !important;
+            font-weight: 900 !important;
+            color: #ffffff !important;
+            margin: 24px 0 !important;
         }
-        .footer-contact a {
-            color: #ffffff;
+        footer p:nth-child(2) a {
+            color: #ffffff !important;
             text-decoration: none;
-            transition: color 0.3s;
-        }
-        .footer-contact a:hover {
-            color: var(--red);
-        }
-        .footer-separator {
-            color: #777;
-            margin: 0 16px;
-            font-weight: 400;
         }
 
-        .footer-info {
-            margin: 16px 0;
+        /* All other footer text = clean Inter font */
+        footer p {
+            margin: 12px 0;
             font-size: 1.1rem;
-            color: #bbbbbb;
+            color: #cccccc;
             font-weight: 500;
         }
-
-        .footer-copy {
+        footer p:last-child {
             margin-top: 20px;
-            font-size: 0.95rem;
-            color: #999999;
-            font-weight: 500;
-        }
-
-        /* Mobile perfection */
-        @media (max-width: 640px) {
-            .footer-contact {
-                font-size: 1.5rem;
-                line-height: 1.6;
-            }
-            .footer-contact a {
-                display: block;
-                margin: 10px 0;
-            }
-            .footer-separator { display: none; }
-            .footer-logo img { max-width: 280px; }
+            font-size: 0.98rem;
+            color: #aaaaaa;
         }
 
         .call-btn {
@@ -277,6 +289,7 @@
 
 <div class="gov-bar">Free Delivery • Free Quote</div>
 
+<!-- Solid white behind logo so George doesn't show through -->
 <div class="logo-area">
     <img src="Yorktown.PNG" alt="Yorktown Tools">
 </div>
@@ -306,9 +319,18 @@
         </p>
 
         <div class="limits">
-            <div class="limit"><strong class="go">GOOD TO POUR</strong><div>All conditions within safe limits</div></div>
-            <div class="limit"><strong class="caution">CAUTION</strong><div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div></div>
-            <div class="limit"><strong class="no">DO NOT POUR</strong><div>Rain probability greater than 30%<br>OR 2+ caution factors</div></div>
+            <div class="limit">
+                <strong class="go">GOOD TO POUR</strong>
+                <div>All conditions within safe limits</div>
+            </div>
+            <div class="limit">
+                <strong class="caution">CAUTION</strong>
+                <div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div>
+            </div>
+            <div class="limit">
+                <strong class="no">DO NOT POUR</strong>
+                <div>Rain probability greater than 30%<br>OR 2+ caution factors</div>
+            </div>
         </div>
 
         <p style="text-align:center; margin-top:32px; color:#555; font-size:0.95rem;">
@@ -323,20 +345,13 @@
     <div class="grid" id="cityGrid"></div>
 </main>
 
-<!-- FINAL BEAUTIFUL FOOTER -->
 <footer>
     <div class="footer-logo">
         <img src="hero.png" alt="Yorktown Tools" loading="lazy">
     </div>
-
-    <p class="footer-contact">
-        <a href="tel:757-940-5171">757-940-5171</a>
-        <span class="footer-separator">•</span>
-        <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a>
-    </p>
-
-    <p class="footer-info">Yorktown, Virginia • Veteran-Owned Small Business</p>
-    <p class="footer-copy">© 2025 Yorktown Tools. All rights reserved.</p>
+    <p>757-940-5171 | yorktowntools@gmail.com</p>
+    <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
+    <p>© 2025 Yorktown Tools. All rights reserved.</p>
 </footer>
 
 <script>
