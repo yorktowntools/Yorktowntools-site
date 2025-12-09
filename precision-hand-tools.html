@@ -43,7 +43,29 @@
             margin-top:-80px;
         }
 
-        .top-red-banner { background:var(--red); color:white; text-align:center; padding:0.8rem; font-weight:700; font-size:1.05rem; }
+        /* NEW SCROLLING LOGO MARQUEE */
+        .logo-marquee {
+            background: var(--red);
+            padding: 12px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .marquee-content {
+            display: inline-flex;
+            animation: scroll 28s linear infinite;
+        }
+        .marquee-content:hover { animation-play-state: paused; }
+        .marquee-content img {
+            height: 44px;
+            margin: 0 32px;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%);
+        }
+
         .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
         .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; }
         .gov-items strong { color:#ffeb3b; }
@@ -85,9 +107,6 @@
             transform: scale(1.18);
             filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25));
         }
-
-        .btn-text { display:inline-block; background:#0066cc; color:white; padding:0.9rem 1.8rem; border-radius:50px; font-weight:700; text-decoration:none; transition:var(--transition); }
-        .btn-text:hover { background:#004499; transform:translateY(-3px); }
 
         .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:2.5rem; margin:4rem 0; }
         .category-card {
@@ -148,7 +167,36 @@
         <img src="Yorktown.PNG" alt="Call">
     </a>
 
-    <div class="top-red-banner">Free Delivery to Hampton Roads</div>
+    <!-- NEW SCROLLING LOGO MARQUEE -->
+    <div class="logo-marquee">
+        <div class="marquee-content">
+            <!-- Duplicated for seamless loop -->
+            <img src="GearWrench-transparent.png" alt="GearWrench">
+            <img src="Crescent-transparent.png" alt="Crescent">
+            <img src="Craftsman-transparent.png" alt="Craftsman">
+            <img src="Tekton-transparent.png" alt="Tekton">
+            <img src="Milwaukee-transparent.png" alt="Milwaukee">
+            <img src="Dewalt-transparent.png" alt="DeWalt">
+            <img src="Knipex-transparent.png" alt="Knipex">
+            <img src="Channellock-transparent.png" alt="Channellock">
+            <img src="Klein-transparent.png" alt="Klein Tools">
+            <img src="Bondhus-transparent.png" alt="Bondhus">
+            <img src="Bosch-transparent.png" alt="Bosch">
+            <!-- Repeat for smooth infinite scroll -->
+            <img src="GearWrench-transparent.png" alt="GearWrench">
+            <img src="Crescent-transparent.png" alt="Crescent">
+            <img src="Craftsman-transparent.png" alt="Craftsman">
+            <img src="Tekton-transparent.png" alt="Tekton">
+            <img src="Milwaukee-transparent.png" alt="Milwaukee">
+            <img src="Dewalt-transparent.png" alt="DeWalt">
+            <img src="Knipex-transparent.png" alt="Knipex">
+            <img src="Channellock-transparent.png" alt="Channellock">
+            <img src="Klein-transparent.png" alt="Klein Tools">
+            <img src="Bondhus-transparent.png" alt="Bondhus">
+            <img src="Bosch-transparent.png" alt="Bosch">
+        </div>
+    </div>
+
     <div class="gov-ids-header">
         <div class="gov-items">
             <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
@@ -182,10 +230,10 @@
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- Updated Brand Logos -->
+        <!-- Brand Logos (clickable) -->
         <div class="brand-selector">
             <a href="#wrenches"><img src="GearWrench.JPG" alt="GearWrench"></a>
-            <a href="#wrenches"><img src="Crescenttools .JPG" alt="Crescent"></a>
+            <a href="#wrenches"><img src="Crescenttools.JPG" alt="Crescent"></a>
             <a href="#wrenches"><img src="Craftsman.JPG" alt="Craftsman"></a>
             <a href="#wrenches"><img src="Tekton.PNG" alt="Tekton"></a>
             <a href="#wrenches"><img src="Milwaukee.PNG" alt="Milwaukee"></a>
@@ -208,73 +256,87 @@
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
                     <h2>Wrenches</h2>
-                    <p class="what-is"><strong>GearWrench • Crescent • Craftsman • Tekton • Milwaukee • DeWalt • CDI</strong></p>
+                    <p class="what-is"><strong>GearWrench • Crescent • Craftsman • Tekton • Milwaukee • DeWalt • CDI Torque</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'wrenches')">
-                        <option value="">— Choose a tool —</option>
-                        <option>GearWrench Ratcheting Set</option>
-                        <option>Crescent Adjustable Wrench</option>
-                        <option>Craftsman Combination Set</option>
-                        <option>Tekton Ratcheting Wrench Set</option>
-                        <option>Milwaukee Ratcheting Wrench</option>
-                        <option>CDI Torque Wrench (any size)</option>
+                        <option value="">— Choose a wrench —</option>
+                        <option>GearWrench 90T Ratcheting Combo Set (8-19mm)</option>
+                        <option>GearWrench XL Ratcheting Wrench Set SAE</option>
+                        <option>Crescent 12" Adjustable Wrench</option>
+                        <option>Craftsman 26-pc Combination Wrench Set</option>
+                        <option>Tekton 8-22mm Ratcheting Combo Set</option>
+                        <option>Milwaukee MaxBite Ratcheting Wrench Set</option>
+                        <option>DeWalt 8-pc Ratcheting Wrench Set</option>
+                        <option>CDI Snap-on 1/2" Torque Wrench (50-250 ft-lb)</option>
+                        <option>CDI 3/8" Micrometer Torque Wrench</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches:%20" class="quote-btn" id="quote-wrenches">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches:%20" class="quote-btn" id="quote-wrenches">Text Quote</a>
                 </div>
             </article>
 
-            <!-- Pliers -->
+            <!-- Pliers & Cutters -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Knipex pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="what-is"><strong>Knipex • Klein Tools • Channellock • Irwin</strong></p>
+                    <p class="what-is"><strong>Knipex • Channellock • Klein Tools • Irwin Vise-Grip</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'pliers')">
-                        <option value="">— Choose a tool —</option>
-                        <option>Knipex Cobra 10"</option>
-                        <option>Knipex TwinGrip</option>
-                        <option>Klein Linesman Pliers</option>
-                        <option>Channellock Tongue & Groove</option>
-                        <option>Snap Ring Pliers Set</option>
+                        <option value="">— Choose pliers —</option>
+                        <option>Knipex Cobra 10" (87 01 250)</option>
+                        <option>Knipex TwinGrip Slip-Joint Pliers</option>
+                        <option>Knipex High-Leverage Diagonal Cutters</option>
+                        <option>Knipex Pliers Wrench 10"</option>
+                        <option>Channellock 430 10" Tongue & Groove</option>
+                        <option>Channellock 909 Crimping Tool</option>
+                        <option>Klein 9" Linesman Pliers</option>
+                        <option>Klein 11-in-1 Screwdriver/Nut Driver</option>
+                        <option>Irwin Vise-Grip 10" GrooveLock</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers:%20" class="quote-btn" id="quote-pliers">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers:%20" class="quote-btn" id="quote-pliers">Text Quote</a>
                 </div>
             </article>
 
-            <!-- Measuring -->
+            <!-- Measuring & Layout -->
             <article class="category-card" id="measuring">
-                <img src="Bosch-laser.jpg" alt="Bosch laser measuring tool" loading="lazy">
+                <img src="Bosch-laser.jpg" alt="Bosch laser" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
-                    <p class="what-is"><strong>Fowler • Stabila • Lufkin • Bosch</strong></p>
+                    <p class="what-is"><strong>Bosch • Stabila • Lufkin • Fowler • Empire</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'measuring')">
-                        <option value="">— Choose a tool —</option>
-                        <option>6" Digital Caliper</option>
-                        <option>48" Level</option>
-                        <option>Bosch Laser Distance Measurer</option>
-                        <option>Tape Measure</option>
+                        <option value="">— Choose measuring tool —</option>
+                        <option>Bosch GLM 50 C Laser Measure</option>
+                        <option>Bosch GLL 30 Self-Leveling Cross-Line Laser</option>
+                        <option>Stabila 48" Digital Level</option>
+                        <option>Fowler 6" Digital Caliper</option>
+                        <option>Lufkin 25ft Shockforce Tape</option>
+                        <option>Empire 9" Magnetic Torpedo Level</option>
+                        <option>Johnson 40-6517 Rotary Laser Kit</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring:%20" class="quote-btn" id="quote-measuring">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring:%20" class="quote-btn" id="quote-measuring">Text Quote</a>
                 </div>
             </article>
 
-            <!-- Screwdrivers -->
+            <!-- Screwdrivers & Nut Drivers -->
             <article class="category-card" id="screwdrivers">
-                <img src="Kleintools-screwdrivers.jpg" alt="Klein Tools screwdrivers" loading="lazy">
+                <img src="Kleintools-screwdrivers.jpg" alt="Klein screwdrivers" loading="lazy">
                 <div class="category-content">
                     <h2>Screwdrivers & Nut Drivers</h2>
-                    <p class="what-is"><strong>Wera • Klein Insulated • Craftsman</strong></p>
+                    <p class="what-is"><strong>Klein • Wera • Wiha • Milwaukee • Craftsman</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'screwdrivers')">
-                        <option value="">— Choose a tool —</option>
-                        <option>Wera Kraftform Set</option>
-                        <option>Klein 11-in-1</option>
-                        <option>Insulated Screwdriver Set</option>
+                        <option value="">— Choose screwdriver —</option>
+                        <option>Klein 11-in-1 Multi-Bit Screwdriver</option>
+                        <option>Klein 1000V Insulated 10-pc Set</option>
+                        <option>Wera Kraftform Plus 334/6 Screwdriver Set</option>
+                        <option>Wiha 26-pc Insulated Set</option>
+                        <option>Milwaukee 10-pc Cushion Grip Set</option>
+                        <option>Craftsman 12-pc Screwdriver Set</option>
+                        <option>Milwaukee 8-pc Nut Driver Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers:%20" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers:%20" class="quote-btn" id="quote-screwdrivers">Text Quote</a>
                 </div>
             </article>
 
@@ -283,33 +345,38 @@
                 <img src="Bondhus-hex.jpg" alt="Bondhus hex keys" loading="lazy">
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
-                    <p class="what-is"><strong>Bondhus • Eklind • Craftsman</strong></p>
+                    <p class="what-is"><strong>Bondhus • Eklind • Wiha • Tekton</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
-                        <option value="">— Choose a tool —</option>
-                        <option>Bondhus Ball-End Set</option>
-                        <option>Eklind Folding Set</option>
-                        <option>Torx Security Bits</option>
+                        <option value="">— Choose hex/torx —</option>
+                        <option>Bondhus GorillaGrip Fold-Up Set (Metric)</option>
+                        <option>Bondhus Ball-End L-Wrench Set SAE</option>
+                        <option>Bondhus T-Handle Hex Set</option>
+                        <option>Eklind 22-pc Ball-Hex-L Key Set</option>
+                        <option>Wiha TorxPlus Security Bit Set</option>
+                        <option>Tekton Star Key Wrench Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx:%20" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx:%20" class="quote-btn" id="quote-hex-torx">Text Quote</a>
                 </div>
             </article>
 
             <!-- Specialty -->
             <article class="category-card" id="specialty">
-                <img src="Texton-pics.jpg" alt="Specialty hand tools" loading="lazy">
+                <img src="Texton-pics.jpg" alt="Specialty tools" loading="lazy">
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
-                    <p class="what-is"><strong>Picks • Hooks • Mirrors • Bosch Bits • Pry Bars</strong></p>
+                    <p class="what-is"><strong>Picks • Hooks • Mirrors • Bosch Bits • Pry Bars • Magnetic Trays</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'specialty')">
-                        <option value="">— Choose a tool —</option>
-                        <option>9-pc Pick & Hook Set</option>
-                        <option>Telescoping Mirror</option>
-                        <option>Bosch Impact Bit Set</option>
-                        <option>Magnetic Tray</option>
+                        <option value="">— Choose specialty tool —</option>
+                        <option>9-pc Pick & Hook Set (Lisle or GearWrench)</option>
+                        <option>Telescoping Inspection Mirror</option>
+                        <option>Bosch 91-pc Impact Tough Bit Set</option>
+                        <option>Mayhew 6-pc Dominator Pry Bar Set</option>
+                        <option>Magnetic Parts Tray (Rectangular)</option>
+                        <option>Performance Tool 4-pc Hook & Pick Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty:%20" class="quote-btn" id="quote-specialty">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty:%20" class="quote-btn" id="quote-specialty">Text Quote</a>
                 </div>
             </article>
 
@@ -340,7 +407,7 @@
             }
         }
 
-        // Smooth scroll
+        // Smooth scroll & nav hide/show (unchanged)
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 if (a.getAttribute('href').startsWith('#') && a.getAttribute('href') !== '#') {
@@ -350,7 +417,6 @@
             });
         });
 
-        // Hide/show sticky nav on scroll
         const nav = document.getElementById('main-nav');
         let last = 0;
         window.addEventListener('scroll', () => {
