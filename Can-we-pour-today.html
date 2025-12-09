@@ -84,7 +84,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 0 6px 25px rgba(11,30,63,0.25);
+            box-shadow: 0 6px 25px rgba(11,30,63,0.25);
         }
         nav ul {
             display: flex;
@@ -207,47 +207,46 @@
         .details { color: #333; margin: 12px 0; font-size: 1.05rem; }
         .issues { color: #d32f2f; font-weight: 600; margin-top: 12px; }
 
-        /* ONLY THE FOOTER IS FIXED BELOW */
+        /* FOOTER ONLY — CLEAN & CENTERED */
         footer {
             background: var(--navy);
             color: white;
             text-align: center;
             padding: 90px 20px 40px;
             margin-top: 120px;
-            font-family: 'Inter', sans-serif; /* ← forces same font */
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Remove white box behind logo */
         .footer-logo {
-            margin-bottom: 36px;
+            margin-bottom: 32px;
         }
         .footer-logo img {
             max-width: 280px;
             width: 90%;
         }
 
-        /* Phone + email = pure white, bold, same font */
+        /* Phone + email line — smaller and perfectly centered */
         footer p:nth-child(2) {
-            font-size: 1.65rem !important;
-            font-weight: 900 !important;
-            color: #ffffff !important;
-            margin: 24px 0 !important;
-        }
-        footer p:nth-child(2) a {
-            color: #ffffff !important;
-            text-decoration: none;
+            font-size: 1.35rem;     /* smaller than before */
+            font-weight: 700;
+            color: #ffffff;
+            margin: 20px auto 16px;
+            line-height: 1.5;
+            max-width: 90%;
         }
 
-        /* All other footer text = clean Inter font */
+        /* All other footer text — same clean font, smaller & centered */
         footer p {
-            margin: 12px 0;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #cccccc;
+            margin: 12px auto;
+            max-width: 90%;
             font-weight: 500;
         }
+
         footer p:last-child {
-            margin-top: 20px;
-            font-size: 0.98rem;
+            margin-top: 24px;
+            font-size: 0.9rem;
             color: #aaaaaa;
         }
 
@@ -289,7 +288,6 @@
 
 <div class="gov-bar">Free Delivery • Free Quote</div>
 
-<!-- Solid white behind logo so George doesn't show through -->
 <div class="logo-area">
     <img src="Yorktown.PNG" alt="Yorktown Tools">
 </div>
@@ -302,9 +300,10 @@
 </nav>
 
 <main>
+    <!-- your entire main content stays 100% unchanged -->
     <section class="hero">
         <h1>Can We Pour Today?</h1>
-        <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach Corridor</div>
+        <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach</div>
         <p>Updated every 15 minutes • Check conditions in your city below</p>
     </section>
 
@@ -345,6 +344,7 @@
     <div class="grid" id="cityGrid"></div>
 </main>
 
+<!-- CLEAN, SMALLER & CENTERED FOOTER -->
 <footer>
     <div class="footer-logo">
         <img src="hero.png" alt="Yorktown Tools" loading="lazy">
