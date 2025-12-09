@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Hand Tools | Yorktown Tools</title>
+    <meta name="description" content="Premium precision hand tools for commercial & government contractors: wrenches, pliers, measuring, screwdrivers, hex/torx, and specialty tools. Free delivery in Hampton Roads.">
+    <meta name="keywords" content="precision hand tools, wrenches, pliers, torque wrenches, calipers, screwdrivers, hex keys, veteran owned, free delivery virginia">
+
+    <!-- Same favicons & fonts as homepage -->
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0b1e3f;
+            --red: #c8102e;
+            --white: #ffffff;
+            --light: #f8f9fa;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background:var(--white);
+            min-height:100vh;
+            position:relative;
+        }
+        body::after {
+            content:"";
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            width:140vw; height:140vw;
+            max-width:1400px; max-height:1400px;
+            background:url('george-mascot.PNG') center/contain no-repeat;
+            opacity:0.15;
+            pointer-events:none;
+            z-index:-1;
+            margin-top:-80px;
+        }
+
+        /* Header & Nav (exactly like homepage) */
+        .top-red-banner { background:var(--red); color:white; text-align:center; padding:0.8rem; font-weight:700; font-size:1.05rem; }
+        .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
+        .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; padding:0.4rem; }
+        .gov-items strong { color:#ffeb3b; }
+        .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
+        .logo-header img { max-width:260px; width:92%; height:auto; }
+
+        nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
+        nav.hidden { transform:translateY(-100%); transition:transform 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:0.8rem; scrollbar-width:none; }
+        .mobile-nav::-webkit-scrollbar { display:none; }
+        .mobile-nav a { flex:0 0 auto; background:rgba(255,255,255,0.12); color:white; padding:0.65rem 1.1rem; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.94rem; white-space:nowrap; transition:var(--transition); }
+        .mobile-nav a:hover { background:white; color:var(--navy); }
+        @media(min-width:768px){
+            .mobile-nav{justify-content:center; overflow:visible; flex-wrap:wrap; gap:1rem; padding:1rem 0;}
+            .mobile-nav a{background:transparent;}
+            .mobile-nav a:hover{background:rgba(255,255,255,0.18); color:var(--red);}
+        }
+
+        main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
+
+        .hero { text-align:center; padding:clamp(4rem,13vw,7rem) 1rem 4rem; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:3rem 0; box-shadow:var(--shadow); }
+        .hero h1 { font-size:clamp(2.8rem,9vw,3.9rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
+        .hero p { font-size:clamp(1.2rem,4vw,1.45rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
+
+        .btn { display:inline-block; background:var(--red); color:white; padding:1.2rem 3rem; border-radius:50px; font-weight:700; font-size:1.2rem; text-decoration:none; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); }
+        .btn:hover { background:#a00d22; transform:translateY(-4px); }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        .category-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-top: 6px solid var(--red);
+            display: flex;
+            flex-direction: column;
+        }
+        .category-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+        }
+        .category-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+        }
+        .category-content {
+            padding: 1.8rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .category-card h2 {
+            font-size: 1.55rem;
+            color: var(--navy);
+            margin-bottom: 0.8rem;
+        }
+        .what-is, .used-for {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .what-is strong { color: var(--red); }
+        .used-for { color: #444; font-size: 0.98rem; }
+
+        .category-card .btn {
+            margin-top: auto;
+            align-self: flex-start;
+        }
+
+        /* Floating Call Button */
+        .call-button {
+            position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
+            width:clamp(72px,16vw,88px); height:clamp(72px,16vw,88px);
+            background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 8px 30px rgba(200,16,46,0.5); z-index:999; animation:pulse 2.6s infinite; cursor:pointer;
+        }
+        .call-button img { width:68%; border-radius:50%; border:3px solid white; }
+        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(200,16,46,0.7)} 70%{box-shadow:0 0 0 25px rgba(200,16,46,0)} 100%{box-shadow:0 0 0 0 rgba(200,16,46,0)} }
+
+        footer { background:var(--navy); color:white; text-align:center; padding:6rem 1rem 3rem; margin-top:8rem; }
+        .footer-artwork { max-width:900px; width:95%; margin:0 auto 3rem; opacity:0.95; }
+        footer a { color:white !important; text-decoration:underline; }
+    </style>
+</head>
+<body>
+
+    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
+        <img src="Yorktown.PNG" alt="Call George">
+    </a>
+
+    <!-- Same top bar, gov bar, logo, nav as homepage -->
+    <div class="top-red-banner">Free Delivery to All Hampton Roads Contractors</div>
+    <div class="gov-ids-header">
+        <div class="gov-items">
+            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
+            <span><strong>CAGE:</strong> 16LD9</span>
+            <span><strong>SAM.gov Registered</strong></span>
+        </div>
+    </div>
+    <div class="logo-header">
+        <a href="/"><img src="Yorktown.PNG" alt="Yorktown Tools"></a>
+    </div>
+    <nav id="main-nav">
+        <div class="mobile-nav">
+            <a href="/">Home</a>
+            <a href="/precision-hand-tools.html">Hand & Power Tools</a>
+            <a href="#accessories">Accessories & PPE</a>
+            <a href="#ladders">Ladders</a>
+            <a href="#about">About</a>
+            <a href="#contact">Get Quote</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Precision Hand Tools</h1>
+            <p>Professional-grade tools built for accuracy, durability, and daily commercial/government use.<br>Free quote in 24 hrs • Free delivery across Hampton Roads.</p>
+            <a href="tel:757-940-5171" class="btn">Call for Quote: 757-940-5171</a>
+        </section>
+
+        <section class="category-grid">
+
+            <!-- 1. Wrenches -->
+            <article class="category-card">
+                <img src="wrenches.jpg" alt="Professional wrenches" loading="lazy">
+                <div class="category-content">
+                    <h2>Wrenches</h2>
+                    <p class="what-is"><strong>What it is:</strong> Combination, adjustable, ratcheting, torque, and pipe wrenches from Snap-on, GearWrench, Wright Tool, and more.</p>
+                    <p class="used-for">Perfect for mechanical, plumbing, aircraft maintenance, and heavy equipment work where exact torque matters.</p>
+                    <a href="tel:757-940-5171" class="btn">Get Quote →</a>
+                </div>
+            </article>
+
+            <!-- 2. Pliers & Cutters -->
+            <article class="category-card">
+                <img src="pliers.jpg" alt="Linesman pliers and cutters" loading="lazy">
+                <div class="category-content">
+                    <h2>Pliers & Cutters</h2>
+                    <p class="what-is"><strong>What it is:</strong> Linesman, needle-nose, locking, snap-ring, diagonal cutters — Knipex, Channellock, Irwin.</p>
+                    <p class="used-for">Electrical work, wire pulling, aviation safety wire, hose clamp removal, and general gripping/cutting tasks.</p>
+                    <a href="tel:757-940-5171" class="btn">Get Quote →</a>
+                </div>
+            </article>
+
+            <!-- 3. Measuring & Layout -->
+            <article class="category-card">
+                <img src="measuring.jpg" alt="Calipers, levels, tape measures" loading="lazy">
+                <div class="category-content">
+                    <h2>Measuring & Layout</h2>
+                    <p class="what-is"><strong>What it is:</strong> Digital calipers, micrometers, Starrett/Mitutoyo precision tools, Empire & Stabila levels, Lufkin tapes.</p>
+                    <p class="used-for">Machining, quality control inspections, carpentry layout, and any job requiring exact measurements.</p>
+                    <a href="tel:757-940-5171" class="btn">Get Quote →</a>
+                </div>
+            </article>
+
+            <!-- 4. Screwdrivers & Nut Drivers -->
+            <article class="category-card">
+                <img src="screwdrivers.jpg" alt="Precision screwdriver sets" loading="lazy">
+                <div class="category-content">
+                    <h2>Screwdrivers & Nut Drivers</h2>
+                    <p class="what-is"><strong>What it is:</strong> Insulated, precision, electronics kits, and heavy-duty nut drivers from Wera, Wiha, Klein.</p>
+                    <p class="used-for">Electrical panels, avionics, control boxes, and general assembly/disassembly.</p>
+                    <a href="tel:757-940-5171" class="btn">Get Quote →</a>
+                </div>
+            </article>
+
+            <!-- 5. Hex Keys & Torx -->
+            <article class="category-card">
+                <img src="hex-torx.jpg" alt="Hex keys and Torx drivers" loading="lazy">
+                <div class="category-content">
+                    <h2>Hex Keys & Torx</h2>
+                    <p class="what-is"><strong>What it is:</strong> Ball-end, T-handle, folding sets, and security bits (Bondhus, Wiha, Eklind).</p>
+                    <p class="used-for">Machinery maintenance, automotive, firearms, and anywhere Allen or Torx fasteners are used.</p>
+                    <a href="tel:757-940-5171" class="btn">Get Quote →</a>
+                </div>
+            </article>
+
+            <!-- 6. Specialty Hand Tools -->
+            <article class="category-card">
+                <img src="specialty.jpg" alt="Picks, hooks, inspection mirrors" loading="lazy">
+                <div class="category-content">
+                    <h2>Specialty Hand Tools</h2>
+                    <p class="what-is"><strong>What it is:</strong> Picks, hooks, files, pry bars, inspection mirrors, magnetic trays, and more.</p>
+                    <p class="used-for">O-ring removal, gasket scraping, retrieving dropped parts, and detailed inspection work.</p>
+                    <a href="tel:757-940-5171" class="btn">Get Quote →</a>
+                </div>
+            </article>
+
+        </section>
+
+        <section style="text-align:center; margin:5rem 0;">
+            <p style="font-size:1.3rem; margin-bottom:1.5rem;">Need a specific brand or GSA pricing?</p>
+            <a href="tel:757-940-5171" class="btn" style="font-size:1.4rem; padding:1.4rem 4rem;">Call or Text: 757-940-5171</a>
+        </section>
+    </main>
+
+    <footer>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned • SAM.gov Registered • UEI: SMYXDLJDJMZ4 • CAGE: 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Same scroll-hide nav as homepage
+        const nav = document.getElementById('main-nav');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            let current = window.pageYOffset;
+            if (current > lastScroll && current > 160) nav.classList.add('hidden');
+            else nav.classList.remove('hidden');
+            lastScroll = current;
+        });
+    </script>
+</body>
+</html>
