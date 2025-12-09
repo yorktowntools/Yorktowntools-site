@@ -26,10 +26,11 @@
             line-height: 1.7;
         }
 
-        /* George Washington mascot background — only visible below the header area */
+        /* Faint George background — starts only after the header */
         .gw-bg {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 300px;        /* Starts well below the navy nav bar */
+            left: 0; right: 0; bottom: 0;
             background: url('george-mascot.PNG') center top no-repeat;
             background-size: cover;
             opacity: 0.11;
@@ -37,13 +38,13 @@
             pointer-events: none;
         }
 
-        /* SOLID WHITE ZONE from top of page down past the navy nav bar */
-        .header-white-zone {
+        /* Full solid white header zone — guarantees pure white from top to bottom of nav */
+        .header-white {
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 280px;        /* Covers red banner + gov bar + logo + navy nav + a little buffer */
+            height: 320px;           /* Covers everything above main content */
             background: white;
-            z-index: 1;
+            z-index: 10;
             pointer-events: none;
         }
 
@@ -57,7 +58,7 @@
             overflow: hidden;
             white-space: nowrap;
             position: relative;
-            z-index: 2;
+            z-index: 20;
         }
         .banner-track {
             display: inline-block;
@@ -70,7 +71,6 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* Navy slogan bar */
         .gov-bar {
             background: var(--navy);
             color: white;
@@ -81,7 +81,12 @@
             letter-spacing: 0.5px;
         }
 
-        .logo { text-align: center; padding: 28px 16px 14px; position: relative; z-index: 3; }
+        .logo {
+            text-align: center;
+            padding: 28px 16px 14px;
+            position: relative;
+            z-index: 30;
+        }
         .logo img { max-width: 260px; width: 90%; }
 
         nav {
@@ -109,113 +114,139 @@
         }
         nav a:hover { background: rgba(255,255,255,0.22); color: var(--red); }
 
-        main { max-width: 1240px; margin: 0 auto; padding: 0 16px 100px; position: relative; z-index: 2; }
-
-        /* Big claim at the top */
-        .claim {
-            text-align: center;
-            padding: 90px 20px 20px;
-            background: linear-gradient(to bottom, rgba(248,249,250,0.95), white);
-            margin: 0 0 20px;
-        }
-        .claim h1 {
-            font-size: clamp(2.8rem, 9vw, 4.8rem);
-            color: var(--navy);
-            font-weight: 900;
-            line-height: 1.1;
-        }
-        .claim p {
-            font-size: 1.3rem;
-            color: #444;
-            margin-top: 12px;
+        main {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 16px 100px;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Hero section – now with solid white background for maximum clarity */
-        .hero {
+        /* Big headline section */
+        .hero-header {
             text-align: center;
-            padding: 80px 20px;
-            background: white;                     /* Pure white */
+            padding: 80px 20px 60px;
+            background: white;
             border-radius: var(--radius);
             margin: 40px 0;
             box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
         }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.98);
-            z-index: -1;
-        }
-        .hero h2 {
-            font-size: clamp(3rem, 10vw, 4.6rem);
+        .hero-header h1 {
+            font-size: clamp(3.2rem, 10vw, 5rem);
             color: var(--navy);
             font-weight: 900;
+            margin-bottom: 12px;
+        }
+        .hero-header .subtitle {
+            font-size: 1.4rem;
+            color: #555;
+            font-weight: 600;
             margin-bottom: 8px;
         }
-        .hero .subtitle {
-            font-size: 1.35rem;
-            color: #555;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        .hero p {
+        .hero-header p {
             font-size: 1.22rem;
             color: #444;
-            margin-bottom: 44px;
             max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .concrete-hero {
+            margin: 50px 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            max-width: 900px;
             margin-left: auto;
             margin-right: auto;
         }
-
-        .big-circle {
-            width: 300px;
-            height: 300px;
-            margin: 0 auto 36px;
-            border-radius: 50%;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4.5rem;
-            font-weight: 900;
-            color: white;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-        .green { background: #2e7d32; }
-        .yellow { background: #b07100; }
-        .red { background: #c8102e; }
-
-        .verdict {
-            font-size: clamp(2.8rem, 9vw, 4.2rem);
-            font-weight: 900;
-            margin: 10px 0 0;
+        .concrete-hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            max-height: 420px;
         }
 
-        /* Rest of your styles remain unchanged */
-        .concrete-hero { margin: 50px 0; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); max-width: 900px; margin-left: auto; margin-right: auto; }
-        .concrete-hero img { width: 100%; height: auto; display: block; object-fit: cover; max-height: 420px; }
-
-        .decision-box { background: white; border-radius: var(--radius); padding: 50px 32px; margin: 70px auto; max-width: 1000px; box-shadow: var(--shadow); border-left: 10px solid var(--red); }
-        .decision-box h3 { font-size: 2.4rem; color: var(--navy); text-align: center; margin-bottom: 40px; font-weight: 900; }
-        .limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; margin: 40px 0; }
-        .limit { background: #fafcff; padding: 28px 24px; border-radius: 18px; text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-        .limit strong { font-size: 1.4rem; display: block; margin-bottom: 12px; }
+        .decision-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 50px 32px;
+            margin: 70px auto;
+            max-width: 1000px;
+            box-shadow: var(--shadow);
+            border-left: 10px solid var(--red);
+        }
+        .decision-box h3 {
+            font-size: 2.4rem;
+            color: var(--navy);
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 900;
+        }
+        .limits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+        }
+        .limit {
+            background: #fafcff;
+            padding: 28px 24px;
+            border-radius: 18px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        .limit strong {
+            font-size: 1.4rem;
+            display: block;
+            margin-bottom: 12px;
+        }
         .go { color: var(--green); }
         .caution { color: var(--yellow); }
         .no { color: #d32f2f; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; margin: 80px 0; }
-        .city-card { background: white; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.35s ease; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
+            margin: 80px 0;
+        }
+        .city-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.35s ease;
+        }
         .city-card:hover { transform: translateY(-12px); }
-        .city-header { background: var(--navy); color: white; padding: 20px; text-align: center; font-size: 1.5rem; font-weight: 700; border-bottom: 7px solid var(--red); }
-        .city-body { padding: 28px 20px; text-align: center; background: #fafcff; }
-        .status { font-size: 1.7rem; font-weight: 800; margin: 14px 0; }
+        .city-header {
+            background: var(--navy);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-bottom: 7px solid var(--red);
+        }
+        .city-body {
+            padding: 28px 20px;
+            text-align: center;
+            background: #fafcff;
+        }
+        .status { font-size: 1.9rem; font-weight: 800; margin: 14px 0; }
+        .go { color: var(--green); }
+        .caution { color: var(--yellow); }
+        .no { color: #d32f2f; }
         .details { color: #333; margin: 12px 0; font-size: 1.05rem; }
         .issues { color: #d32f2f; font-weight: 600; margin-top: 12px; }
 
-        footer { background: var(--navy); color: white; text-align: center; padding: 80px 20px 40px; margin-top: 100px; }
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 80px 20px 40px;
+            margin-top: 100px;
+        }
         footer img { max-width: 90%; margin-bottom: 24px; opacity: 0.92; }
 
         .call-btn {
@@ -241,18 +272,17 @@
         }
 
         @media (max-width: 480px) {
-            .big-circle { width: 250px; height: 250px; font-size: 3.8rem; }
             .limits { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- George background (faint) -->
+    <!-- Faint George starts only below header -->
     <div class="gw-bg"></div>
 
-    <!-- Solid white zone that completely hides George above the main content -->
-    <div class="header-white-zone"></div>
+    <!-- Solid white header zone (guarantees 100% white background) -->
+    <div class="header-white"></div>
 
     <a href="tel:757-940-5171" class="call-btn" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="Call">
@@ -276,28 +306,17 @@
     </nav>
 
     <main>
-        <section class="claim">
-            <h1>Virginia’s Fastest<br>Concrete Pour Decision Tool</h1>
-            <p>One glance — instantly know if you can pour anywhere from Richmond to Virginia Beach</p>
-        </section>
-
-        <!-- BIG CIRCLE SECTION – Now 100% clear what it means -->
-        <section class="hero">
-            <h2>Can We Pour Today?</h2>
-            <div class="subtitle">Overall Verdict for the Entire Region</div>
-            <p>Live NOAA forecast • Richmond to Virginia Beach corridor<br>Updated every 15 minutes • Worst-case of all 7 cities shown below</p>
-
-            <div class="big-circle green" id="mainCircle">
-                <span id="circleText">YES</span>
-            </div>
-            <div class="verdict" id="mainVerdict">Loading live data...</div>
+        <!-- Clean, clear hero header (no big circle) -->
+        <section class="hero-header">
+            <h1>Can We Pour Today?</h1>
+            <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach Corridor</div>
+            <p>Updated every 15 minutes • Check conditions in your city below</p>
         </section>
 
         <div class="concrete-hero">
             <img src="Concrete.jpg" alt="Professional concrete pour in progress">
         </div>
 
-        <!-- Decision guidelines -->
         <div class="decision-box">
             <h3>How We Decide – ACI 305/306 Guidelines</h3>
             <p style="text-align:center; max-width:800px; margin:0 auto 40px; color:#555;">
@@ -349,9 +368,6 @@
             { name: "Virginia Beach", lat: 36.8529, lng: -75.9780 }
         ];
 
-        const mainCircle = document.getElementById('mainCircle');
-        const circleText = document.getElementById('circleText');
-        const mainVerdict = document.getElementById('mainVerdict');
         const cityGrid = document.getElementById('cityGrid');
         const lastUpdate = document.getElementById('lastUpdate');
         const liveTime = document.getElementById('liveTime');
@@ -391,20 +407,6 @@
             Promise.all(locations.map(loc => getForecast(loc.lat, loc.lng).then(d => ({...loc, ...d}))))
                 .then(results => results.map(r => ({...r, ...assess(r)})))
                 .then(cities => {
-                    const hasNo = cities.some(c => c.status === 'no');
-                    const hasCaution = cities.some(c => c.status === 'caution');
-                    const overall = hasNo ? 'no' : hasCaution ? 'caution' : 'go';
-
-                    // Update big circle
-                    mainCircle.className = `big-circle ${overall === 'go' ? 'green' : overall === 'caution' ? 'yellow' : 'red'}`;
-                    circleText.textContent = overall === 'go' ? 'YES' : overall === 'caution' ? 'MAYBE' : 'NO';
-
-                    // Update verdict text
-                    mainVerdict.textContent = overall === 'go' ? 'YES — POUR WITH CONFIDENCE' :
-                                             overall === 'caution' ? 'CAUTION — Check City Details Below' : 'NO — Hold the Pour Today';
-                    mainVerdict.style.color = overall === 'go' ? '#2e7d32' : overall === 'caution' ? '#b07100' : '#c8102e';
-
-                    // City cards
                     cityGrid.innerHTML = cities.map(c => `
                         <div class="city-card">
                             <div class="city-header">${c.name}</div>
