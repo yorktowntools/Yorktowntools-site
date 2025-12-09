@@ -53,24 +53,17 @@
         .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
         .logo-header img { max-width:260px; width:92%; height:auto; }
 
-        /* Sticky Nav */
+        /* Sticky Nav - Cleaned up */
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); }
-        .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:0.9rem; scrollbar-width:none; align-items:center; }
+        .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; align-items:center; justify-content:center; }
         .mobile-nav::-webkit-scrollbar { display:none; }
         .mobile-nav a {
-            flex:0 0 auto; background:rgba(255,255,255,0.12); color:white; padding:0.65rem 1.1rem;
+            flex:0 0 auto; color:white; padding:0.65rem 1.2rem;
             border-radius:30px; text-decoration:none; font-weight:600; font-size:0.94rem; white-space:nowrap;
             transition:var(--transition);
         }
-        .mobile-nav a:hover, .mobile-nav a.active { background:white; color:var(--navy); }
-        .mobile-nav a.phone { background:var(--red); font-weight:800; }
-        @media(min-width:768px){
-            .mobile-nav{justify-content:center; overflow:visible; flex-wrap:wrap; gap:1rem; padding:1rem 0;}
-            .mobile-nav a{background:transparent;}
-            .mobile-nav a:hover, .mobile-nav a.active {background:rgba(255,255,255,0.18); color:var(--red);}
-            .mobile-nav a.phone:hover { background:var(--red); color:white; }
-        }
+        .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.18); color:var(--red); }
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
 
@@ -83,20 +76,20 @@
             margin: -1.5rem auto 3rem; max-width:1000px; font-weight:600;
         }
 
+        /* Brand Logos Instead of Text Buttons */
         .brand-selector {
-            display:flex; flex-wrap:wrap; justify-content:center; gap:1.2rem; margin:3rem 0 4rem;
-            font-size:1.1rem; font-weight:600;
+            display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; margin:3rem 0 4rem; align-items:center;
         }
-        .brand-selector a {
-            background:#f1f3f5; color:var(--navy); padding:0.9rem 1.6rem; border-radius:50px;
-            text-decoration:none; transition:var(--transition); border:2px solid transparent;
+        .brand-selector img {
+            height:48px; opacity:0.85; transition:var(--transition); filter: grayscale(20%);
         }
-        .brand-selector a:hover { background:var(--red); color:white; border-color:var(--red); }
+        .brand-selector img:hover { opacity:1; filter: grayscale(0); transform:scale(1.12); }
 
-        .btn { display:inline-block; background:var(--red); color:white; padding:1rem 2rem; border-radius:50px; font-weight:700; font-size:1.1rem; text-decoration:none; transition:var(--transition); box-shadow:0 6px 20px rgba(200,16,46,0.3); }
-        .btn:hover { background:#a00d22; transform:translateY(-3px); }
-        .btn-text { background:#0066cc; margin-left:0.8rem; }
-        .btn-text:hover { background:#004499; }
+        .btn-text {
+            display:inline-block; background:#0066cc; color:white; padding:0.9rem 1.8rem; border-radius:50px;
+            font-weight:700; font-size:1rem; text-decoration:none; transition:var(--transition);
+        }
+        .btn-text:hover { background:#004499; transform:translateY(-3px); }
 
         .category-grid {
             display: grid;
@@ -133,8 +126,9 @@
         .what-is, .used-for { margin-bottom: 1rem; line-height: 1.6; }
         .what-is strong { color: var(--red); }
         .used-for { color: #444; font-size: 0.98rem; }
-        .category-card .btn-group { margin-top: auto; display:flex; gap:0.6rem; flex-wrap:wrap; }
+        .category-card .btn-group { margin-top: auto; text-align:center; }
 
+        /* Floating Call Button */
         .call-button {
             position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
             width:clamp(72px,16vw,88px); height:clamp(72px,16vw,88px);
@@ -151,6 +145,7 @@
 </head>
 <body>
 
+    <!-- Floating Call Button -->
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="Call George">
     </a>
@@ -167,6 +162,7 @@
         <a href="/"><img src="Yorktown.PNG" alt="Yorktown Tools"></a>
     </div>
 
+    <!-- Clean Navigation -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="/">Home</a>
@@ -176,34 +172,29 @@
             <a href="#screwdrivers">Screwdrivers</a>
             <a href="#hex-torx">Hex & Torx</a>
             <a href="#specialty">Specialty</a>
-            <a href="tel:757-940-5171" class="phone">757-940-5171</a>
-            <a href="sms:7579405171?body=Hi%20Yorktown%20Tools%2C%20I%20need%20pricing%20on..." class="phone">Text Us</a>
         </div>
     </nav>
 
     <main>
         <section class="hero" id="top">
             <h1>Precision Hand Tools</h1>
-            <p>Professional-grade tools from the brands you trust. Free delivery across Hampton Roads.</p>
-            <div style="margin-top:1.5rem;">
-                <a href="tel:757-940-5171" class="btn">Call 757-940-5171</a>
-                <a href="sms:7579405171?body=Hi%2C%20I%20need%20a%20quote%20on..." class="btn btn-text">Text for Quote</a>
-            </div>
+            <p>Professional-grade tools from the brands you trust. Free next-day delivery across Hampton Roads.</p>
         </section>
 
         <div class="gsa-banner">
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
+        <!-- Brand Logos -->
         <div class="brand-selector">
-            <a href="#wrenches">Snap-on</a>
-            <a href="#wrenches">GearWrench</a>
-            <a href="#pliers">Knipex</a>
-            <a href="#pliers">Channellock</a>
-            <a href="#screwdrivers">Wiha</a>
-            <a href="#measuring">Mitutoyo</a>
-            <a href="#measuring">Starrett</a>
-            <a href="#wrenches">Wright Tool</a>
+            <a href="#wrenches"><img src="logos/snapon.png" alt="Snap-on"></a>
+            <a href="#wrenches"><img src="logos/gearwrench.png" alt="GearWrench"></a>
+            <a href="#pliers"><img src="logos/knipex.png" alt="Knipex"></a>
+            <a href="#pliers"><img src="logos/channellock.png" alt="Channellock"></a>
+            <a href="#screwdrivers"><img src="logos/wiha.png" alt="Wiha"></a>
+            <a href="#measuring"><img src="logos/mitutoyo.png" alt="Mitutoyo"></a>
+            <a href="#measuring"><img src="logos/starrett.png" alt="Starrett"></a>
+            <a href="#wrenches"><img src="logos/wright.png" alt="Wright Tool"></a>
         </div>
 
         <section class="category-grid">
@@ -217,8 +208,7 @@
                     <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, CDI.</p>
                     <p class="used-for">Aircraft maintenance, shipyard, heavy equipment, and anywhere exact torque is critical.</p>
                     <div class="btn-group">
-                        <a href="tel:757-940-5171" class="btn">Call for Quote</a>
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20wrenches..." class="btn btn-text">Text Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20wrenches..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -232,8 +222,7 @@
                     <p class="what-is"><strong>What it is:</strong> Knipex, Channellock, Irwin, Klein – linesman, needle-nose, snap-ring, diagonal cutters.</p>
                     <p class="used-for">Electrical, aviation safety wire, wire pulling, and daily heavy-duty gripping.</p>
                     <div class="btn-group">
-                        <a href="tel:757-940-5171" class="btn">Call for Quote</a>
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20Knipex%20pliers..." class="btn btn-text">Text Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20Knipex%20pliers..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -246,8 +235,7 @@
                     <p class="what-is"><strong>What it is:</strong> Mitutoyo, Starrett, Fowler digital calipers & micrometers, Stabila levels, Lufkin tapes.</p>
                     <p class="used-for">Quality control, machining, carpentry layout – any job that demands precision.</p>
                     <div class="btn-group">
-                        <a href="tel:757-940-5171" class="btn">Call for Quote</a>
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20Mitutoyo..." class="btn btn-text">Text Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20Mitutoyo..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -259,9 +247,8 @@
                     <h2>Screwdrivers & Nut Drivers</h2>
                     <p class="what-is"><strong>What it is:</strong> Wiha, Wera, Klein insulated & precision sets, heavy-duty nut drivers.</p>
                     <p class="used-for">Avionics, control panels, electrical enclosures, and electronics assembly.</p>
-                    <div class="btn-group">
-                        <a href="tel:757-940-5171" class="btn">Call for Quote</a>
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20Wiha..." class="btn btn-text">Text Quote</a>
+                    <div class="btn-button">
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20Wiha..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -274,8 +261,7 @@
                     <p class="what-is"><strong>What it is:</strong> Bondhus, Wiha, Eklind ball-end, T-handle, folding, and security bits.</p>
                     <p class="used-for">Machinery, automotive, firearms, and any Allen/Torx fastener work.</p>
                     <div class="btn-group">
-                        <a href="tel:757-940-5171" class="btn">Call for Quote</a>
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20hex%20keys..." class="btn btn-text">Text Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20hex%20keys..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -288,8 +274,7 @@
                     <p class="what-is"><strong>What it is:</strong> Picks, hooks, files, pry bars, inspection mirrors, magnetic trays.</p>
                     <p class="used-for">O-ring removal, gasket work, retrieving dropped parts, detailed inspection.</p>
                     <div class="btn-group">
-                        <a href="tel:757-940-5171" class="btn">Call for Quote</a>
-                        <a href="sms:7579405171?body=Need%20specialty%20tools..." class="btn btn-text">Text Quote</a>
+                        <a href="sms:7579405171?body=Need%20specialty%20tools..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -297,11 +282,8 @@
         </section>
 
         <section style="text-align:center; margin:6rem 0;">
-            <p style="font-size:1.4rem; margin-bottom:1.5rem;">Need a specific item, brand, or GSA pricing today?</p>
-            <div>
-                <a href="tel:757-940-5171" class="btn" style="font-size:1.4rem; padding:1.2rem 3rem;">Call 757-940-5171</a>
-                <a href="sms:7579405171?body=Hi%2C%20I%20need%20a%20quote..." class="btn btn-text" style="font-size:1.4rem; padding:1.2rem 3rem;">Text Us Now</a>
-            </div>
+            <p style="font-size:1.4rem; margin-bottom:1.5rem;">Need a specific item or GSA pricing today?</p>
+            <a href="sms:7579405171?body=Hi%2C%20I%20need%20a%20quote..." class="btn-text" style="font-size:1.3rem; padding:1.1rem 2.8rem;">Text Us Now</a>
         </section>
     </main>
 
@@ -313,9 +295,10 @@
     </footer>
 
     <script>
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
-                if (this.getAttribute('href').startsWith('#')) {
+                if (this.getAttribute('href').startsWith('#') && this.getAttribute('href') !== '#') {
                     e.preventDefault();
                     document.querySelector(this.getAttribute('href')).scrollIntoView({
                         behavior: 'smooth',
@@ -325,6 +308,7 @@
             });
         });
 
+        // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -334,6 +318,7 @@
             lastScroll = current;
         });
 
+        // Active nav link highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
