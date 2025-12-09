@@ -89,7 +89,6 @@
             padding: 0.5rem 0;
             font-size: 0.86rem;
             font-weight: 500;
-            overflow: hidden;
         }
         .gov-items {
             display: flex;
@@ -98,9 +97,9 @@
             gap: 1.3rem;
             white-space: nowrap;
             padding: 0.4rem 1rem;
+            flex-wrap: wrap;
         }
         .gov-items strong { color: #ffeb3b; }
-        .gov-items img { height: 24px; vertical-align: middle; margin-right: 4px; }
 
         /* Logo */
         .logo-header {
@@ -118,8 +117,6 @@
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(11,30,63,0.18);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: transform;
-            overflow: hidden;
         }
         nav.hidden { transform: translateY(-100%); }
 
@@ -197,14 +194,11 @@
         .card h3 { color: var(--navy); padding: 1.4rem 1rem 0.6rem; font-size: 1.35rem; }
         .card p { padding: 0 1.4rem 1.8rem; color: #555; font-size: 1rem; }
 
-        /* EXPANDABLE PRECISION HAND TOOLS CARD */
+        /* EXPANDABLE CARD - FIXED */
         .expandable-card {
             cursor: pointer;
             position: relative;
             overflow: hidden;
-        }
-        .card-header {
-            position: relative;
         }
         .expand-icon {
             margin-top: 1rem;
@@ -213,11 +207,11 @@
             font-weight: 600;
             transition: var(--transition);
         }
-        .expandable-card[aria-expanded="true"] .expand-icon::after {
-            content: " Click to collapse";
-        }
         .expandable-card .expand-icon::after {
             content: " Click to explore categories";
+        }
+        .expandable-card[aria-expanded="true"] .expand-icon::after {
+            content: " Click to collapse";
         }
 
         .card-expandable-content {
@@ -228,7 +222,7 @@
             border-top: 1px solid rgba(11,30,63,0.08);
         }
         .expandable-card[aria-expanded="true"] .card-expandable-content {
-            max-height: 1000px;
+            max-height: 1200px;
             padding: 2.4rem 1.8rem 2rem;
         }
 
@@ -293,7 +287,7 @@
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
-        /* Form styles (unchanged) */
+        /* Form styles */
         .quote-form { display:grid; gap:1.9rem; }
         .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
         .required { color:var(--red); }
@@ -366,12 +360,10 @@
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
                 <a href="/Can-we-pour-today.html" target="_blank" class="free-resource-card">
-                    <div class="icon">Weather</div>
                     <h3>Can We Pour Today?</h3>
                     <p>Live concrete pouring forecast — Richmond to Virginia Beach</p>
                 </a>
                 <a href="/rebar-calculator.html" target="_blank" class="free-resource-card">
-                    <div class="icon">Rebar</div>
                     <h3>Rebar Lap Splice Calculator</h3>
                     <p>Instant ACI 318 lap lengths — no code book needed</p>
                 </a>
@@ -386,51 +378,30 @@
 
             <div class="grid">
 
-                <!-- EXPANDABLE PRECISION HAND TOOLS CARD -->
-                <div class="card expandable-card" id="precision-hand-tools-card" aria-expanded="false" tabindex="0" role="button">
+                <!-- FIXED EXPANDABLE CARD -->
+                <div class="card expandable-card" id="precision-hand-tools-card" aria-expanded="false" tabindex="0" role="button" aria-controls="precision-hand-tools-content">
                     <div class="card-header">
                         <img src="Pliers.PNG" alt="Precision hand tools" loading="lazy">
                         <h3>Precision Hand Tools</h3>
                         <p>Wrenches, pliers, and measuring tools to work as hard as you do.</p>
-                        <div class="expand-icon"></div>
+                        <div class="expand-icon" aria-hidden="true"></div>
                     </div>
 
-                    <div class="card-expandable-content">
+                    <div id="precision-hand-tools-content" class="card-expandable-content">
                         <div class="subcategory-grid">
-                            <a href="/hand-tools/wrenches.html" class="subcategory">
-                                <strong>Wrenches</strong><br>
-                                Combination • Adjustable • Ratcheting • Torque • Pipe
-                            </a>
-                            <a href="/hand-tools/pliers.html" class="subcategory">
-                                <strong>Pliers & Cutters</strong><br>
-                                Linesman • Needle-Nose • Locking • Snap-Ring • Diagonal
-                            </a>
-                            <a href="/hand-tools/measuring.html" class="subcategory">
-                                <strong>Measuring & Layout</strong><br>
-                                Calipers • Micrometers • Tape Measures • Levels • Squares
-                            </a>
-                            <a href="/hand-tools/screwdrivers.html" class="subcategory">
-                                <strong>Screwdrivers & Nut Drivers</strong><br>
-                                Precision • Jewelers • Electronics Kits • Insulated
-                            </a>
-                            <a href="/hand-tools/hex-torx.html" class="subcategory">
-                                <strong>Hex Keys & Torx</strong><br>
-                                Ball-End • Folding • T-Handle • Security Bits
-                            </a>
-                            <a href="/hand-tools/specialty.html" class="subcategory">
-                                <strong>Specialty Hand Tools</strong><br>
-                                Picks • Hooks • Files • Pry Bars • Inspection Tools
-                            </a>
+                            <a href="/hand-tools/wrenches.html" class="subcategory"><strong>Wrenches</strong><br>Combination • Adjustable • Ratcheting • Torque • Pipe</a>
+                            <a href="/hand-tools/pliers.html" class="subcategory"><strong>Pliers & Cutters</strong><br>Linesman • Needle-Nose • Locking • Snap-Ring • Diagonal</a>
+                            <a href="/hand-tools/measuring.html" class="subcategory"><strong>Measuring & Layout</strong><br>Calipers • Micrometers • Tape Measures • Levels • Squares</a>
+                            <a href="/hand-tools/screwdrivers.html" class="subcategory"><strong>Screwdrivers & Nut Drivers</strong><br>Precision • Jewelers • Electronics Kits • Insulated</a>
+                            <a href="/hand-tools/hex-torx.html" class="subcategory"><strong>Hex Keys & Torx</strong><br>Ball-End • Folding • T-Handle • Security Bits</a>
+                            <a href="/hand-tools/specialty.html" class="subcategory"><strong>Specialty Hand Tools</strong><br>Picks • Hooks • Files • Pry Bars • Inspection Tools</a>
                         </div>
                         <div style="text-align:center;margin-top:1.8rem;">
-                            <a href="/hand-tools" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">
-                                View All Precision Hand Tools
-                            </a>
+                            <a href="/hand-tools" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">View All Precision Hand Tools</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Regular cards -->
                 <div class="card">
                     <img src="Dewalt.PNG" alt="Power tools" loading="lazy">
                     <h3>Power Tools</h3>
@@ -445,7 +416,7 @@
             </div>
         </section>
 
-        <!-- All other sections remain 100% unchanged -->
+        <!-- All other sections unchanged -->
         <section id="accessories">
             <h2>Tool Accessories, Storage & Safety Gear</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
@@ -597,16 +568,23 @@
             banners[j].classList.add('active');
         }, 2000);
 
-        // Expandable card toggle
-        document.getElementById('precision-hand-tools-card').addEventListener('click', function(e) {
-            if (e.target.closest('a')) return; // let links work
-            this.toggleAttribute('aria-expanded');
+        // FIXED EXPANDABLE CARD
+        const expandableCard = document.getElementById('precision-hand-tools-card');
+
+        function toggleCard() {
+            const isExpanded = expandableCard.getAttribute('aria-expanded') === 'true';
+            expandableCard.setAttribute('aria-expanded', !isExpanded);
+        }
+
+        expandableCard.addEventListener('click', function(e) {
+            if (e.target.closest('a')) return; // ignore clicks on links inside
+            toggleCard();
         });
 
-        document.getElementById('precision-hand-tools-card').addEventListener('keydown', function(e) {
+        expandableCard.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                this.toggleAttribute('aria-expanded');
+                toggleCard();
             }
         });
 
@@ -615,9 +593,10 @@
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
             row.className = 'item-row';
-            row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
+            row.innerHTML = `
+                <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
             container.appendChild(row);
         }
     </script>
