@@ -26,7 +26,7 @@
             position: relative;
         }
 
-        /* Transparent George (hidden behind solid areas) */
+        /* Transparent George mascot */
         body::after {
             content: "";
             position: fixed;
@@ -41,7 +41,6 @@
             margin-top: -80px;
         }
 
-        /* Red scrolling banner */
         .top-banner {
             background: var(--red);
             color: white;
@@ -68,7 +67,6 @@
             font-weight: 700;
         }
 
-        /* Solid white block so George doesn't bleed through logo */
         .logo-area {
             background: white;
             padding: 32px 16px 20px;
@@ -181,7 +179,6 @@
             margin-top: 20px;
         }
 
-        /* What’s Next section – you said you love it */
         .next-steps {
             margin-top: 50px;
             padding: 36px;
@@ -189,7 +186,7 @@
             border-radius: var(--radius);
             border-left: 8px solid var(--red);
             text-align: center;
-            display: none; /* shown only after calculation */
+            display: none;
         }
         .next-steps h3 {
             color: var(--navy);
@@ -201,49 +198,64 @@
             color: #333;
             margin-bottom: 20px;
         }
+        /* Smaller & cleaner “Call for Pricing” button */
         .next-steps a {
             display: inline-block;
             background: var(--red);
             color: white;
-            padding: 16px 40px;
+            padding: 14px 32px;           /* ← smaller */
             border-radius: 50px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 1.3rem;
-            box-shadow: 0 10px 30px rgba(200,16,46,0.35);
+            font-size: 1.15rem;           /* ← smaller text */
+            box-shadow: 0 8px 25px rgba(200,16,46,0.35);
             transition: 0.3s;
         }
         .next-steps a:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 40px rgba(200,16,46,0.45);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(200,16,46,0.45);
         }
 
+        /* ——— SAME CLEAN FOOTER AS YOUR OTHER PAGE ——— */
         footer {
             background: var(--navy);
             color: white;
             text-align: center;
             padding: 90px 20px 40px;
             margin-top: 120px;
+            font-family: 'Inter', sans-serif;
         }
 
         .footer-logo {
-            background: white;
-            padding: 36px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 36px;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+            margin-bottom: 32px;
         }
         .footer-logo img {
             max-width: 280px;
             width: 90%;
         }
 
-        /* Phone number = pure bright white */
-        footer p strong {
-            color: #ffffff !important;
-            font-weight: 900;
-            font-size: 1.55rem;
+        /* Phone + email line — smaller & centered */
+        footer p:nth-child(2) {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 20px auto 16px;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        footer p {
+            font-size: 1rem;
+            color: #cccccc;
+            margin: 12px auto;
+            max-width: 90%;
+            font-weight: 500;
+        }
+
+        footer p:last-child {
+            margin-top: 24px;
+            font-size: 0.9rem;
+            color: #aaaaaa;
         }
 
         .call-btn {
@@ -284,7 +296,6 @@
 
 <div class="gov-bar">Free Tool for the Trade</div>
 
-<!-- Solid white behind logo -->
 <div class="logo-area">
     <img src="Yorktown.PNG" alt="Yorktown Tools">
 </div>
@@ -342,16 +353,16 @@
             Results appear here after you hit the button
         </div>
 
-        <!-- You said you love this section — it's back and better -->
         <div class="next-steps" id="nextSteps">
             <h3>What's Next After You Get Your Lap Length?</h3>
             <p><strong>Class B is the safe default</strong> unless your engineer approves Class A.</p>
-            <p>Do you need rebar?</p>
+            <p>Need rebar fast?</p>
             <a href="tel:757-940-5171">Call 757-940-5171 for Pricing</a>
         </div>
     </div>
 </main>
 
+<!-- EXACT SAME CLEAN FOOTER AS YOUR OTHER PAGE -->
 <footer>
     <div class="footer-logo">
         <img src="hero.png" alt="Yorktown Tools" loading="lazy">
@@ -396,7 +407,6 @@
             Minimum lap = 12" (ACI 318-19)
         `;
 
-        // Show the “What’s Next” box
         nextSteps.style.display = 'block';
     }
 </script>
