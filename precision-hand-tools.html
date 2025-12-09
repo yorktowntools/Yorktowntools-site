@@ -31,7 +31,6 @@
         }
         img { max-width:100%; height:auto; display:block; }
 
-        /* Watermark mascot */
         body::after {
             content:"";
             position:fixed;
@@ -45,20 +44,20 @@
             z-index:-1;
         }
 
-        /* RED MARQUEE – perfect on mobile */
+        /* RED MARQUEE */
         .logo-marquee-container {
             background:var(--red);
-            padding:14px 0;
+            padding:16px 0;
             overflow:hidden;
             white-space:nowrap;
         }
         .marquee-track {
             display:inline-flex;
             gap:clamp(30px,7vw,80px);
-            animation:scroll 45s linear infinite;
+            animation:scroll 42s linear infinite;
         }
         .marquee-track img {
-            height:clamp(44px,9vw,64px);
+            height:clamp(46px,9.5vw,66px);
             filter:brightness(0) invert(1);
             flex-shrink:0;
         }
@@ -68,26 +67,24 @@
             100% { transform:translateX(-50%); }
         }
 
-        /* TOP BOLD BANNER */
         .top-banner {
             background:var(--navy);
             color:white;
             text-align:center;
-            padding:12px 16px;
+            padding:14px 16px;
             font-weight:800;
-            font-size:clamp(0.95rem,4vw,1.1rem);
+            font-size:clamp(1rem,4.2vw,1.15rem);
             text-transform:uppercase;
-            letter-spacing:1px;
+            letter-spacing:1.2px;
         }
 
         .logo-header {
             text-align:center;
-            padding:20px 16px 16px;
+            padding:24px 16px 18px;
             background:white;
         }
-        .logo-header img { max-width:280px; width:90%; margin:0 auto; }
+        .logo-header img { max-width:300px; width:92%; margin:0 auto; }
 
-        /* NAVIGATION */
         nav {
             background:var(--navy);
             position:sticky;
@@ -98,24 +95,24 @@
         .mobile-nav {
             display:flex;
             overflow-x:auto;
-            padding:12px 0;
-            gap:14px;
+            padding:14px 0;
+            gap:16px;
             justify-content:center;
             scrollbar-width:none;
         }
         .mobile-nav::-webkit-scrollbar { display:none; }
         .mobile-nav a {
             color:white;
-            padding:10px 18px;
+            padding:10px 20px;
             border-radius:30px;
             text-decoration:none;
             font-weight:600;
-            font-size:0.95rem;
+            font-size:0.98rem;
             white-space:nowrap;
             flex-shrink:0;
         }
         .mobile-nav a:hover, .mobile-nav a.active {
-            background:rgba(255,255,255,0.2);
+            background:rgba(255,255,255,0.22);
             color:var(--red);
         }
 
@@ -123,111 +120,99 @@
 
         .hero {
             text-align:center;
-            padding:clamp(60px,15vw,100px) 20px 60px;
+            padding:clamp(70px,16vw,110px) 20px 70px;
             background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);
             border-radius:var(--radius);
-            margin:30px 0 40px;
+            margin:36px 0 50px;
             box-shadow:var(--shadow);
         }
-        .hero h1 {
-            { font-size:clamp(2.6rem,9vw,4.2rem); font-weight:800; color:var(--navy); margin-bottom:16px; }
-        .hero p                { font-size:clamp(1.2rem,4.5vw,1.6rem); color:#444; max-width:900px; margin:0 auto; }
+        .hero h1 { font-size:clamp(2.8rem,9.5vw,4.4rem); font-weight:800; color:var(--navy); margin-bottom:16px; }
+        .hero p { font-size:clamp(1.25rem,4.8vw,1.7rem); color:#444; max-width:900px; margin:0 auto; }
 
         .gsa-banner {
             background:var(--navy);
             color:white;
             text-align:center;
-            padding:20px;
+            padding:22px 20px;
             border-radius:var(--radius);
-            margin:30px auto 50px;
+            margin:40px auto 60px;
             max-width:1000px;
-            font-weight:700;
-            font-size:1.05rem;
-            line-height:1.8;
+            font-weight:700 1.1rem/1.9 Inter, sans-serif;
         }
         .gsa-banner .highlight { color:var(--yellow); }
 
         .category-grid {
             display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-            gap:28px;
-            margin:40px 0 60px;
+            grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+            gap:32px;
+            margin:50px 0 80px;
         }
         .category-card {
             background:white;
             border-radius:var(--radius);
             overflow:hidden;
             box-shadow:var(--shadow);
-            border-top:8px solid var(--red);
+            border-top:9px solid var(--red);
             display:flex;
             flex-direction:column;
+            position:relative;
             transition:var(--transition);
         }
-        .category-card:hover { transform:translateY(-10px); box-shadow:0 20px 50px rgba(0,0,0,0.18); }
-        .category-card img {
-            width:100%;
-            height:220px;
-            object-fit:cover;
-        }
+        .category-card:hover { transform:translateY(-12px); box-shadow:0 24px 60px rgba(0,0,0,0.2); }
+        .category-card img { width:100%; height:240px; object-fit:cover; }
         .badge-popular {
             position:absolute;
-            top:12px; right:12px;
+            top:14px; right:14px;
             background:var(--red);
             color:white;
-            padding:8px 16px;
+            padding:9px 18px;
             border-radius:30px;
-            font-size:0.85rem;
+            font-size:0.88rem;
             font-weight:800;
             z-index:2;
         }
-        .category-content {
-            padding:24px;
-            display:flex;
-            flex-direction:column;
-            flex-grow:1;
-        }
-        .category-card h2 { font-size:1.65rem; color:var(--navy); margin-bottom:10px; }
-        .category-desc { color:#555; margin-bottom:20px; flex-grow:1; }
+        .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
+        .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
+        .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
         .tool-select {
             width:100%;
-            padding:14px 16px;
+            padding:15px 18px;
             border:2px solid #e9ecef;
-            border-radius:12px;
-            font-size:1rem;
-            margin:16px 0;
+            border-radius:14px;
+            font-size:1.02rem;
+            margin:18px 0;
             background:white;
         }
         .quote-btn {
             background:var(--red);
             color:white;
             text-align:center;
-            padding:16px;
-            border-radius:12px;
+            padding:17px;
+            border-radius:14px;
             font-weight:700;
             text-decoration:none;
             margin-top:auto;
             transition:var(--transition);
         }
-        .quote-btn:hover { background:#a00d24; transform:translateY(-3px); }
+        .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
-        /* Floating call button */
         .call-button {
             position:fixed;
             right:16px; bottom:16px;
-            width:68px; height:68px;
+            width:72px; height:72px;
             background:var(--red);
             border-radius:50%;
             display:flex;
             align-items:center;
             justify-content:center;
-            box-shadow:0 8px 30px rgba(200,16,46,0.5);
+            box-shadow:0 8px 32px rgba(200,16,46,0.55);
             z-index:999;
             animation:pulse 2.6s infinite;
         }
-        .call-button img { width:62%; border:4px solid white; border-radius:50%; }
+        .call-button img { width:64%; border:5px solid white; border-radius:50%; }
         @keyframes pulse {
             0%   { box-shadow:0 0 0 0 rgba(200,16,46,0.7); }
-            70%  { box-shadow:0 0 0 20px rgba(200,16,46,0); }
+            70%  { box-shadow:0 0 0 25px rgba(200,16,46,0); }
             100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
         }
 
@@ -235,17 +220,17 @@
             background:var(--navy);
             color:white;
             text-align:center;
-            padding:80px 20px 30px;
-            margin-top:80px;
+            padding:90px 20px 40px;
+            margin-top:100px;
         }
-        .footer-artwork { max-width:800px; width:95%; margin:0 auto 30px; opacity:0.95; }
+        .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
         footer a { color:white; text-decoration:underline; }
     </style>
 </head>
 <body>
 
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call">
-        <img src="Yorktown.PNG" alt="Call">
+    <a href="tel:757-940-5171" class="call-button">
+        <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
     <!-- RED MARQUEE -->
@@ -259,10 +244,10 @@
             <img src="Tekton.PNG" alt="Tekton">
             <img src="Crescenttools.JPG" alt="Crescent">
             <img src="Channellock.WEBP" alt="Channellock">
-            <img src="Kleintools.png" alt="Klein">
+            <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.AVIF" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- duplicate set for seamless loop -->
+            <!-- duplicate -->
             <img src="GearWrench.JPG" alt="">
             <img src="Knipex.PNG" alt="">
             <img src="Milwaukee.WEBP" alt="">
@@ -277,7 +262,6 @@
         </div>
     </div>
 
-    <!-- TOP BOLD BANNER -->
     <div class="top-banner">
         STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
     </div>
@@ -313,82 +297,193 @@
 
         <section class="category-grid">
 
+            <!-- 1. Wrenches -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
                     <h2>Wrenches & Torque</h2>
-                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty wrenches. SAE & metric.</p>
+                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty. SAE & metric, 90-tooth and XL lengths.</p>
                     <select class="tool-select" onchange="updateQuote(this,'wrenches')">
-                        <option>— Choose a wrench —</option>
+                        <option value="">— Choose a wrench —</option>
                         <option>GearWrench 90T Ratcheting Metric Set (8-19mm)</option>
                         <option>GearWrench 90T Ratcheting SAE Set</option>
-                        <option>GearWrench XL Ratcheting Set</option>
-                        <option>Tekton Ratcheting Combo Set (Metric)</option>
-                        <option>Tekton Ratcheting Combo Set (SAE)</option>
-                        <option>Crescent X10 12" Adjustable</option>
-                        <option>Milwaukee Max Bite 15-pc</option>
-                        <option>CDI 1/2" Torque Wrench</option>
-                        <option>Precision Instruments 3/8" Torque</option>
-                        <option>Other / Custom</option>
+                        <option>GearWrench XL Combination Ratcheting Set</option>
+                        <option>Tekton Ratcheting Combination Set (Metric)</option>
+                        <option>Tekton Ratcheting Combination Set (SAE)</option>
+                        <option>Crescent X10 12" Adjustable Wrench</option>
+                        <option>Milwaukee Max Bite 15-pc Set</option>
+                        <option>CDI 1/2" Torque Wrench (50-250 ft-lb)</option>
+                        <option>Precision Instruments 3/8" Split-Beam Torque</option>
+                        <option>Other / Custom Request</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- (All other cards are identical to the one above – just different images & titles) -->
-            <!-- I’m keeping the rest exactly the same as your last version for speed -->
-
+            <!-- 2. Pliers -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="category-desc">Knipex Cobra & Pliers Wrenches, TwinGrip, Channellock, Klein.</p>
+                    <p class="category-desc">Knipex Cobra & Pliers Wrenches, TwinGrip, high-leverage cutters, Channellock tongue-and-groove, Klein linesman.</p>
                     <select class="tool-select" onchange="updateQuote(this,'pliers')">
-                        <option>— Choose pliers —</option>
-                        <option>Knipex Cobra 10"</option>
-                        <option>Knipex Pliers Wrench 10"</option>
-                        <option>Knipex TwinGrip</option>
-                        <option>Knipex Diagonal Cutters 8"</option>
-                        <option>Channellock 430 10"</option>
-                        <option>Klein 9" Linesman</option>
-                        <option>Other</option>
+                        <option value="">— Choose pliers —</option>
+                        <option>Knipex Cobra 10" (87 01 250)</option>
+                        <option>Knipex Pliers Wrench 10" (86 03 250)</option>
+                        <option>Knipex TwinGrip Slip-Joint Pliers</option>
+                        <option>Knipex High-Leverage Diagonal Cutters 8"</option>
+                        <option>Knipex Cobra XS 4"</option>
+                        <option>Channellock 430 Tongue & Groove 10"</option>
+                        <option>Channellock 460 16" BigAzz</option>
+                        <option>Klein 9" High-Leverage Linesman</option>
+                        <option>Klein D213-9NE 9" Side Cutters</option>
+                        <option>Other / Custom</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Repeat the same pattern for the other 4 categories with correct image names -->
-            <!-- Measuring -->
+            <!-- 3. Measuring -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Measuring" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
-                    <p class="category-desc">Bosch lasers, Stabila levels, Fowler calipers, tapes.</p>
+                    <p class="category-desc">Bosch laser distance measurers, cross-line lasers, Stabila digital levels, Fowler calipers, Lufkin tapes.</p>
                     <select class="tool-select" onchange="updateQuote(this,'measuring')">
-                        <option>— Choose measuring tool —</option>
-                        <option>Bosch GLM 50 C Laser</option>
-                        <option>Bosch GLL 55 Laser</option>
+                        <option value="">— Choose measuring tool —</option>
+                        <option>Bosch GLM 50 C Bluetooth Laser Measure</option>
+                        <option>Bosch GLM 20 Laser Measure</option>
+                        <option>Bosch GLL 55 Cross-Line Laser</option>
+                        <option>Bosch GLL30 Self-Leveling Cross-Line</option>
                         <option>Stabila 48" Digital Level</option>
+                        <option>Fowler 6" Digital Caliper</option>
+                        <option>Empire 9" Magnetic Torpedo Level</option>
+                        <option>Lufkin 25ft Shockforce Tape</option>
+                        <option>Tajima 25ft G-Series Tape</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Continue with screwdrivers, hex-torx, specialty exactly the same way -->
-            <!-- (I didn’t paste all 6 to keep this message short – just copy the pattern above) -->
+            <!-- 4. Screwdrivers -->
+            <article class="category-card" id="screwdrivers">
+                <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
+                <div class="category-content">
+                    <h2>Screwdrivers & Nut Drivers</h2>
+                    <p class="category-desc">1000V insulated sets, multi-bit drivers, precision sets, cushion-grip from Klein, Milwaukee, Wera, Wiha.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'screwdrivers')">
+                        <option value="">— Choose screwdriver —</option>
+                        <option>Klein 11-in-1 Multi-Bit Screwdriver</option>
+                        <option>Klein 8-pc 1000V Insulated Set</option>
+                        <option>Milwaukee 14-in-1 Multi-Bit</option>
+                        <option>Milwaukee Cushion Grip 6-pc Set</option>
+                        <option>Wera Kraftform Plus 6-pc Set</option>
+                        <option>Wiha 6-pc Insulated SlimLine Set</option>
+                        <option>Megapro 24-in-1 Multi-Bit</option>
+                        <option>Klein 7-pc Nut Driver Set</option>
+                        <option>Felo Smart 13-pc Set</option>
+                        <option>Other</option>
+                    </select>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
+                </div>
+            </article>
 
+            <!-- 5. Hex & Torx -->
+            <article class="category-card" id="hex-torx">
+                <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
+                <div class="category-content">
+                    <h2>Hex Keys & Torx</h2>
+                    <p class="category-desc">Bondhus ball-end and T-handle hex keys, Wiha Torx, Eklind fold-ups – USA-made precision.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
+                        <option value="">— Choose hex/torx —</option>
+                        <option>Bondhus Ball-End Metric Long Set</option>
+                        <option>Bondhus Ball-End SAE Long Set</option>
+                        <option>Bondhus GorillaGrip Fold-Up Metric</option>
+                        <option>Bondhus GorillaGrip Fold-Up SAE</option>
+                        <option>Bondhus T-Handle Metric Set (w/ Stand)</option>
+                        <option>Bondhus T-Handle SAE Set (w/ Stand)</option>
+                        <option>Wiha Torx T-Handle Set</option>
+                        <option>Wiha Security Torx Bit Set</option>
+                        <option>Eklind Ball-Hex-L Key Set</option>
+                        <option>Other</option>
+                    </select>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
+                </div>
+            </article>
+
+            <!-- 6. Specialty -->
+            <article class="category-card" id="specialty">
+                <img src="Tekton-pics.jpg" alt="Specialty tools" loading="lazy">
+                <div class="category-content">
+                    <h2>Specialty Hand Tools</h2>
+                    <p class="category-desc">Pick & hook sets, telescoping mirrors, magnetic trays, pry bars, impact bit sets, inspection tools.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'specialty')">
+                        <option value="">— Choose specialty tool —</option>
+                        <option>Tekton 9-pc Pick & Hook Set</option>
+                        <option>Tekton Telescoping Inspection Mirror + Magnet</option>
+                        <option>Milwaukee 48-22-92100 100-pc Impact Bit Set</option>
+                        <option>Bosch 91-pc Drilling & Driving Set</option>
+                        <option>Mayhew 6-pc Dominator Pry Bar Set</option>
+                        <option>Tekton 3-pc Magnetic Tray Set</option>
+                        <option>Lang 5-pc Mini Pick & Hook Set</option>
+                        <option>Ullman Telescoping Magnetic Pickup Tool</option>
+                        <option>Performance Tool 8-pc Impact Adapter Set</option>
+                        <option>Other / Custom</option>
+                    </select>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote →</a>
+                </div>
+            </article>
+
+        </section>
+
+        <section style="text-align:center;margin:80px 0 40px;">
+            <p style="font-size:1.5rem;margin-bottom:24px;">Need something specific or GSA pricing?</p>
+            <a href="sms:7579405171?body=Hi%2C%20need%20a%20quote" style="display:inline-block;background:#0066cc;color:white;padding:18px 40px;border-radius:50px;font-size:1.35rem;font-weight:700;text-decoration:none;">Text Us Now</a>
         </section>
     </main>
 
+    <footer>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned • SAM.gov Registered • UEI: SMYXDLJDJMZ4 • CAGE: 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.</p>
+    </footer>
+
     <script>
-        function updateQuote(e, t) {
-            const o = document.getElementById("quote-" + t);
-            e.value ? (o.href = "sms:7579405171?body=Need%20quote%20-%20" + t + ":%20" + encodeURIComponent(e.value), o.textContent = "Quote: " + e.value + " →") : (o.href = "sms:7579405171?body=Need%20quote%20-%20" + t, o.textContent = "Text Quote →")
+        function updateQuote(select, category) {
+            const btn = document.getElementById('quote-' + category);
+            if (select.value) {
+                btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category + ":%20" + encodeURIComponent(select.value);
+                btn.textContent = "Quote: " + select.value + " →";
+            } else {
+                btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category;
+                btn.textContent = "Text Quote →";
+            }
         }
-        // smooth scroll & sticky nav code stays the same (already working perfectly)
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (href.startsWith('#') && href !== '#') {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Sticky nav hide/show on scroll
+        const nav = document.querySelector('nav');
+        let last = 0;
+        window.addEventListener('scroll', () => {
+            let cur = window.pageYOffset;
+            if (cur > last && cur > 160) nav.style.transform = 'translateY(-100%)';
+            else nav.style.transform = 'translateY(0)';
+            last = cur;
+        });
     </script>
 </body>
 </html>
