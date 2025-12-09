@@ -44,7 +44,7 @@
             margin-top:-80px;
         }
 
-        /* SINGLE-LINE SEAMLESS RED MARQUEE */
+        /* RED MARQUEE – white logos */
         .logo-marquee-container {
             background: var(--red);
             padding: 20px 0;
@@ -63,18 +63,14 @@
             filter: brightness(0) invert(1) drop-shadow(0 3px 10px rgba(0,0,0,0.5));
             transition: transform 0.3s;
         }
-        .marquee-track img:hover {
-            transform: scale(1.15);
-        }
-        .logo-marquee-container:hover .marquee-track {
-            animation-play-state: paused;
-        }
+        .marquee-track img:hover { transform: scale(1.15); }
+        .logo-marquee-container:hover .marquee-track { animation-play-state: paused; }
         @keyframes scroll-left {
             0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
 
-        /* BLUE BANNER – ALL CAPS */
+        /* BOLD BLUE TOP BANNER */
         .gov-ids-header { 
             background:var(--navy); 
             color:white; 
@@ -167,7 +163,7 @@
         @keyframes pulse { 
             0%   { box-shadow:0 0 0 0 rgba(200,16,46,0.7); }
             70%  { box-shadow:0 0 0 28px rgba(200,16,46,0); }
-            100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
+            100% { box-shadow:0 0 0 0 0 rgba(200,16,46,0); }
         }
 
         footer { background:var(--navy); color:white; text-align:center; padding:6rem 1rem 3rem; margin-top:8rem; }
@@ -181,7 +177,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- SINGLE-LINE RED MARQUEE -->
+    <!-- RED MARQUEE -->
     <div class="logo-marquee-container">
         <div class="marquee-track">
             <img src="GearWrench.JPG" alt="GearWrench">
@@ -195,7 +191,7 @@
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.AVIF" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- Duplicate for seamless loop -->
+            <!-- duplicate set for seamless loop -->
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukee.WEBP" alt="Milwaukee">
@@ -210,7 +206,7 @@
         </div>
     </div>
 
-    <!-- ALL CAPS BLUE BANNER -->
+    <!-- NEW BOLD TOP BANNER -->
     <div class="gov-ids-header">
         STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
     </div>
@@ -237,7 +233,6 @@
             <p>Professional-grade tools from the brands you trust.<br class="hero-br">Free next-day delivery across Hampton Roads.</p>
         </section>
 
-        <!-- GSA BANNER – yellow labels -->
         <div class="gsa-banner">
             ★ GSA PRICING • SAME-DAY QUOTES FOR .GOV & DOD • 
             <span class="highlight">UEI:</span> SMYXDLJDJMZ4 • 
@@ -247,13 +242,14 @@
 
         <section class="category-grid">
 
-            <!-- 1. Wrenches & Torque -->
+            <!-- Wrenches -->
+            <img src="GearWrenchset.jpg" -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Ratcheting wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
                     <h2>Wrenches & Torque</h2>
-                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty wrenches. SAE & metric, 90-tooth and XL lengths available. Perfect for aviation, automotive, and industrial work.</p>
+                    <p class="category-desc">Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty wrenches. SAE & metric, 90-tooth and XL lengths available.</p>
                     <select class="tool-select" onchange="updateQuote(this,'wrenches')">
                         <option value="">— Choose a wrench —</option>
                         <option>GearWrench 90T Ratcheting Metric Set (8-19mm)</option>
@@ -267,11 +263,11 @@
                         <option>Precision Instruments 3/8" Split-Beam Torque</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- 2. Pliers & Cutters -->
+            <!-- Pliers -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Knipex pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
@@ -291,13 +287,14 @@
                         <option>Klein D213-9NE 9" Side Cutters</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- 3. Measuring & Layout -->
+            <!-- Measuring -->
+            <img src="Bosch-laser.jpg" -->
             <article class="category-card" id="measuring">
-                <img src="Bosch-laser.jpg" alt="Laser measure" loading="lazy">
+                <img src="Bosch-laser.jpg" alt="Bosch laser measure" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
                     <p class="category-desc">Bosch laser distance measurers, cross-line lasers, Stabila digital levels, Fowler calipers, Lufkin tapes, Empire levels.</p>
@@ -314,11 +311,11 @@
                         <option>Tajima 25ft G-Series Tape</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- 4. Screwdrivers & Nut Drivers -->
+            <!-- Screwdrivers            <img src="Kleintools-screwdrivers.jpg" -->
             <article class="category-card" id="screwdrivers">
                 <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
                 <div class="category-content">
@@ -337,13 +334,13 @@
                         <option>Felo Smart 13-pc Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- 5. Hex Keys & Torx -->
+            <!-- Hex & Torx            <img src="Bondhus-hex.jpg" -->
             <article class="category-card" id="hex-torx">
-                <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
+                <img src="Bondhus-hex.jpg" alt="Bondhus hex keys" loading="lazy">
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
                     <p class="category-desc">Bondhus ball-end and T-handle hex keys, Wiha Torx, Eklind fold-ups – USA-made precision.</p>
@@ -360,11 +357,11 @@
                         <option>Eklind Ball-Hex-L Key Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- 6. Specialty Hand Tools -->
+            <!-- Specialty            <img src="Tekton-pics.jpg" -->
             <article class="category-card" id="specialty">
                 <img src="Tekton-pics.jpg" alt="Specialty tools" loading="lazy">
                 <div class="category-content">
@@ -383,7 +380,7 @@
                         <option>Performance Tool 8-pc Impact Adapter Set</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote →</a>
                 </div>
             </article>
 
@@ -414,7 +411,7 @@
             }
         }
 
-        // Smooth scrolling
+        // Smooth scrolling, nav hide/show, active highlighting stay the same
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -425,7 +422,6 @@
             });
         });
 
-        // Hide/show sticky nav on scroll
         const nav = document.getElementById('main-nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -435,7 +431,6 @@
             last = cur;
         });
 
-        // Active nav highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
