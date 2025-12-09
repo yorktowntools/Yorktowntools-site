@@ -7,7 +7,7 @@
     <meta name="description" content="Premium hand tools for contractors & government: GearWrench, Knipex, Crescent, Craftsman, Tekton, Milwaukee, DeWalt, Bondhus, Bosch. Free next-day delivery in Hampton Roads.">
     <meta name="keywords" content="precision hand tools, gearwrench knipex crescent craftsman tekton milwaukee dewalt bondhus torque wrenches veteran owned gsa pricing">
 
-    <link rel="icon" href="Yorktown.PNG" type="image/png">
+    <link rel="icon" href="Yorktown.PNG" type="imageگی/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,30 +43,31 @@
             margin-top:-80px;
         }
 
-        /* TOP RED SCROLLING LOGO MARQUEE — ONLY LOGO SECTION */
+        /* SINGLE-LINE RED SCROLLING MARQUEE */
         .logo-marquee-container {
             background: var(--red);
-            padding: 16px 0;
+            padding: 18px 0;
             overflow: hidden;
+            white-space: nowrap;
         }
-        .marquee-row {
-            display: flex;
-            align-items: center;
-            gap: clamp(28px, 7vw, 70px);
-            animation: scroll 42s linear infinite;
-            width: max-content;
+        .marquee-single {
+            display: inline-flex;
+            gap: clamp(32px, 7vw, 80px);
+            animation: scroll-left 50s linear infinite;
+            will-change: transform;
         }
-        .marquee-row.reverse { animation-direction: reverse; animation-duration: 38s; }
-        .marquee-row img {
-            height: clamp(40px, 8.5vw, 56px);
+        .marquee-single img {
+            height: clamp(44px, 9vw, 62px);
             width: auto;
             flex-shrink: 0;
             filter: drop-shadow(0 3px 8px rgba(0,0,0,0.35));
         }
-        .logo-marquee-container:hover .marquee-row { animation-play-state: paused; }
-        @keyframes scroll {
+        .logo-marquee-container:hover .marquee-single {
+            animation-play-state: paused;
+        }
+        @keyframes scroll-left {
             0%   { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
+            100% { transform: translateX(-50%); }
         }
 
         .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
@@ -77,46 +78,62 @@
         .logo-header img { max-width:280px; width:92%; height:auto; }
 
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
-        nav.hidden { transform:translateY(-100%); }
-        .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; justify-content:center; }
+        nav.hidden { transform:translateY(-100%); transition:transform 0.35s ease; }
+        .mobile-nav { 
+            display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; 
+            scrollbar-width:none; justify-content:center;
+        }
         .mobile-nav::-webkit-scrollbar { display:none; }
-        .mobile-nav a { color:white; padding:0.7rem 1.3rem; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.95rem; white-space:nowrap; flex-shrink:0; transition:var(--transition); }
-        .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.18); color:var(--red); }
+        .mobile-nav a { 
+            color:white; padding:0.7rem 1.3rem; border-radius:30px; 
+            text-decoration:none; font-weight:600; font-size:0.95rem; 
+            white-space:nowrap; flex-shrink:0; transition:var(--transition); 
+        }
+        .mobile-nav a:hover, .mobile-nav a.active { 
+            background:rgba(255,255,255,0.18); color:var(--red); 
+        }
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
 
-        .hero { text-align:center; padding:clamp(4rem,13vw,7rem) 1rem 4rem; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:3rem 0 4rem; box-shadow:var(--shadow); }
+        .hero { 
+            text-align:center; padding:clamp(4rem,13vw,7rem) 1rem 4rem; 
+            background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); 
+            border-radius:var(--radius); margin:3rem 0 4rem; box-shadow:var(--shadow); 
+        }
         .hero h1 { font-size:clamp(2.8rem,9vw,4rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
         .hero p { font-size:clamp(1.2rem,4vw,1.5rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
 
-        .gsa-banner { background:var(--navy); color:white; text-align:center; padding:1.1rem; border-radius:var(--radius); margin:2rem auto 4rem; max-width:1000px; font-weight:600; font-size:1.02rem; }
+        .gsa-banner { 
+            background:var(--navy); color:white; text-align:center; 
+            padding:1.1rem; border-radius:var(--radius); margin:2rem auto 4rem; 
+            max-width:1000px; font-weight:600; font-size:1.02rem; 
+        }
 
-        .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:2.5rem; margin:4rem 0; }
+        .category-grid { 
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); 
+            gap:2.5rem; margin:4rem 0; 
+        }
         .category-card {
-            background:white; border-radius:var(--radius); overflow:hidden; overflow:hidden; box-shadow:var(--shadow);
-            border-top:7px solid var(--red); display:flex; flex-direction:column; position:relative;
+            background:white; border-radius:var(--radius); overflow:hidden; 
+            box-shadow:var(--shadow); border-top:7px solid var(--red); 
+            display:flex; flex-direction:column; position:relative;
             transition:var(--transition); scroll-margin-top:120px;
         }
-        .category-card:hover { transform:translateY(-12px); box-shadow:0 22px 50px rgba(0,0,0,0.2); }
-        .category-card img { width:100%; height:240px; object-fit:cover; }
-
-        .badge-popular {
-            position:absolute; top:12px; right:12px; background:var(--red); color:white;
-            padding:0.5rem 1rem; border-radius:20px; font-size:0.85rem; font-weight:800; z-index:2;
+        .category-card:hover { 
+            transform:translateY(-12px); box-shadow:0 22px 50px rgba(0,0,0,0.2); 
         }
-
+        .category-card img { width:100%; height:240px; object-fit:cover; }
+        .badge-popular {
+            position:absolute; top:12px; right:12px; background:var(--red); 
+            color:white; padding:0.5rem 1rem; border-radius:20px; 
+            font-size:0.85rem; font-weight:800; z-index:2;
+        }
         .category-content { padding:2rem; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.65rem; color:var(--navy); margin-bottom:0.8rem; }
-        .category-desc {
-            color:#444;
-            margin: 1rem 0 1.4rem;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
+        .category-desc { color:#444; margin:1rem 0 1.4rem; line-height:1.6; flex-grow:1; }
         .tool-select {
             width:100%; padding:0.95rem 1.1rem; border:2px solid #e9ecef;
-            border-radius:12px; font-size:1rem; margin:1.4rem 0;
-            background:white;
+            border-radius:12px; font-size:1rem; margin:1.4rem 0; background:white;
         }
         .quote-btn {
             margin-top:auto; background:var(--red); color:white; text-align:center;
@@ -128,11 +145,17 @@
         .call-button {
             position:fixed; right:clamp(16px,4vw,24px); bottom:clamp(16px,4vw,24px);
             width:clamp(72px,16vw,88px); height:clamp(72px,16vw,88px);
-            background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center;
-            box-shadow:0 8px 30px rgba(200,16,46,0.5); z-index:999; animation:pulse 2.6s infinite;
+            background:var(--red); border-radius:50%; display:flex; 
+            align-items:center; justify-content:center;
+            box-shadow:0 8px 30px rgba(200,16,46,0.5); z-index:999; 
+            animation:pulse 2.6s infinite;
         }
         .call-button img { width:68%; border-radius:50%; border:4px solid white; }
-        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(200,16,46,0.7)} 70%{box-shadow:0 0 0 25px rgba(200,16,46,0)}100%{box-shadow:0 0 0 0 rgba(200,16,46,0)} }
+        @keyframes pulse { 
+            0%   { box-shadow:0 0 0 0 rgba(200,16,46,0.7); }
+            70%  { box-shadow:0 0 0 25px rgba(200,16,46,0); }
+            100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
+        }
 
         footer { background:var(--navy); color:white; text-align:center; padding:6rem 1rem 3rem; margin-top:8rem; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 3rem; opacity:0.95; }
@@ -142,12 +165,12 @@
 <body>
 
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
-        <img src="Yorktown.PNG" alt="Call">
+        <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- ONLY LOGO SECTION — TOP RED SCROLLING MARQUEE -->
+    <!-- SINGLE-LINE RED SCROLLING MARQUEE -->
     <div class="logo-marquee-container">
-        <div class="marquee-row">
+        <div class="marquee-single">
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukee.PNG" alt="Milwaukee">
@@ -156,10 +179,10 @@
             <img src="Tekton.PNG" alt="Tekton">
             <img src="Crescenttools .JPG" alt="Crescent">
             <img src="Channellock.WEBP" alt="Channellock">
-            <img src="Kleintools. png" alt="Klein Tools">
+            <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.fAVIF" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- Duplicate for seamless loop -->
+            <!-- Duplicated for seamless loop -->
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukee.PNG" alt="Milwaukee">
@@ -168,31 +191,7 @@
             <img src="Tekton.PNG" alt="Tekton">
             <img src="Crescenttools .JPG" alt="Crescent">
             <img src="Channellock.WEBP" alt="Channellock">
-            <img src="Kleintools. png" alt="Klein Tools">
-            <img src="Bondhus.fAVIF" alt="Bondhus">
-            <img src="Bosch.WEBP" alt="Bosch">
-        </div>
-        <div class="marquee-row reverse">
-                        <img src="GearWrench.JPG" alt="GearWrench">
-            <img src="Knipex.PNG" alt="Knipex">
-            <img src="Milwaukee.PNG" alt="Milwaukee">
-            <img src="Dewalt-logo.PNG" alt="DeWalt">
-            <img src="Craftsman.JPG" alt="Craftsman">
-            <img src="Tekton.PNG" alt="Tekton">
-            <img src="Crescenttools .JPG" alt="Crescent">
-            <img src="Channellock.WEBP" alt="Channellock">
-            <img src="Kleintools. png" alt="Klein Tools">
-            <img src="Bondhus.fAVIF" alt="Bondhus">
-            <img src="Bosch.WEBP" alt="Bosch">
-                        <img src="GearWrench.JPG" alt="GearWrench">
-            <img src="Knipex.PNG" alt="Knipex">
-            <img src="Milwaukee.PNG" alt="Milwaukee">
-            <img src="Dewalt-logo.PNG" alt="DeWalt">
-            <img src="Craftsman.JPG" alt="Craftsman">
-            <img src="Tekton.PNG" alt="Tekton">
-            <img src="Crescenttools .JPG" alt="Crescent">
-            <img src="Channellock.WEBP" alt="Channellock">
-            <img src="Kleintools. png" alt="Klein Tools">
+            <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.fAVIF" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
         </div>
@@ -378,16 +377,18 @@
             }
         }
 
-        // Smooth scroll, nav hide/show, active state (unchanged)
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
-                if (a.getAttribute('href').startsWith('#') && a.getAttribute('href') !== '#') {
+                const href = a.getAttribute('href');
+                if (href.startsWith('#') && href !== '#') {
                     e.preventDefault();
-                    document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
+        // Hide/show sticky nav on scroll
         const nav = document.getElementById('main-nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -397,6 +398,7 @@
             last = cur;
         });
 
+        // Active nav highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
