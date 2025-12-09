@@ -65,7 +65,6 @@
 
         .gsa-banner { background:var(--navy); color:white; text-align:center; padding:1rem; border-radius:var(--radius); margin:-1.5rem auto 3rem; max-width:1000px; font-weight:600; }
 
-        /* Brand Logos – Uniform size & clean background */
         .brand-selector {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -80,7 +79,7 @@
             object-fit: contain;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
             transition: var(--transition);
-            background: transparent; /* forces clean look even on white-background logos */
+            background: transparent;
         }
         .brand-selector img:hover {
             transform: scale(1.18);
@@ -107,7 +106,6 @@
         .category-content { padding:1.8rem; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.55rem; color:var(--navy); margin-bottom:0.8rem; }
 
-        /* Dropdown inside each card */
         .tool-select {
             width:100%;
             padding:0.8rem 1rem;
@@ -184,7 +182,7 @@
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- 13 LOGOS – All same height, clean backgrounds -->
+        <!-- Brand logos unchanged -->
         <div class="brand-selector">
             <a href="#wrenches"><img src="snapon.png" alt="Snap-on"></a>
             <a href="#wrenches"><img src="gearwrench.png" alt="GearWrench"></a>
@@ -207,9 +205,9 @@
 
         <section class="category-grid">
 
-            <!-- Wrenches Card + Dropdown -->
+            <!-- Wrenches -->
             <article class="category-card" id="wrenches">
-                <img src="wrenches.jpg" alt="Torque wrenches" loading="lazy">
+                <img src="GearWrenchset.jpg" alt="GearWrench wrench set" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
                     <h2>Wrenches</h2>
@@ -227,9 +225,9 @@
                 </div>
             </article>
 
-            <!-- Pliers Card + Dropdown -->
+            <!-- Pliers -->
             <article class="category-card" id="pliers">
-                <img src="pliers.jpg" alt="Pliers" loading="lazy">
+                <img src="Knipex-pliers.JPG" alt="Knipex pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
@@ -247,27 +245,28 @@
                 </div>
             </article>
 
-            <!-- Measuring Card + Dropdown -->
+            <!-- Measuring -->
             <article class="category-card" id="measuring">
-                <img src="measuring.jpg" alt="Calipers" loading="lazy">
+                <img src="Bosch-laser.jpg" alt="Bosch laser measuring tool" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
-                    <p class="what-is"><strong>Mitutoyo • Starrett • Fowler • Stabila • Lufkin</strong></p>
+                    <p class="what-is"><strong>Mitutoyo • Starrett • Fowler • Stabila • Lufkin • Bosch</strong></p>
                     <select class="tool-select" onchange="updateQuote(this,'measuring')">
                         <option value="">— Choose a tool —</option>
                         <option>Mitutoyo 6" Digital Caliper</option>
                         <option>Mitutoyo 0-1" Micrometer</option>
                         <option>Starrett Combination Square</option>
                         <option>Stabila 48" Level</option>
+                        <option>Bosch Laser Distance Measurer</option>
                         <option>Other</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Measuring:%20" class="quote-btn" id="quote-measuring">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Screwdrivers Card + Dropdown -->
+            <!-- Screwdrivers -->
             <article class="category-card" id="screwdrivers">
-                <img src="screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
+                <img src="Kleintools-screwdrivers.jpg" alt="Klein Tools screwdrivers" loading="lazy">
                 <div class="category-content">
                     <h2>Screwdrivers & Nut Drivers</h2>
                     <p class="what-is"><strong>Wiha • Wera • Klein Insulated</strong></p>
@@ -283,13 +282,13 @@
                 </div>
             </article>
 
-            <!-- Hex/Torx Card + Dropdown -->
+            <!-- Hex & Torx -->
             <article class="category-card" id="hex-torx">
-                <img src="hex-torx.jpg" alt="Hex keys" loading="lazy">
+                <img src="Bondhus-hex.jpg" alt="Bondhus hex keys" loading="lazy">
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
                     <p class="what-is"><strong>Bondhus • Wiha • Eklind</strong></p>
-                    <select class="tool-select" onchange="updateQuote(this,'hex')">
+                    <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
                         <option value="">— Choose a tool —</option>
                         <option>Bondhus Ball-End Set</option>
                         <option>Wiha T-Handle Set</option>
@@ -297,13 +296,13 @@
                         <option>Torx Security Bits</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx:%20" class="quote-btn" id="quote-hex">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx:%20" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
                 </div>
             </article>
 
-            <!-- Specialty Card + Dropdown -->
+            <!-- Specialty -->
             <article class="category-card" id="specialty">
-                <img src="specialty.jpg" alt="Specialty tools" loading="lazy">
+                <img src="Texton-pics.jpg" alt="Specialty hand tools" loading="lazy">
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
                     <p class="what-is"><strong>Picks • Hooks • Mirrors • Bosch Bits • Pry Bars</strong></p>
@@ -334,7 +333,6 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <!-- Auto-update SMS links when user picks a tool -->
     <script>
         function updateQuote(select, category) {
             const btn = document.getElementById('quote-' + category);
@@ -347,7 +345,7 @@
             }
         }
 
-        // Smooth scroll & nav highlighting (unchanged)
+        // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 if (a.getAttribute('href').startsWith('#') && a.getAttribute('href') !== '#') {
@@ -357,6 +355,7 @@
             });
         });
 
+        // Hide/show sticky nav on scroll
         const nav = document.getElementById('main-nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -366,6 +365,7 @@
             last = cur;
         });
 
+        // Active nav highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
