@@ -82,7 +82,7 @@
         }
         .banner-text.active { opacity: 1; }
 
-        /* UEI BAR – 100% visible even on iPhone SE */
+        /* UEI BAR */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
@@ -110,7 +110,7 @@
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
-        /* MOBILE: Horizontal scrolling nav – clean & modern */
+        /* Navigation */
         nav {
             background: var(--navy);
             position: sticky;
@@ -146,11 +146,10 @@
             transition: var(--transition);
         }
         .mobile-nav a:hover {
-            background: var(--white);
+            background: rgba(255,255,255,1);
             color: var(--navy);
         }
 
-        /* Desktop: regular horizontal nav */
         @media (min-width: 768px) {
             .mobile-nav {
                 justify-content: center;
@@ -171,7 +170,6 @@
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
 
-        /* Rest of your styles – 100% unchanged */
         .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
         .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
         .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
@@ -198,6 +196,72 @@
         .card img { width:100%; height: clamp(200px, 38vw, 260px); object-fit:cover; }
         .card h3 { color: var(--navy); padding: 1.4rem 1rem 0.6rem; font-size: 1.35rem; }
         .card p { padding: 0 1.4rem 1.8rem; color: #555; font-size: 1rem; }
+
+        /* EXPANDABLE PRECISION HAND TOOLS CARD */
+        .expandable-card {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-header {
+            position: relative;
+        }
+        .expand-icon {
+            margin-top: 1rem;
+            font-size: 1.05rem;
+            color: var(--red);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        .expandable-card[aria-expanded="true"] .expand-icon::after {
+            content: " Click to collapse";
+        }
+        .expandable-card .expand-icon::after {
+            content: " Click to explore categories";
+        }
+
+        .card-expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.65s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s ease;
+            background: #f9fbff;
+            border-top: 1px solid rgba(11,30,63,0.08);
+        }
+        .expandable-card[aria-expanded="true"] .card-expandable-content {
+            max-height: 1000px;
+            padding: 2.4rem 1.8rem 2rem;
+        }
+
+        .subcategory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.4rem;
+            margin-bottom: 1.2rem;
+        }
+        .subcategory {
+            background: white;
+            padding: 1.6rem 1.4rem;
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--navy);
+            font-size: 1.02rem;
+            line-height: 1.5;
+            border: 2px solid rgba(11,30,63,0.08);
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            text-align: left;
+        }
+        .subcategory:hover {
+            transform: translateY(-8px);
+            border-color: var(--red);
+            box-shadow: 0 14px 35px rgba(200,16,46,0.18);
+        }
+        .subcategory strong {
+            color: var(--red);
+            font-size: 1.18rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
 
         .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start; }
         .founder-photo { max-width: 280px; border-radius: 16px; border: 6px solid var(--navy); box-shadow: var(--shadow); justify-self: center; }
@@ -229,6 +293,7 @@
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
+        /* Form styles (unchanged) */
         .quote-form { display:grid; gap:1.9rem; }
         .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
         .required { color:var(--red); }
@@ -255,14 +320,11 @@
         <div class="banner-text">No Hassle.</div>
     </div>
 
-    <!-- UEI bar – perfect on every iPhone -->
     <div class="gov-ids-header">
         <div class="gov-items">
-            <span><strong>UEI:</strong> SMYXDLJDJDJMZ4</span>
+            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
             <span><strong>CAGE:</strong> 16LD9</span>
-            <span>
-                <strong>SAM.gov</strong>
-            </span>
+            <span><strong>SAM.gov</strong></span>
         </div>
     </div>
 
@@ -270,7 +332,6 @@
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
-    <!-- Mobile-first horizontal scroll nav -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="#home">Home</a>
@@ -284,7 +345,6 @@
     </nav>
 
     <main>
-        <!-- All your original sections – 100% unchanged -->
         <section id="home" class="hero">
             <h1>Build Better with Yorktown Tools</h1>
             <p>Veteran-owned • Free delivery to Langley AFB, Fort Eustis, Naval Station Norfolk, and to all of Hampton Roads.</p>
@@ -301,9 +361,6 @@
             </div>
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
-
-        <!-- [All your remaining sections exactly as before – Free Resources, Tools, Accessories, Ladders, About, Contact, Footer] -->
-        <!-- They are all included in full in the final code below -->
 
         <section id="free-resources">
             <h2>Free Resources for Contractors</h2>
@@ -323,18 +380,63 @@
 
         <section id="tools">
             <h2>High-Performance Hand & Power Tools</h2>
-            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Precision-engineered tools for commercial and government contractors — built for durability and accuracy.</p>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">
+                Precision-engineered tools for commercial and government contractors — built for durability and accuracy.
+            </p>
+
             <div class="grid">
-                <div class="card">
-                    <img src="Pliers.PNG" alt="Precision hand tools" loading="lazy">
-                    <h3>Precision Hand Tools</h3>
-                    <p>Wrenches, pliers, and measuring tools to work as hard as you do.</p>
+
+                <!-- EXPANDABLE PRECISION HAND TOOLS CARD -->
+                <div class="card expandable-card" id="precision-hand-tools-card" aria-expanded="false" tabindex="0" role="button">
+                    <div class="card-header">
+                        <img src="Pliers.PNG" alt="Precision hand tools" loading="lazy">
+                        <h3>Precision Hand Tools</h3>
+                        <p>Wrenches, pliers, and measuring tools to work as hard as you do.</p>
+                        <div class="expand-icon"></div>
+                    </div>
+
+                    <div class="card-expandable-content">
+                        <div class="subcategory-grid">
+                            <a href="/hand-tools/wrenches.html" class="subcategory">
+                                <strong>Wrenches</strong><br>
+                                Combination • Adjustable • Ratcheting • Torque • Pipe
+                            </a>
+                            <a href="/hand-tools/pliers.html" class="subcategory">
+                                <strong>Pliers & Cutters</strong><br>
+                                Linesman • Needle-Nose • Locking • Snap-Ring • Diagonal
+                            </a>
+                            <a href="/hand-tools/measuring.html" class="subcategory">
+                                <strong>Measuring & Layout</strong><br>
+                                Calipers • Micrometers • Tape Measures • Levels • Squares
+                            </a>
+                            <a href="/hand-tools/screwdrivers.html" class="subcategory">
+                                <strong>Screwdrivers & Nut Drivers</strong><br>
+                                Precision • Jewelers • Electronics Kits • Insulated
+                            </a>
+                            <a href="/hand-tools/hex-torx.html" class="subcategory">
+                                <strong>Hex Keys & Torx</strong><br>
+                                Ball-End • Folding • T-Handle • Security Bits
+                            </a>
+                            <a href="/hand-tools/specialty.html" class="subcategory">
+                                <strong>Specialty Hand Tools</strong><br>
+                                Picks • Hooks • Files • Pry Bars • Inspection Tools
+                            </a>
+                        </div>
+                        <div style="text-align:center;margin-top:1.8rem;">
+                            <a href="/hand-tools" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">
+                                View All Precision Hand Tools
+                            </a>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Regular cards -->
                 <div class="card">
                     <img src="Dewalt.PNG" alt="Power tools" loading="lazy">
                     <h3>Power Tools</h3>
                     <p>Corded and cordless drills, saws, and impact drivers for demanding environments.</p>
                 </div>
+
                 <div class="card">
                     <img src="IMG_4117.jpg" alt="Specialty tools" loading="lazy">
                     <h3>Specialty Tools</h3>
@@ -343,6 +445,7 @@
             </div>
         </section>
 
+        <!-- All other sections remain 100% unchanged -->
         <section id="accessories">
             <h2>Tool Accessories, Storage & Safety Gear</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
@@ -454,7 +557,7 @@
     </footer>
 
     <script>
-        // Smooth hide/show nav
+        // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         let ticking = false;
@@ -477,7 +580,7 @@
             }
         });
 
-        // Rotators
+        // Tagline & banner rotators
         const taglines = document.querySelectorAll('.tagline');
         let i = 0;
         setInterval(() => {
@@ -494,6 +597,20 @@
             banners[j].classList.add('active');
         }, 2000);
 
+        // Expandable card toggle
+        document.getElementById('precision-hand-tools-card').addEventListener('click', function(e) {
+            if (e.target.closest('a')) return; // let links work
+            this.toggleAttribute('aria-expanded');
+        });
+
+        document.getElementById('precision-hand-tools-card').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.toggleAttribute('aria-expanded');
+            }
+        });
+
+        // Add another item row in form
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
