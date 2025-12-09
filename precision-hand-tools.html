@@ -53,7 +53,7 @@
         .logo-header { text-align:center; padding:1.4rem 1rem 1rem; background:white; }
         .logo-header img { max-width:260px; width:92%; height:auto; }
 
-        /* Sticky Nav - Cleaned up */
+        /* Sticky Nav */
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); }
         .mobile-nav { display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; scrollbar-width:none; align-items:center; justify-content:center; }
@@ -76,14 +76,28 @@
             margin: -1.5rem auto 3rem; max-width:1000px; font-weight:600;
         }
 
-        /* Brand Logos Instead of Text Buttons */
+        /* Brand Logos Grid - Responsive & Future-Proof */
         .brand-selector {
-            display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; margin:3rem 0 4rem; align-items:center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 2rem 1.5rem;
+            margin: 4rem 0 5rem;
+            justify-items: center;
+            align-items: center;
+            padding: 1rem;
         }
         .brand-selector img {
-            height:48px; opacity:0.85; transition:var(--transition); filter: grayscale(20%);
+            height: 52px;
+            opacity: 0.88;
+            transition: var(--transition);
+            filter: grayscale(15%) drop-shadow(0 2px 6px rgba(0,0,0,0.1));
+            object-fit: contain;
         }
-        .brand-selector img:hover { opacity:1; filter: grayscale(0); transform:scale(1.12); }
+        .brand-selector img:hover {
+            opacity: 1;
+            filter: grayscale(0%) drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            transform: scale(1.14);
+        }
 
         .btn-text {
             display:inline-block; background:#0066cc; color:white; padding:0.9rem 1.8rem; border-radius:50px;
@@ -162,10 +176,10 @@
         <a href="/"><img src="Yorktown.PNG" alt="Yorktown Tools"></a>
     </div>
 
-    <!-- Clean Navigation -->
+    <!-- Navigation -->
     <nav id="main-nav">
         <div class="mobile-nav">
-            <a href="/">Home</a>
+            <a href/"/">Home</a>
             <a href="#wrenches">Wrenches</a>
             <a href="#pliers">Pliers</a>
             <a href="#measuring">Measuring</a>
@@ -185,27 +199,37 @@
             ★ GSA pricing • Same-day quotes for .gov & DoD • UEI SMYXDLJDJMZ4 • CAGE 16LD9
         </div>
 
-        <!-- Brand Logos -->
+        <!-- BRAND LOGOS - Easy to add more in the future -->
         <div class="brand-selector">
             <a href="#wrenches"><img src="logos/snapon.png" alt="Snap-on"></a>
             <a href="#wrenches"><img src="logos/gearwrench.png" alt="GearWrench"></a>
+            <a href="#wrenches"><img src="logos/wright.png" alt="Wright Tool"></a>
+            <a href="#wrenches"><img src="logos/tekton.png" alt="Tekton"></a>
+            <a href="#wrenches"><img src="logos/milwaukee.png" alt="Milwaukee"></a>
+            <a href="#wrenches"><img src="logos/dewalt.png" alt="DeWalt"></a>
+
             <a href="#pliers"><img src="logos/knipex.png" alt="Knipex"></a>
             <a href="#pliers"><img src="logos/channellock.png" alt="Channellock"></a>
+            <a href="#pliers"><img src="logos/kleintools.png" alt="Klein Tools"></a>
+
             <a href="#screwdrivers"><img src="logos/wiha.png" alt="Wiha"></a>
+
             <a href="#measuring"><img src="logos/mitutoyo.png" alt="Mitutoyo"></a>
             <a href="#measuring"><img src="logos/starrett.png" alt="Starrett"></a>
-            <a href="#wrenches"><img src="logos/wright.png" alt="Wright Tool"></a>
+
+            <a href="#specialty"><img src="logos/bosch.webp" alt="Bosch"></a>
         </div>
 
+        <!-- Category Grid -->
         <section class="category-grid">
 
             <article class="category-card" id="wrenches">
-                <img src="wrenches.jpg" alt="Snap-on and Wright torque wrenches" loading="lazy">
+                <img src="wrenches.jpg" alt="Snap-on, Wright, Milwaukee torque wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Wrenches</h2>
-                    <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, CDI.</p>
+                    <p class="what-is"><strong>What it is:</strong> Combination, ratcheting, torque, adjustable & pipe wrenches – Snap-on, GearWrench, Wright Tool, Tekton, Milwaukee, DeWalt, CDI.</p>
                     <p class="used-for">Aircraft maintenance, shipyard, heavy equipment, and anywhere exact torque is critical.</p>
                     <div class="btn-group">
                         <a href="sms:7579405171?body=Need%20pricing%20on%20wrenches..." class="btn-text">Text for Quote</a>
@@ -214,15 +238,15 @@
             </article>
 
             <article class="category-card" id="pliers">
-                <img src="pliers.jpg" alt="Knipex and Channellock pliers" loading="lazy">
+                <img src="pliers.jpg" alt="Knipex, Klein Tools, Channellock pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="what-is"><strong>What it is:</strong> Knipex, Channellock, Irwin, Klein – linesman, needle-nose, snap-ring, diagonal cutters.</p>
+                    <p class="what-is"><strong>What it is:</strong> Knipex, Klein Tools, Channellock, Irwin – linesman, needle-nose, snap-ring, diagonal cutters.</p>
                     <p class="used-for">Electrical, aviation safety wire, wire pulling, and daily heavy-duty gripping.</p>
                     <div class="btn-group">
-                        <a href="sms:7579405171?body=Need%20pricing%20on%20Knipex%20pliers..." class="btn-text">Text for Quote</a>
+                        <a href="sms:7579405171?body=Need%20pricing%20on%20Knipex%20or%20Klein%20pliers..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
             </article>
@@ -247,7 +271,7 @@
                     <h2>Screwdrivers & Nut Drivers</h2>
                     <p class="what-is"><strong>What it is:</strong> Wiha, Wera, Klein insulated & precision sets, heavy-duty nut drivers.</p>
                     <p class="used-for">Avionics, control panels, electrical enclosures, and electronics assembly.</p>
-                    <div class="btn-button">
+                    <div class="btn-group">
                         <a href="sms:7579405171?body=Need%20pricing%20on%20Wiha..." class="btn-text">Text for Quote</a>
                     </div>
                 </div>
@@ -267,11 +291,11 @@
             </article>
 
             <article class="category-card" id="specialty">
-                <img src="specialty.jpg" alt="Picks, hooks, inspection mirrors" loading="lazy">
+                <img src="specialty.jpg" alt="Picks, hooks, Bosch bits, inspection mirrors" loading="lazy">
                 <div class="badge-delivery">Free Next-Day</div>
                 <div class="category-content">
                     <h2>Specialty Hand Tools</h2>
-                    <p class="what-is"><strong>What it is:</strong> Picks, hooks, files, pry bars, inspection mirrors, magnetic trays.</p>
+                    <p class="what-is"><strong>What it is:</strong> Picks, hooks, files, pry bars, inspection mirrors, Bosch bits, magnetic trays.</p>
                     <p class="used-for">O-ring removal, gasket work, retrieving dropped parts, detailed inspection.</p>
                     <div class="btn-group">
                         <a href="sms:7579405171?body=Need%20specialty%20tools..." class="btn-text">Text for Quote</a>
