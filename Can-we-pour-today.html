@@ -24,29 +24,23 @@
             background: white;
             color: #222;
             line-height: 1.7;
+            min-height: 100vh;
             position: relative;
         }
 
-        /* Solid white zone that covers the entire header (red banner + logo + navy nav) */
-        .solid-header {
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 245px;           /* Adjust only if you change header height */
-            background: white;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        /* George Washington background — starts EXACTLY after the navy nav bar */
-        .gw-bg {
+        /* Transparent George (hidden behind solid areas) */
+        body::after {
+            content: "";
             position: fixed;
-            top: 245px;              /* Same value as .solid-header height */
-            left: 0; right: 0; bottom: 0;
-            background: url('george-mascot.PNG') center top no-repeat;
-            background-size: cover;
-            opacity: 0.11;
-            z-index: -1;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw; height: 140vw;
+            max-width: 1400px; max-height: 1400px;
+            background: url('george-mascot.PNG') center/contain no-repeat;
+            opacity: 0.15;
             pointer-events: none;
+            z-index: -1;
+            margin-top: -80px;
         }
 
         /* Red scrolling banner */
@@ -58,8 +52,6 @@
             font-size: 1.1rem;
             overflow: hidden;
             white-space: nowrap;
-            position: relative;
-            z-index: 20;
         }
         .banner-track {
             display: inline-block;
@@ -67,10 +59,7 @@
             padding-left: 100%;
         }
         .banner-track span { padding: 0 80px; display: inline-block; }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         .gov-bar {
             background: var(--navy);
@@ -79,17 +68,15 @@
             padding: 11px;
             font-size: 1.05rem;
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
 
-        .logo {
-            text-align: center;
-            padding: 28px 16px 14px;
+        /* Solid white block so George doesn't bleed through logo */
+        .logo-area {
             background: white;
-            position: relative;
-            z-index: 30;
+            padding: 32px 16px 20px;
+            text-align: center;
         }
-        .logo img { max-width: 260px; width: 90%; }
+        .logo-area img { max-width: 260px; width: 90%; }
 
         nav {
             background: var(--navy);
@@ -102,7 +89,7 @@
         nav ul {
             display: flex;
             justify-content: center;
-            gap: 22px;
+            gap: 32px;
             list-style: none;
             padding: 0 16px;
         }
@@ -116,43 +103,20 @@
         }
         nav a:hover { background: rgba(255,255,255,0.22); color: var(--red); }
 
-        main {
-            max-width: 1240px;
-            margin: 0 auto;
-            padding: 60px 16px 100px;
-            position: relative;
-            z-index: 2;
-        }
+        main { max-width: 1240px; margin: 0 auto; padding: 0 16px 100px; }
 
-        /* Hero headline section */
-        .hero-header {
+        .hero {
             text-align: center;
             padding: 80px 20px 60px;
-            background: white;
+            background: linear-gradient(to bottom, #f8f9fa 0%, white 70%);
             border-radius: var(--radius);
-            margin: 0 0 50px 0;
+            margin: 36px 0;
             box-shadow: var(--shadow);
         }
-        .hero-header h1 {
-            font-size: clamp(3.2rem, 10vw, 5rem);
-            color: var(--navy);
-            font-weight: 900;
-            margin-bottom: 12px;
-        }
-        .hero-header .subtitle {
-            font-size: 1.4rem;
-            color: #555;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .hero-header p {
-            font-size: 1.22rem;
-            color: #444;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .hero h1 { font-size: clamp(3.2rem, 10vw, 5rem); color: var(--navy); font-weight: 900; margin-bottom: 12px; }
+        .hero .subtitle { font-size: 1.4rem; color: #555; font-weight: 600; margin-bottom: 8px; }
+        .hero p { font-size: 1.22rem; color: #444; max-width: 800px; margin: 0 auto; }
 
-        /* Rest of your styles (unchanged) */
         .concrete-hero {
             margin: 50px 0;
             border-radius: var(--radius);
@@ -166,8 +130,8 @@
             width: 100%;
             height: auto;
             display: block;
-            object-fit: cover;
             max-height: 420px;
+            object-fit: cover;
         }
 
         .decision-box {
@@ -177,7 +141,7 @@
             margin: 70px auto;
             max-width: 1000px;
             box-shadow: var(--shadow);
-            border-left: 10px solid var(--red);
+            border-top: 8px solid var(--red);
         }
         .decision-box h3 {
             font-size: 2.4rem;
@@ -247,10 +211,19 @@
             background: var(--navy);
             color: white;
             text-align: center;
-            padding: 80px 20px 40px;
-            margin-top: 100px;
+            padding: 90px 20px 40px;
+            margin-top: 120px;
         }
-        footer img { max-width: 90%; margin-bottom: 24px; opacity: 0.92; }
+        .footer-logo {
+            background: white;
+            padding: 36px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 36px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+        .footer-logo img { max-width: 280px; width: 90%; }
+        footer p strong { color: #ffffff !important; font-weight: 900; font-size: 1.55rem; }
 
         .call-btn {
             position: fixed;
@@ -277,153 +250,154 @@
 </head>
 <body>
 
-    <!-- Full solid white header (covers red banner + logo + navy nav) -->
-    <div class="solid-header"></div>
+<a href="tel:757-940-5171" class="call-btn" aria-label="Call Yorktown Tools">
+    <img src="Yorktown.PNG" alt="Call">
+</a>
 
-    <!-- George background starts directly under the navy nav bar -->
-    <div class="gw-bg"></div>
+<div class="top-banner">
+    <div class="banner-track">
+        <span>Live NOAA Concrete Pour Forecast • Updated: <span id="liveTime">Never</span></span>
+        <span>Live NOAA Concrete Pour Forecast • Updated: <span id="liveTime">Never</span></span>
+    </div>
+</div>
 
-    <a href="tel:757-940-5171" class="call-btn" aria-label="Call Yorktown Tools">
-        <img src="Yorktown.PNG" alt="Call">
-    </a>
+<div class="gov-bar">Free Delivery • Free Quote</div>
 
-    <div class="top-banner">
-        <div class="banner-track">
-            <span>Live NOAA Forecast for Hampton Roads • Updated: <span id="liveTime">Never</span></span>
-            <span>Live NOAA Forecast for Hampton Roads • Updated: <span id="liveTime">Never</span></span>
-        </div>
+<!-- Solid white behind logo so George doesn't show through -->
+<div class="logo-area">
+    <img src="Yorktown.PNG" alt="Yorktown Tools">
+</div>
+
+<nav>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/#contact">Get Quote</a></li>
+    </ul>
+</nav>
+
+<main>
+    <section class="hero">
+        <h1>Can We Pour Today?</h1>
+        <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach Corridor</div>
+        <p>Updated every 15 minutes • Check conditions in your city below</p>
+    </section>
+
+    <div class="concrete-hero">
+        <img src="Concrete.jpg" alt="Professional concrete pour in progress">
     </div>
 
-    <div class="gov-bar">Free Delivery • Free Quote</div>
+    <div class="decision-box">
+        <h3>How We Decide – ACI 305/306 Guidelines</h3>
+        <p style="text-align:center; max-width:800px; margin:0 auto 40px; color:#555;">
+            We analyze the next 8 hours of NOAA data and instantly apply official hot/cold weather concreting rules.
+        </p>
 
-    <div class="logo">
-        <img src="Yorktown.PNG" alt="Yorktown Tools">
-    </div>
-
-    <nav>
-        <ul><li><a href="/">Home</a></li></ul>
-    </nav>
-
-    <main>
-        <section class="hero-header">
-            <h1>Can We Pour Today?</h1>
-            <div class="subtitle">Live NOAA Forecast • Richmond to Virginia Beach Corridor</div>
-            <p>Updated every 15 minutes • Check conditions in your city below</p>
-        </section>
-
-        <div class="concrete-hero">
-            <img src="Concrete.jpg" alt="Professional concrete pour in progress">
-        </div>
-
-        <div class="decision-box">
-            <h3>How We Decide – ACI 305/306 Guidelines</h3>
-            <p style="text-align:center; max-width:800px; margin:0 auto 40px; color:#555;">
-                We analyze the next 8 hours of NOAA data and instantly apply official hot/cold weather concreting rules.
-            </p>
-
-            <div class="limits">
-                <div class="limit">
-                    <strong class="go">GOOD TO POUR</strong>
-                    <div>All conditions within safe limits</div>
-                </div>
-                <div class="limit">
-                    <strong class="caution">CAUTION</strong>
-                    <div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div>
-                </div>
-                <div class="limit">
-                    <strong class="no">DO NOT POUR</strong>
-                    <div>Rain probability greater than 30%<br>OR 2+ caution factors</div>
-                </div>
+        <div class="limits">
+            <div class="limit">
+                <strong class="go">GOOD TO POUR</strong>
+                <div>All conditions within safe limits</div>
             </div>
-
-            <p style="text-align:center; margin-top:32px; color:#555; font-size:0.95rem;">
-                <small id="lastUpdate">Last updated: Never</small>
-            </p>
+            <div class="limit">
+                <strong class="caution">CAUTION</strong>
+                <div>Temp less than 40°F or greater than 90°F<br>OR Wind gusts greater than 20 mph</div>
+            </div>
+            <div class="limit">
+                <strong class="no">DO NOT POUR</strong>
+                <div>Rain probability greater than 30%<br>OR 2+ caution factors</div>
+            </div>
         </div>
 
-        <h2 style="text-align:center; font-size:2.6rem; margin:80px 0 40px; color:var(--navy); font-weight:900;">
-            Current Conditions by City
-        </h2>
+        <p style="text-align:center; margin-top:32px; color:#555; font-size:0.95rem;">
+            <small id="lastUpdate">Last updated: Never</small>
+        </p>
+    </div>
 
-        <div class="grid" id="cityGrid"></div>
-    </main>
+    <h2 style="text-align:center; font-size:2.6rem; margin:80px 0 40px; color:var(--navy); font-weight:900;">
+        Current Conditions by City
+    </h2>
 
-    <footer>
-        <img src="hero.png" alt="Yorktown Tools" loading="lazy">
-        <p><strong>757-940-5171</strong> | yorktowntools@gmail.com</p>
-        <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
-        <p>© 2025 Yorktown Tools. All rights reserved.</p>
-    </footer>
+    <div class="grid" id="cityGrid"></div>
+</main>
 
-    <script>
-        const locations = [
-            { name: "Richmond", lat: 37.5407, lng: -77.4360 },
-            { name: "Williamsburg", lat: 37.2707, lng: -76.7075 },
-            { name: "Yorktown", lat: 37.2394, lng: -76.5041 },
-            { name: "Newport News", lat: 37.0871, lng: -76.4730 },
-            { name: "Hampton", lat: 37.0299, lng: -76.3452 },
-            { name: "Norfolk", lat: 36.8508, lng: -76.2852 },
-            { name: "Virginia Beach", lat: 36.8529, lng: -75.9780 }
-        ];
+<footer>
+    <div class="footer-logo">
+        <img src="hero-artwork.png" alt="Yorktown Tools" loading="lazy">
+    </div>
+    <p>757-940-5171 | yorktowntools@gmail.com</p>
+    <p>Yorktown, Virginia • Veteran-Owned Small Business</p>
+    <p>© 2025 Yorktown Tools. All rights reserved.</p>
+</footer>
 
-        const cityGrid = document.getElementById('cityGrid');
-        const lastUpdate = document.getElementById('lastUpdate');
-        const liveTime = document.getElementById('liveTime');
+<script>
+    const locations = [
+        { name: "Richmond", lat: 37.5407, lng: -77.4360 },
+        { name: "Williamsburg", lat: 37.2707, lng: -76.7075 },
+        { name: "Yorktown", lat: 37.2394, lng: -76.5041 },
+        { name: "Newport News", lat: 37.0871, lng: -76.4730 },
+        { name: "Hampton", lat: 37.0299, lng: -76.3452 },
+        { name: "Norfolk", lat: 36.8508, lng: -76.2852 },
+        { name: "Virginia Beach", lat: 36.8529, lng: -75.9780 }
+    ];
 
-        async function getForecast(lat, lng) {
-            try {
-                const res = await fetch(`https://api.weather.gov/points/${lat},${lng}`, {
-                    headers: { 'User-Agent': 'YorktownTools/1.0 (+yorktowntools@gmail.com)' }
-                });
-                const point = await res.json();
-                const forecast = await fetch(point.properties.forecast).then(r => r.json());
-                const periods = forecast.properties.periods.slice(0, 10);
+    const cityGrid = document.getElementById('cityGrid');
+    const lastUpdate = document.getElementById('lastUpdate');
+    const liveTime = document.getElementById('liveTime');
 
-                const rain = Math.max(...periods.map(p => p.probabilityOfPrecipitation?.value || 0));
-                const temps = periods.map(p => p.temperature);
-                const wind = Math.max(...periods.map(p => parseInt(p.windSpeed.split(' ')[0]) || 0));
+    async function getForecast(lat, lng) {
+        try {
+            const res = await fetch(`https://api.weather.gov/points/${lat},${lng}`, {
+                headers: { 'User-Agent': 'YorktownTools/1.0 (+yorktowntools@gmail.com)' }
+            });
+            const point = await res.json();
+            const forecast = await fetch(point.properties.forecast).then(r => r.json());
+            const periods = forecast.properties.periods.slice(0, 10);
 
-                return { rain, tempMin: Math.min(...temps), tempMax: Math.max(...temps), wind };
-            } catch (e) {
-                console.error(e);
-                return { rain: 0, tempMin: 55, tempMax: 75, wind: 8 };
-            }
+            const rain = Math.max(...periods.map(p => p.probabilityOfPrecipitation?.value || 0));
+            const temps = periods.map(p => p.temperature);
+            const wind = Math.max(...periods.map(p => parseInt(p.windSpeed.split(' ')[0]) || 0));
+
+            return { rain, tempMin: Math.min(...temps), tempMax: Math.max(...temps), wind };
+        } catch (e) {
+            console.error(e);
+            return { rain: 0, tempMin: 55, tempMax: 75, wind: 8 };
         }
+    }
 
-        function assess(data) {
-            const issues = [];
-            if (data.rain > 30) issues.push("Rain");
-            if (data.tempMin < 40 || data.tempMax > 90) issues.push("Temp");
-            if (data.wind > 20) issues.push("Wind");
+    function assess(data) {
+        const issues = [];
+        if (data.rain > 30) issues.push("Rain");
+        if (data.tempMin < 40 || data.tempMax > 90) issues.push("Temp");
+        if (data.wind > 20) issues.push("Wind");
 
-            if (issues.length >= 2) return { status: "no", text: "Do Not Pour", issues };
-            if (issues.length === 1) return { status: "caution", text: "Use Caution", issues };
-            return { status: "go", text: "Good to Pour", issues: [] };
-        }
+        if (issues.length >= 2) return { status: "no", text: "Do Not Pour", issues };
+        if (issues.length === 1) return { status: "caution", text: "Use Caution", issues };
+        return { status: "go", text: "Good to Pour", issues: [] };
+    }
 
-        function update() {
-            Promise.all(locations.map(loc => getForecast(loc.lat, loc.lng).then(d => ({...loc, ...d}))))
-                .then(results => results.map(r => ({...r, ...assess(r)})))
-                .then(cities => {
-                    cityGrid.innerHTML = cities.map(c => `
-                        <div class="city-card">
-                            <div class="city-header">${c.name}</div>
-                            <div class="city-body">
-                                <div class="status ${c.status}">${c.text}</div>
-                                <div class="details">${c.tempMin}–${c.tempMax}°F • ${c.rain}% rain • ${c.wind} mph gusts</div>
-                                ${c.issues.length ? `<div class="issues">Issue: ${c.issues.join(', ')}</div>` : ''}
-                            </div>
+    function update() {
+        Promise.all(locations.map(loc => getForecast(loc.lat, loc.lng).then(d => ({...loc, ...d}))))
+            .then(results => results.map(r => ({...r, ...assess(r)})))
+            .then(cities => {
+                cityGrid.innerHTML = cities.map(c => `
+                    <div class="city-card">
+                        <div class="city-header">${c.name}</div>
+                        <div class="city-body">
+                            <div class="status ${c.status}">${c.text}</div>
+                            <div class="details">${c.tempMin}–${c.tempMax}°F • ${c.rain}% rain • ${c.wind} mph gusts</div>
+                            ${c.issues.length ? `<div class="issues">Issue: ${c.issues.join(', ')}</div>` : ''}
                         </div>
-                    `).join('');
+                    </div>
+                `).join('');
 
-                    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    liveTime.textContent = time;
-                    lastUpdate.textContent = `Last updated: ${time}`;
-                });
-        }
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                liveTime.textContent = time;
+                lastUpdate.textContent = `Last updated: ${time}`;
+            });
+    }
 
-        update();
-        setInterval(update, 15 * 60 * 1000);
-    </script>
+    update();
+    setInterval(update, 15 * 60 * 1000);
+</script>
+
 </body>
 </html>
