@@ -44,7 +44,7 @@
             z-index:-1;
         }
 
-        /* RED MARQUEE – PERFECTLY UNIFORM LOGOS (fixed) */
+        /* RED MARQUEE – PERFECT UNIFORM LOGOS */
         .logo-marquee-container {
             background:var(--red);
             padding:20px 0;
@@ -57,13 +57,12 @@
             animation:scroll 40s linear infinite;
         }
         .marquee-track img {
-            height:66px !important;
-            width:155px !important;
+            height:66px;
+            width:155px;
             object-fit:contain;
             object-position:center;
             filter:brightness(0) invert(1);
             flex-shrink:0;
-            padding:0 10px;
         }
         .logo-marquee-container:hover .marquee-track { animation-play-state:paused; }
         @keyframes scroll {
@@ -82,153 +81,38 @@
             letter-spacing:1.2px;
         }
 
-        .logo-header {
-            text-align:center;
-            padding:24px 16px 18px;
-            background:white;
-        }
+        .logo-header { text-align:center; padding:24px 16px 18px; background:white; }
         .logo-header img { max-width:300px; width:92%; margin:0 auto; }
 
-        nav {
-            background:var(--navy);
-            position:sticky;
-            top:0;
-            z-index:1000;
-            box-shadow:0 4px 20px rgba(11,30,63,0.2);
-        }
-        .mobile-nav {
-            display:flex;
-            overflow-x:auto;
-            padding:14px 0;
-            gap:16px;
-            justify-content:center;
-            scrollbar-width:none;
-        }
+        nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.2); }
+        .mobile-nav { display:flex; overflow-x:auto; padding:14px 0; gap:16px; justify-content:center; scrollbar-width:none; }
         .mobile-nav::-webkit-scrollbar { display:none; }
-        .mobile-nav a {
-            color:white;
-            padding:10px 20px;
-            border-radius:30px;
-            text-decoration:none;
-            font-weight:600;
-            font-size:0.98rem;
-            white-space:nowrap;
-            flex-shrink:0;
-        }
-        .mobile-nav a:hover, .mobile-nav a.active {
-            background:rgba(255,255,255,0.22);
-            color:var(--red);
-        }
+        .mobile-nav a { color:white; padding:10px 20px; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.98rem; white-space:nowrap; flex-shrink:0; }
+        .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.22); color:var(--red); }
 
         main { padding:0 16px; max-width:1400px; margin:0 auto; }
 
-        .hero {
-            text-align:center;
-            padding:clamp(70px,16vw,110px) 20px 70px;
-            background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%);
-            border-radius:var(--radius);
-            margin:36px 0 50px;
-            box-shadow:var(--shadow);
-        }
+        .hero { text-align:center; padding:clamp(70px,16vw,110px) 20px 70px; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:36px 0 50px; box-shadow:var(--shadow); }
         .hero h1 { font-size:clamp(2.8rem,9.5vw,4.4rem); font-weight:800; color:var(--navy); margin-bottom:16px; }
         .hero p { font-size:clamp(1.25rem,4.8vw,1.7rem); color:#444; max-width:900px; margin:0 auto; }
 
-        .gsa-banner {
-            background:var(--navy);
-            color:white;
-            text-align:center;
-            padding:22px 20px;
-            border-radius:var(--radius);
-            margin:40px auto 60px;
-            max-width:1000px;
-            font-weight:700;
-            font-size:1.1rem;
-            line-height:1.9;
-        }
-        .gsa-banner .highlight { color:var(--yellow); }
-
-        .category-grid {
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
-            gap:32px;
-            margin:50px 0 80px;
-        }
-        .category-card {
-            background:white;
-            border-radius:var(--radius);
-            overflow:hidden;
-            box-shadow:var(--shadow);
-            border-top:9px solid var(--red);
-            display:flex;
-            flex-direction:column;
-            position:relative;
-            transition:var(--transition);
-        }
+        .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:32px; margin:50px 0 80px; }
+        .category-card { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); border-top:9px solid var(--red); display:flex; flex-direction:column; position:relative; transition:var(--transition); }
         .category-card:hover { transform:translateY(-12px); box-shadow:0 24px 60px rgba(0,0,0,0.2); }
         .category-card img { width:100%; height:240px; object-fit:cover; }
-        .badge-popular {
-            position:absolute;
-            top:14px; right:14px;
-            background:var(--red);
-            color:white;
-            padding:9px 18px;
-            border-radius:30px;
-            font-size:0.88rem;
-            font-weight:800;
-            z-index:2;
-        }
+        .badge-popular { position:absolute; top:14px; right:14px; background:var(--red); color:white; padding:9px 18px; border-radius:30px; font-size:0.88rem; font-weight:800; z-index:2; }
         .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
         .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
-        .tool-select {
-            width:100%;
-            padding:15px 18px;
-            border:2px solid #e9ecef;
-            border-radius:14px;
-            font-size:1.02rem;
-            margin:18px 0;
-            background:white;
-        }
-        .quote-btn {
-            background:var(--red);
-            color:white;
-            text-align:center;
-            padding:17px;
-            border-radius:14px;
-            font-weight:700;
-            text-decoration:none;
-            margin-top:auto;
-            transition:var(--transition);
-        }
+        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0; background:white; }
+        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; text-decoration:none; margin-top:auto; transition:var(--transition); }
         .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
-        .call-button {
-            position:fixed;
-            right:16px; bottom:16px;
-            width:72px; height:72px;
-            background:var(--red);
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            box-shadow:0 8px 32px rgba(200,16,46,0.55);
-            z-index:999;
-            animation:pulse 2.6s infinite;
-        }
+        .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
         .call-button img { width:64%; border:5px solid white; border-radius:50%; }
-        @keyframes pulse {
-            0%   { box-shadow:0 0 0 0 rgba(200,16,46,0.7); }
-            70%  { box-shadow:0 0 0 25px rgba(200,16,46,0); }
-            100% { box-shadow:0 0 0 0 rgba(200,16,46,0); }
-        }
+        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
 
-        footer {
-            background:var(--navy);
-            color:white;
-            text-align:center;
-            padding:90px 20px 40px;
-            margin-top:100px;
-        }
+        footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
         footer a { color:white; text-decoration:underline; }
     </style>
@@ -239,38 +123,37 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- RED MARQUEE – NOW PERFECT LOGO SIZES -->
+    <!-- RED MARQUEE – YOUR EXACT LOGO FILES + PERFECT SIZE -->
     <div class="logo-marquee-container">
         <div class="marquee-track">
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
-            <img src="Milwaukee.WEBP" alt="Milwaukee">
+            <img src="Milwaukeelogo.PNG" alt="Milwaukee">
             <img src="Dewalt-logo.PNG" alt="DeWalt">
-            <img src="Craftsman.PNG" alt="Craftsman">
-            <img src="Tekton.PNG" alt="Tekton">
+            <img src="Craftsmanlogo.PNG" alt="Craftsman">
+            <img src="Tektonlogo.PNG" alt="Tekton">
             <img src="Crescenttools.JPG" alt="Crescent">
-            <img src="Channellock.WEBP" alt="Channellock">
+            <img src="Channellocklogo.PNG" alt="Channellock">
             <img src="Kleintools.png" alt="Klein Tools">
-            <img src="Bondhus.AVIF" alt="Bondhus">
+            <img src="Bondhuslogo.PNG" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- duplicate for seamless loop -->
+            <!-- Duplicate for seamless loop -->
             <img src="GearWrench.JPG" alt="">
             <img src="Knipex.PNG" alt="">
-            <img src="Milwaukee.WEBP" alt="">
+            <img src="Milwaukeelogo.PNG" alt="">
             <img src="Dewalt-logo.PNG" alt="">
-            <img src="Craftsman.PNG" alt="">
-            <img src="Tekton.PNG" alt="">
+            <img src="Craftsmanlogo.PNG" alt="">
+            <img src="Tektonlogo.PNG" alt="">
             <img src="Crescenttools.JPG" alt="">
-            <img src="Channellock.WEBP" alt="">
+            <img src="Channellocklogo.PNG" alt="">
             <img src="Kleintools.png" alt="">
-            <img src="Bondhus.AVIF" alt="">
+            <img src="Bondhuslogo.PNG" alt="">
             <img src="Bosch.WEBP" alt="">
         </div>
     </div>
 
-    <!-- Everything else 100% unchanged from your perfect version -->
     <div class="top-banner">
-        STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
+        Stop Hunting Tools For Hours – WE HAVE THEM
     </div>
 
     <div class="logo-header">
@@ -295,16 +178,10 @@
             <p>Professional-grade tools from the brands you trust.<br>Free next-day delivery across Hampton Roads.</p>
         </section>
 
-        <div class="gsa-banner">
-            GSA PRICING • SAME-DAY QUOTES FOR .GOV & DOD • 
-            <span class="highlight">UEI:</span> SMYXDLJDJMZ4 • 
-            <span class="highlight">CAGE:</span> 16LD9 • 
-            <span class="highlight">SAM.GOV</span> REGISTERED
-        </div>
+        <!-- GSA BANNER REMOVED -->
 
         <section class="category-grid">
 
-            <!-- All 6 cards exactly as you had them – nothing changed -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -371,6 +248,8 @@
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote</a>
                 </div>
+            </article>
+
             </article>
 
             <article class="category-card" id="screwdrivers">
