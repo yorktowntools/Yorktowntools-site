@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Power Tools – Drills, Saws & Impacts | Yorktown Tools</title>
+    <meta name="description" content="Milwaukee, DeWalt, Makita, Bosch corded & cordless drills, circular saws, reciprocating saws, impact drivers & wrenches. M18, FLEXVOLT, XGT platforms. Same/next-day delivery in Hampton Roads."/>
+
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0b1e3f;
+            --red: #c8102e;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --transition: all 0.35s ease;
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background:var(--white);
+            overflow-x:hidden;
+        }
+        img { max-width:100%; height:auto; display:block; }
+
+        body::after {
+            content:"";
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            width:140vw; height:140vw;
+            max-width:1400px; max-height:1400px;
+            background:url('george-mascot.PNG') center/contain no-repeat;
+            opacity:0.12;
+            pointer-events:none;
+            z-index:-1;
+        }
+
+        /* MARQUEE */
+        .logo-marquee-container {
+            background: var(--light-gray);
+            height: 96px;
+            overflow: hidden;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+        }
+        .marq { display: flex; width: 100%; }
+        .marq-track {
+            display: flex;
+            gap: clamp(50px, 7vw, 100px);
+            flex-shrink: 0;
+            animation: scroll 30s linear infinite;
+            will-change: transform;
+        }
+        .logo-item {
+            flex: 0 0 180px;
+            height: 76px;
+            display: grid;
+            place-items: center;
+        }
+        .logo-item img {
+            max-width: 94%;
+            max-height: 94%;
+            object-fit: contain;
+            filter: grayscale(28%) brightness(96%);
+            transition: var(--transition);
+            user-select: none;
+            draggable: false;
+        }
+        .logo-item img:hover {
+            filter: grayscale(0%) brightness(100%);
+            transform: scale(1.11);
+        }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-33.333%); }
+        }
+        @media (min-width: 768px)  { .marq-track { animation-duration: 26s; } }
+        @media (min-width: 1200px) { .marq-track { animation-duration: 22s; } }
+        .logo-marquee-container:hover .marq-track { animation-play-state: paused; }
+
+        .top-banner { background:#0b1e3f; color:white; text-align:center; padding:16px 20px; font-weight:800; font-size:clamp(1rem,4.2vw,1.2rem); text-transform:uppercase; letter-spacing:1.5px; }
+        .logo-header { text-align:center; padding:30px 16px 20px; background:white; }
+        .logo-header img { max-width:300px; width:92%; margin:0 auto; }
+
+        nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.2); }
+        .mobile-nav { display:flex; overflow-x:auto; padding:14px 0; gap:16px; justify-content:center; scrollbar-width:none; }
+        .mobile-nav::-webkit-scrollbar { display:none; }
+        .mobile-nav a { color:white; padding:10px 20px; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.98rem; white-space:nowrap; flex-shrink:0; }
+        .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.22); color:var(--red); }
+
+        main { padding:0 16px; max-width:1400px; margin:0 auto; }
+        .hero { text-align:center; padding:clamp(70px,16vw,110px) 20px 70px; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:36px 0 50px; box-shadow:var(--shadow); }
+        .hero h1 { font-size:clamp(2.8rem,9.5vw,4.4rem); font-weight:800; color:var(--navy); margin-bottom:16px; }
+        .hero p { font-size:clamp(1.25rem,4.8vw,1.7rem); color:#444; max-width:900px; margin:0 auto; }
+
+        .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:32px; margin:50px 0 80px; }
+        .category-card { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); border-top:9px solid var(--red); display:flex; flex-direction:column; position:relative; transition:var(--transition); }
+        .category-card:hover { transform:translateY(-12px); box-shadow:0 24px 60px rgba(0,0,0,0.2); }
+        .category-card img { width:100%; height:240px; object-fit:cover; }
+        .badge-popular { position:absolute; top:14px; right:14px; background:var(--red); color:white; padding:9px 18px; border-radius:30px; font-size:0.88rem; font-weight:800; z-index:2; }
+        .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
+        .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
+        .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
+        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0; background:white; }
+        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; margin-top:auto; transition:var(--transition); }
+        .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
+
+        .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
+        .call-button img { width:64%; border:5px solid white; border-radius:50%; }
+        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
+
+        footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
+        .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
+        footer a { color:white; text-decoration:underline; }
+
+        #desktop-modal {
+            display:none;
+            position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000;
+            align-items:center; justify-content:center; text-align:center; padding:20px;
+        }
+        #desktop-modal.show { display:flex; }
+        .modal-content {
+            background:white; padding:40px; border-radius:20px; max-width:420px; width:100%;
+        }
+        .modal-content h3 { margin-bottom:16px; color:var(--navy); }
+        .modal-content p { margin:20px 0; font-size:1.1rem; }
+        .modal-phone { font-size:2.2rem; font-weight:800; color:var(--red); margin:20px 0; }
+        .modal-btn { display:inline-block; background:var(--red); color:white; padding:16px 32px; border-radius:50px; font-size:1.2rem; text-decoration:none; margin:10px; }
+        .modal-btn.call { background:#0b1e3f; }
+    </style>
+</head>
+<body id="top">
+
+    <a href="tel:757-940-5171" class="call-button">
+        <img src="Yorktown.PNG" alt="Call Yorktown Tools">
+    </a>
+
+    <!-- MARQUEE (same brands – power tool heavy) -->
+    <div class="logo-marquee-container" aria-label="Trusted power tool brands">
+        <div class="marq">
+            <div class="marq-track">
+                <div class="logo-item"><img src="Milwaukeelogo.PNG" alt="Milwaukee"></div>
+                <div class="logo-item"><img src="Dewalt-logo.PNG" alt="DeWalt"></div>
+                <div class="logo-item"><img src="Makita-logo.PNG" alt="Makita"></div>
+                <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
+                <div class="logo-item"><img src="MetaboHPT-logo.PNG" alt="Metabo HPT"></div>
+                <div class="logo-item"><img src="Flex-logo.PNG" alt="FLEX"></div>
+                <div class="logo-item"><img src="Hilti-logo.PNG" alt="Hilti"></div>
+                <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
+                <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
+            </div>
+            <div class="marq-track"> <!-- duplicate --> 
+                <!-- same logos again -->
+                <div class="logo-item"><img src="Milwaukeelogo.PNG" alt="Milwaukee"></div>
+                <div class="logo-item"><img src="Dewalt-logo.PNG" alt="DeWalt"></div>
+                <div class="logo-item"><img src="Makita-logo.PNG" alt="Makita"></div>
+                <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
+                <div class="logo-item"><img src="MetaboHPT-logo.PNG" alt="Metabo HPT"></div>
+                <div class="logo-item"><img src="Flex-logo.PNG" alt="FLEX"></div>
+                <div class="logo-item"><img src="Hilti-logo.PNG" alt="Hilti"></div>
+                <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
+                <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
+            </div>
+            <div class="marq-track"> <!-- duplicate again -->
+                <!-- same logos -->
+                <div class="logo-item"><img src="Milwaukeelogo.PNG" alt="Milwaukee"></div>
+                <div class="logo-item"><img src="Dewalt-logo.PNG" alt="DeWalt"></div>
+                <div class="logo-item"><img src="Makita-logo.PNG" alt="Makita"></div>
+                <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
+                <div class="logo-item"><img src="MetaboHPT-logo.PNG" alt="Metabo HPT"></div>
+                <div class="logo-item"><img src="Flex-logo.PNG" alt="FLEX"></div>
+                <div class="logo-item"><img src="Hilti-logo.PNG" alt="Hilti"></div>
+                <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
+                <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-banner">
+        POWER TOOLS IN STOCK – SAME / NEXT-DAY DELIVERY HAMPTON ROADS
+    </div>
+
+    <div class="logo-header">
+        <img src="Yorktown.PNG" alt="Yorktown Tools">
+    </div>
+
+    <nav>
+        <div class="mobile-nav">
+            <a href="#">Home</a>
+            <a href="#drills">Drills & Hammers</a>
+            <a href="#saws">Saws</a>
+            <a href="#impacts">Impact Drivers/Wrenches</a>
+            <a href="#combo-kits">Combo Kits</a>
+            <a href="#accessories">Batteries & Accessories</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Power Tools for Demanding Jobs</h1>
+            <p>Corded & cordless drills, saws, impact drivers from Milwaukee M18, DeWalt 20V/60V, Makita XGT, Bosch & more.<br>Free next-day delivery in Hampton Roads – GSA pricing available.</p>
+        </section>
+
+        <section class="category-grid">
+
+            <article class="category-card" id="drills">
+                <img src="milwaukee-m18-drill.jpg" alt="Cordless Drills" loading="lazy">
+                <div class="badge-popular">#1 Seller</div>
+                <div class="category-content">
+                    <h2>Drills & Hammer Drills</h2>
+                    <p class="category-desc">1/2" brushless drills, hammer drills, right-angle, magnetic drills, and rotary hammers. M18 FUEL, DeWalt FLEXVOLT, Makita XGT, Bosch.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'drills')">
+                        <option value="">— Choose a drill —</option>
+                        <option>Milwaukee M18 FUEL 1/2" Hammer Drill/Driver Kit</option>
+                        <option>DeWalt 20V MAX XR Hammer Drill Kit</option>
+                        <option>DeWalt 60V MAX FLEXVOLT Hammer Drill</option>
+                        <option>Makita 40V XGT Brushless Hammer Drill</option>
+                        <option>Bosch 18V Profactor Hammer Drill</option>
+                        <option>Milwaukee M18 Right Angle Drill</option>
+                        <option>Hilti TE 6-A36 Cordless Rotary Hammer</option>
+                        <option>Other / Custom Request</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Drills" id="quote-drills">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="saws">
+                <img src="dewalt-circular-saw.jpg" alt="Power Saws" loading="lazy">
+                <div class="badge-popular">High Demand</div>
+                <div class="category-content">
+                    <h2>Saws – Circular, Recip, Miter</h2>
+                    <p class="category-desc">7-1/4" circular saws, Sawzalls, track saws, miter saws, bandsaws – corded & cordless.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'saws')">
+                        <option value="">— Choose a saw —</option>
+                        <option>Milwaukee M18 FUEL 7-1/4" Circular Saw</option>
+                        <option>DeWalt 60V FLEXVOLT 7-1/4" Circular Saw</option>
+                        <option>Makita 40V XGT Rear-Handle Circular Saw</option>
+                        <option>Milwaukee M18 FUEL Sawzall Reciprocating Saw</option>
+                        <option>DeWalt 20V MAX Reciprocating Saw</option>
+                        <option>Milwaukee M18 FUEL 12" Dual Bevel Sliding Miter Saw</option>
+                        <option>Makita 36V Track Saw Kit</option>
+                        <option>Other / Custom Request</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Saws" id="quote-saws">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="impacts">
+                <img src="impact-driver.jpg" alt="Impact Drivers & Wrenches" loading="lazy">
+                <div class="badge-popular">Most Requested</div>
+                <div class="category-content">
+                    <h2>Impact Drivers & Wrenches</h2>
+                    <p class="category-desc">1/4" hex impact drivers, 1/2" & 3/4" impact wrenches, high-torque models up to 1,500 ft-lb.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'impacts')">
+                        <option value="">— Choose impact tool —</option>
+                        <option>Milwaukee M18 FUEL 1/4" Hex Impact Driver</option>
+                        <option>Milwaukee M18 FUEL High Torque 1/2" Impact Wrench</option>
+                        <option>Milwaukee M18 FUEL 1" D-Handle High Torque</option>
+                        <option>DeWalt 20V MAX XR 1/4" Impact Driver</option>
+                        <option>DeWalt 60V 7/8" High Torque Impact Wrench</option>
+                        <option>Makita 40V XGT 1/2" Impact Wrench</option>
+                        <option>Other / Custom Request</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Impacts" id="quote-impacts">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="combo-kits">
+                <img src="combo-kit.jpg" alt="Combo Kits" loading="lazy">
+                <div class="category-content">
+                    <h2>Combo Kits</h2>
+                    <p class="category-desc">Drill + impact driver + saw kits. Best value for outfitting crews fast.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'combo-kits')">
+                        <option value="">— Choose combo kit —</option>
+                        <option>Milwaukee M18 FUEL 2-Tool Combo (Hammer Drill + Impact)</option>
+                        <option>Milwaukee M18 FUEL 7-Tool Combo Kit</option>
+                        <option>DeWalt 20V MAX 6-Tool Combo Kit</option>
+                        <option>DeWalt 20V/60V 9-Tool Ultimate Kit</option>
+                        <option>Makita 18V LXT 5-Pc Combo Kit</option>
+                        <option>Other / Custom Request</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Combo%20Kits" id="quote-combo-kits">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="accessories">
+                <img src="m18-batteries.jpg" alt="Batteries & Chargers" loading="lazy">
+                <div class="category-content">
+                    <h2>Batteries, Chargers & Accessories</h2>
+                    <p class="category-desc">High-output batteries (HO 6.0, 8.0, 12.0), rapid chargers, Packout storage, blades, bits.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'accessories')">
+                        <option value="">— Choose accessory —</option>
+                        <option>Milwaukee M18 REDLITHIUM HIGH OUTPUT HD12.0 Battery</option>
+                        <option>Milwaukee M18 & M12 Rapid Charger</option>
+                        <option>DeWalt 20V/60V FLEXVOLT 9.0Ah Battery</option>
+                        <option>Diablo Demo Demon Blades</option>
+                        <option>Packout Rolling Tool Box</option>
+                        <option>Other / Custom Request</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Batteries/Accessories" id="quote-accessories">Text Quote</div>
+                </div>
+            </article>
+
+        </section>
+
+        <section style="text-align:center;margin:80px 0 40px;">
+            <p style="font-size:1.5rem;margin-bottom:24px;">Need GSA pricing or bulk crew orders?</p>
+            <a href="sms:7579405171?body=Hi%2C%20need%20power%20tool%20quote" style="display:inline-block;background:#0066cc;color:white;padding:18px 40px;border-radius:50px;font-size:1.35rem;font-weight:700;text-decoration:none;">Text Us Now</a>
+        </section>
+    </main>
+
+    <footer>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned • SAM.gov Registered • UEI: SMYXDLJDJMZ4 • CAGE: 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.</p>
+    </footer>
+
+    <!-- Desktop fallback modal (same as original) -->
+    <div id="desktop-modal">
+        <div class="modal-content">
+            <h3>Text Us for a Fast Quote</h3>
+            <p>Tap the number below on your phone<br>or give us a call:</p>
+            <div class="modal-phone">757-940-5171</div>
+            <a href="#" class="modal-btn" id="modal-sms-link">Text Message</a>
+            <a href="tel:757-940-5171" class="modal-btn call">Call Now</a>
+            <p><small>Close this window to continue browsing</small></p>
+        </div>
+    </div>
+
+    <script>
+        function updateQuote(select, category) {
+            const btn = document.getElementById('quote-' + category);
+            const base = "sms:7579405171?body=Need%20quote%20-%20" + 
+                         category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('%20');
+            if (select.value) {
+                const sms = base + ":%20" + encodeURIComponent(select.value);
+                btn.dataset.sms = sms;
+                btn.textContent = "Quote: " + select.value + " →";
+            } else {
+                btn.dataset.sms = base;
+                btn.textContent = "Text Quote →";
+            }
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (href === '#' || href === '#top') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (href.startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Hide/show navbar on scroll
+        const nav = document.querySelector('nav');
+        let last = 0;
+        window.addEventListener('scroll', () => {
+            let cur = window.pageYOffset;
+            if (cur > last && cur > 160) nav.style.transform = 'translateY(-100%)';
+            else nav.style.transform = 'translateY(0)';
+            last = cur;
+        });
+
+        // Quote button handler (mobile SMS, desktop modal)
+        document.querySelectorAll('.quote-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const smsUrl = this.dataset.sms;
+                const opened = window.open(smsUrl, '_blank');
+                if (!opened || opened === null || typeof opened === 'undefined') {
+                    document.getElementById('modal-sms-link').href = smsUrl;
+                    document.getElementById('desktop-modal').classList.add('show');
+                }
+            });
+        });
+
+        // Close modal
+        document.getElementById('desktop-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    </script>
+</body>
+</html>
