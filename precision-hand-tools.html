@@ -7,7 +7,7 @@
     <meta name="description" content="Premium hand tools for contractors & government: GearWrench, Knipex, Crescent, Craftsman, Tekton, Milwaukee, DeWalt, Bondhus, Bosch. Free next-day delivery in Hampton Roads.">
     <meta name="keywords" content="precision hand tools, gearwrench knipex crescent craftsman tekton milwaukee dewalt bondhus torque wrenches veteran owned gsa pricing">
 
-    <link rel="icon" href="Yorktown.PNG" type="imageگی/png">
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,54 +43,64 @@
             margin-top:-80px;
         }
 
-        /* SINGLE-LINE RED SCROLLING MARQUEE */
+        /* RED SCROLLING MARQUEE – FIXED SIZES & VISIBILITY */
         .logo-marquee-container {
             background: var(--red);
-            padding: 18px 0;
+            padding: 20px 0;
             overflow: hidden;
             white-space: nowrap;
         }
         .marquee-single {
             display: inline-flex;
-            gap: clamp(32px, 7vw, 80px);
-            animation: scroll-left 50s linear infinite;
-            will-change: transform;
+            gap: clamp(40px, 8vw, 100px);
+            animation: scroll-left 55s linear infinite;
         }
         .marquee-single img {
-            height: clamp(44px, 9vw, 62px);
+            height: 66px;                    /* All logos exactly the same height */
             width: auto;
+            object-fit: contain;
+            padding: 8px 12px;
+            background: white;               /* White backing = no more red-on-red */
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.45);
             flex-shrink: 0;
-            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.35));
+            transition: transform 0.3s ease;
         }
-        .logo-marquee-container:hover .marquee-single {
-            animation-play-state: paused;
-        }
+        .marquee-single img:hover { transform: scale(1.15); }
+        .logo-marquee-container:hover .marquee-single { animation-play-state: paused; }
         @keyframes scroll-left {
             0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
 
-        .gov-ids-header { background:var(--navy); color:white; padding:0.5rem 0; font-size:0.86rem; text-align:center; }
-        .gov-items { display:flex; justify-content:center; gap:1.3rem; flex-wrap:wrap; }
-        .gov-items strong { color:#ffeb3b; }
+        /* GOV IDS HEADER REPLACED WITH SLOGAN – KEPT SAME POSITION & STYLE */
+        .gov-ids-header {
+            background: var(--navy);
+            color: white;
+            padding: 0.9rem 0;
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+        }
 
-        .logo-header { text-align:center; padding:1.6rem 1rem 1.2rem; background:white; }
-        .logo-header img { max-width:280px; width:92%; height:auto; }
+        .logo-header { text-align:center; padding:1.8rem 1rem 1.4rem; background:white; }
+        .logo-header img { max-width:300px; width:92%; height:auto; }
 
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.18); }
         nav.hidden { transform:translateY(-100%); transition:transform 0.35s ease; }
         .mobile-nav { 
-            display:flex; overflow-x:auto; padding:0.75rem 0; gap:1rem; 
+            display:flex; overflow-x:auto; padding:0.85rem 0; gap:1.2rem; 
             scrollbar-width:none; justify-content:center;
         }
         .mobile-nav::-webkit-scrollbar { display:none; }
         .mobile-nav a { 
-            color:white; padding:0.7rem 1.3rem; border-radius:30px; 
-            text-decoration:none; font-weight:600; font-size:0.95rem; 
+            color:white; padding:0.75rem 1.4rem; border-radius:30px; 
+            text-decoration:none; font-weight:600; font-size:0.98rem; 
             white-space:nowrap; flex-shrink:0; transition:var(--transition); 
         }
         .mobile-nav a:hover, .mobile-nav a.active { 
-            background:rgba(255,255,255,0.18); color:var(--red); 
+            background:rgba(255,255,255,0.2); color:var(--red); 
         }
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
@@ -102,12 +112,6 @@
         }
         .hero h1 { font-size:clamp(2.8rem,9vw,4rem); color:var(--navy); font-weight:800; margin-bottom:1rem; }
         .hero p { font-size:clamp(1.2rem,4vw,1.5rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
-
-        .gsa-banner { 
-            background:var(--navy); color:white; text-align:center; 
-            padding:1.1rem; border-radius:var(--radius); margin:2rem auto 4rem; 
-            max-width:1000px; font-weight:600; font-size:1.02rem; 
-        }
 
         .category-grid { 
             display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); 
@@ -168,7 +172,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- SINGLE-LINE RED SCROLLING MARQUEE -->
+    <!-- RED SCROLLING LOGOS – ALL SAME SIZE & VISIBLE -->
     <div class="logo-marquee-container">
         <div class="marquee-single">
             <img src="GearWrench.JPG" alt="GearWrench">
@@ -197,12 +201,9 @@
         </div>
     </div>
 
+    <!-- YOUR REQUEST: SAME HEADER, NEW TEXT -->
     <div class="gov-ids-header">
-        <div class="gov-items">
-            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
-            <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.GOV</strong></span>
-        </div>
+        Stay On The Job – We Will Provide The Tools
     </div>
 
     <div class="logo-header">
@@ -227,9 +228,7 @@
             <p>Professional-grade tools from the brands you trust.<br class="hero-br">Free delivery across Hampton Roads.</p>
         </section>
 
-        <div class="gsa-banner">
-            Stay On The Job - We Will Provide The Tools
-        </div>
+        <!-- REMOVED THE OLD .gsa-banner AS REQUESTED -->
 
         <section class="category-grid">
 
@@ -377,7 +376,6 @@
             }
         }
 
-        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -388,7 +386,6 @@
             });
         });
 
-        // Hide/show sticky nav on scroll
         const nav = document.getElementById('main-nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -398,7 +395,6 @@
             last = cur;
         });
 
-        // Active nav highlighting
         window.addEventListener('scroll', () => {
             let fromTop = window.scrollY + 160;
             document.querySelectorAll('.category-card').forEach(card => {
