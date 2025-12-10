@@ -45,38 +45,64 @@
             z-index:-1;
         }
 
-        /* FIXED: LOGO MARQUEE - NOW VISIBLE & 2× FASTER */
+        /* ULTIMATE 2025-2026 SEAMLESS LOGO MARQUEE */
         .logo-marquee-container {
-            background:var(--light-gray);
-            padding:40px 0;           /* increased padding so logos aren't cut off */
-            min-height:120px;         /* guarantees space */
-            overflow:hidden;
-            white-space:nowrap;
-            border-bottom:1px solid #e9ecef;
-        }
-        .marquee-track {
-            display:inline-flex;
-            align-items:center;
-            gap:clamp(60px,10vw,120px);
-            animation:scroll 22.5s linear infinite;
-        }
-        .marquee-track img {
-            height:70px;
-            width:auto;
-            object-fit:contain;
-            flex-shrink:0;
-        }
-        .logo-marquee-container:hover .marquee-track {
-            animation-play-state:paused;
-        }
-        @keyframes scroll {
-            0%   { transform:translateX(0); }
-            100% { transform:translateX(-50%); }
+            background: var(--light-gray);
+            padding: 44px 0;
+            overflow: hidden;
+            border-bottom: 1px solid #e9ecef;
+            user-select: none;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 10%, black 90%, transparent 100%);
         }
 
-        /* FIXED: BLUE TOP BANNER - WAS BROKEN BY "var(--navy)" TYPO */
+        .marquee-wrapper {
+            display: flex;
+            width: max-content;
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: clamp(64px, 9vw, 140px);
+            flex-shrink: 0;
+            animation: scroll-left 36s linear infinite;
+            padding-right: clamp(64px, 9vw, 140px);
+            will-change: transform;
+        }
+
+        .marquee-track img {
+            height: 76px;
+            width: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            draggable: false;
+            filter: grayscale(30%) brightness(98%);
+            transition: all 0.4s ease;
+        }
+
+        .marquee-track img:hover {
+            filter: grayscale(0%) brightness(100%);
+            transform: scale(1.08);
+        }
+
+        @keyframes scroll-left {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-33.333%); }
+        }
+
+        /* Adaptive speed */
+        @media (min-width: 640px) { .marquee-track { animation-duration: 28s; } }
+        @media (min-width: 1024px) { .marquee-track { animation-duration: 22s; } }
+        @media (min-width: 1400px) { .marquee-track { animation-duration: 18s; } }
+
+        /* Pause on hover / touch */
+        .logo-marquee-container:hover .marquee-track,
+        .logo-marquee-container:active .marquee-track {
+            animation-play-state: paused;
+        }
+
         .top-banner {
-            background:#0b1e3f;      /* fixed - was var(--navy) which was broken */
+            background:#0b1e3f;
             color:white;
             text-align:center;
             padding:16px 20px;
@@ -128,37 +154,54 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- LOGO MARQUEE - NOW VISIBLE & 2× SPEED -->
-    <div class="logo-marquee-container">
-        <div class="marquee-track">
-            <img src="GearWrench.JPG" alt="GearWrench">
-            <img src="Knipex.PNG" alt="Knipex">
-            <img src="Milwaukeelogo.PNG" alt="Milwaukee">
-            <img src="Dewalt-logo.PNG" alt="DeWalt">
-            <img src="Craftsmanlogo.PNG" alt="Craftsman">
-            <img src="Tektonlogo.PNG" alt="Tekton">
-            <img src="Crescenttools.JPG" alt="Crescent">
-            <img src="Channellocklogo.PNG" alt="Channellock">
-            <img src="Kleintools.png" alt="Klein Tools">
-            <img src="Bondhuslogo.PNG" alt="Bondhus">
-            <img src="Bosch.WEBP" alt="Bosch">
-
-            <!-- Duplicate set for seamless loop -->
-            <img src="GearWrench.JPG" alt="GearWrench">
-            <img src="Knipex.PNG" alt="Knipex">
-            <img src="Milwaukeelogo.PNG" alt="Milwaukee">
-            <img src="Dewalt-logo.PNG" alt="DeWalt">
-            <img src="Craftsmanlogo.PNG" alt="Craftsman">
-            <img src="Tektonlogo.PNG" alt="Tekton">
-            <img src="Crescenttools.JPG" alt="Crescent">
-            <img src="Channellocklogo.PNG" alt="Channellock">
-            <img src="Kleintools.png" alt="Klein Tools">
-            <img src="Bondhuslogo.PNG" alt="Bondhus">
-            <img src="Bosch.WEBP" alt="Bosch">
+    <!-- ULTIMATE SEAMLESS LOGO MARQUEE (3 copies = zero gaps ever) -->
+    <div class="logo-marquee-container" aria-label="Trusted brands we carry">
+        <div class="marquee-wrapper">
+            <!-- Track 1 -->
+            <div class="marquee-track">
+                <img src="GearWrench.JPG" alt="GearWrench">
+                <img src="Knipex.PNG" alt="Knipex">
+                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+                <img src="Dewalt-logo.PNG" alt="DeWalt">
+                <img src="Craftsmanlogo.PNG" alt="Craftsman">
+                <img src="Tektonlogo.PNG" alt="Tekton">
+                <img src="Crescenttools.JPG" alt="Crescent">
+                <img src="Channellocklogo.PNG" alt="Channellock">
+                <img src="Kleintools.png" alt="Klein Tools">
+                <img src="Bondhuslogo.PNG" alt="Bondhus">
+                <img src="Bosch.WEBP" alt="Bosch">
+            </div>
+            <!-- Track 2 (exact duplicate) -->
+            <div class="marquee-track">
+                <img src="GearWrench.JPG" alt="GearWrench">
+                <img src="Knipex.PNG" alt="Knipex">
+                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+                <img src="Dewalt-logo.PNG" alt="DeWalt">
+                <img src="Craftsmanlogo.PNG" alt="Craftsman">
+                <img src="Tektonlogo.PNG" alt="Tekton">
+                <img src="Crescenttools.JPG" alt="Crescent">
+                <img src="Channellocklogo.PNG" alt="Channellock">
+                <img src="Kleintools.png" alt="Klein Tools">
+                <img src="Bondhuslogo.PNG" alt="Bondhus">
+                <img src="Bosch.WEBP" alt="Bosch">
+            </div>
+            <!-- Track 3 (the magic one that eliminates any possible flash) -->
+            <div class="marquee-track">
+                <img src="GearWrench.JPG" alt="GearWrench">
+                <img src="Knipex.PNG" alt="Knipex">
+                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+                <img src="Dewalt-logo.PNG" alt="DeWalt">
+                <img src="Craftsmanlogo.PNG" alt="Craftsman">
+                <img src="Tektonlogo.PNG" alt="Tekton">
+                <img src="Crescenttools.JPG" alt="Crescent">
+                <img src="Channellocklogo.PNG" alt="Channellock">
+                <img src="Kleintools.png" alt="Klein Tools">
+                <img src="Bondhuslogo.PNG" alt="Bondhus">
+                <img src="Bosch.WEBP" alt="Bosch">
+            </div>
         </div>
     </div>
 
-    <!-- FIXED BLUE BANNER -->
     <div class="top-banner">
         Stop Spending Hours Looking For Tools – WE HAVE THEM
     </div>
@@ -167,7 +210,6 @@
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
-    <!-- Rest of your site (unchanged - red badges removed as requested) -->
     <nav>
         <div class="mobile-nav">
             <a href="#top">Home</a>
@@ -187,6 +229,7 @@
         </section>
 
         <section class="category-grid">
+            <!-- All your category cards remain 100% unchanged -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
