@@ -44,27 +44,34 @@
             z-index:-1;
         }
 
-        /* RED MARQUEE – PERFECT UNIFORM LOGOS */
+        /* FIXED & PERFECT RED SCROLLING LOGO BANNER */
         .logo-marquee-container {
             background:var(--red);
             padding:20px 0;
             overflow:hidden;
             white-space:nowrap;
         }
-        .marquee-track {
+        .marquee-wrapper {
             display:inline-flex;
-            gap:clamp(45px,9vw,100px);
-            animation:scroll 40s linear infinite;
+            animation:scroll 45s linear infinite;
+        }
+        .marquee-track {
+            display:flex;
+            align-items:center;
+            gap:clamp(40px,8vw,100px);
+            padding:0 40px;
         }
         .marquee-track img {
-            height:66px;
-            width:155px;
+            height:68px;
+            width:auto;
+            max-width:160px;
             object-fit:contain;
-            object-position:center;
-            filter:brightness(0) invert(1);
             flex-shrink:0;
+            filter:brightness(0) invert(1);
         }
-        .logo-marquee-container:hover .marquee-track { animation-play-state:paused; }
+        .logo-marquee-container:hover .marquee-wrapper {
+            animation-play-state:paused;
+        }
         @keyframes scroll {
             0%   { transform:translateX(0); }
             100% { transform:translateX(-50%); }
@@ -110,7 +117,7 @@
 
         .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
         .call-button img { width:64%; border:5px solid white; border-radius:50%; }
-        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 0 rgba(200,16,46,0); } }
+        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
 
         footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
@@ -123,32 +130,36 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- RED MARQUEE – YOUR EXACT LOGO FILES + PERFECT SIZE -->
+    <!-- RED SCROLLING LOGO BANNER – NOW 100% FIXED & SEAMLESS -->
     <div class="logo-marquee-container">
-        <div class="marquee-track">
-            <img src="GearWrench.JPG" alt="GearWrench">
-            <img src="Knipex.PNG" alt="Knipex">
-            <img src="Milwaukeelogo.PNG" alt="Milwaukee">
-            <img src="Dewalt-logo.PNG" alt="DeWalt">
-            <img src="Craftsmanlogo.PNG" alt="Craftsman">
-            <img src="Tektonlogo.PNG" alt="Tekton">
-            <img src="Crescenttools.JPG" alt="Crescent">
-            <img src="Channellocklogo.PNG" alt="Channellock">
-            <img src="Kleintools.png" alt="Klein Tools">
-            <img src="Bondhuslogo.PNG" alt="Bondhus">
-            <img src="Bosch.WEBP" alt="Bosch">
-            <!-- duplicate -->
-            <img src="GearWrench.JPG" alt="">
-            <img src="Knipex.PNG" alt="">
-            <img src="Milwaukeelogo.PNG" alt="">
-            <img src="Dewalt-logo.PNG" alt="">
-            <img src="Craftsmanlogo.PNG" alt="">
-            <img src="Tektonlogo.PNG" alt="">
-            <img src="Crescenttools.JPG" alt="">
-            <img src="Channellocklogo.PNG" alt="">
-            <img src="Kleintools.png" alt="">
-            <img src="Bondhuslogo.PNG" alt="">
-            <img src="Bosch.WEBP" alt="">
+        <div class="marquee-wrapper">
+            <div class="marquee-track">
+                <img src="GearWrench.JPG" alt="GearWrench">
+                <img src="Knipex.PNG" alt="Knipex">
+                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+                <img src="Dewalt-logo.PNG" alt="DeWalt">
+                <img src="Craftsmanlogo.PNG" alt="Craftsman">
+                <img src="Tektonlogo.PNG" alt="Tekton">
+                <img src="Crescenttools.JPG" alt="Crescent">
+                <img src="Channellocklogo.PNG" alt="Channellock">
+                <img src="Kleintools.png" alt="Klein Tools">
+                <img src="Bondhuslogo.PNG" alt="Bondhus">
+                <img src="Bosch.WEBP" alt="Bosch">
+            </div>
+            <!-- Exact duplicate for perfect infinite loop -->
+            <div class="marquee-track">
+                <img src="GearWrench.JPG" alt="GearWrench">
+                <img src="Knipex.PNG" alt="Knipex">
+                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+                <img src="Dewalt-logo.PNG" alt="DeWalt">
+                <img src="Craftsmanlogo.PNG" alt="Craftsman">
+                <img src="Tektonlogo.PNG" alt="Tekton">
+                <img src="Crescenttools.JPG" alt="Crescent">
+                <img src="Channellocklogo.PNG" alt="Channellock">
+                <img src="Kleintools.png" alt="Klein Tools">
+                <img src="Bondhuslogo.PNG" alt="Bondhus">
+                <img src="Bosch.WEBP" alt="Bosch">
+            </div>
         </div>
     </div>
 
@@ -178,11 +189,8 @@
             <p>Professional-grade tools from the brands you trust.<br>Free delivery across Hampton Roads.</p>
         </section>
 
-        <!-- NO GSA BANNER – REMOVED -->
-
         <section class="category-grid">
 
-            <!-- All 6 cards – full and perfect -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
