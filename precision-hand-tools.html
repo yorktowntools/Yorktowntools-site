@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- THIS LINE STOPS CACHING — ADD THIS LINE -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Precision Hand Tools | Yorktown Tools</title>
     <meta name="description" content="Premium hand tools for contractors & government: GearWrench, Knipex, Crescent, Craftsman, Tekton, Milwaukee, DeWalt, Bondhus, Bosch. Free next-day delivery in Hampton Roads.">
@@ -18,7 +17,6 @@
             --navy: #0b1e3f;
             --red: #c8102e;
             --white: #ffffff;
-            --yellow: #ffeb3b;
             --light-gray: #f8f9fa;
             --transition: all 0.35s ease;
             --radius: 20px;
@@ -34,6 +32,7 @@
         }
         img { max-width:100%; height:auto; display:block; }
 
+        /* Subtle background mascot */
         body::after {
             content:"";
             position:fixed;
@@ -47,18 +46,18 @@
             z-index:-1;
         }
 
-        /* UPDATED SCROLLING BANNER – LIGHT BACKGROUND, COLOR LOGOS, AUTO WIDTH */
+        /* LOGO MARQUEE - 2× FASTER */
         .logo-marquee-container {
             background:var(--light-gray);
             padding:30px 0;
             overflow:hidden;
             white-space:nowrap;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom:1px solid #e9ecef;
         }
         .marquee-track {
             display:inline-flex;
             gap:clamp(60px,10vw,120px);
-            animation:scroll 45s linear infinite;
+            animation:scroll 22.5s linear infinite; /* 2× faster than original 45s */
         }
         .marquee-track img {
             height:70px;
@@ -103,7 +102,10 @@
         .category-card { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); border-top:9px solid var(--red); display:flex; flex-direction:column; position:relative; transition:var(--transition); }
         .category-card:hover { transform:translateY(-12px); box-shadow:0 24px 60px rgba(0,0,0,0.2); }
         .category-card img { width:100%; height:240px; object-fit:cover; }
-        .badge-popular { position:absolute; top:14px; right:14px; background:var(--red); color:white; padding:9px 18px; border-radius:30px; font-size:0.88rem; font-weight:800; z-index:2; }
+        .badge-popular {
+            position:absolute; top:14px; right:14px; background:var(--red); color:white;
+            padding:9px 18px; border-radius:30px; font-size:0.88rem; font-weight:800; z-index:2;
+        }
         .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
         .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
@@ -111,7 +113,11 @@
         .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; text-decoration:none; margin-top:auto; transition:var(--transition); }
         .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
-        .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
+        .call-button {
+            position:fixed; right:16px; bottom:16px; width:72px; height:72px;
+            background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite;
+        }
         .call-button img { width:64%; border:5px solid white; border-radius:50%; }
         @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
 
@@ -126,7 +132,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- UPDATED SCROLLING BANNER – COLOR LOGOS ON LIGHT BACKGROUND -->
+    <!-- LOGO MARQUEE - 2× SPEED, ALL LOGOS INCLUDED -->
     <div class="logo-marquee-container">
         <div class="marquee-track">
             <img src="GearWrench.JPG" alt="GearWrench">
@@ -140,7 +146,8 @@
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhuslogo.PNG" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- duplicates with alt texts -->
+
+            <!-- Duplicated set for seamless loop -->
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukeelogo.PNG" alt="Milwaukee">
@@ -181,9 +188,9 @@
             <p>Professional-grade tools from the brands you trust.<br>Free next-day delivery across Hampton Roads.</p>
         </section>
 
-        <!-- NO GSA BANNER -->
-
         <section class="category-grid">
+
+            <!-- Wrenches -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -207,6 +214,7 @@
                 </div>
             </article>
 
+            <!-- Pliers -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Pliers" loading="lazy">
                 <div class="badge-popular">Popular</div>
@@ -227,9 +235,9 @@
                 </div>
             </article>
 
+            <!-- Measuring (badge removed) -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Measuring Tools" loading="lazy">
-                <div class="badge-popular">Essential</div>
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
                     <p class="category-desc">Tape measures, levels, squares, calipers, and laser tools. Accurate and durable for precise work.</p>
@@ -246,9 +254,9 @@
                 </div>
             </article>
 
+            <!-- Screwdrivers (badge removed) -->
             <article class="category-card" id="screwdrivers">
                 <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
-                <div class="badge-popular">Daily Use</div>
                 <div class="category-content">
                     <h2>Screwdrivers & Sets</h2>
                     <p class="category-desc">Phillips, flathead, Torx, nut drivers, and multi-bit. Insulated and precision options available.</p>
@@ -265,9 +273,9 @@
                 </div>
             </article>
 
+            <!-- Hex & Torx (badge removed) -->
             <article class="category-card" id="hex-torx">
                 <img src="Bondhus-hex.jpg" alt="Hex & Torx" loading="lazy">
-                <div class="badge-popular">Specialty</div>
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
                     <p class="category-desc">Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
@@ -284,9 +292,9 @@
                 </div>
             </article>
 
+            <!-- Specialty (badge removed) -->
             <article class="category-card" id="specialty">
                 <img src="Texton-pics.jpg" alt="Specialty Tools" loading="lazy">
-                <div class="badge-popular">Unique</div>
                 <div class="category-content">
                     <h2>Specialty Tools</h2>
                     <p class="category-desc">Pipe wrenches, basin wrenches, pullers, punches, and other task-specific tools.</p>
@@ -329,6 +337,7 @@
             }
         }
 
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -339,6 +348,7 @@
             });
         });
 
+        // Hide/show sticky nav on scroll
         const nav = document.querySelector('nav');
         let last = 0;
         window.addEventListener('scroll', () => {
