@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="Yt-logo.PNG">
     <link rel="manifest" href="/site.webmanifest">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -321,11 +321,12 @@
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
-    <!-- UPDATED NAVIGATION -->
+    <!-- UPDATED NAVIGATION - SEPARATE HAND & POWER TOOLS -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="#home">Home</a>
-            <a href="precision-hand-tools.html">Hand & Power Tools</a>
+            <a href="precision-hand-tools.html">Hand Tools</a>
+            <a href="power-tools.html">Power Tools</a>
             <a href="#accessories">Accessories & PPE</a>
             <a href="#ladders">Ladders</a>
             <a href="#about">About</a>
@@ -374,47 +375,61 @@
 
             <div class="grid">
 
-                <!-- EXPANDABLE CARD — NOW POINTS TO THE NEW PAGE -->
-                <div class="card expandable-card" id="precision-hand-tools-card" aria-expanded="false" tabindex="0" role="button">
-                    <div class="card-header">
-                        <img src="Pliers.PNG" alt="Precision hand tools" loading="lazy">
-                        <h3>Precision Hand Tools</h3>
-                        <p>Wrenches, pliers, and measuring tools to work as hard as you do.</p>
-                        <div class="expand-icon"></div>
-                    </div>
+                <!-- PRECISION HAND TOOLS - EXPANDABLE CARD -->
+                <div class="card expandable-card" id="hand-tools-card" aria-expanded="false" tabindex="0" role="button">
+                    <img src="Pliers.PNG" alt="Precision hand tools" loading="lazy">
+                    <h3>Precision Hand Tools</h3>
+                    <p>Wrenches, pliers, screwdrivers, measuring tools — built to last a lifetime.</p>
+                    <div class="expand-icon"></div>
 
                     <div class="card-expandable-content">
                         <div class="subcategory-grid">
-                            <a href="precision-hand-tools.html#wrenches" class="subcategory"><strong>Wrenches</strong><br>Combination • Adjustable • Ratcheting • Torque • Pipe</a>
-                            <a href="precision-hand-tools.html#pliers-cutters" class="subcategory"><strong>Pliers & Cutters</strong><br>Linesman • Needle-Nose • Locking • Snap-Ring • Diagonal</a>
-                            <a href="precision-hand-tools.html#measuring" class="subcategory"><strong>Measuring & Layout</strong><br>Calipers • Micrometers • Tape Measures • Levels • Squares</a>
-                            <a href="precision-hand-tools.html#screwdrivers" class="subcategory"><strong>Screwdrivers & Nut Drivers</strong><br>Precision • Jewelers • Electronics Kits • Insulated</a>
-                            <a href="precision-hand-tools.html#hex-torx" class="subcategory"><strong>Hex Keys & Torx</strong><br>Ball-End • Folding • T-Handle • Security Bits</a>
-                            <a href="precision-hand-tools.html#specialty" class="subcategory"><strong>Specialty Hand Tools</strong><br>Picks • Hooks • Files • Pry Bars • Inspection Tools</a>
+                            <a href="precision-hand-tools.html#wrenches" class="subcategory"><strong>Wrenches</strong><br>Combination • Ratcheting • Torque • Adjustable • Pipe</a>
+                            <a href="precision-hand-tools.html#pliers" class="subcategory"><strong>Pliers & Cutters</strong><br>Linesman • Needle-Nose • Locking • Diagonal</a>
+                            <a href="precision-hand-tools.html#measuring" class="subcategory"><strong>Measuring & Layout</strong><br>Calipers • Levels • Squares • Lasers</a>
+                            <a href="precision-hand-tools.html#screwdrivers" class="subcategory"><strong>Screwdrivers</strong><br>Insulated • Precision • Multi-Bit Sets</a>
+                            <a href="precision-hand-tools.html#hex-torx" class="subcategory"><strong>Hex & Torx Keys</strong><br>Ball-End • Folding • T-Handle</a>
+                            <a href="precision-hand-tools.html#specialty" class="subcategory"><strong>Specialty Hand Tools</strong><br>Picks • Pry Bars • Inspection Tools</a>
                         </div>
                         <div style="text-align:center;margin-top:1.8rem;">
                             <a href="precision-hand-tools.html" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">
-                                View All Precision Hand Tools
+                                View All Hand Tools
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POWER TOOLS - NEW EXPANDABLE CARD -->
+                <div class="card expandable-card" id="power-tools-card" aria-expanded="false" tabindex="0" role="button">
+                    <img src="Dewalttoolpile.PNG" alt="Power tools" loading="lazy">
+                    <h3>Power Tools</h3>
+                    <p>Corded & cordless drills, saws, impacts — Milwaukee, DeWalt, Makita, Bosch.</p>
+                    <div class="expand-icon"></div>
+
+                    <div class="card-expandable-content">
+                        <div class="subcategory-grid">
+                            <a href="power-tools.html#drills" class="subcategory"><strong>Drills & Hammer Drills</strong><br>M18 • 20V • 60V • XGT • Rotary Hammers</a>
+                            <a href="power-tools.html#saws" class="subcategory"><strong>Saws</strong><br>Circular • Recip • Miter • Track Saws</a>
+                            <a href="power-tools.html#impacts" class="subcategory"><strong>Impact Drivers & Wrenches</strong><br>1/4" Hex • 1/2" • High-Torque 1"</a>
+                            <a href="power-tools.html#combo-kits" class="subcategory"><strong>Combo Kits</strong><br>2-Tool to 9-Tool Kits • Best Value</a>
+                            <a href="power-tools.html#accessories" class="subcategory"><strong>Batteries & Chargers</strong><br>High-Output • Rapid Chargers • Packout</a>
+                        </div>
+                        <div style="text-align:center;margin-top:1.8rem;">
+                            <a href="power-tools.html" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">
+                                View All Power Tools
                             </a>
                         </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <img src="Dewalttoolpile.PNG" alt="Power tools" loading="lazy">
-                    <h3>Power Tools</h3>
-                    <p>Corded and cordless drills, saws, and impact drivers for demanding environments.</p>
-                </div>
-
-                <div class="card">
                     <img src="IMG_4117.jpg" alt="Specialty tools" loading="lazy">
-                    <h3>Specialty Tools</h3>
-                    <p>Task-specific solutions for scheduled and unscheduled operations.</p>
+                    <h3>Specialty & Task-Specific Tools</h3>
+                    <p>Coming soon — custom solutions for mission-critical jobs.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Rest of your sections (unchanged) -->
         <section id="accessories">
             <h2>Tool Accessories, Storage & Safety Gear</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
@@ -427,12 +442,12 @@
                 <div class="card">
                     <img src="Knaack.PNG" alt="Storage" loading="lazy">
                     <h3>Storage & Organization</h3>
-                    <p>Modular toolboxes and workstations — built for job site efficiency and security.</p>
+                    <p>Modular toolboxes and workstations — built for job site security.</p>
                 </div>
                 <div class="card">
                     <img src="IMG_4175.jpg" alt="PPE" loading="lazy">
                     <h3>Safety & PPE</h3>
-                    <p>Gloves, eyewear, and hearing protection meeting OSHA standards.</p>
+                    <p>Gloves, eyewear, hearing protection — OSHA compliant.</p>
                 </div>
             </div>
             <p style="text-align:center; margin-top:3.5rem;">
@@ -529,9 +544,7 @@
         // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
-        let ticking = false;
-
-        function updateNav() {
+        window.addEventListener('scroll', () => {
             const current = window.pageYOffset;
             if (current > lastScroll && current > 160) {
                 nav.classList.add('hidden');
@@ -539,17 +552,9 @@
                 nav.classList.remove('hidden');
             }
             lastScroll = current;
-            ticking = false;
-        }
-
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                requestAnimationFrame(updateNav);
-                ticking = true;
-            }
         });
 
-        // Tagline & banner rotators
+        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let i = 0;
         setInterval(() => {
@@ -558,6 +563,7 @@
             taglines[i].classList.add('active');
         }, 7000);
 
+        // Banner rotator
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
@@ -566,34 +572,34 @@
             banners[j].classList.add('active');
         }, 2000);
 
-        // FIXED EXPANDABLE CARD
-        const expandableCard = document.getElementById('precision-hand-tools-card');
+        // Expandable cards (now works for both hand and power tools)
+        document.querySelectorAll('.expandable-card').forEach(card => {
+            const toggle = () => {
+                const expanded = card.getAttribute('aria-expanded') === 'true';
+                card.setAttribute('aria-expanded', !expanded);
+            };
 
-        function toggleCard() {
-            const isExpanded = expandableCard.getAttribute('aria-expanded') === 'true';
-            expandableCard.setAttribute('aria-expanded', !isExpanded);
-        }
+            card.addEventListener('click', e => {
+                if (e.target.closest('a')) return;
+                toggle();
+            });
 
-        expandableCard.addEventListener('click', function(e) {
-            if (e.target.closest('a')) return;
-            toggleCard();
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggle();
+                }
+            });
         });
 
-        expandableCard.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleCard();
-            }
-        });
-
-        // Add item row in form
+        // Add item row in quote form
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
             row.className = 'item-row';
             row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
+                             <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                             <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
             container.appendChild(row);
         }
     </script>
