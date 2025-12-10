@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- THIS LINE STOPS CACHING — ADD THIS LINE -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Precision Hand Tools | Yorktown Tools</title>
     <meta name="description" content="Premium hand tools for contractors & government: GearWrench, Knipex, Crescent, Craftsman, Tekton, Milwaukee, DeWalt, Bondhus, Bosch. Free next-day delivery in Hampton Roads.">
 
@@ -17,6 +19,7 @@
             --red: #c8102e;
             --white: #ffffff;
             --yellow: #ffeb3b;
+            --light-gray: #f8f9fa;
             --transition: all 0.35s ease;
             --radius: 20px;
             --shadow: 0 12px 40px rgba(0,0,0,0.12);
@@ -44,34 +47,27 @@
             z-index:-1;
         }
 
-        /* FIXED & PERFECT RED SCROLLING LOGO BANNER */
+        /* UPDATED SCROLLING BANNER – LIGHT BACKGROUND, COLOR LOGOS, AUTO WIDTH */
         .logo-marquee-container {
-            background:var(--red);
-            padding:20px 0;
+            background:var(--light-gray);
+            padding:30px 0;
             overflow:hidden;
             white-space:nowrap;
-        }
-        .marquee-wrapper {
-            display:inline-flex;
-            animation:scroll 45s linear infinite;
+            border-bottom: 1px solid #e9ecef;
         }
         .marquee-track {
-            display:flex;
-            align-items:center;
-            gap:clamp(40px,8vw,100px);
-            padding:0 40px;
+            display:inline-flex;
+            gap:clamp(60px,10vw,120px);
+            animation:scroll 45s linear infinite;
         }
         .marquee-track img {
-            height:68px;
+            height:70px;
             width:auto;
-            max-width:160px;
             object-fit:contain;
+            object-position:center;
             flex-shrink:0;
-            filter:brightness(0) invert(1);
         }
-        .logo-marquee-container:hover .marquee-wrapper {
-            animation-play-state:paused;
-        }
+        .logo-marquee-container:hover .marquee-track { animation-play-state:paused; }
         @keyframes scroll {
             0%   { transform:translateX(0); }
             100% { transform:translateX(-50%); }
@@ -130,41 +126,37 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- RED SCROLLING LOGO BANNER – NOW 100% FIXED & SEAMLESS -->
+    <!-- UPDATED SCROLLING BANNER – COLOR LOGOS ON LIGHT BACKGROUND -->
     <div class="logo-marquee-container">
-        <div class="marquee-wrapper">
-            <div class="marquee-track">
-                <img src="GearWrench.JPG" alt="GearWrench">
-                <img src="Knipex.PNG" alt="Knipex">
-                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
-                <img src="Dewalt-logo.PNG" alt="DeWalt">
-                <img src="Craftsmanlogo.PNG" alt="Craftsman">
-                <img src="Tektonlogo.PNG" alt="Tekton">
-                <img src="Crescenttools.JPG" alt="Crescent">
-                <img src="Channellocklogo.PNG" alt="Channellock">
-                <img src="Kleintools.png" alt="Klein Tools">
-                <img src="Bondhuslogo.PNG" alt="Bondhus">
-                <img src="Bosch.WEBP" alt="Bosch">
-            </div>
-            <!-- Exact duplicate for perfect infinite loop -->
-            <div class="marquee-track">
-                <img src="GearWrench.JPG" alt="GearWrench">
-                <img src="Knipex.PNG" alt="Knipex">
-                <img src="Milwaukeelogo.PNG" alt="Milwaukee">
-                <img src="Dewalt-logo.PNG" alt="DeWalt">
-                <img src="Craftsmanlogo.PNG" alt="Craftsman">
-                <img src="Tektonlogo.PNG" alt="Tekton">
-                <img src="Crescenttools.JPG" alt="Crescent">
-                <img src="Channellocklogo.PNG" alt="Channellock">
-                <img src="Kleintools.png" alt="Klein Tools">
-                <img src="Bondhuslogo.PNG" alt="Bondhus">
-                <img src="Bosch.WEBP" alt="Bosch">
-            </div>
+        <div class="marquee-track">
+            <img src="GearWrench.JPG" alt="GearWrench">
+            <img src="Knipex.PNG" alt="Knipex">
+            <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+            <img src="Dewalt-logo.PNG" alt="DeWalt">
+            <img src="Craftsmanlogo.PNG" alt="Craftsman">
+            <img src="Tektonlogo.PNG" alt="Tekton">
+            <img src="Crescenttools.JPG" alt="Crescent">
+            <img src="Channellocklogo.PNG" alt="Channellock">
+            <img src="Kleintools.png" alt="Klein Tools">
+            <img src="Bondhuslogo.PNG" alt="Bondhus">
+            <img src="Bosch.WEBP" alt="Bosch">
+            <!-- duplicates with alt texts -->
+            <img src="GearWrench.JPG" alt="GearWrench">
+            <img src="Knipex.PNG" alt="Knipex">
+            <img src="Milwaukeelogo.PNG" alt="Milwaukee">
+            <img src="Dewalt-logo.PNG" alt="DeWalt">
+            <img src="Craftsmanlogo.PNG" alt="Craftsman">
+            <img src="Tektonlogo.PNG" alt="Tekton">
+            <img src="Crescenttools.JPG" alt="Crescent">
+            <img src="Channellocklogo.PNG" alt="Channellock">
+            <img src="Kleintools.png" alt="Klein Tools">
+            <img src="Bondhuslogo.PNG" alt="Bondhus">
+            <img src="Bosch.WEBP" alt="Bosch">
         </div>
     </div>
 
     <div class="top-banner">
-        Stop Hunting Tools For Hours – WE HAVE THEM
+        STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
     </div>
 
     <div class="logo-header">
@@ -186,11 +178,12 @@
     <main>
         <section class="hero" id="top">
             <h1>Precision Hand Tools</h1>
-            <p>Professional-grade tools from the brands you trust.<br>Free delivery across Hampton Roads.</p>
+            <p>Professional-grade tools from the brands you trust.<br>Free next-day delivery across Hampton Roads.</p>
         </section>
 
-        <section class="category-grid">
+        <!-- NO GSA BANNER -->
 
+        <section class="category-grid">
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -215,111 +208,95 @@
             </article>
 
             <article class="category-card" id="pliers">
-                <img src="Knipex-pliers.JPG" alt="Pliers" loading="lazy">
-                <div class="badge-popular">Most Requested</div>
+                <img src="pliers.jpg" alt="Pliers" loading="lazy">
+                <div class="badge-popular">Popular</div>
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
-                    <p class="category-desc">Knipex Cobra & Pliers Wrenches, TwinGrip, high-leverage cutters, Channellock tongue-and-groove, Klein linesman.</p>
+                    <p class="category-desc">Needle nose, slip joint, locking, cutters, and more. High-leverage designs for professional use.</p>
                     <select class="tool-select" onchange="updateQuote(this,'pliers')">
                         <option value="">— Choose pliers —</option>
-                        <option>Knipex Cobra 10" (87 01 250)</option>
-                        <option>Knipex Pliers Wrench 10" (86 03 250)</option>
-                        <option>Knipex TwinGrip Slip-Joint Pliers</option>
-                        <option>Knipex High-Leverage Diagonal Cutters 8"</option>
-                        <option>Knipex Cobra XS 4"</option>
-                        <option>Channellock 430 Tongue & Groove 10"</option>
-                        <option>Channellock 460 16" BigAzz</option>
-                        <option>Klein 9" High-Leverage Linesman</option>
-                        <option>Klein D213-9NE 9" Side Cutters</option>
-                        <option>Other / Custom</option>
+                        <option>Knipex Cobra Pliers Set</option>
+                        <option>Knipex Alligator Pliers</option>
+                        <option>Channellock 9.5" Tongue & Groove</option>
+                        <option>Klein Tools Diagonal Cutters</option>
+                        <option>Milwaukee Locking Pliers</option>
+                        <option>Crescent Compound Action Pliers</option>
+                        <option>Other / Custom Request</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote</a>
                 </div>
             </article>
 
             <article class="category-card" id="measuring">
-                <img src="Bosch-laser.jpg" alt="Measuring" loading="lazy">
+                <img src="measuring.jpg" alt="Measuring Tools" loading="lazy">
+                <div class="badge-popular">Essential</div>
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
-                    <p class="category-desc">Bosch laser distance measurers, cross-line lasers, Stabila digital levels, Fowler calipers, Lufkin tapes.</p>
+                    <p class="category-desc">Tape measures, levels, squares, calipers, and laser tools. Accurate and durable for precise work.</p>
                     <select class="tool-select" onchange="updateQuote(this,'measuring')">
                         <option value="">— Choose measuring tool —</option>
-                        <option>Bosch GLM 50 C Bluetooth Laser Measure</option>
-                        <option>Bosch GLM 20 Laser Measure</option>
-                        <option>Bosch GLL 55 Cross-Line Laser</option>
-                        <option>Bosch GLL30 Self-Leveling Cross-Line</option>
-                        <option>Stabila 48" Digital Level</option>
-                        <option>Fowler 6" Digital Caliper</option>
-                        <option>Empire 9" Magnetic Torpedo Level</option>
-                        <option>Lufkin 25ft Shockforce Tape</option>
-                        <option>Tajima 25ft G-Series Tape</option>
-                        <option>Other</option>
+                        <option>DeWalt 25' Tape Measure</option>
+                        <option>Milwaukee 48" Level</option>
+                        <option>Bosch Laser Measure</option>
+                        <option>Starrett Combination Square</option>
+                        <option>Mitutoyo Digital Caliper</option>
+                        <option>Other / Custom Request</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote</a>
                 </div>
             </article>
 
             <article class="category-card" id="screwdrivers">
-                <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
+                <img src="screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
+                <div class="badge-popular">Daily Use</div>
                 <div class="category-content">
-                    <h2>Screwdrivers & Nut Drivers</h2>
-                    <p class="category-desc">1000V insulated sets, multi-bit drivers, precision sets, cushion-grip from Klein, Milwaukee, Wera, Wiha.</p>
+                    <h2>Screwdrivers & Sets</h2>
+                    <p class="category-desc">Phillips, flathead, Torx, nut drivers, and multi-bit. Insulated and precision options available.</p>
                     <select class="tool-select" onchange="updateQuote(this,'screwdrivers')">
                         <option value="">— Choose screwdriver —</option>
-                        <option>Klein 11-in-1 Multi-Bit Screwdriver</option>
-                        <option>Klein 8-pc 1000V Insulated Set</option>
-                        <option>Milwaukee 14-in-1 Multi-Bit</option>
-                        <option>Milwaukee Cushion Grip 6-pc Set</option>
-                        <option>Wera Kraftform Plus 6-pc Set</option>
-                        <option>Wiha 6-pc Insulated SlimLine Set</option>
-                        <option>Megapro 24-in-1 Multi-Bit</option>
-                        <option>Klein 7-pc Nut Driver Set</option>
-                        <option>Felo Smart 13-pc Set</option>
-                        <option>Other</option>
+                        <option>Craftsman 12-pc Set</option>
+                        <option>Klein Tools Insulated Set</option>
+                        <option>Wera Kraftform Plus Set</option>
+                        <option>Milwaukee 11-in-1 Multi-Bit</option>
+                        <option>DeWalt Precision Set</option>
+                        <option>Other / Custom Request</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote</a>
                 </div>
             </article>
 
             <article class="category-card" id="hex-torx">
-                <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
+                <img src="hex-torx.jpg" alt="Hex & Torx" loading="lazy">
+                <div class="badge-popular">Specialty</div>
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
-                    <p class="category-desc">Bondhus ball-end and T-handle hex keys, Wiha Torx, Eklind fold-ups – USA-made precision.</p>
+                    <p class="category-desc">Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
                     <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
                         <option value="">— Choose hex/torx —</option>
-                        <option>Bondhus Ball-End Metric Long Set</option>
-                        <option>Bondhus Ball-End SAE Long Set</option>
-                        <option>Bondhus GorillaGrip Fold-Up Metric</option>
-                        <option>Bondhus GorillaGrip Fold-Up SAE</option>
-                        <option>Bondhus T-Handle Metric Set (w/ Stand)</option>
-                        <option>Bondhus T-Handle SAE Set (w/ Stand)</option>
-                        <option>Wiha Torx T-Handle Set</option>
-                        <option>Wiha Security Torx Bit Set</option>
-                        <option>Eklind Ball-Hex-L Key Set</option>
-                        <option>Other</option>
+                        <option>Bondhus Ball-End Hex Set (Metric)</option>
+                        <option>Bondhus Ball-End Hex Set (SAE)</option>
+                        <option>Wiha Torx Set</option>
+                        <option>Tekton Long Arm Hex Key Set</option>
+                        <option>GearWrench Torx Bit Set</option>
+                        <option>Other / Custom Request</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex-Torx" class="quote-btn" id="quote-hex-torx">Text Quote</a>
                 </div>
             </article>
 
             <article class="category-card" id="specialty">
-                <img src="Tekton-pics.jpg" alt="Specialty tools" loading="lazy">
+                <img src="specialty.jpg" alt="Specialty Tools" loading="lazy">
+                <div class="badge-popular">Unique</div>
                 <div class="category-content">
-                    <h2>Specialty Hand Tools</h2>
-                    <p class="category-desc">Pick & hook sets, telescoping mirrors, magnetic trays, pry bars, impact bit sets, inspection tools.</p>
+                    <h2>Specialty Tools</h2>
+                    <p class="category-desc">Pipe wrenches, basin wrenches, pullers, punches, and other task-specific tools.</p>
                     <select class="tool-select" onchange="updateQuote(this,'specialty')">
                         <option value="">— Choose specialty tool —</option>
-                        <option>Tekton 9-pc Pick & Hook Set</option>
-                        <option>Tekton Telescoping Inspection Mirror + Magnet</option>
-                        <option>Milwaukee 48-22-92100 100-pc Impact Bit Set</option>
-                        <option>Bosch 91-pc Drilling & Driving Set</option>
-                        <option>Mayhew 6-pc Dominator Pry Bar Set</option>
-                        <option>Tekton 3-pc Magnetic Tray Set</option>
-                        <option>Lang 5-pc Mini Pick & Hook Set</option>
-                        <option>Ullman Telescoping Magnetic Pickup Tool</option>
-                        <option>Performance Tool 8-pc Impact Adapter Set</option>
-                        <option>Other / Custom</option>
+                        <option>Ridgid Pipe Wrench</option>
+                        <option>Basin Wrench Telescoping</option>
+                        <option>Gear Puller Set</option>
+                        <option>Punch and Chisel Set</option>
+                        <option>Other / Custom Request</option>
                     </select>
                     <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote</a>
                 </div>
@@ -344,10 +321,10 @@
         function updateQuote(select, category) {
             const btn = document.getElementById('quote-' + category);
             if (select.value) {
-                btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category + ":%20" + encodeURIComponent(select.value);
+                btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category.charAt(0).toUpperCase() + category.slice(1) + ":%20" + encodeURIComponent(select.value);
                 btn.textContent = "Quote: " + select.value + " →";
             } else {
-                btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category;
+                btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category.charAt(0).toUpperCase() + category.slice(1);
                 btn.textContent = "Text Quote →";
             }
         }
