@@ -44,7 +44,7 @@
             z-index:-1;
         }
 
-        /* RED MARQUEE – ALL LOGOS NOW EXACT SAME SIZE AS DEWALT */
+        /* RED MARQUEE – ALL LOGOS NOW IDENTICAL SIZE (same as DeWalt) */
         .logo-marquee-container {
             background:var(--red);
             padding:18px 0;
@@ -53,18 +53,17 @@
         }
         .marquee-track {
             display:inline-flex;
-            gap:clamp(40px,8vw,90px);
-            animation:scroll 42s linear infinite;
+            gap:clamp(45px,9vw,100px);
+            animation:scroll 40s linear infinite;
         }
         .marquee-track img {
-            height:62px !important;        /* ← Same as DeWalt */
-            width:140px !important;         /* ← Forces perfect uniform width */
-            object-fit:contain;             /* Keeps proportions inside box */
+            height:64px !important;
+            width:150px !important;
+            object-fit:contain;
             object-position:center;
-            padding:0 10px;                 /* Extra breathing room */
+            padding:0 8px;
             filter:brightness(0) invert(1);
             flex-shrink:0;
-            background:transparent;
         }
         .logo-marquee-container:hover .marquee-track { animation-play-state:paused; }
         @keyframes scroll {
@@ -72,7 +71,6 @@
             100% { transform:translateX(-50%); }
         }
 
-        /* Rest of your perfect styles (unchanged) */
         .top-banner {
             background:var(--navy);
             color:white;
@@ -129,7 +127,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- RED MARQUEE – ALL LOGOS NOW UNIFORM SIZE -->
+    <!-- RED MARQUEE – ALL LOGOS SAME SIZE -->
     <div class="logo-marquee-container">
         <div class="marquee-track">
             <img src="GearWrench.JPG" alt="GearWrench">
@@ -143,7 +141,7 @@
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhus.AVIF" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
-            <!-- Duplicate set for seamless loop -->
+            <!-- Duplicate for seamless loop -->
             <img src="GearWrench.JPG" alt="">
             <img src="Knipex.PNG" alt="">
             <img src="Milwaukee.WEBP" alt="">
@@ -158,7 +156,6 @@
         </div>
     </div>
 
-    <!-- Rest of your site (100% unchanged – everything else is perfect) -->
     <div class="top-banner">
         STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
     </div>
@@ -186,7 +183,7 @@
         </section>
 
         <div class="gsa-banner">
-            ★ GSA PRICING • SAME-DAY QUOTES FOR .GOV & DOD • 
+            GSA PRICING • SAME-DAY QUOTES FOR .GOV & DOD • 
             <span class="highlight">UEI:</span> SMYXDLJDJMZ4 • 
             <span class="highlight">CAGE:</span> 16LD9 • 
             <span class="highlight">SAM.GOV</span> REGISTERED
@@ -194,7 +191,7 @@
 
         <section class="category-grid">
 
-            <!-- All 6 cards exactly as before (unchanged) -->
+            <!-- 1. Wrenches -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -214,10 +211,11 @@
                         <option>Precision Instruments 3/8" Split-Beam Torque</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Wrenches" class="quote-btn" id="quote-wrenches">Text Quote</a>
                 </div>
             </article>
 
+            <!-- 2. Pliers -->
             <article class="category-card" id="pliers">
                 <img src="Knipex-pliers.JPG" alt="Pliers" loading="lazy">
                 <div class="badge-popular">Most Requested</div>
@@ -237,10 +235,11 @@
                         <option>Klein D213-9NE 9" Side Cutters</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Pliers" class="quote-btn" id="quote-pliers">Text Quote</a>
                 </div>
             </article>
 
+            <!-- 3. Measuring -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Measuring" loading="lazy">
                 <div class="category-content">
@@ -259,10 +258,11 @@
                         <option>Tajima 25ft G-Series Tape</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Measuring" class="quote-btn" id="quote-measuring">Text Quote</a>
                 </div>
             </article>
 
+            <!-- 4. Screwdrivers -->
             <article class="category-card" id="screwdrivers">
                 <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
                 <div class="category-content">
@@ -281,10 +281,11 @@
                         <option>Felo Smart 13-pc Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" class="quote-btn" id="quote-screwdrivers">Text Quote</a>
                 </div>
             </article>
 
+            <!-- 5. Hex & Torx -->
             <article class="category-card" id="hex-torx">
                 <img src="Bondhus-hex.jpg" alt="Hex keys" loading="lazy">
                 <div class="category-content">
@@ -303,10 +304,11 @@
                         <option>Eklind Ball-Hex-L Key Set</option>
                         <option>Other</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Hex/Torx" class="quote-btn" id="quote-hex-torx">Text Quote</a>
                 </div>
             </article>
 
+            <!-- 6. Specialty -->
             <article class="category-card" id="specialty">
                 <img src="Tekton-pics.jpg" alt="Specialty tools" loading="lazy">
                 <div class="category-content">
@@ -325,7 +327,7 @@
                         <option>Performance Tool 8-pc Impact Adapter Set</option>
                         <option>Other / Custom</option>
                     </select>
-                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote →</a>
+                    <a href="sms:7579405171?body=Need%20quote%20-%20Specialty" class="quote-btn" id="quote-specialty">Text Quote</a>
                 </div>
             </article>
 
@@ -349,10 +351,10 @@
             const btn = document.getElementById('quote-' + category);
             if (select.value) {
                 btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category + ":%20" + encodeURIComponent(select.value);
-                btn.textContent = "Quote: " + select.value + " →";
+                btn.textContent = "Quote: " + select.value + "";
             } else {
                 btn.href = "sms:7579405171?body=Need%20quote%20-%20" + category;
-                btn.textContent = "Text Quote →";
+                btn.textContent = "Text Quote";
             }
         }
 
