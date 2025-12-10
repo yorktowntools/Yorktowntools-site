@@ -45,34 +45,34 @@
             z-index:-1;
         }
 
-        /* FINAL PERFECT MARQUEE – Uniform size + faster + flawless loop */
+        /* FINAL: ULTRA-COMPACT, PERFECTLY CENTERED, FAST MARQUEE */
         .logo-marquee-container {
             background: var(--light-gray);
-            padding: 40px 0;
+            height: 96px;
             overflow: hidden;
             border-bottom: 1px solid #e9ecef;
-            -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%);
-            mask-image: linear-gradient(90deg, transparent 0%, black 12%, black 88%, transparent 100%);
+            display: flex;
+            align-items: center;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
         }
-        .marq { display: flex; }
+        .marq { display: flex; width: 100%; }
         .marq-track {
             display: flex;
             gap: clamp(50px, 7vw, 100px);
             flex-shrink: 0;
-            animation: scroll 16s linear infinite;
+            animation: scroll 15s linear infinite;
             will-change: transform;
         }
         .logo-item {
             flex: 0 0 180px;
-            height: 84px;
+            height: 76px;
             display: grid;
             place-items: center;
         }
         .logo-item img {
             max-width: 94%;
             max-height: 94%;
-            width: auto;
-            height: auto;
             object-fit: contain;
             filter: grayscale(28%) brightness(96%);
             transition: var(--transition);
@@ -81,14 +81,14 @@
         }
         .logo-item img:hover {
             filter: grayscale(0%) brightness(100%);
-            transform: scale(1.1);
+            transform: scale(1.11);
         }
         @keyframes scroll {
             from { transform: translateX(0); }
             to   { transform: translateX(-33.333%); }
         }
-        @media (min-width: 768px)  { .marq-track { animation-duration: 14s; } }
-        @media (min-width: 1200px) { .marq-track { animation-duration: 12s; } }
+        @media (min-width: 768px)  { .marq-track { animation-duration: 13s; } }
+        @media (min-width: 1200px) { .marq-track { animation-duration: 11s; } }
         .logo-marquee-container:hover .marq-track { animation-play-state: paused; }
 
         .top-banner { background:#0b1e3f; color:white; text-align:center; padding:16px 20px; font-weight:800; font-size:clamp(1rem,4.2vw,1.2rem); text-transform:uppercase; letter-spacing:1.5px; }
@@ -133,7 +133,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- FINAL UNIFORM + FAST + PERFECTLY SMOOTH MARQUEE -->
+    <!-- ULTRA-COMPACT PERFECT MARQUEE (96px tall, zero wasted space) -->
     <div class="logo-marquee-container" aria-label="Trusted brands">
         <div class="marq">
             <!-- Track 1 -->
@@ -150,7 +150,7 @@
                 <div class="logo-item"><img src="Bondhuslogo.PNG" alt="Bondhus"></div>
                 <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
             </div>
-            <!-- Track 2 (exact duplicate) -->
+            <!-- Track 2 (duplicate) -->
             <div class="marq-track">
                 <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
                 <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
@@ -164,7 +164,7 @@
                 <div class="logo-item"><img src="Bondhuslogo.PNG" alt="Bondhus"></div>
                 <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
             </div>
-            <!-- Track 3 (bulletproof seamless) -->
+            <!-- Track 3 (duplicate) -->
             <div class="marq-track">
                 <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
                 <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
@@ -208,7 +208,6 @@
         </section>
 
         <section class="category-grid">
-            <!-- Your 6 category cards – unchanged -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
