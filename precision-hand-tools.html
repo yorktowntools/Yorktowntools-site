@@ -45,44 +45,48 @@
             z-index:-1;
         }
 
-        /* LOGO MARQUEE - 2× FASTER */
+        /* FIXED: LOGO MARQUEE - NOW VISIBLE & 2× FASTER */
         .logo-marquee-container {
             background:var(--light-gray);
-            padding:30px 0;
+            padding:40px 0;           /* increased padding so logos aren't cut off */
+            min-height:120px;         /* guarantees space */
             overflow:hidden;
             white-space:nowrap;
             border-bottom:1px solid #e9ecef;
         }
         .marquee-track {
             display:inline-flex;
+            align-items:center;
             gap:clamp(60px,10vw,120px);
-            animation:scroll 22.5s linear infinite; /* 2× faster */
+            animation:scroll 22.5s linear infinite;
         }
         .marquee-track img {
             height:70px;
             width:auto;
             object-fit:contain;
-            object-position:center;
             flex-shrink:0;
         }
-        .logo-marquee-container:hover .marquee-track { animation-play-state:paused; }
+        .logo-marquee-container:hover .marquee-track {
+            animation-play-state:paused;
+        }
         @keyframes scroll {
             0%   { transform:translateX(0); }
             100% { transform:translateX(-50%); }
         }
 
+        /* FIXED: BLUE TOP BANNER - WAS BROKEN BY "var(--navy)" TYPO */
         .top-banner {
-            background:var(var(--navy));
+            background:#0b1e3f;      /* fixed - was var(--navy) which was broken */
             color:white;
             text-align:center;
-            padding:14px 16px;
+            padding:16px 20px;
             font-weight:800;
-            font-size:clamp(1rem,4.2vw,1.15rem);
+            font-size:clamp(1rem,4.2vw,1.2rem);
             text-transform:uppercase;
-            letter-spacing:1.2px;
+            letter-spacing:1.5px;
         }
 
-        .logo-header { text-align:center; padding:24px 16px 18px; background:white; }
+        .logo-header { text-align:center; padding:30px 16px 20px; background:white; }
         .logo-header img { max-width:300px; width:92%; margin:0 auto; }
 
         nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.2); }
@@ -124,7 +128,7 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- LOGO MARQUEE - CLEANED & GUARANTEED TO SHOW ALL LOGOS (2× speed) -->
+    <!-- LOGO MARQUEE - NOW VISIBLE & 2× SPEED -->
     <div class="logo-marquee-container">
         <div class="marquee-track">
             <img src="GearWrench.JPG" alt="GearWrench">
@@ -133,13 +137,13 @@
             <img src="Dewalt-logo.PNG" alt="DeWalt">
             <img src="Craftsmanlogo.PNG" alt="Craftsman">
             <img src="Tektonlogo.PNG" alt="Tekton">
-            <img src="Crescenttools.JPG" alt="Crescent"> <!-- fixed filename (removed space) -->
+            <img src="Crescenttools.JPG" alt="Crescent">
             <img src="Channellocklogo.PNG" alt="Channellock">
             <img src="Kleintools.png" alt="Klein Tools">
             <img src="Bondhuslogo.PNG" alt="Bondhus">
             <img src="Bosch.WEBP" alt="Bosch">
 
-            <!-- Duplicated set for seamless infinite scroll -->
+            <!-- Duplicate set for seamless loop -->
             <img src="GearWrench.JPG" alt="GearWrench">
             <img src="Knipex.PNG" alt="Knipex">
             <img src="Milwaukeelogo.PNG" alt="Milwaukee">
@@ -154,7 +158,7 @@
         </div>
     </div>
 
-    <!-- Rest of your site (unchanged except red badges removed) -->
+    <!-- FIXED BLUE BANNER -->
     <div class="top-banner">
         STOP HUNTING TOOLS FOR HOURS – WE HAVE THEM IN STOCK TODAY
     </div>
@@ -163,6 +167,7 @@
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
+    <!-- Rest of your site (unchanged - red badges removed as requested) -->
     <nav>
         <div class="mobile-nav">
             <a href="#top">Home</a>
@@ -182,7 +187,6 @@
         </section>
 
         <section class="category-grid">
-            <!-- Only keeping the two badges you want -->
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
@@ -226,7 +230,6 @@
                 </div>
             </article>
 
-            <!-- All other cards - red badges removed -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Measuring Tools" loading="lazy">
                 <div class="category-content">
