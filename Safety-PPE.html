@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Safety & PPE | Yorktown Tools</title>
+    <meta name="description" content="OSHA-compliant safety gear: gloves, safety glasses, hard hats, hearing protection, hi-vis, respirators, knee pads. Milwaukee, Mechanix, 3M, Ergodyne. Free delivery Hampton Roads."/>
+
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0b1e3f;
+            --red: #c8102e;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --transition: all 0.35s ease;
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.12);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background:var(--white);
+            overflow-x:hidden;
+        }
+        img { max-width:100%; height:auto; display:block; }
+
+        body::after {
+            content:"";
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            width:140vw; height:140vw;
+            max-width:1400px; max-height:1400px;
+            background:url('george-mascot.PNG') center/contain no-repeat;
+            opacity:0.12;
+            pointer-events:none;
+            z-index:-1;
+        }
+
+        /* MARQUEE */
+        .logo-marquee-container {
+            background: var(--light-gray);
+            height: 96px;
+            overflow: hidden;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 85%, transparent 100%);
+        }
+        .marq { display: flex; width: 100%; }
+        .marq-track {
+            display: flex;
+            gap: clamp(50px, 7vw, 100px);
+            flex-shrink: 0;
+            animation: scroll 30s linear infinite;
+            will-change: transform;
+        }
+        .logo-item {
+            flex: 0 0 180px;
+            height: 76px;
+            display: grid;
+            place-items: center;
+        }
+        .logo-item img {
+            max-width: 94%;
+            max-height: 94%;
+            object-fit: contain;
+            filter: grayscale(28%) brightness(96%);
+            transition: var(--transition);
+            user-select: none;
+            draggable: false;
+        }
+        .logo-item img:hover {
+            filter: grayscale(0%) brightness(100%);
+            transform: scale(1.11);
+        }
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-33.333%); }
+        }
+        @media (min-width: 768px)  { .marq-track { animation-duration: 26s; } }
+        @media (min-width: 1200px) { .marq-track { animation-duration: 22s; } }
+        .logo-marquee-container:hover .marq-track { animation-play-state: paused; }
+
+        .top-banner { background:#0b1e3f; color:white; text-align:center; padding:16px 20px; font-weight:800; font-size:clamp(1rem,4.2vw,1.2rem); text-transform:uppercase; letter-spacing:1.5px; }
+        .logo-header { text-align:center; padding:30px 16px 20px; background:white; }
+        .logo-header img { max-width:300px; width:92%; margin:0 auto; }
+
+        nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.2); }
+        .mobile-nav { display:flex; overflow-x:auto; padding:14px 0; gap:16px; justify-content:center; scrollbar-width:none; }
+        .mobile-nav::-webkit-scrollbar { display:none; }
+        .mobile-nav a { color:white; padding:10px 20px; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.98rem; white-space:nowrap; flex-shrink:0; }
+        .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.22); color:var(--red); }
+
+        main { padding:0 16px; max-width:1400px; margin:0 auto; }
+        .hero { text-align:center; padding:clamp(70px,16vw,110px) 20px 70px; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:36px 0 50px; box-shadow:var(--shadow); }
+        .hero h1 { font-size:clamp(2.8rem,9.5vw,4.4rem); font-weight:800; color:var(--navy); margin-bottom:16px; }
+        .hero p { font-size:clamp(1.25rem,4.8vw,1.7rem); color:#444; max-width:900px; margin:0 auto; }
+
+        .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:32px; margin:50px 0 80px; }
+        .category-card { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); border-top:9px solid var(--red); display:flex; flex-direction:column; position:relative; transition:var(--transition); }
+        .category-card:hover { transform:translateY(-12px); box-shadow:0 24px 60px rgba(0,0,0,0.2); }
+        .category-card img { width:100%; height:240px; object-fit:cover; }
+        .badge-popular { position:absolute; top:14px; right:14px; background:var(--red); color:white; padding:9px 18px; border-radius:30px; font-size:0.88rem; font-weight:800; z-index:2; }
+        .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
+        .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
+        .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
+        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0; background:white; }
+        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; margin-top:auto; transition:var(--transition); }
+        .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
+
+        .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
+        .call-button img { width:64%; border:5px solid white; border-radius:50%; }
+        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
+
+        footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
+        .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
+        footer a { color:white; text-decoration:underline; }
+
+        #desktop-modal {
+            display:none;
+            position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000;
+            align-items:center; justify-content:center; text-align:center; padding:20px;
+        }
+        #desktop-modal.show { display:flex; }
+        .modal-content {
+            background:white; padding:40px; border-radius:20px; max-width:420px; width:100%;
+        }
+        .modal-content h3 { margin-bottom:16px; color:var(--navy); }
+        .modal-content p { margin:20px 0; font-size:1.1rem; }
+        .modal-phone { font-size:2.2rem; font-weight:800; color:var(--red); margin:20px 0; }
+        .modal-btn { display:inline-block; background:var(--red); color:white; padding:16px 32px; border-radius:50px; font-size:1.2rem; text-decoration:none; margin:10px; }
+        .modal-btn.call { background:#0b1e3f; }
+    </style>
+</head>
+<body id="top">
+
+    <a href="tel:757-940-5171" class="call-button">
+        <img src="Yorktown.PNG" alt="Call Yorktown Tools">
+    </a>
+
+    <!-- MARQUEE -->
+    <div class="logo-marquee-container" aria-label="Trusted brands">
+        <div class="marq">
+            <div class="marq-track">
+                <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
+                <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
+                <div class="logo-item"><img src="Milwaukeelogo.PNG" alt="Milwaukee"></div>
+                <div class="logo-item"><img src="Dewalt-logo.PNG" alt="DeWalt"></div>
+                <div class="logo-item"><img src="Craftsmanlogo.PNG" alt="Craftsman"></div>
+                <div class="logo-item"><img src="Tektonlogo.PNG" alt="Tekton"></div>
+                <div class="logo-item"><img src="Crescenttools .JPG" alt="Crescent"></div>
+                <div class="logo-item"><img src="Channellocklogo.PNG" alt="Channellock"></div>
+                <div class="logo-item"><img src="Kleintools.png" alt="Klein Tools"></div>
+                <div class="logo-item"><img src="Bondhuslogo.PNG" alt="Bondhus"></div>
+                <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
+            </div>
+            <div class="marq-track"><!-- duplicate --></div>
+            <div class="marq-track"><!-- duplicate --></div>
+        </div>
+    </div>
+
+    <div class="top-banner">
+        Gloves, Eyewear, Hearing Protection — OSHA Compliant
+    </div>
+
+    <div class="logo-header">
+        <img src="Yorktown.PNG" alt="Yorktown Tools">
+    </div>
+
+    <nav>
+        <div class="mobile-nav">
+            <a href="#">Home</a>
+            <a href="#gloves">Work Gloves</a>
+            <a href="#eyewear">Safety Glasses</a>
+            <a href="#hearing">Hearing Protection</a>
+            <a href="#hardhats">Hard Hats & Helmets</a>
+            <a href="#respiratory">Respirators & Masks</a>
+            <a href="#hi-vis">Hi-Vis & Apparel</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Safety & PPE</h1>
+            <p>ANSI & OSHA-compliant gear from Mechanix Wear, Milwaukee, 3M, Ergodyne, Pyramex, and more.<br>Free next-day delivery in Hampton Roads.</p>
+        </section>
+
+        <section class="category-grid">
+
+            <article class="category-card" id="gloves">
+                <img src="Mechanix-gloves.jpg" alt="Work Gloves" loading="lazy">
+                <div class="badge-popular">Most Requested</div>
+                <div class="category-content">
+                    <h2>Work Gloves</h2>
+                    <p class="category-desc">Cut-resistant (A4–A9), impact, insulated, hi-dex, leather, nitrile-coated.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'gloves')">
+                        <option value="">— Choose gloves —</option>
+                        <option>Mechanix FastFit (12-pair)</option>
+                        <option>Mechanix M-Pact Cut Level E (A7)</option>
+                        <option>Milwaukee Impact Cut Level 5</option>
+                        <option>Ergodyne ProFlex 9015F(x) Anti-Vibe</option>
+                        <option>Milwaukee Winter Insulated Gloves</option>
+                        <option>Other / Bulk Crew Order</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Gloves" id="quote-gloves">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="eyewear">
+                <img src="3m-safety-glasses.jpg" alt="Safety Glasses" loading="lazy">
+                <div class="category-content">
+                    <h2>Safety Glasses & Goggles</h2>
+                    <p class="category-desc">ANSI Z87.1+ rated, anti-fog, tinted, prescription inserts.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'eyewear')">
+                        <option value="">— Choose eyewear —</option>
+                        <option>3M Virtua CCS Clear (20-pack)</option>
+                        <option>Milwaukee Anti-Fog Safety Glasses</option>
+                        <option>Pyramex Proximity Anti-Fog</option>
+                        <option>Bolle Safety Goggles (Foam Seal)</option>
+                        <option>Prescription Insert Frames</option>
+                        <option>Other / Bulk</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Eyewear" id="quote-eyewear">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="hearing">
+                <img src="3m-peltor-earmuffs.jpg" alt="Hearing Protection" loading="lazy">
+                <div class="category-content">
+                    <h2>Hearing Protection</h2>
+                    <p class="category-desc">Earmuffs (NRR 23–30), foam earplugs, banded plugs.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'hearing')">
+                        <option value="">— Choose hearing protection —</option>
+                        <option>3M Peltor X5A Over-the-Head (NRR 31)</option>
+                        <option>Milwaukee Banded Ear Plugs (10-pair)</option>
+                        <option>Howard Leight Laser Lite Earplugs (200-pair)</option>
+                        <option>3M E-A-R Push-Ins Corded (100-pair)</option>
+                        <option>Other / Bulk</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Hearing" id="quote-hearing">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="hardhats">
+                <img src="Milwaukee-hardhat.jpg" alt="Hard Hats & Helmets" loading="lazy">
+                <div class="category-content">
+                    <h2>Hard Hats & Helmets</h2>
+                    <p class="category-desc">Type I & II, vented, full-brim, with chin straps.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'hardhats')">
+                        <option value="">— Choose hard hat —</option>
+                        <option>Milwaukee Type 1 Vented (Front Brim)</option>
+                        <option>Pyramex Ridgeline Full-Brim (4-pt)</option>
+                        <option>Lift Safety DAX Carbon Fiber</option>
+                        <option>MSA V-Gard Full-Brim</option>
+                        <option>Custom Logo Hard Hats</option>
+                        <option>Other / Bulk</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Hard%20Hats" id="quote-hardhats">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="respiratory">
+                <img src="3m-respirator.jpg" alt="Respirators & Masks" loading="lazy">
+                <div class="category-content">
+                    <h2>Respirators & Dust Masks</h2>
+                    <p class="category-desc">N95, half-mask, full-face, filters & cartridges.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'respiratory')">
+                        <option value="">— Choose respirator —</option>
+                        <option>3M 6500QL Half-Mask + 2097 P100 Filters</option>
+                        <option>3M N95 9211+ Aura (10-pack)</option>
+                        <option>3M 7500 Series Silicone Half-Mask</option>
+                        <option>3M 6000 Series Cartridges (Organic Vapor)</option>
+                        <option>Other / Bulk</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Respiratory" id="quote-respiratory">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="hi-vis">
+                <img src="Ergodyne-hivis.jpg" alt="Hi-Vis & Apparel" loading="lazy">
+                <div class="badge-popular">Crew Packs</div>
+                <div class="category-content">
+                    <h2>Hi-Vis, Knee Pads & Apparel</h2>
+                    <p class="category-desc">ANSI Class 2/3 vests, sweatshirts, knee pads, cooling gear.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'hi-vis')">
+                        <option value="">— Choose hi-vis / apparel —</option>
+                        <option>Ergodyne GloWear 8231 Class 3 Vest (10-pack)</option>
+                        <option>Milwaukee Class 2 Hi-Vis Safety Vest</option>
+                        <option>Ergodyne ProFlex 375 Gel Knee Pads</option>
+                        <option>Ergodyne Chill-Its Cooling Towel (12-pack)</option>
+                        <option>Custom Logo Hi-Vis Shirts</option>
+                        <option>Other / Bulk Crew Order</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Hi-Vis-Apparel" id="quote-hi-vis">Text Quote</div>
+                </div>
+            </article>
+
+        </section>
+
+        <section style="text-align:center;margin:80px 0 40px;">
+            <p style="font-size:1.5rem;margin-bottom:24px;">Need full crew PPE kits or GSA pricing?</p>
+            <a href="sms:7579405171?body=Hi%2C%20need%20PPE%20quote" style="display:inline-block;background:#0066cc;color:white;padding:18px 40px;border-radius:50px;font-size:1.35rem;font-weight:700;text-decoration:none;">Text Us Now</a>
+        </section>
+    </main>
+
+    <footer>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned • SAM.gov Registered • UEI: SMYXDLJDJMZ4 • CAGE: 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.</p>
+    </footer>
+
+    <!-- Desktop fallback modal -->
+    <div id="desktop-modal">
+        <div class="modal-content">
+            <h3>Text Us for a Fast Quote</h3>
+            <p>Tap the number below on your phone<br>or give us a call:</p>
+            <div class="modal-phone">757-940-5171</div>
+            <a href="#" class="modal-btn" id="modal-sms-link">Text Message</a>
+            <a href="tel:757-940-5171" class="modal-btn call">Call Now</a>
+            <p><small>Close this window to continue browsing</small></p>
+        </div>
+    </div>
+
+    <script>
+        function updateQuote(select, category) {
+            const btn = document.getElementById('quote-' + category);
+            const base = "sms:7579405171?body=Need%20quote%20-%20" + 
+                         category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('%20');
+            if (select.value) {
+                const sms = base + ":%20" + encodeURIComponent(select.value);
+                btn.dataset.sms = sms;
+                btn.textContent = "Quote: " + select.value + " →";
+            } else {
+                btn.dataset.sms = base;
+                btn.textContent = "Text Quote →";
+            }
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (href === '#' || href === '#top') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (href.startsWith('#')) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        const nav = document.querySelector('nav');
+        let last = 0;
+        window.addEventListener('scroll', () => {
+            let cur = window.pageYOffset;
+            if (cur > last && cur > 160) nav.style.transform = 'translateY(-100%)';
+            else nav.style.transform = 'translateY(0)';
+            last = cur;
+        });
+
+        document.querySelectorAll('.quote-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const smsUrl = this.dataset.sms;
+                const opened = window.open(smsUrl, '_blank');
+                if (!opened || opened === null || typeof opened === 'undefined') {
+                    document.getElementById('modal-sms-link').href = smsUrl;
+                    document.getElementById('desktop-modal').classList.add('show');
+                }
+            });
+        });
+
+        document.getElementById('desktop-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    </script>
+</body>
+</html>
