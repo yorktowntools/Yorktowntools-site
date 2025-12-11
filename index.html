@@ -20,7 +20,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="Yt-logo.PNG">
     <link rel="manifest" href="/site.webmanifest">
 
-    <link rel="preconnect href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -59,7 +59,6 @@
             margin-top: -80px;
         }
 
-        /* Red banner */
         .top-red-banner {
             background: var(--red);
             color: var(--white);
@@ -82,7 +81,6 @@
         }
         .banner-text.active { opacity: 1; }
 
-        /* UEI BAR */
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
@@ -101,7 +99,6 @@
         }
         .gov-items strong { color: #ffeb3b; }
 
-        /* Logo */
         .logo-header {
             text-align: center;
             padding: 1.4rem 1rem 1rem;
@@ -109,7 +106,6 @@
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
-        /* Navigation */
         nav {
             background: var(--navy);
             position: sticky;
@@ -142,7 +138,7 @@
             white-space: nowrap;
             transition: var(--transition);
         }
-        .mobile-nav a:hover {
+        .mobile-nav a:hover, .mobile-nav a.active {
             background: rgba(255,255,255,1);
             color: var(--navy);
         }
@@ -159,7 +155,7 @@
                 background: transparent;
                 padding: 0.6rem 1rem;
             }
-            .mobile-nav a:hover {
+            .mobile-nav a:hover, .mobile-nav a.active {
                 background: rgba(255,255,255,0.18);
                 color: var(--red);
             }
@@ -194,7 +190,6 @@
         .card h3 { color: var(--navy); padding: 1.4rem 1rem 0.6rem; font-size: 1.35rem; }
         .card p { padding: 0 1.4rem 1.8rem; color: #555; font-size: 1rem; }
 
-        /* EXPANDABLE CARD */
         .expandable-card {
             cursor: pointer;
             position: relative;
@@ -321,16 +316,17 @@
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
-    <!-- UPDATED NAVIGATION - SEPARATE HAND & POWER TOOLS -->
+    <!-- FINAL NAVIGATION - LINKS TO ALL YOUR ACTUAL PAGES -->
     <nav id="main-nav">
         <div class="mobile-nav">
-            <a href="#home">Home</a>
-            <a href="/precision-hand-tools.html">Hand Tools</a>
-            <a href="/Power-tools.html">Power Tools</a>
-            <a href="#accessories">Accessories & PPE</a>
-            <a href="#ladders">Ladders</a>
-            <a href="#about">About</a>
-            <a href="#free-resources">Free Resources</a>
+            <a href="index.html" class="active">Home</a>
+            <a href="precision-hand-tools.html">Hand Tools</a>
+            <a href="Power-tools.html">Power Tools</a>
+            <a href="Bits-blades.html">Bits & Blades</a>
+            <a href="Storage-organization.html">Storage</a>
+            <a href="Safety-PPE.html">Safety & PPE</a>
+            <a href="Ladders.html">Ladders</a>
+            <a href="Specialty-tools.html">Specialty Tools</a>
             <a href="#contact">Get Quote</a>
         </div>
     </nav>
@@ -375,7 +371,7 @@
 
             <div class="grid">
 
-                <!-- PRECISION HAND TOOLS - EXPANDABLE CARD -->
+                <!-- HAND TOOLS CARD -->
                 <div class="card expandable-card" id="hand-tools-card" aria-expanded="false" tabindex="0" role="button">
                     <img src="Pliers.PNG" alt="Precision hand tools" loading="lazy">
                     <h3>Precision Hand Tools</h3>
@@ -392,14 +388,12 @@
                             <a href="precision-hand-tools.html#specialty" class="subcategory"><strong>Specialty Hand Tools</strong><br>Picks • Pry Bars • Inspection Tools</a>
                         </div>
                         <div style="text-align:center;margin-top:1.8rem;">
-                            <a href="precision-hand-tools.html" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">
-                                View All Hand Tools
-                            </a>
+                            <a href="precision-hand-tools.html" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">View All Hand Tools</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- POWER TOOLS - NEW EXPANDABLE CARD -->
+                <!-- POWER TOOLS CARD -->
                 <div class="card expandable-card" id="power-tools-card" aria-expanded="false" tabindex="0" role="button">
                     <img src="Dewalttoolpile.PNG" alt="Power tools" loading="lazy">
                     <h3>Power Tools</h3>
@@ -408,24 +402,25 @@
 
                     <div class="card-expandable-content">
                         <div class="subcategory-grid">
-                            <a href="power-tools.html#drills" class="subcategory"><strong>Drills & Hammer Drills</strong><br>M18 • 20V • 60V • XGT • Rotary Hammers</a>
-                            <a href="power-tools.html#saws" class="subcategory"><strong>Saws</strong><br>Circular • Recip • Miter • Track Saws</a>
-                            <a href="power-tools.html#impacts" class="subcategory"><strong>Impact Drivers & Wrenches</strong><br>1/4" Hex • 1/2" • High-Torque 1"</a>
-                            <a href="power-tools.html#combo-kits" class="subcategory"><strong>Combo Kits</strong><br>2-Tool to 9-Tool Kits • Best Value</a>
-                            <a href="power-tools.html#accessories" class="subcategory"><strong>Batteries & Chargers</strong><br>High-Output • Rapid Chargers • Packout</a>
+                            <a href="Power-tools.html#drills" class="subcategory"><strong>Drills & Hammer Drills</strong><br>M18 • 20V • 60V • XGT • Rotary Hammers</a>
+                            <a href="Power-tools.html#saws" class="subcategory"><strong>Saws</strong><br>Circular • Recip • Miter • Track Saws</a>
+                            <a href="Power-tools.html#impacts" class="subcategory"><strong>Impact Drivers & Wrenches</strong><br>1/4" Hex • 1/2" • High-Torque 1"</a>
+                            <a href="Power-tools.html#combo-kits" class="subcategory"><strong>Combo Kits</strong><br>2-Tool to 9-Tool Kits • Best Value</a>
+                            <a href="Power-tools.html#accessories" class="subcategory"><strong>Batteries & Chargers</strong><br>High-Output • Rapid Chargers • Packout</a>
                         </div>
                         <div style="text-align:center;margin-top:1.8rem;">
-                            <a href="power-tools.html" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">
-                                View All Power Tools
-                            </a>
+                            <a href="Power-tools.html" class="btn" style="padding:1.1rem 3rem;font-size:1.15rem;">View All Power Tools</a>
                         </div>
                     </div>
                 </div>
 
+                <!-- SPECIALTY TOOLS CARD -->
                 <div class="card">
-                    <img src="IMG_4117.jpg" alt="Specialty tools" loading="lazy">
-                    <h3>Specialty & Task-Specific Tools</h3>
-                    <p>Coming soon — custom solutions for mission-critical jobs.</p>
+                    <a href="Specialty-tools.html" style="text-decoration:none;color:inherit;">
+                        <img src="IMG_4117.jpg" alt="Specialty tools" loading="lazy">
+                        <h3>Specialty & Task-Specific Tools</h3>
+                        <p>Custom solutions for mission-critical jobs — plumbing, electrical, HVAC, concrete, pullers, inspection cameras.</p>
+                    </a>
                 </div>
             </div>
         </section>
@@ -435,24 +430,27 @@
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Stay organized, compliant, and protected with industry-leading consumables and PPE.</p>
             <div class="grid">
                 <div class="card">
-                    <img src="Blades.PNG" alt="Bits & Blades" loading="lazy">
-                    <h3>Bits, Blades & Abrasives</h3>
-                    <p>High-durability consumables for consistent performance.</p>
+                    <a href="Bits-blades.html" style="text-decoration:none;color:inherit;">
+                        <img src="Blades.PNG" alt="Bits & Blades" loading="lazy">
+                        <h3>Bits, Blades & Abrasives</h3>
+                        <p>High-durability consumables that outlast the job.</p>
+                    </a>
                 </div>
                 <div class="card">
-                    <img src="Knaack.PNG" alt="Storage" loading="lazy">
-                    <h3>Storage & Organization</h3>
-                    <p>Modular toolboxes and workstations — built for job site security.</p>
+                    <a href="Storage-organization.html" style="text-decoration:none;color:inherit;">
+                        <img src="Knaack.PNG" alt="Storage" loading="lazy">
+                        <h3>Storage & Organization</h3>
+                        <p>PACKOUT • TOUGHSYSTEM • MODbox — built for job site security.</p>
+                    </a>
                 </div>
                 <div class="card">
-                    <img src="IMG_4175.jpg" alt="PPE" loading="lazy">
-                    <h3>Safety & PPE</h3>
-                    <p>Gloves, eyewear, hearing protection — OSHA compliant.</p>
+                    <a href="Safety-PPE.html" style="text-decoration:none;color:inherit;">
+                        <img src="IMG_4175.jpg" alt="PPE" loading="lazy">
+                        <h3>Safety & PPE</h3>
+                        <p>Gloves, eyewear, hearing protection — OSHA compliant.</p>
+                    </a>
                 </div>
             </div>
-            <p style="text-align:center; margin-top:3.5rem;">
-                <a href="#contact" class="btn">Request a Custom Quote</a>
-            </p>
         </section>
 
         <section id="ladders">
@@ -460,12 +458,17 @@
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Safe, reliable fiberglass and aluminum ladders for construction and maintenance tasks.</p>
             <div class="grid">
                 <div class="card">
-                    <img src="Ladders.PNG" alt="Ladders" loading="lazy">
-                    <h3>Professional Ladders</h3>
-                    <p>OSHA-compliant access solutions for any work environment.</p>
+                    <a href="Ladders.html" style="text-decoration:none;color:inherit;">
+                        <img src="Ladders.PNG" alt="Ladders" loading="lazy">
+                        <h3>Professional Ladders</h3>
+                        <p>Little Giant • Werner • Louisville — Type IA/IAA rated.</p>
+                    </a>
                 </div>
             </div>
         </section>
+
+        <!-- ABOUT & CONTACT sections remain exactly as you designed them -->
+        <!-- (kept 100% identical to your beautiful new layout) -->
 
         <section id="about">
             <h2>About Yorktown Tools</h2>
@@ -541,7 +544,6 @@
     </footer>
 
     <script>
-        // Hide/show nav on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -554,7 +556,6 @@
             lastScroll = current;
         });
 
-        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let i = 0;
         setInterval(() => {
@@ -563,7 +564,6 @@
             taglines[i].classList.add('active');
         }, 7000);
 
-        // Banner rotator
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
@@ -572,18 +572,15 @@
             banners[j].classList.add('active');
         }, 2000);
 
-        // Expandable cards (now works for both hand and power tools)
         document.querySelectorAll('.expandable-card').forEach(card => {
             const toggle = () => {
                 const expanded = card.getAttribute('aria-expanded') === 'true';
                 card.setAttribute('aria-expanded', !expanded);
             };
-
             card.addEventListener('click', e => {
                 if (e.target.closest('a')) return;
                 toggle();
             });
-
             card.addEventListener('keydown', e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -592,7 +589,6 @@
             });
         });
 
-        // Add item row in quote form
         function addItem() {
             const container = document.getElementById('item-list');
             const row = document.createElement('div');
