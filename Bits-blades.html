@@ -125,6 +125,100 @@
         footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
         footer a { color:white; text-decoration:underline; }
+
+        /* Basket View Modal */
+        #basket-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #basket-modal.show { display: flex; }
+        .basket-modal-content {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+        .basket-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        .basket-header h3 {
+            font-size: 1.8rem;
+            color: var(--navy);
+        }
+        .basket-items {
+            padding: 20px 24px;
+        }
+        .basket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .basket-item:last-child { border-bottom: none; }
+        .basket-item-name {
+            flex: 1;
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .basket-item-qty {
+            margin: 0 16px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+        .basket-remove {
+            background: var(--red);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        .basket-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        .basket-actions {
+            padding: 20px 24px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .basket-btn {
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .basket-btn-primary {
+            background: var(--red);
+            color: white;
+        }
+        .basket-btn-primary:hover { background: #a00d24; transform: translateY(-3px); }
+        .basket-btn-secondary {
+            background: #eee;
+            color: var(--navy);
+        }
+        .basket-btn-secondary:hover { background: #ddd; }
     </style>
 </head>
 <body id="top">
@@ -325,6 +419,22 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
+    <!-- View & Edit Basket Modal -->
+    <div id="basket-modal">
+        <div class="basket-modal-content">
+            <div class="basket-header">
+                <h3>Your Quote Basket</h3>
+            </div>
+            <div class="basket-items" id="basket-items-list">
+                <!-- Items will be injected here -->
+            </div>
+            <div class="basket-actions">
+                <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
+                <div class="basket-btn basket-btn-primary" id="basket-proceed-btn">Proceed to Quote</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Load the shared basket system -->
     <script src="basket.js"></script>
 
@@ -349,6 +459,67 @@
             qtyInput.value = 1;
         }
 
+        // Show the basket modal
+        function showBasketModal() {
+            const modal = document.getElementById('basket-modal');
+            const list = document.getElementById('basket-items-list');
+            const basket = getBasket();
+
+            if (basket.length === 0) {
+                list.innerHTML = '<div class="basket-empty">Your quote basket is empty.</div>';
+            } else {
+                list.innerHTML = '';
+                basket.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'basket-item';
+                    div.innerHTML = `
+                        <div class="basket-item-name">${item.name}</div>
+                        <div class="basket-item-qty">×${item.qty}</div>
+                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index})">×</button>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+
+            modal.classList.add('show');
+        }
+
+        // Remove item by index and refresh modal + UI
+        function removeFromBasketByIndex(index) {
+            let basket = getBasket();
+            basket.splice(index, 1);
+            saveBasket(basket);
+            updateBasketUI();
+            showBasketModal(); // Refresh view
+        }
+
+        // Close modal
+        function closeBasketModal() {
+            document.getElementById('basket-modal').classList.remove('show');
+        }
+
+        // Proceed from modal – same logic as floating button
+        document.getElementById('basket-proceed-btn').onclick = function() {
+            closeBasketModal();
+            document.getElementById('quote-basket-btn').click();
+        };
+
+        // Override floating button to open modal instead of direct action
+        document.addEventListener('DOMContentLoaded', () => {
+            const floatingBtn = document.getElementById('quote-basket-btn');
+            if (floatingBtn) {
+                floatingBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const basket = getBasket();
+                    if (basket.length === 0) {
+                        alert("Your quote basket is empty!");
+                    } else {
+                        showBasketModal();
+                    }
+                };
+            }
+        });
+
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
@@ -372,6 +543,11 @@
             if (cur > last && cur > 160) nav.style.transform = 'translateY(-100%)';
             else nav.style.transform = 'translateY(0)';
             last = cur;
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('basket-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeBasketModal();
         });
     </script>
 </body>
