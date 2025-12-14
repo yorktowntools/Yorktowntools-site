@@ -584,9 +584,32 @@
         </div>
     </div>
 
-    <script src="basket.js"></script>
-
     <script>
+        // Full inline basket functionality (no external basket.js needed)
+
+        function getBasket() {
+            const stored = localStorage.getItem('quoteBasket');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveBasket(basket) {
+            localStorage.setItem('quoteBasket', JSON.stringify(basket));
+        }
+
+        function addToBasket(name, qty) {
+            const basket = getBasket();
+            basket.push({ name, qty });
+            saveBasket(basket);
+        }
+
+        function removeFromBasketByIndex(index) {
+            const basket = getBasket();
+            if (index >= 0 && index < basket.length) {
+                basket.splice(index, 1);
+                saveBasket(basket);
+            }
+        }
+
         // Top red banner rotation
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
@@ -609,7 +632,7 @@
             lastScroll = current;
         });
 
-        // Basket functions
+        // Add to basket
         function addSelectedToBasket(categoryId) {
             const select = document.getElementById('select-' + categoryId);
             if (!select || select.value === "") {
@@ -624,6 +647,7 @@
             qtyInput.value = 1;
         }
 
+        // Proceed to quote (SMS or redirect)
         function proceedToQuote() {
             const basket = getBasket();
             if (basket.length === 0) {
@@ -639,6 +663,7 @@
             }
         }
 
+        // Show modal and populate items
         function showBasketModal() {
             const modal = document.getElementById('basket-modal');
             const list = document.getElementById('basket-items-list');
@@ -665,6 +690,7 @@
             document.getElementById('basket-modal').classList.remove('show');
         }
 
+        // Floating quote button click
         document.addEventListener('DOMContentLoaded', () => {
             const floatingBtn = document.getElementById('quote-basket-btn');
             if (floatingBtn) {
