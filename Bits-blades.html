@@ -114,8 +114,8 @@
         .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
         .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
-        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0; background:white; }
-        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; margin-top:auto; transition:var(--transition); }
+        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0 0; background:white; }
+        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; transition:var(--transition); }
         .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
         .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
@@ -125,21 +125,6 @@
         footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
         footer a { color:white; text-decoration:underline; }
-
-        #desktop-modal {
-            display:none;
-            position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000;
-            align-items:center; justify-content:center; text-align:center; padding:20px;
-        }
-        #desktop-modal.show { display:flex; }
-        .modal-content {
-            background:white; padding:40px; border-radius:20px; max-width:420px; width:100%;
-        }
-        .modal-content h3 { margin-bottom:16px; color:var(--navy); }
-        .modal-content p { margin:20px 0; font-size:1.1rem; }
-        .modal-phone { font-size:2.2rem; font-weight:800; color:var(--red); margin:20px 0; }
-        .modal-btn { display:inline-block; background:var(--red); color:white; padding:16px 32px; border-radius:50px; font-size:1.2rem; text-decoration:none; margin:10px; }
-        .modal-btn.call { background:#0b1e3f; }
     </style>
 </head>
 <body id="top">
@@ -203,7 +188,7 @@
                 <div class="category-content">
                     <h2>Drill Bits & Driver Bits</h2>
                     <p class="category-desc">Shockwave impact bits, titanium & cobalt drill bits, step bits, spade bits, masonry.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'drill-bits')">
+                    <select class="tool-select" id="select-drill-bits">
                         <option value="">— Choose bits —</option>
                         <option>Milwaukee SHOCKWAVE 100-pc Impact Set</option>
                         <option>DeWalt MAXFIT + Titanium Drill Bit Set</option>
@@ -213,7 +198,10 @@
                         <option>Makita Impact Gold Bit Set</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Drill%20Bits" id="quote-drill-bits">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('drill-bits')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -223,7 +211,7 @@
                 <div class="category-content">
                     <h2>Reciprocating Saw Blades</h2>
                     <p class="category-desc">Demo Demon, Steel Demon, wood/metal/nail-embedded, carbide-tipped blades.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'recip-blades')">
+                    <select class="tool-select" id="select-recip-blades">
                         <option value="">— Choose recip blades —</option>
                         <option>Diablo Demo Demon Nail-Embedded Wood</option>
                         <option>Diablo Steel Demon Metal Cutting</option>
@@ -232,7 +220,10 @@
                         <option>DeWalt Breakaway Bi-Metal Blades</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Recip%20Blades" id="quote-recip-blades">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('recip-blades')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -241,7 +232,7 @@
                 <div class="category-content">
                     <h2>Circular Saw Blades</h2>
                     <p class="category-desc">7-1/4" framing, finish, ultra-fine, metal-cutting, and fiber cement blades.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'circular-blades')">
+                    <select class="tool-select" id="select-circular-blades">
                         <option value="">— Choose circular blades —</option>
                         <option>Diablo 7-1/4" 24T Framing Blade</option>
                         <option>Diablo 7-1/4" 60T Ultra Finish</option>
@@ -250,7 +241,10 @@
                         <option>Milwaukee 7-1/4" Framing Blade</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Circular%20Blades" id="quote-circular-blades">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('circular-blades')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -259,7 +253,7 @@
                 <div class="category-content">
                     <h2>Hole Saws & Accessories</h2>
                     <p class="category-desc">Bi-metal, carbide-grit, diamond, arbors, and complete kits.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'hole-saws')">
+                    <select class="tool-select" id="select-hole-saws">
                         <option value="">— Choose hole saw —</option>
                         <option>Milwaukee Hole Dozer Bi-Metal Set</option>
                         <option>Lenox Diamond Hole Saw Set</option>
@@ -268,7 +262,10 @@
                         <option>Quick-Change Arbor + Pilot Bits</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Hole%20Saws" id="quote-hole-saws">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('hole-saws')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -277,7 +274,7 @@
                 <div class="category-content">
                     <h2>Abrasives & Sanding Discs</h2>
                     <p class="category-desc">Flap discs, grinding wheels, sanding sheets, quick-lock discs, wire wheels.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'abrasives')">
+                    <select class="tool-select" id="select-abrasives">
                         <option value="">— Choose abrasives —</option>
                         <option>Diablo 4-1/2" Flap Disc 60-Grit (10pk)</option>
                         <option>DeWalt HP Grinding Wheel 4-1/2"</option>
@@ -286,7 +283,10 @@
                         <option>Sait Quick-Change Discs</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Abrasives" id="quote-abrasives">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('abrasives')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -295,7 +295,7 @@
                 <div class="category-content">
                     <h2>Bit & Blade Sets</h2>
                     <p class="category-desc">Bulk packs and contractor kits for crews.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'sets')">
+                    <select class="tool-select" id="select-sets">
                         <option value="">— Choose set —</option>
                         <option>Milwaukee SHOCKWAVE 150-pc Master Set</option>
                         <option>Diablo 40-pc Blade & Bit Contractor Pack</option>
@@ -303,7 +303,10 @@
                         <option>Lenox 26-pc Recip + Circular Blade Set</option>
                         <option>Other / Custom Bulk Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Bit-Blade%20Sets" id="quote-sets">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('sets')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -322,33 +325,31 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <!-- Desktop fallback modal -->
-    <div id="desktop-modal">
-        <div class="modal-content">
-            <h3>Text Us for a Fast Quote</h3>
-            <p>Tap the number below on your phone<br>or give us a call:</p>
-            <div class="modal-phone">757-940-5171</div>
-            <a href="#" class="modal-btn" id="modal-sms-link">Text Message</a>
-            <a href="tel:757-940-5171" class="modal-btn call">Call Now</a>
-            <p><small>Close this window to continue browsing</small></p>
-        </div>
-    </div>
+    <!-- Load the shared basket system -->
+    <script src="basket.js"></script>
 
     <script>
-        function updateQuote(select, category) {
-            const btn = document.getElementById('quote-' + category);
-            const base = "sms:7579405171?body=Need%20quote%20-%20" + 
-                         category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('%20');
-            if (select.value) {
-                const sms = base + ":%20" + encodeURIComponent(select.value);
-                btn.dataset.sms = sms;
-                btn.textContent = "Quote: " + select.value + " →";
-            } else {
-                btn.dataset.sms = base;
-                btn.textContent = "Text Quote →";
+        // Add selected item + quantity to the quote basket
+        function addSelectedToBasket(categoryId) {
+            const select = document.getElementById('select-' + categoryId);
+            if (!select || !select.value) {
+                alert("Please select an item first.");
+                return;
             }
+
+            const qtyInput = select.parentElement.querySelector('input[type="number"]');
+            const qty = parseInt(qtyInput.value) || 1;
+
+            addToBasket(select.value, qty);
+
+            alert(`Added to quote basket:\n${select.value} × ${qty}`);
+
+            // Reset for next selection
+            select.selectedIndex = 0;
+            qtyInput.value = 1;
         }
 
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -357,11 +358,13 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else if (href.startsWith('#')) {
                     e.preventDefault();
-                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const target = document.querySelector(href);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
+        // Sticky nav hide/show on scroll
         const nav = document.querySelector('nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -369,22 +372,6 @@
             if (cur > last && cur > 160) nav.style.transform = 'translateY(-100%)';
             else nav.style.transform = 'translateY(0)';
             last = cur;
-        });
-
-        document.querySelectorAll('.quote-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const smsUrl = this.dataset.sms;
-                const opened = window.open(smsUrl, '_blank');
-                if (!opened || opened === null || typeof opened === 'undefined') {
-                    document.getElementById('modal-sms-link').href = smsUrl;
-                    document.getElementById('desktop-modal').classList.add('show');
-                }
-            });
-        });
-
-        document.getElementById('desktop-modal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('show');
         });
     </script>
 </body>
