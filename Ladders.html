@@ -179,13 +179,11 @@
 
     <nav>
         <div class="mobile-nav">
-            <a href="#">Home</a>
+            <a href="index.html">Home</a>
+            <a href="#platform">Platform Ladders</a>
             <a href="#step-ladders">Step Ladders</a>
             <a href="#extension">Extension Ladders</a>
-            <a href="#multi">Multi-Position</a>
-            <a href="#podium">Podium Ladders</a>
-            <a href="#platforms">Platforms & Scaffolds</a>
-            <a href="#accessories">Accessories</a>
+            <a href="#articulating">Articulating Ladders</a>
         </div>
     </nav>
 
@@ -197,12 +195,29 @@
 
         <section class="category-grid">
 
-            <article class="category-card" id="step-ladders">
-                <img src="Little-giant-step.jpg" alt="Fiberglass Step Ladders" loading="lazy">
+            <article class="category-card" id="platform">
+                <img src="Platform ladder.jpg" alt="Platform Ladders" loading="lazy">
                 <div class="badge-popular">Top Choice</div>
                 <div class="category-content">
-                    <h2>Fiberglass Step Ladders</h2>
-                    <p class="category-desc">Non-conductive, Type IA & IAA (300–375 lb rating), 4–16 ft.</p>
+                    <h2>Platform Ladders</h2>
+                    <p class="category-desc">Extra-large standing platform, wrap-around guardrail for added safety.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'platform')">
+                        <option value="">— Choose platform ladder —</option>
+                        <option>Werner PD6208 8-ft Podium (Type IA)</option>
+                        <option>Louisville PD9000 Series 10-ft</option>
+                        <option>Little Giant Jumbo Step (Fiberglass)</option>
+                        <option>Werner PD7306 6-ft Podium</option>
+                        <option>Other / Custom</option>
+                    </select>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Platform%20Ladders" id="quote-platform">Text Quote</div>
+                </div>
+            </article>
+
+            <article class="category-card" id="step-ladders">
+                <img src="Wernerstepladder.jpg" alt="Step Ladders" loading="lazy">
+                <div class="category-content">
+                    <h2>Step Ladders</h2>
+                    <p class="category-desc">Non-conductive fiberglass, Type IA & IAA (300–375 lb rating), 4–16 ft.</p>
                     <select class="tool-select" onchange="updateQuote(this,'step-ladders')">
                         <option value="">— Choose step ladder —</option>
                         <option>Little Giant King Kombo 8-ft (Type IAA)</option>
@@ -216,7 +231,7 @@
             </article>
 
             <article class="category-card" id="extension">
-                <img src="Werner-extension.jpg" alt="Extension Ladders" loading="lazy">
+                <img src="Wernerextensionladder.jpg" alt="Extension Ladders" loading="lazy">
                 <div class="category-content">
                     <h2>Extension Ladders</h2>
                     <p class="category-desc">Fiberglass & aluminum, 16–40 ft, D-rung, Type IA/IAA.</p>
@@ -232,71 +247,20 @@
                 </div>
             </article>
 
-            <article class="category-card" id="multi">
-                <img src="Little-giant-velocity.jpg" alt="Multi-Position Ladders" loading="lazy">
+            <article class="category-card" id="articulating">
+                <img src="Wernerarticulatingladder.jpg" alt="Articulating Ladders" loading="lazy">
                 <div class="category-content">
-                    <h2>Multi-Position & Articulating</h2>
-                    <p class="category-desc">Converts to A-frame, extension, staircase, 90° ladder.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'multi')">
-                        <option value="">— Choose multi-position —</option>
+                    <h2>Articulating & Multi-Position Ladders</h2>
+                    <p class="category-desc">Converts to A-frame, extension, staircase, 90° configurations.</p>
+                    <select class="tool-select" onchange="updateQuote(this,'articulating')">
+                        <option value="">— Choose articulating ladder —</option>
                         <option>Little Giant Velocity M22 (Type IA)</option>
                         <option>Little Giant Conquest M26 (Type IAA)</option>
                         <option>Werner MT-22 Multi-Ladder</option>
                         <option>Little Giant Dark Horse 2.0 (Fiberglass)</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Multi-Position" id="quote-multi">Text Quote</div>
-                </div>
-            </article>
-
-            <article class="category-card" id="podium">
-                <img src="Werner-podium.jpg" alt="Podium Ladders" loading="lazy">
-                <div class="category-content">
-                    <h2>Podium & Platform Ladders</h2>
-                    <p class="category-desc">Extra-large standing platform, wrap-around guardrail.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'podium')">
-                        <option value="">— Choose podium —</option>
-                        <option>Werner PD6208 8-ft Podium (Type IA)</option>
-                        <option>Louisville PD9000 Series 10-ft</option>
-                        <option>Little Giant Jumbo Step (Fiberglass)</option>
-                        <option>Werner PD7306 6-ft Podium</option>
-                        <option>Other / Custom</option>
-                    </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Podium" id="quote-podium">Text Quote</div>
-                </div>
-            </article>
-
-            <article class="category-card" id="platforms">
-                <img src="Werner-work-platform.jpg" alt="Work Platforms & Scaffolds" loading="lazy">
-                <div class="category-content">
-                    <h2>Work Platforms & Scaffolding</h2>
-                    <p class="category-desc">Portable platforms, rolling scaffolds, pump jacks.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'platforms')">
-                        <option value="">— Choose platform/scaffold —</option>
-                        <option>Werner AP-20 Work Platform</option>
-                        <option>Little Giant Safety Step (Aluminum)</option>
-                        <option>MetalTech 6-ft Baker Scaffold</option>
-                        <option>Werner Pump Jack System</option>
-                        <option>Other / Custom</option>
-                    </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Platforms" id="quote-platforms">Text Quote</div>
-                </div>
-            </article>
-
-            <article class="category-card" id="accessories">
-                <img src="Ladder-accessories.jpg" alt="Ladder Accessories" loading="lazy">
-                <div class="category-content">
-                    <h2>Ladder Accessories</h2>
-                    <p class="category-desc">Levelers, stabilizers, leg extensions, tool trays.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'accessories')">
-                        <option value="">— Choose accessory —</option>
-                        <option>Little Giant WingSpan Wall Standoff</option>
-                        <option>Werner Quick-Click Ladder Leveler</option>
-                        <option>Little Giant Trestle Brackets</option>
-                        <option>Ladder Leg Extensions (Pair)</option>
-                        <option>Other / Custom</option>
-                    </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Ladder%20Accessories" id="quote-accessories">Text Quote</div>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Articulating%20Ladders" id="quote-articulating">Text Quote</div>
                 </div>
             </article>
 
@@ -345,10 +309,7 @@
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
-                if (href === '#' || href === '#top') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else if (href.startsWith('#')) {
+                if (href.startsWith('#')) {
                     e.preventDefault();
                     document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
