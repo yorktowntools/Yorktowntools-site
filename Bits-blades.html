@@ -17,107 +17,254 @@
             --navy: #0b1e3f;
             --red: #c8102e;
             --white: #ffffff;
-            --light-gray: #f8f9fa;
-            --transition: all 0.35s ease;
+            --light: #f8f9fa;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             --radius: 20px;
-            --shadow: 0 12px 40px rgba(0,0,0,0.12);
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
             line-height:1.65;
             color:#212529;
-            background:var(--white);
-            overflow-x:hidden;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
         }
-        img { max-width:100%; height:auto; display:block; }
 
         body::after {
-            content:"";
-            position:fixed;
-            top:50%; left:50%;
-            transform:translate(-50%,-50%);
-            width:140vw; height:140vw;
-            max-width:1400px; max-height:1400px;
-            background:url('george-mascot.PNG') center/contain no-repeat;
-            opacity:0.12;
-            pointer-events:none;
-            z-index:-1;
+            content: "";
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw; height: 140vw;
+            max-width: 1400px; max-height: 1400px;
+            background: url('george-mascot.PNG') center center / contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            margin-top: -80px;
         }
 
-        /* NEW RED ROTATING BANNER */
         .top-red-banner {
             background: var(--red);
-            color: white;
+            color: var(--white);
             text-align: center;
-            padding: 16px 20px;
-            font-weight: 800;
-            font-size: clamp(1rem, 4.2vw, 1.2rem);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            overflow: hidden;
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            min-height: 52px;
             position: relative;
+            overflow: hidden;
         }
         .banner-text {
             position: absolute;
             width: 100%;
-            left: 0;
+            left: 50%;
             top: 50%;
-            transform: translateY(-50%);
+            transform: translate(-50%, -50%);
             opacity: 0;
-            transition: opacity 0.8s ease;
+            transition: opacity 1s ease;
         }
-        .banner-text.active {
-            opacity: 1;
+        .banner-text.active { opacity: 1; }
+
+        .logo-header {
+            text-align: center;
+            padding: 1.4rem 1rem 1rem;
+            background: var(--white);
         }
+        .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
-        .top-banner { background:#0b1e3f; color:white; text-align:center; padding:16px 20px; font-weight:800; font-size:clamp(1rem,4.2vw,1.2rem); text-transform:uppercase; letter-spacing:1.5px; }
-        .logo-header { text-align:center; padding:30px 16px 20px; background:white; }
-        .logo-header img { max-width:300px; width:92%; margin:0 auto; }
+        nav {
+            background: var(--navy);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav.hidden { transform: translateY(-100%); }
 
-        nav { background:var(--navy); position:sticky; top:0; z-index:1000; box-shadow:0 4px 20px rgba(11,30,63,0.2); }
-        .mobile-nav { display:flex; overflow-x:auto; padding:14px 0; gap:16px; justify-content:center; scrollbar-width:none; }
-        .mobile-nav::-webkit-scrollbar { display:none; }
-        .mobile-nav a { color:white; padding:10px 20px; border-radius:30px; text-decoration:none; font-weight:600; font-size:0.98rem; white-space:nowrap; flex-shrink:0; }
-        .mobile-nav a:hover, .mobile-nav a.active { background:rgba(255,255,255,0.22); color:var(--red); }
-
-        main { padding:0 16px; max-width:1400px; margin:0 auto; }
-        .hero { text-align:center; padding:clamp(70px,16vw,110px) 20px 70px; background:linear-gradient(135deg,#f8f9fa 0%,#fff 100%); border-radius:var(--radius); margin:36px 0 50px; box-shadow:var(--shadow); }
-        .hero h1 { font-size:clamp(2.8rem,9.5vw,4.4rem); font-weight:800; color:var(--navy); margin-bottom:16px; }
-        .hero p { font-size:clamp(1.25rem,4.8vw,1.7rem); color:#444; max-width:900px; margin:0 auto; }
-
-        .category-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:32px; margin:50px 0 80px; }
-        .category-card { background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); border-top:9px solid var(--red); display:flex; flex-direction:column; position:relative; transition:var(--transition); }
-        .category-card:hover { transform:translateY(-12px); box-shadow:0 24px 60px rgba(0,0,0,0.2); }
-        .category-card img { width:100%; height:240px; object-fit:cover; }
-        .badge-popular { position:absolute; top:14px; right:14px; background:var(--red); color:white; padding:9px 18px; border-radius:30px; font-size:0.88rem; font-weight:800; z-index:2; }
-        .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
-        .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
-        .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
-        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0 0; background:white; }
-        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; transition:var(--transition); }
-        .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
-
-        /* Floating buttons */
-        .floating-buttons-container {
-            position: fixed;
-            right: 16px;
-            bottom: 16px;
+        .mobile-nav {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            z-index: 999;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding: 0.75rem 0;
+            gap: 0.8rem;
+        }
+        .mobile-nav::-webkit-scrollbar { display: none; }
+
+        .mobile-nav a {
+            flex: 0 0 auto;
+            background: rgba(255,255,255,0.12);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.94rem;
+            padding: 0.65rem 1.1rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .mobile-nav a:hover, .mobile-nav a.active {
+            background: rgba(255,255,255,1);
+            color: var(--navy);
         }
 
-        .call-button, #quote-basket-btn {
-            width: 72px;
-            height: 72px;
+        @media (min-width: 768px) {
+            .mobile-nav {
+                justify-content: center;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem 0;
+            }
+            .mobile-nav a {
+                background: transparent;
+                padding: 0.6rem 1rem;
+            }
+            .mobile-nav a:hover, .mobile-nav a.active {
+                background: rgba(255,255,255,0.18);
+                color: var(--red);
+            }
+        }
+
+        main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
+
+        .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
+        .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
+        .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
+
+        .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: clamp(1.8rem, 4.5vw, 3rem); margin-bottom:5.5rem; }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-top: 5px solid var(--red);
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 55px rgba(0,0,0,0.18);
+        }
+        .card img {
+            width: 100%;
+            height: clamp(200px, 38vw, 260px);
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1.6rem 1.4rem 2rem;
+            text-align: center;
+        }
+        .card h3 {
+            color: var(--navy);
+            margin: 0 0 0.8rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .card p {
+            color: #444;
+            font-size: 1.05rem;
+            line-height: 1.55;
+            margin-bottom: 1.2rem;
+        }
+
+        .badge-popular {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: var(--red);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            z-index: 2;
+        }
+
+        .tool-select {
+            width: 100%;
+            padding: 1.3rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            margin: 1rem 0 0;
+            background: white;
+            transition: border 0.3s;
+        }
+        .tool-select:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+
+        .qty-add-group {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1.2rem 0 0;
+        }
+        .qty-input {
+            width: 90px;
+            padding: 1.3rem 0.8rem;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+        .add-btn {
+            flex: 1;
+            background: var(--red);
+            color: white;
+            padding: 1.3rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+        }
+        .add-btn:hover {
+            background: #a00d22;
+            transform: translateY(-5px);
+        }
+
+        .call-button {
+            position: fixed;
+            right: clamp(16px, 4vw, 24px);
+            bottom: clamp(16px, 4vw, 24px);
+            width: clamp(72px, 16vw, 88px);
+            height: clamp(72px, 16vw, 88px);
             background: var(--red);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 32px rgba(200, 16, 46, 0.55);
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            z-index: 999;
+            animation: pulse 2.6s infinite;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
+
+        #quote-basket-btn {
+            position: fixed;
+            right: clamp(16px, 4vw, 24px);
+            bottom: calc(clamp(16px, 4vw, 24px) + clamp(72px, 16vw, 88px) + 16px);
+            width: clamp(72px, 16vw, 88px);
+            height: clamp(72px, 16vw, 88px);
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            z-index: 999;
             animation: pulse 2.6s infinite;
             cursor: pointer;
             color: white;
@@ -128,21 +275,17 @@
             line-height: 1.2;
         }
 
-        .call-button img {
-            width: 64%;
-            border: 5px solid white;
-            border-radius: 50%;
-        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.7); }
-            70% { box-shadow: 0 0 0 25px rgba(200, 16, 46, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0); }
-        }
+        footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
+        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+        footer a { color: #ffffff !important; text-decoration: underline; }
+        footer a:hover { opacity: 0.85; }
 
-        footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
-        .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
-        footer a { color:white; text-decoration:underline; }
+        .bulk-section { text-align:center; margin:5rem 0 4rem; }
+        .bulk-section p { font-size:1.5rem; margin-bottom:1.5rem; }
+        .text-btn { display:inline-block; background:#0066cc; color:white; padding:1.3rem 3rem; border-radius:50px; font-size:1.35rem; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(0,102,204,0.3); transition:var(--transition); }
+        .text-btn:hover { transform:translateY(-5px); opacity:0.9; }
 
         /* Basket Modal */
         #basket-modal {
@@ -231,7 +374,7 @@
             background: var(--red);
             color: white;
         }
-        .basket-btn-primary:hover { background: #a00d24; transform: translateY(-3px); }
+        .basket-btn-primary:hover { background: #a00d22; transform: translateY(-3px); }
         .basket-btn-secondary {
             background: #eee;
             color: var(--navy);
@@ -239,34 +382,27 @@
         .basket-btn-secondary:hover { background: #ddd; }
     </style>
 </head>
-<body id="top">
+<body>
 
-    <!-- Floating Buttons -->
-    <div class="floating-buttons-container">
-        <div id="quote-basket-btn">
-            Get<br>Quote
-        </div>
-        <a href="tel:757-940-5171" class="call-button">
-            <img src="Yorktown.PNG" alt="Call Yorktown Tools">
-        </a>
+    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
+        <img src="Yorktown.PNG" alt="George">
+    </a>
+
+    <div id="quote-basket-btn">
+        Get<br>Quote
     </div>
 
-    <!-- RED ROTATING BANNER -->
     <div class="top-red-banner">
         <div class="banner-text active">Free Delivery.</div>
         <div class="banner-text">Free Quote.</div>
         <div class="banner-text">No Hassle.</div>
     </div>
 
-    <div class="top-banner">
-        High-Durability Consumables That Outlast the Job
-    </div>
-
     <div class="logo-header">
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
 
-    <nav>
+    <nav id="main-nav">
         <div class="mobile-nav">
             <a href="index.html">Home</a>
             <a href="#drill-bits">Drill Bits</a>
@@ -284,14 +420,16 @@
             <p>Diablo, Lenox, Milwaukee, DeWalt, Bosch, Spyder – the longest-lasting consumables on the market.<br>Free delivery in Hampton Roads.</p>
         </section>
 
-        <section class="category-grid">
+        <section class="grid">
 
-            <article class="category-card" id="drill-bits">
-                <img src="Torquebits.jpg" alt="Drill Bits & Driver Bits" loading="lazy">
-                <div class="badge-popular">Most Popular</div>
-                <div class="category-content">
-                    <h2>Drill Bits & Driver Bits</h2>
-                    <p class="category-desc">Shockwave impact bits, titanium & cobalt drill bits, step bits, spade bits, masonry.</p>
+            <div class="card" id="drill-bits">
+                <div style="position:relative;">
+                    <img src="Torquebits.jpg" alt="Drill Bits & Driver Bits" loading="lazy">
+                    <div class="badge-popular">Most Popular</div>
+                </div>
+                <div class="card-content">
+                    <h3>Drill Bits & Driver Bits</h3>
+                    <p>Shockwave impact bits, titanium & cobalt drill bits, step bits, spade bits, masonry.</p>
                     <select class="tool-select" id="select-drill-bits">
                         <option value="">— Choose bits —</option>
                         <option>Milwaukee SHOCKWAVE 100-pc Impact Set</option>
@@ -302,19 +440,21 @@
                         <option>Makita Impact Gold Bit Set</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
-                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
-                        <div class="quote-btn" onclick="addSelectedToBasket('drill-bits')">Add to Quote →</div>
+                    <div class="qty-add-group">
+                        <input type="number" min="1" value="1" class="qty-input">
+                        <div class="add-btn" onclick="addSelectedToBasket('drill-bits')">Add to Quote →</div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <article class="category-card" id="recip-blades">
-                <img src="Sawzallblade.jpg" alt="Reciprocating Saw Blades" loading="lazy">
-                <div class="badge-popular">Top Seller</div>
-                <div class="category-content">
-                    <h2>Reciprocating Saw Blades</h2>
-                    <p class="category-desc">Demo Demon, Steel Demon, wood/metal/nail-embedded, carbide-tipped blades.</p>
+            <div class="card" id="recip-blades">
+                <div style="position:relative;">
+                    <img src="Sawzallblade.jpg" alt="Reciprocating Saw Blades" loading="lazy">
+                    <div class="badge-popular">Top Seller</div>
+                </div>
+                <div class="card-content">
+                    <h3>Reciprocating Saw Blades</h3>
+                    <p>Demo Demon, Steel Demon, wood/metal/nail-embedded, carbide-tipped blades.</p>
                     <select class="tool-select" id="select-recip-blades">
                         <option value="">— Choose recip blades —</option>
                         <option>Diablo Demo Demon Nail-Embedded Wood</option>
@@ -324,18 +464,18 @@
                         <option>DeWalt Breakaway Bi-Metal Blades</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
-                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
-                        <div class="quote-btn" onclick="addSelectedToBasket('recip-blades')">Add to Quote →</div>
+                    <div class="qty-add-group">
+                        <input type="number" min="1" value="1" class="qty-input">
+                        <div class="add-btn" onclick="addSelectedToBasket('recip-blades')">Add to Quote →</div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <article class="category-card" id="circular-blades">
+            <div class="card" id="circular-blades">
                 <img src="Circularsawblade.jpg" alt="Circular Saw Blades" loading="lazy">
-                <div class="category-content">
-                    <h2>Circular Saw Blades</h2>
-                    <p class="category-desc">7-1/4" framing, finish, ultra-fine, metal-cutting, and fiber cement blades.</p>
+                <div class="card-content">
+                    <h3>Circular Saw Blades</h3>
+                    <p>7-1/4" framing, finish, ultra-fine, metal-cutting, and fiber cement blades.</p>
                     <select class="tool-select" id="select-circular-blades">
                         <option value="">— Choose circular blades —</option>
                         <option>Diablo 7-1/4" 24T Framing Blade</option>
@@ -345,18 +485,18 @@
                         <option>Milwaukee 7-1/4" Framing Blade</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
-                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
-                        <div class="quote-btn" onclick="addSelectedToBasket('circular-blades')">Add to Quote →</div>
+                    <div class="qty-add-group">
+                        <input type="number" min="1" value="1" class="qty-input">
+                        <div class="add-btn" onclick="addSelectedToBasket('circular-blades')">Add to Quote →</div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <article class="category-card" id="hole-saws">
+            <div class="card" id="hole-saws">
                 <img src="Holesawblade.jpg" alt="Hole Saws" loading="lazy">
-                <div class="category-content">
-                    <h2>Hole Saws & Accessories</h2>
-                    <p class="category-desc">Bi-metal, carbide-grit, diamond, arbors, and complete kits.</p>
+                <div class="card-content">
+                    <h3>Hole Saws & Accessories</h3>
+                    <p>Bi-metal, carbide-grit, diamond, arbors, and complete kits.</p>
                     <select class="tool-select" id="select-hole-saws">
                         <option value="">— Choose hole saw —</option>
                         <option>Milwaukee Hole Dozer Bi-Metal Set</option>
@@ -366,18 +506,18 @@
                         <option>Quick-Change Arbor + Pilot Bits</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
-                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
-                        <div class="quote-btn" onclick="addSelectedToBasket('hole-saws')">Add to Quote →</div>
+                    <div class="qty-add-group">
+                        <input type="number" min="1" value="1" class="qty-input">
+                        <div class="add-btn" onclick="addSelectedToBasket('hole-saws')">Add to Quote →</div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <article class="category-card" id="abrasives">
+            <div class="card" id="abrasives">
                 <img src="Sandwich.jpg" alt="Abrasives & Sanding" loading="lazy">
-                <div class="category-content">
-                    <h2>Abrasives & Sanding Discs</h2>
-                    <p class="category-desc">Flap discs, grinding wheels, sanding sheets, quick-lock discs, wire wheels.</p>
+                <div class="card-content">
+                    <h3>Abrasives & Sanding Discs</h3>
+                    <p>Flap discs, grinding wheels, sanding sheets, quick-lock discs, wire wheels.</p>
                     <select class="tool-select" id="select-abrasives">
                         <option value="">— Choose abrasives —</option>
                         <option>Diablo 4-1/2" Flap Disc 60-Grit (10pk)</option>
@@ -387,18 +527,18 @@
                         <option>Sait Quick-Change Discs</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
-                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
-                        <div class="quote-btn" onclick="addSelectedToBasket('abrasives')">Add to Quote →</div>
+                    <div class="qty-add-group">
+                        <input type="number" min="1" value="1" class="qty-input">
+                        <div class="add-btn" onclick="addSelectedToBasket('abrasives')">Add to Quote →</div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <article class="category-card" id="sets">
+            <div class="card" id="sets">
                 <img src="Assortedpacksawblades.jpg" alt="Bit & Blade Sets" loading="lazy">
-                <div class="category-content">
-                    <h2>Bit & Blade Sets</h2>
-                    <p class="category-desc">Bulk packs and contractor kits for crews.</p>
+                <div class="card-content">
+                    <h3>Bit & Blade Sets</h3>
+                    <p>Bulk packs and contractor kits for crews.</p>
                     <select class="tool-select" id="select-sets">
                         <option value="">— Choose set —</option>
                         <option>Milwaukee SHOCKWAVE 150-pc Master Set</option>
@@ -407,29 +547,30 @@
                         <option>Lenox 26-pc Recip + Circular Blade Set</option>
                         <option>Other / Custom Bulk Request</option>
                     </select>
-                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
-                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
-                        <div class="quote-btn" onclick="addSelectedToBasket('sets')">Add to Quote →</div>
+                    <div class="qty-add-group">
+                        <input type="number" min="1" value="1" class="qty-input">
+                        <div class="add-btn" onclick="addSelectedToBasket('sets')">Add to Quote →</div>
                     </div>
                 </div>
-            </article>
+            </div>
 
         </section>
 
-        <section style="text-align:center;margin:80px 0 40px;">
-            <p style="font-size:1.5rem;margin-bottom:24px;">Need bulk pricing or GSA quotes?</p>
-            <a href="sms:7579405171?body=Hi%2C%20need%20bits-blades%20quote" style="display:inline-block;background:#0066cc;color:white;padding:18px 40px;border-radius:50px;font-size:1.35rem;font-weight:700;text-decoration:none;">Text Us Now</a>
+        <section class="bulk-section">
+            <p>Need bulk pricing or GSA quotes?</p>
+            <a href="sms:7579405171?body=Hi%2C%20need%20bits-blades%20quote" class="text-btn">Text Us Now</a>
         </section>
     </main>
 
     <footer>
         <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
-        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned • SAM.gov Registered • UEI: SMYXDLJDJMZ4 • CAGE: 16LD9</p>
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <!-- Basket Modal -->
     <div id="basket-modal">
         <div class="basket-modal-content">
             <div class="basket-header">
@@ -446,24 +587,36 @@
     <script src="basket.js"></script>
 
     <script>
-        // Red banner rotation
-        const bannerTexts = document.querySelectorAll('.top-red-banner .banner-text');
-        let currentIndex = 0;
-        function rotateBanner() {
-            bannerTexts[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex + 1) % bannerTexts.length;
-            bannerTexts[currentIndex].classList.add('active');
-        }
-        setInterval(rotateBanner, 3500);
+        // Top red banner rotation
+        const banners = document.querySelectorAll('.banner-text');
+        let j = 0;
+        setInterval(() => {
+            banners[j].classList.remove('active');
+            j = (j + 1) % banners.length;
+            banners[j].classList.add('active');
+        }, 3500);
+
+        // Sticky nav hide/show on scroll
+        const nav = document.getElementById('main-nav');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const current = window.pageYOffset;
+            if (current > lastScroll && current > 160) {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+            lastScroll = current;
+        });
 
         // Basket functions
         function addSelectedToBasket(categoryId) {
             const select = document.getElementById('select-' + categoryId);
-            if (!select || !select.value) {
+            if (!select || select.value === "") {
                 alert("Please select an item first.");
                 return;
             }
-            const qtyInput = select.parentElement.querySelector('input[type="number"]');
+            const qtyInput = select.closest('.card-content').querySelector('.qty-input');
             const qty = parseInt(qtyInput.value) || 1;
             addToBasket(select.value, qty);
             alert(`Added to quote basket:\n${select.value} × ${qty}`);
@@ -500,20 +653,12 @@
                     div.innerHTML = `
                         <div class="basket-item-name">${item.name}</div>
                         <div class="basket-item-qty">×${item.qty}</div>
-                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index})">×</button>
+                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index}); showBasketModal();">×</button>
                     `;
                     list.appendChild(div);
                 });
             }
             modal.classList.add('show');
-        }
-
-        function removeFromBasketByIndex(index) {
-            let basket = getBasket();
-            basket.splice(index, 1);
-            saveBasket(basket);
-            updateBasketUI();
-            showBasketModal();
         }
 
         function closeBasketModal() {
@@ -534,29 +679,16 @@
             }
         });
 
-        // Smooth scrolling
+        // Smooth scrolling for nav links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
-                if (href === '#' || href === '#top') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else if (href.startsWith('#')) {
+                if (href.length > 1) {
                     e.preventDefault();
                     const target = document.querySelector(href);
-                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             });
-        });
-
-        // Sticky nav hide/show on scroll
-        const nav = document.querySelector('nav');
-        let last = 0;
-        window.addEventListener('scroll', () => {
-            let cur = window.pageYOffset;
-            if (cur > last && cur > 160) nav.style.transform = 'translateY(-100%)';
-            else nav.style.transform = 'translateY(0)';
-            last = cur;
         });
 
         // Close modal on outside click
