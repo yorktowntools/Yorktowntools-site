@@ -179,7 +179,7 @@
 
     <nav>
         <div class="mobile-nav">
-            <a href="#">Home</a>
+            <a href="index.html">Home</a>
             <a href="#plumbing">Plumbing & Pipe</a>
             <a href="#electrical">Electrical</a>
             <a href="#hvac">HVAC & Refrigeration</a>
@@ -198,7 +198,7 @@
         <section class="category-grid">
 
             <article class="category-card" id="plumbing">
-                <img src="Ridgid-pipe-wrench.jpg" alt="Plumbing & Pipe Tools" loading="lazy">
+                <img src="Ridgidpipewrench.jpg" alt="Plumbing & Pipe Tools" loading="lazy">
                 <div class="badge-popular">Crew Favorite</div>
                 <div class="category-content">
                     <h2>Plumbing & Pipe Tools</h2>
@@ -217,7 +217,7 @@
             </article>
 
             <article class="category-card" id="electrical">
-                <img src="Klein-conduit-tools.jpg" alt="Electrical Specialty" loading="lazy">
+                <img src="Flukekit.jpg" alt="Electrical Specialty" loading="lazy">
                 <div class="category-content">
                     <h2>Electrical Specialty</h2>
                     <p class="category-desc">Conduit benders, fish tapes, wire strippers, voltage testers, knockout sets.</p>
@@ -235,7 +235,7 @@
             </article>
 
             <article class="category-card" id="hvac">
-                <img src="Yellowjacket-manifold.jpg" alt="HVAC & Refrigeration" loading="lazy">
+                <img src="Hvacyellowjacket.jpg" alt="HVAC & Refrigeration" loading="lazy">
                 <div class="category-content">
                     <h2>HVAC & Refrigeration</h2>
                     <p class="category-desc">Manifold gauges, vacuum pumps, recovery machines, core removal tools.</p>
@@ -252,7 +252,7 @@
             </article>
 
             <article class="category-card" id="concrete">
-                <img src="Concrete-tools.jpg" alt="Concrete & Masonry" loading="lazy">
+                <img src="Rebarbender.jpg" alt="Concrete & Masonry" loading="lazy">
                 <div class="category-content">
                     <h2>Concrete & Masonry</h2>
                     <p class="category-desc">Rebar cutters, tie wire twisters, bull floats, tuck pointers, brick hammers.</p>
@@ -269,7 +269,7 @@
             </article>
 
             <article class="category-card" id="pullers">
-                <img src="OTC-puller-set.jpg" alt="Pullers & Extractors" loading="lazy">
+                <img src="Boltextractor.jpg" alt="Pullers & Extractors" loading="lazy">
                 <div class="category-content">
                     <h2>Pullers & Extractors</h2>
                     <p class="category-desc">Gear pullers, bearing separators, slide hammers, bolt extractors.</p>
@@ -281,12 +281,12 @@
                         <option>Irwin Bolt-Grip Extractor Set</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Pullers" id="quote-pullers">Text Quote</div>
+                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Pullers" id="quote-pullers"> Texts Quote</div>
                 </div>
             </article>
 
             <article class="category-card" id="inspection">
-                <img src="Ridgid-inspection-camera.jpg" alt="Inspection & Retrieval" loading="lazy">
+                <img src="Magneticpickup.jpg" alt="Inspection & Retrieval" loading="lazy">
                 <div class="category-content">
                     <h2>Inspection & Retrieval</h2>
                     <p class="category-desc">Borescopes, inspection cameras, magnetic retrievers, telescoping mirrors.</p>
@@ -347,10 +347,7 @@
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
-                if (href === '#' || href === '#top') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else if (href.startsWith('#')) {
+                if (href.startsWith('#') && href !== '#top') {
                     e.preventDefault();
                     document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
