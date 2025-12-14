@@ -430,7 +430,7 @@
             </div>
             <div class="basket-actions">
                 <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
-                <div class="basket-btn basket-btn-primary" id="basket-proceed-btn">Proceed to Quote</div>
+                <div class="basket-btn basket-btn-primary" onclick="proceedToQuote()">Proceed to Quote</div>
             </div>
         </div>
     </div>
@@ -457,6 +457,23 @@
             // Reset for next selection
             select.selectedIndex = 0;
             qtyInput.value = 1;
+        }
+
+        // The actual quote logic (extracted from basket.js for reuse)
+        function proceedToQuote() {
+            const basket = getBasket();
+            if (basket.length === 0) {
+                alert("Your quote basket is empty!");
+                return;
+            }
+
+            if (basket.length <= 5) {
+                const itemsText = basket.map(i => `• ${i.name} ×${i.qty}`).join('\n');
+                const smsBody = `Quote Request from YorktownTools.com\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+                window.location.href = `sms:7579405171?body=${smsBody}`;
+            } else {
+                window.location.href = 'index.html?basket=1';
+            }
         }
 
         // Show the basket modal
@@ -498,18 +515,11 @@
             document.getElementById('basket-modal').classList.remove('show');
         }
 
-        // Proceed from modal – same logic as floating button
-        document.getElementById('basket-proceed-btn').onclick = function() {
-            closeBasketModal();
-            document.getElementById('quote-basket-btn').click();
-        };
-
-        // Override floating button to open modal instead of direct action
+        // Floating button opens the modal
         document.addEventListener('DOMContentLoaded', () => {
             const floatingBtn = document.getElementById('quote-basket-btn');
             if (floatingBtn) {
-                floatingBtn.onclick = (e) => {
-                    e.stopPropagation();
+                floatingBtn.onclick = () => {
                     const basket = getBasket();
                     if (basket.length === 0) {
                         alert("Your quote basket is empty!");
