@@ -114,47 +114,167 @@
         .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
         .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
-        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0; background:white; }
-        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; margin-top:auto; transition:var(--transition); }
+        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0 0; background:white; }
+        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; transition:var(--transition); }
         .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
-        .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
-        .call-button img { width:64%; border:5px solid white; border-radius:50%; }
-        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
+        /* Floating buttons - stacked vertically */
+        .floating-buttons-container {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 999;
+        }
+
+        .call-button, #quote-basket-btn {
+            width: 72px;
+            height: 72px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(200, 16, 46, 0.55);
+            animation: pulse 2.6s infinite;
+            cursor: pointer;
+            color: white;
+            font-weight: 800;
+            font-size: 0.68rem;
+            text-align: center;
+            padding: 8px;
+            line-height: 1.2;
+        }
+
+        .call-button img {
+            width: 64%;
+            border: 5px solid white;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(200, 16, 46, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0); }
+        }
 
         footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
         footer a { color:white; text-decoration:underline; }
 
-        /* Desktop fallback modal */
-        #desktop-modal {
-            display:none;
-            position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000;
-            align-items:center; justify-content:center; text-align:center; padding:20px;
+        /* Basket View Modal */
+        #basket-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        #desktop-modal.show { display:flex; }
-        .modal-content {
-            background:white; padding:40px; border-radius:20px; max-width:420px; width:100%;
+        #basket-modal.show { display: flex; }
+        .basket-modal-content {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
         }
-        .modal-content h3 { margin-bottom:16px; color:var(--navy); }
-        .modal-content p { margin:20px 0; font-size:1.1rem; }
-        .modal-phone {
-            font-size:2.2rem; font-weight:800; color:var(--red); margin:20px 0;
+        .basket-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
         }
-        .modal-btn {
-            display:inline-block; background:var(--red); color:white; padding:16px 32px;
-            border-radius:50px; font-size:1.2rem; text-decoration:none; margin:10px;
+        .basket-header h3 {
+            font-size: 1.8rem;
+            color: var(--navy);
         }
-        .modal-btn.call { background:#0b1e3f; }
+        .basket-items {
+            padding: 20px 24px;
+        }
+        .basket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .basket-item:last-child { border-bottom: none; }
+        .basket-item-name {
+            flex: 1;
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .basket-item-qty {
+            margin: 0 16px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+        .basket-remove {
+            background: var(--red);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        .basket-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        .basket-actions {
+            padding: 20px 24px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .basket-btn {
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .basket-btn-primary {
+            background: var(--red);
+            color: white;
+        }
+        .basket-btn-primary:hover { background: #a00d24; transform: translateY(-3px); }
+        .basket-btn-secondary {
+            background: #eee;
+            color: var(--navy);
+        }
+        .basket-btn-secondary:hover { background: #ddd; }
     </style>
 </head>
 <body id="top">
 
-    <a href="tel:757-940-5171" class="call-button">
-        <img src="Yorktown.PNG" alt="Call Yorktown Tools">
-    </a>
+    <!-- Floating Buttons - Stacked Vertically -->
+    <div class="floating-buttons-container">
+        <!-- Get Quote Button (on top) -->
+        <div id="quote-basket-btn">
+            Get<br>Quote
+        </div>
 
-    <!-- MARQUEE (unchanged) -->
+        <!-- Phone Call Button (on bottom) -->
+        <a href="tel:757-940-5171" class="call-button">
+            <img src="Yorktown.PNG" alt="Call Yorktown Tools">
+        </a>
+    </div>
+
+    <!-- MARQUEE -->
     <div class="logo-marquee-container" aria-label="Trusted brands">
         <div class="marq">
             <div class="marq-track">
@@ -170,33 +290,8 @@
                 <div class="logo-item"><img src="Bondhuslogo.PNG" alt="Bondhus"></div>
                 <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
             </div>
-            <!-- duplicated tracks -->
-            <div class="marq-track"> <!-- same content --> 
-                <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
-                <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
-                <div class="logo-item"><img src="Milwaukeelogo.PNG" alt="Milwaukee"></div>
-                <div class="logo-item"><img src="Dewalt-logo.PNG" alt="DeWalt"></div>
-                <div class="logo-item"><img src="Craftsmanlogo.PNG" alt="Craftsman"></div>
-                <div class="logo-item"><img src="Tektonlogo.PNG" alt="Tekton"></div>
-                <div class="logo-item"><img src="Crescenttools .JPG" alt="Crescent"></div>
-                <div class="logo-item"><img src="Channellocklogo.PNG" alt="Channellock"></div>
-                <div class="logo-item"><img src="Kleintools.png" alt="Klein Tools"></div>
-                <div class="logo-item"><img src="Bondhuslogo.PNG" alt="Bondhus"></div>
-                <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
-            </div>
-            <div class="marq-track"> <!-- same again --> 
-                <div class="logo-item"><img src="GearWrench.JPG" alt="GearWrench"></div>
-                <div class="logo-item"><img src="Knipex.PNG" alt="Knipex"></div>
-                <div class="logo-item"><img src="Milwaukeelogo.PNG" alt="Milwaukee"></div>
-                <div class="logo-item"><img src="Dewalt-logo.PNG" alt="DeWalt"></div>
-                <div class="logo-item"><img src="Craftsmanlogo.PNG" alt="Craftsman"></div>
-                <div class="logo-item"><img src="Tektonlogo.PNG" alt="Tekton"></div>
-                <div class="logo-item"><img src="Crescenttools .JPG" alt="Crescent"></div>
-                <div class="logo-item"><img src="Channellocklogo.PNG" alt="Channellock"></div>
-                <div class="logo-item"><img src="Kleintools.png" alt="Klein Tools"></div>
-                <div class="logo-item"><img src="Bondhuslogo.PNG" alt="Bondhus"></div>
-                <div class="logo-item"><img src="Bosch.WEBP" alt="Bosch"></div>
-            </div>
+            <div class="marq-track"><!-- duplicate --></div>
+            <div class="marq-track"><!-- duplicate --></div>
         </div>
     </div>
 
@@ -227,14 +322,14 @@
         </section>
 
         <section class="category-grid">
-            <!-- All category cards unchanged except quote-btn now has data-sms attribute -->
+
             <article class="category-card" id="wrenches">
                 <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
                 <div class="badge-popular">#1 Most Requested</div>
                 <div class="category-content">
                     <h2>Wrenches & Torque</h2>
                     <p class="category-desc">Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty. SAE & metric, 90-tooth and XL lengths.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'wrenches')">
+                    <select class="tool-select" id="select-wrenches">
                         <option value="">— Choose a wrench —</option>
                         <option>GearWrench 90T Ratcheting Metric Set (8-19mm)</option>
                         <option>GearWrench 90T Ratcheting SAE Set</option>
@@ -247,7 +342,10 @@
                         <option>Precision Instruments 3/8" Split-Beam Torque</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Wrenches" id="quote-wrenches">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('wrenches')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -257,7 +355,7 @@
                 <div class="category-content">
                     <h2>Pliers & Cutters</h2>
                     <p class="category-desc">Needle nose, slip joint, locking, cutters, and more. High-leverage designs for professional use.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'pliers')">
+                    <select class="tool-select" id="select-pliers">
                         <option value="">— Choose pliers —</option>
                         <option>Knipex Cobra Pliers Set</option>
                         <option>Knipex Alligator Pliers</option>
@@ -267,17 +365,19 @@
                         <option>Crescent Compound Action Pliers</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Pliers" id="quote-pliers">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('pliers')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
-            <!-- Repeat same pattern for all other cards -->
             <article class="category-card" id="measuring">
                 <img src="Bosch-laser.jpg" alt="Measuring Tools" loading="lazy">
                 <div class="category-content">
                     <h2>Measuring & Layout</h2>
                     <p class="category-desc">Tape measures, levels, squares, calipers, and laser tools. Accurate and durable for precise work.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'measuring')">
+                    <select class="tool-select" id="select-measuring">
                         <option value="">— Choose measuring tool —</option>
                         <option>DeWalt 25' Tape Measure</option>
                         <option>Milwaukee 48" Level</option>
@@ -286,7 +386,10 @@
                         <option>Mitutoyo Digital Caliper</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Measuring" id="quote-measuring">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('measuring')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -295,7 +398,7 @@
                 <div class="category-content">
                     <h2>Screwdrivers & Sets</h2>
                     <p class="category-desc">Phillips, flathead, Torx, nut drivers, and multi-bit. Insulated and precision options available.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'screwdrivers')">
+                    <select class="tool-select" id="select-screwdrivers">
                         <option value="">— Choose screwdriver —</option>
                         <option>Craftsman 12-pc Set</option>
                         <option>Klein Tools Insulated Set</option>
@@ -304,7 +407,10 @@
                         <option>DeWalt Precision Set</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Screwdrivers" id="quote-screwdrivers">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('screwdrivers')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -313,7 +419,7 @@
                 <div class="category-content">
                     <h2>Hex Keys & Torx</h2>
                     <p class="category-desc">Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'hex-torx')">
+                    <select class="tool-select" id="select-hex-torx">
                         <option value="">— Choose hex/torx —</option>
                         <option>Bondhus Ball-End Hex Set (Metric)</option>
                         <option>Bondhus Ball-End Hex Set (SAE)</option>
@@ -322,7 +428,10 @@
                         <option>GearWrench Torx Bit Set</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Hex-Torx" id="quote-hex-torx">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('hex-torx')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -331,7 +440,7 @@
                 <div class="category-content">
                     <h2>Specialty Tools</h2>
                     <p class="category-desc">Pipe wrenches, basin wrenches, pullers, punches, and other task-specific tools.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'specialty')">
+                    <select class="tool-select" id="select-specialty">
                         <option value="">— Choose specialty tool —</option>
                         <option>Ridgid Pipe Wrench</option>
                         <option>Basin Wrench Telescoping</option>
@@ -339,9 +448,13 @@
                         <option>Punch and Chisel Set</option>
                         <option>Other / Custom Request</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Specialty" id="quote-specialty">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('specialty')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
+
         </section>
 
         <section style="text-align:center;margin:80px 0 40px;">
@@ -357,35 +470,137 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <!-- Desktop fallback modal -->
-    <div id="desktop-modal">
-        <div class="modal-content">
-            <h3>Text Us for a Fast Quote</h3>
-            <p>Tap the number below on your phone<br>or give us a call:</p>
-            <div class="modal-phone">757-940-5171</div>
-            <a href="#" class="modal-btn" id="modal-sms-link">Text Message →</a>
-            <a href="tel:757-940-5171" class="modal-btn call">Call Now</a>
-            <p><small>Close this window to continue browsing</small></p>
+    <!-- View & Edit Basket Modal -->
+    <div id="basket-modal">
+        <div class="basket-modal-content">
+            <div class="basket-header">
+                <h3>Your Quote Basket</h3>
+            </div>
+            <div class="basket-items" id="basket-items-list">
+                <!-- Items will be injected here -->
+            </div>
+            <div class="basket-actions">
+                <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
+                <div class="basket-btn basket-btn-primary" onclick="proceedToQuote()">Proceed to Quote</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Update quote button text + data attribute
-        function updateQuote(select, category) {
-            const btn = document.getElementById('quote-' + category);
-            const base = "sms:7579405171?body=Need%20quote%20-%20" + 
-                        category.charAt(0).toUpperCase() + category.slice(1);
-            if (select.value) {
-                const sms = base + ":%20" + encodeURIComponent(select.value);
-                btn.dataset.sms = sms;
-                btn.textContent = "Quote: " + select.value + " →";
-            } else {
-                btn.dataset.sms = base;
-                btn.textContent = "Text Quote →";
-            }
+        // Simple in-page basket implementation
+        const BASKET_KEY = 'handtools_quote_basket';
+
+        function getBasket() {
+            const stored = localStorage.getItem(BASKET_KEY);
+            return stored ? JSON.parse(stored) : [];
         }
 
-        // Smooth scroll for all # links (including Home → top of page)
+        function saveBasket(basket) {
+            localStorage.setItem(BASKET_KEY, JSON.stringify(basket));
+        }
+
+        function addToBasket(name, qty) {
+            const basket = getBasket();
+            const existing = basket.find(item => item.name === name);
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                basket.push({ name, qty });
+            }
+            saveBasket(basket);
+        }
+
+        function removeFromBasketByIndex(index) {
+            const basket = getBasket();
+            basket.splice(index, 1);
+            saveBasket(basket);
+            showBasketModal(); // refresh view
+        }
+
+        function addSelectedToBasket(categoryId) {
+            const select = document.getElementById('select-' + categoryId);
+            if (!select || !select.value) {
+                alert("Please select an item first.");
+                return;
+            }
+
+            const qtyInput = select.parentElement.querySelector('input[type="number"]');
+            const qty = parseInt(qtyInput.value) || 1;
+
+            addToBasket(select.value, qty);
+
+            alert(`Added to quote basket:\n${select.value} × ${qty}`);
+
+            // Reset for next selection
+            select.selectedIndex = 0;
+            qtyInput.value = 1;
+        }
+
+        function proceedToQuote() {
+            const basket = getBasket();
+            if (basket.length === 0) {
+                alert("Your quote basket is empty!");
+                return;
+            }
+
+            const itemsText = basket.map(i => `• ${i.name} ×${i.qty}`).join('\n');
+            const smsBody = `Quote Request - Precision Hand Tools from YorktownTools.com\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+            const smsUrl = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+
+            const opened = window.open(smsUrl, '_blank');
+            if (!opened) {
+                window.location.href = smsUrl;
+            }
+
+            // Clear basket after sending
+            localStorage.removeItem(BASKET_KEY);
+            closeBasketModal();
+        }
+
+        function showBasketModal() {
+            const modal = document.getElementById('basket-modal');
+            const list = document.getElementById('basket-items-list');
+            const basket = getBasket();
+
+            if (basket.length === 0) {
+                list.innerHTML = '<div class="basket-empty">Your quote basket is empty.</div>';
+            } else {
+                list.innerHTML = '';
+                basket.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'basket-item';
+                    div.innerHTML = `
+                        <div class="basket-item-name">${item.name}</div>
+                        <div class="basket-item-qty">×${item.qty}</div>
+                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index})">×</button>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeBasketModal() {
+            document.getElementById('basket-modal').classList.remove('show');
+        }
+
+        // Floating Get Quote button opens modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const floatingBtn = document.getElementById('quote-basket-btn');
+            if (floatingBtn) {
+                floatingBtn.onclick = () => {
+                    const basket = getBasket();
+                    if (basket.length === 0) {
+                        alert("Your quote basket is empty!");
+                    } else {
+                        showBasketModal();
+                    }
+                };
+            }
+        });
+
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -394,12 +609,13 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else if (href.startsWith('#')) {
                     e.preventDefault();
-                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const target = document.querySelector(href);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
-        // Hide/show navbar on scroll
+        // Sticky nav hide/show on scroll
         const nav = document.querySelector('nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -409,26 +625,9 @@
             last = cur;
         });
 
-        // Quote button handler – mobile opens sms:, desktop shows modal
-        document.querySelectorAll('.quote-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const smsUrl = this.dataset.sms;
-
-                // Try to open SMS (works on mobile)
-                const opened = window.open(smsUrl, '_blank');
-
-                // If on desktop (no SMS app), show modal
-                if (!opened || opened === null || typeof opened === 'undefined') {
-                    document.getElementById('modal-sms-link').href = smsUrl;
-                    document.getElementById('desktop-modal').classList.add('show');
-                }
-            });
-        });
-
-        // Close modal when clicking outside content
-        document.getElementById('desktop-modal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('show');
+        // Close modal when clicking outside
+        document.getElementById('basket-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeBasketModal();
         });
     </script>
 </body>
