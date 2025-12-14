@@ -119,12 +119,11 @@
         .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
         .call-button, #quote-basket-btn {
-            position:fixed; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; cursor:pointer;
+            position:fixed; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; cursor:pointer; color:white; font-weight:800; font-size:0.68rem; text-align:center; padding:8px; line-height:1.2;
         }
         .call-button { right:16px; }
         #quote-basket-btn { right:100px; }
         .call-button img { width:64%; border:5px solid white; border-radius:50%; }
-        #quote-basket-btn span { font-size: 36px; }
         @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
 
         footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
@@ -233,9 +232,9 @@
         <img src="Yorktown.PNG" alt="Call Yorktown Tools">
     </a>
 
-    <!-- Quote Basket Floating Button (now properly added and visible) -->
+    <!-- Get Quote Floating Button (text only) -->
     <div id="quote-basket-btn">
-        <span>🛒</span>
+        Get<br>Quote
     </div>
 
     <!-- MARQUEE -->
@@ -295,7 +294,7 @@
                         <option value="">— Choose platform ladder —</option>
                         <option>Werner PD6208 8-ft Podium (Type IA)</option>
                         <option>Louisville PD9000 Series 10-ft</option>
-                        <option>Little Giant Jumbo Step (Fiberglass)</option>
+                        <option>Little Giant Jumbo Step (Fib fiberglass)</option>
                         <option>Werner PD7306 6-ft Podium</option>
                         <option>Other / Custom</option>
                     </select>
@@ -398,7 +397,7 @@
     </div>
 
     <script>
-        // Basket functions (self-contained)
+        // Basket storage functions
         function getBasket() {
             const data = localStorage.getItem('quoteBasket');
             return data ? JSON.parse(data) : [];
@@ -488,7 +487,7 @@
             document.getElementById('basket-modal').classList.remove('show');
         }
 
-        // Floating quote basket button opens modal
+        // Floating quote basket button
         document.addEventListener('DOMContentLoaded', () => {
             const floatingBtn = document.getElementById('quote-basket-btn');
             if (floatingBtn) {
