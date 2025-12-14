@@ -96,12 +96,12 @@ function createBasketButton() {
             return;
         }
 
-        // For small baskets (≤5 items), send via SMS
+        // For small baskets (≤5 items), send via SMS with clean, readable newlines
         if (basket.length <= 5) {
-            const itemsText = basket.map(i => `• ${i.name} ×${i.qty}`).join('%0A');
-            const smsBody = encodeURIComponent(
-                `Quote Request from YorktownTools.com%0A%0A${itemsText}%0A%0APlease send pricing, availability, and delivery options. Thank you!`
-            );
+            const itemsText = basket.map(i => `• ${i.name} ×${i.qty}`).join('\n');
+            const smsBody = `Quote Request from YorktownTools.com\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+            
+            // Use plain \n newlines — modern phones (iOS & most Android) display them correctly as line breaks
             window.location.href = `sms:7579405171?body=${smsBody}`;
         } else {
             // For larger baskets, go to main page and pre-fill the form
