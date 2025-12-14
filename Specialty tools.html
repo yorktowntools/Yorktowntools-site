@@ -114,39 +114,165 @@
         .category-content { padding:26px; flex-grow:1; display:flex; flex-direction:column; }
         .category-card h2 { font-size:1.7rem; color:var(--navy); margin-bottom:12px; }
         .category-desc { color:#555; margin-bottom:20px; flex-grow:1; line-height:1.6; }
-        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0; background:white; }
-        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; margin-top:auto; transition:var(--transition); }
+        .tool-select { width:100%; padding:15px 18px; border:2px solid #e9ecef; border-radius:14px; font-size:1.02rem; margin:18px 0 0; background:white; }
+        .quote-btn { background:var(--red); color:white; text-align:center; padding:17px; border-radius:14px; font-weight:700; cursor:pointer; transition:var(--transition); }
         .quote-btn:hover { background:#a00d24; transform:translateY(-4px); }
 
-        .call-button { position:fixed; right:16px; bottom:16px; width:72px; height:72px; background:var(--red); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 32px rgba(200,16,46,0.55); z-index:999; animation:pulse 2.6s infinite; }
-        .call-button img { width:64%; border:5px solid white; border-radius:50%; }
-        @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow:0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow:0 0 0 0 rgba(200,16,46,0); } }
+        /* Floating buttons - stacked vertically */
+        .floating-buttons-container {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 999;
+        }
+
+        .call-button, #quote-basket-btn {
+            width: 72px;
+            height: 72px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(200, 16, 46, 0.55);
+            animation: pulse 2.6s infinite;
+            cursor: pointer;
+            color: white;
+            font-weight: 800;
+            font-size: 0.68rem;
+            text-align: center;
+            padding: 8px;
+            line-height: 1.2;
+        }
+
+        .call-button img {
+            width: 64%;
+            border: 5px solid white;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(200, 16, 46, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0); }
+        }
 
         footer { background:var(--navy); color:white; text-align:center; padding:90px 20px 40px; margin-top:100px; }
         .footer-artwork { max-width:900px; width:95%; margin:0 auto 40px; opacity:0.95; }
         footer a { color:white; text-decoration:underline; }
 
-        #desktop-modal {
-            display:none;
-            position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:10000;
-            align-items:center; justify-content:center; text-align:center; padding:20px;
+        /* Basket View Modal */
+        #basket-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        #desktop-modal.show { display:flex; }
-        .modal-content {
-            background:white; padding:40px; border-radius:20px; max-width:420px; width:100%;
+        #basket-modal.show { display: flex; }
+        .basket-modal-content {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
         }
-        .modal-content h3 { margin-bottom:16px; color:var(--navy); }
-        .modal-content p { margin:20px 0; font-size:1.1rem; }
-        .modal-phone { font-size:2.2rem; font-weight:800; color:var(--red); margin:20px 0; }
-        .modal-btn { display:inline-block; background:var(--red); color:white; padding:16px 32px; border-radius:50px; font-size:1.2rem; text-decoration:none; margin:10px; }
-        .modal-btn.call { background:#0b1e3f; }
+        .basket-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        .basket-header h3 {
+            font-size: 1.8rem;
+            color: var(--navy);
+        }
+        .basket-items {
+            padding: 20px 24px;
+        }
+        .basket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .basket-item:last-child { border-bottom: none; }
+        .basket-item-name {
+            flex: 1;
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .basket-item-qty {
+            margin: 0 16px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+        .basket-remove {
+            background: var(--red);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+        .basket-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        .basket-actions {
+            padding: 20px 24px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .basket-btn {
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .basket-btn-primary {
+            background: var(--red);
+            color: white;
+        }
+        .basket-btn-primary:hover { background: #a00d24; transform: translateY(-3px); }
+        .basket-btn-secondary {
+            background: #eee;
+            color: var(--navy);
+        }
+        .basket-btn-secondary:hover { background: #ddd; }
     </style>
 </head>
 <body id="top">
 
-    <a href="tel:757-940-5171" class="call-button">
-        <img src="Yorktown.PNG" alt="Call Yorktown Tools">
-    </a>
+    <!-- Floating Buttons - Stacked Vertically -->
+    <div class="floating-buttons-container">
+        <!-- Get Quote Button (on top) -->
+        <div id="quote-basket-btn">
+            Get<br>Quote
+        </div>
+
+        <!-- Phone Call Button (on bottom) -->
+        <a href="tel:757-940-5171" class="call-button">
+            <img src="Yorktown.PNG" alt="Call Yorktown Tools">
+        </a>
+    </div>
 
     <!-- MARQUEE -->
     <div class="logo-marquee-container" aria-label="Trusted brands">
@@ -203,7 +329,7 @@
                 <div class="category-content">
                     <h2>Plumbing & Pipe Tools</h2>
                     <p class="category-desc">Heavy-duty pipe wrenches, basin wrenches, tubing cutters, flaring tools, press tools.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'plumbing')">
+                    <select class="tool-select" id="select-plumbing">
                         <option value="">— Choose plumbing tool —</option>
                         <option>RIDGID 36" Straight Pipe Wrench</option>
                         <option>RIDGID 18" Aluminum RapidGrip</option>
@@ -212,7 +338,10 @@
                         <option>RIDGID RP 350 Press Tool Kit</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Plumbing" id="quote-plumbing">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('plumbing')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -221,7 +350,7 @@
                 <div class="category-content">
                     <h2>Electrical Specialty</h2>
                     <p class="category-desc">Conduit benders, fish tapes, wire strippers, voltage testers, knockout sets.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'electrical')">
+                    <select class="tool-select" id="select-electrical">
                         <option value="">— Choose electrical tool —</option>
                         <option>Klein 1/2"–1" Conduit Bender Set</option>
                         <option>Ideal 200-ft Steel Fish Tape</option>
@@ -230,7 +359,10 @@
                         <option>Fluke T6-1000 Electrical Tester</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Electrical" id="quote-electrical">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('electrical')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -239,7 +371,7 @@
                 <div class="category-content">
                     <h2>HVAC & Refrigeration</h2>
                     <p class="category-desc">Manifold gauges, vacuum pumps, recovery machines, core removal tools.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'hvac')">
+                    <select class="tool-select" id="select-hvac">
                         <option value="">— Choose HVAC tool —</option>
                         <option>Yellow Jacket 4-Valve Digital Manifold</option>
                         <option>JB Industries 7 CFM Vacuum Pump</option>
@@ -247,7 +379,10 @@
                         <option>hilmor Core Removal Tool Set</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20HVAC" id="quote-hvac">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('hvac')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -256,7 +391,7 @@
                 <div class="category-content">
                     <h2>Concrete & Masonry</h2>
                     <p class="category-desc">Rebar cutters, tie wire twisters, bull floats, tuck pointers, brick hammers.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'concrete')">
+                    <select class="tool-select" id="select-concrete">
                         <option value="">— Choose concrete tool —</option>
                         <option>BN Products 3/4" Rebar Cutter/Bender</option>
                         <option>Marshalltown 48" Bull Float Kit</option>
@@ -264,7 +399,10 @@
                         <option>Bon Tool Brick Hammer</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Concrete" id="quote-concrete">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('concrete')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -273,7 +411,7 @@
                 <div class="category-content">
                     <h2>Pullers & Extractors</h2>
                     <p class="category-desc">Gear pullers, bearing separators, slide hammers, bolt extractors.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'pullers')">
+                    <select class="tool-select" id="select-pullers">
                         <option value="">— Choose puller —</option>
                         <option>OTC 20-Ton Hydraulic Puller Set</option>
                         <option>Posi Lock 20-Ton Gear Puller</option>
@@ -281,7 +419,10 @@
                         <option>Irwin Bolt-Grip Extractor Set</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Pullers" id="quote-pullers"> Texts Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('pullers')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -290,7 +431,7 @@
                 <div class="category-content">
                     <h2>Inspection & Retrieval</h2>
                     <p class="category-desc">Borescopes, inspection cameras, magnetic retrievers, telescoping mirrors.</p>
-                    <select class="tool-select" onchange="updateQuote(this,'inspection')">
+                    <select class="tool-select" id="select-inspection">
                         <option value="">— Choose inspection tool —</option>
                         <option>RIDGID SeeSnake NanoReel</option>
                         <option>Milwaukee M12 M-Spector 9-ft Camera</option>
@@ -298,7 +439,10 @@
                         <option>General Tools Wireless Borescope</option>
                         <option>Other / Custom</option>
                     </select>
-                    <div class="quote-btn" data-sms="sms:7579405171?body=Need%20quote%20-%20Inspection" id="quote-inspection">Text Quote</div>
+                    <div style="display:flex; gap:12px; margin:18px 0 24px;">
+                        <input type="number" min="1" value="1" placeholder="Qty" style="width:90px; padding:12px 8px; border-radius:12px; border:2px solid #dee2e6; font-size:1rem; text-align:center;">
+                        <div class="quote-btn" onclick="addSelectedToBasket('inspection')">Add to Quote →</div>
+                    </div>
                 </div>
             </article>
 
@@ -317,43 +461,152 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <!-- Desktop fallback modal -->
-    <div id="desktop-modal">
-        <div class="modal-content">
-            <h3>Text Us for a Fast Quote</h3>
-            <p>Tap the number below on your phone<br>or give us a call:</p>
-            <div class="modal-phone">757-940-5171</div>
-            <a href="#" class="modal-btn" id="modal-sms-link">Text Message</a>
-            <a href="tel:757-940-5171" class="modal-btn call">Call Now</a>
-            <p><small>Close this window to continue browsing</small></p>
+    <!-- View & Edit Basket Modal -->
+    <div id="basket-modal">
+        <div class="basket-modal-content">
+            <div class="basket-header">
+                <h3>Your Quote Basket</h3>
+            </div>
+            <div class="basket-items" id="basket-items-list">
+                <!-- Items will be injected here -->
+            </div>
+            <div class="basket-actions">
+                <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
+                <div class="basket-btn basket-btn-primary" onclick="proceedToQuote()">Proceed to Quote</div>
+            </div>
         </div>
     </div>
 
     <script>
-        function updateQuote(select, category) {
-            const btn = document.getElementById('quote-' + category);
-            const base = "sms:7579405171?body=Need%20quote%20-%20" + 
-                         category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('%20');
-            if (select.value) {
-                const sms = base + ":%20" + encodeURIComponent(select.value);
-                btn.dataset.sms = sms;
-                btn.textContent = "Quote: " + select.value + " →";
-            } else {
-                btn.dataset.sms = base;
-                btn.textContent = "Text Quote →";
-            }
+        // Simple in-page basket implementation
+        const BASKET_KEY = 'specialty_quote_basket';
+
+        function getBasket() {
+            const stored = localStorage.getItem(BASKET_KEY);
+            return stored ? JSON.parse(stored) : [];
         }
 
+        function saveBasket(basket) {
+            localStorage.setItem(BASKET_KEY, JSON.stringify(basket));
+        }
+
+        function addToBasket(name, qty) {
+            const basket = getBasket();
+            const existing = basket.find(item => item.name === name);
+            if (existing) {
+                existing.qty += qty;
+            } else {
+                basket.push({ name, qty });
+            }
+            saveBasket(basket);
+        }
+
+        function removeFromBasketByIndex(index) {
+            const basket = getBasket();
+            basket.splice(index, 1);
+            saveBasket(basket);
+            showBasketModal(); // refresh view
+        }
+
+        function addSelectedToBasket(categoryId) {
+            const select = document.getElementById('select-' + categoryId);
+            if (!select || !select.value) {
+                alert("Please select an item first.");
+                return;
+            }
+
+            const qtyInput = select.parentElement.querySelector('input[type="number"]');
+            const qty = parseInt(qtyInput.value) || 1;
+
+            addToBasket(select.value, qty);
+
+            alert(`Added to quote basket:\n${select.value} × ${qty}`);
+
+            // Reset for next selection
+            select.selectedIndex = 0;
+            qtyInput.value = 1;
+        }
+
+        function proceedToQuote() {
+            const basket = getBasket();
+            if (basket.length === 0) {
+                alert("Your quote basket is empty!");
+                return;
+            }
+
+            const itemsText = basket.map(i => `• ${i.name} ×${i.qty}`).join('\n');
+            const smsBody = `Quote Request - Specialty Tools from YorktownTools.com\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+            const smsUrl = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+
+            const opened = window.open(smsUrl, '_blank');
+            if (!opened) {
+                window.location.href = smsUrl;
+            }
+
+            // Clear basket after sending
+            localStorage.removeItem(BASKET_KEY);
+            closeBasketModal();
+        }
+
+        function showBasketModal() {
+            const modal = document.getElementById('basket-modal');
+            const list = document.getElementById('basket-items-list');
+            const basket = getBasket();
+
+            if (basket.length === 0) {
+                list.innerHTML = '<div class="basket-empty">Your quote basket is empty.</div>';
+            } else {
+                list.innerHTML = '';
+                basket.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'basket-item';
+                    div.innerHTML = `
+                        <div class="basket-item-name">${item.name}</div>
+                        <div class="basket-item-qty">×${item.qty}</div>
+                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index})">×</button>
+                    `;
+                    list.appendChild(div);
+                });
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeBasketModal() {
+            document.getElementById('basket-modal').classList.remove('show');
+        }
+
+        // Floating Get Quote button opens modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const floatingBtn = document.getElementById('quote-basket-btn');
+            if (floatingBtn) {
+                floatingBtn.onclick = () => {
+                    const basket = getBasket();
+                    if (basket.length === 0) {
+                        alert("Your quote basket is empty!");
+                    } else {
+                        showBasketModal();
+                    }
+                };
+            }
+        });
+
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
-                if (href.startsWith('#') && href !== '#top') {
+                if (href === '#' || href === '#top') {
                     e.preventDefault();
-                    document.querySelector(href).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
+        // Sticky nav hide/show on scroll
         const nav = document.querySelector('nav');
         let last = 0;
         window.addEventListener('scroll', () => {
@@ -363,20 +616,9 @@
             last = cur;
         });
 
-        document.querySelectorAll('.quote-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const smsUrl = this.dataset.sms;
-                const opened = window.open(smsUrl, '_blank');
-                if (!opened || opened === null || typeof opened === 'undefined') {
-                    document.getElementById('modal-sms-link').href = smsUrl;
-                    document.getElementById('desktop-modal').classList.add('show');
-                }
-            });
-        });
-
-        document.getElementById('desktop-modal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('show');
+        // Close modal when clicking outside
+        document.getElementById('basket-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeBasketModal();
         });
     </script>
 </body>
