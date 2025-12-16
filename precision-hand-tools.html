@@ -173,6 +173,12 @@
             line-height: 1.55;
             margin-bottom: 1.2rem;
         }
+        .card .popular-note {
+            font-size: 0.98rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
 
         .badge-popular {
             position: absolute;
@@ -287,9 +293,9 @@
         .text-btn { display:inline-block; background:#0066cc; color:white; padding:1.3rem 3rem; border-radius:50px; font-size:1.35rem; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(0,102,204,0.3); transition:var(--transition); }
         .text-btn:hover { transform:translateY(-5px); opacity:0.9; }
 
-        /* NEW: Brand Directory Section */
+        /* Brand Directory Section */
         .brand-directory {
-            margin: 5rem 0 6rem;
+            margin: 6rem 0;
             text-align: center;
         }
         .brand-directory h2 {
@@ -298,7 +304,7 @@
             margin-bottom: 1rem;
             font-weight: 800;
         }
-        .brand-directory p {
+        .brand-directory > p {
             font-size: 1.2rem;
             color: #495057;
             max-width: 800px;
@@ -312,7 +318,7 @@
         .brand-card {
             background: var(--white);
             border-radius: var(--radius);
-            padding: 2rem 1.5rem;
+            padding: 2.5rem 1.5rem;
             box-shadow: var(--shadow);
             transition: var(--transition);
             display: flex;
@@ -323,12 +329,16 @@
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
-        .brand-card img {
-            height: 80px;
-            width: auto;
-            max-width: 180px;
-            object-fit: contain;
-            margin-bottom: 1.2rem;
+        .brand-card h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .brand-card .brand-desc {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 1.8rem;
+            flex-grow: 1;
         }
         .brand-card a {
             display: inline-block;
@@ -338,7 +348,6 @@
             border-radius: 50px;
             font-weight: 700;
             text-decoration: none;
-            margin-top: auto;
             transition: var(--transition);
         }
         .brand-card a:hover {
@@ -489,6 +498,7 @@
                 <div class="card-content">
                     <h3>Wrenches & Torque</h3>
                     <p>Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty. SAE & metric, 90-tooth and XL lengths.</p>
+                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
                     <select class="tool-select" id="select-wrenches">
                         <option value="">— Choose a wrench —</option>
                         <option>GearWrench 90T Ratcheting Metric Set (8-19mm)</option>
@@ -517,6 +527,7 @@
                 <div class="card-content">
                     <h3>Pliers & Cutters</h3>
                     <p>Needle nose, slip joint, locking, cutters, and more. High-leverage designs for professional use.</p>
+                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
                     <select class="tool-select" id="select-pliers">
                         <option value="">— Choose pliers —</option>
                         <option>Knipex Cobra Pliers Set</option>
@@ -539,6 +550,7 @@
                 <div class="card-content">
                     <h3>Measuring & Layout</h3>
                     <p>Tape measures, levels, squares, calipers, and laser tools. Accurate and durable for precise work.</p>
+                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
                     <select class="tool-select" id="select-measuring">
                         <option value="">— Choose measuring tool —</option>
                         <option>DeWalt 25' Tape Measure</option>
@@ -560,6 +572,7 @@
                 <div class="card-content">
                     <h3>Screwdrivers & Sets</h3>
                     <p>Phillips, flathead, Torx, nut drivers, and multi-bit. Insulated and precision options available.</p>
+                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
                     <select class="tool-select" id="select-screwdrivers">
                         <option value="">— Choose screwdriver —</option>
                         <option>Craftsman 12-pc Set</option>
@@ -581,6 +594,7 @@
                 <div class="card-content">
                     <h3>Hex Keys & Torx</h3>
                     <p>Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
+                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
                     <select class="tool-select" id="select-hex-torx">
                         <option value="">— Choose hex/torx —</option>
                         <option>Bondhus Ball-End Hex Set (Metric)</option>
@@ -602,6 +616,7 @@
                 <div class="card-content">
                     <h3>Specialty Tools</h3>
                     <p>Pipe wrenches, basin wrenches, pullers, punches, and other task-specific tools.</p>
+                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
                     <select class="tool-select" id="select-specialty">
                         <option value="">— Choose specialty tool —</option>
                         <option>Ridgid Pipe Wrench</option>
@@ -619,25 +634,29 @@
 
         </section>
 
-        <!-- NEW BRAND DIRECTORY SECTION -->
+        <!-- BRAND DIRECTORY SECTION -->
         <section class="brand-directory">
-            <h2>Explore Full Hand Tool Catalogs</h2>
-            <p>Browse complete hand tool collections directly from leading manufacturers.</p>
+            <h2>Explore Full Manufacturer Hand Tool Catalogs</h2>
+            <p>Not seeing exactly what you need? Browse the complete hand tool collections directly from these leading brands.</p>
             <div class="brand-grid">
                 <div class="brand-card">
-                    <img src="https://www.dewalt.com/sites/g/files/oykume291/files/styles/brand_logo/public/2023-03/DeWalt_Logo.png?itok=5z7s7k1K" alt="DeWALT Logo" loading="lazy">
+                    <h3 style="color: #FEBD17;">DeWALT</h3>
+                    <p class="brand-desc">Professional power & hand tools built for the toughest jobs.</p>
                     <a href="https://www.dewalt.com/products/hand-tools" target="_blank" rel="noopener">View DeWALT Hand Tools →</a>
                 </div>
                 <div class="brand-card">
-                    <img src="https://www.milwaukeetool.com/-/media/Feature/Redesign-2023/Milwaukee-Tool-Logo.png?h=100&iar=0&w=300&hash=9C3F3E4F4E4E4E4E" alt="Milwaukee Logo" loading="lazy">
+                    <h3 style="color: #C92A28;">Milwaukee</h3>
+                    <p class="brand-desc">Heavy-duty tools engineered for the professional trades.</p>
                     <a href="https://www.milwaukeetool.com/products/hand-tools" target="_blank" rel="noopener">View Milwaukee Hand Tools →</a>
                 </div>
                 <div class="brand-card">
-                    <img src="https://www.stanleytools.com/sites/g/files/oykume291/files/styles/brand_logo/public/2023-03/STANLEY_Logo.png?itok=5z7s7k1K" alt="STANLEY Logo" loading="lazy">
+                    <h3 style="color: #FFDB0A;">STANLEY</h3>
+                    <p class="brand-desc">Trusted hand tools with a legacy of quality since 1843.</p>
                     <a href="https://www.stanleytools.com/products/hand-tools" target="_blank" rel="noopener">View STANLEY Hand Tools →</a>
                 </div>
                 <div class="brand-card">
-                    <img src="https://www.irwin.com/uploads/brand/irwin-logo.png" alt="IRWIN Logo" loading="lazy">
+                    <h3 style="color: #0033A0;">IRWIN</h3>
+                    <p class="brand-desc">Precision fastening, cutting, and vise-grip tools.</p>
                     <a href="https://www.irwintools.com/products/hand-tools" target="_blank" rel="noopener">View IRWIN Hand Tools →</a>
                 </div>
             </div>
