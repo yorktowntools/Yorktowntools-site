@@ -454,6 +454,7 @@
                 </div>
             </div>
 
+            <!-- Pliers Card – Now functions identically to Wrenches -->
             <div class="card" id="pliers">
                 <div style="position:relative;">
                     <img src="Knipex-pliers.JPG" alt="Pliers" loading="lazy">
@@ -462,20 +463,22 @@
                 <div class="card-content">
                     <h3>Pliers & Cutters</h3>
                     <p>Needle nose, slip joint, locking, cutters, and more. High-leverage designs for professional use.</p>
-                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
-                    <select class="tool-select" id="select-pliers">
-                        <option value="">— Choose pliers —</option>
-                        <option>Knipex Cobra Pliers Set</option>
-                        <option>Knipex Alligator Pliers</option>
-                        <option>Channellock 9.5" Tongue & Groove</option>
-                        <option>Klein Tools Diagonal Cutters</option>
-                        <option>Milwaukee Locking Pliers</option>
-                        <option>Crescent Compound Action Pliers</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full pliers catalog online, or select "Request Custom Quote" for pricing and availability.</p>
+                    <select class="tool-select" id="select-pliers" onchange="handlePlierSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.knipex.com/products">Knipex Pliers</option>
+                        <option value="https://shop.channellock.com/collections/pliers">Channelock Pliers</option>
+                        <option value="https://www.kleintools.com/catalog/pliers">Klein Tools Pliers</option>
+                        <option value="https://www.milwaukeetool.com/products/hand-tools/pliers">Milwaukee Pliers</option>
+                        <option value="https://www.irwintools.com/products/hand-tools/pliers-snips/pliers">Irwin Pliers</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/pliers-snips">DeWalt Pliers</option>
+                        <option value="https://www.gearwrench.com/all-tools/hand-tools/pliers">GearWrench Pliers</option>
+                        <option value="https://www.stanleytools.com/products/hand-tools/pliers-snips">Stanley Pliers</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
                     <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('pliers')">Add to Quote →</div>
+                        <input type="number" min="1" value="1" class="qty-input" id="plier-qty" style="display:none;">
+                        <div class="add-btn" id="plier-add-btn" onclick="addCustomPlierToBasket()" style="display:none;">Add to Quote →</div>
                     </div>
                 </div>
             </div>
@@ -658,6 +661,36 @@
             document.getElementById('select-wrenches').selectedIndex = 0;
             qtyInput.value = 1;
             document.querySelector('#wrench-qty').parentElement.style.display = 'none';
+            document.getElementById('wrench-add-btn').style.display = 'none';
+        }
+
+        // Handle Pliers dropdown selection (identical to wrenches)
+        function handlePlierSelect(select) {
+            const qtyGroup = document.querySelector('#plier-qty').parentElement;
+            const addBtn = document.getElementById('plier-add-btn');
+            const qtyInput = document.getElementById('plier-qty');
+
+            if (select.value.startsWith('http')) {
+                qtyGroup.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                qtyGroup.style.display = 'flex';
+                addBtn.style.display = 'block';
+            } else {
+                qtyGroup.style.display = 'none';
+            }
+        }
+
+        function addCustomPlierToBasket() {
+            const qtyInput = document.getElementById('plier-qty');
+            const qty = parseInt(qtyInput.value) || 1;
+            addToBasket('Custom Pliers / Other Brand Request', qty);
+            alert(`Added to quote basket:\nCustom Pliers / Other Brand Request × ${qty}`);
+            document.getElementById('select-pliers').selectedIndex = 0;
+            qtyInput.value = 1;
+            document.querySelector('#plier-qty').parentElement.style.display = 'none';
+            document.getElementById('plier-add-btn').style.display = 'none';
         }
 
         // Top red banner rotation
