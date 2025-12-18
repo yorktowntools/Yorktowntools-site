@@ -440,10 +440,12 @@
                     <p class="popular-note">Choose a brand to view their full wrench catalog online, or select "Request Custom Quote" for pricing and availability.</p>
                     <select class="tool-select" id="select-wrenches" onchange="handleWrenchSelect(this)">
                         <option value="">— Select an option —</option>
+                        <option value="https://www.craftsman.com/en-us/products/hand-tools/wrenches">Craftsman Wrenches</option>
                         <option value="https://www.dewalt.com/products/hand-tools/wrenches">DeWALT Wrenches</option>
                         <option value="https://www.gearwrench.com/all-tools/wrenches">GearWrench Wrenches</option>
                         <option value="https://www.irwintools.com/products/hand-tools/wrenches">IRWIN Wrenches</option>
                         <option value="https://www.milwaukeetool.com/products/hand-tools">Milwaukee Hand Tools</option>
+                        <option value="https://www.ridgid.com/us/en/wrenches">Ridgid Wrenches</option>
                         <option value="https://www.stanleytools.com/products/hand-tools/wrenches">Stanley Wrenches</option>
                         <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
@@ -467,7 +469,6 @@
                     <select class="tool-select" id="select-pliers" onchange="handlePlierSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://www.knipex.com/products">Knipex Pliers</option>
-                        <option value="https://shop.channellock.com/collections/pliers">Channelock Pliers</option>
                         <option value="https://www.kleintools.com/catalog/pliers">Klein Tools Pliers</option>
                         <option value="https://www.milwaukeetool.com/products/hand-tools/pliers">Milwaukee Pliers</option>
                         <option value="https://www.irwintools.com/products/hand-tools/pliers-snips/pliers">Irwin Pliers</option>
@@ -483,7 +484,7 @@
                 </div>
             </div>
 
-            <!-- Measuring Card – Updated to match Wrenches/Pliers style -->
+            <!-- Measuring Card -->
             <div class="card" id="measuring">
                 <div style="position:relative;">
                     <img src="Bosch-laser.jpg" alt="Measuring Tools" loading="lazy">
@@ -508,30 +509,36 @@
                 </div>
             </div>
 
+            <!-- Screwdrivers Card -->
             <div class="card" id="screwdrivers">
-                <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Kleintools-screwdrivers.jpg" alt="Screwdrivers" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Screwdrivers & Sets</h3>
                     <p>Phillips, flathead, Torx, nut drivers, and multi-bit. Insulated and precision options available.</p>
-                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
-                    <select class="tool-select" id="select-screwdrivers">
-                        <option value="">— Choose screwdriver —</option>
-                        <option>Craftsman 12-pc Set</option>
-                        <option>Klein Tools Insulated Set</option>
-                        <option>Wera Kraftform Plus Set</option>
-                        <option>Milwaukee 11-in-1 Multi-Bit</option>
-                        <option>DeWalt Precision Set</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full screwdriver catalog online, or select "Request Custom Quote" for pricing and availability.</p>
+                    <select class="tool-select" id="select-screwdrivers" onchange="handleScrewdriverSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.craftsman.com/en-us/products/hand-tools/screwdrivers-nut-drivers-keys/">Craftsman Screwdrivers</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/screwdrivers-hex-keys/screwdrivers">DeWalt Screwdrivers</option>
+                        <option value="https://www.gearwrench.com/all-tools/hand-tools/screwdrivers-and-nut-drivers">GearWrench Screwdrivers</option>
+                        <option value="https://www.kleintools.com/catalog/screwdrivers-and-nut-drivers">Klein Tools Screwdrivers</option>
+                        <option value="https://www.milwaukeetool.com/search?q=screwdriver&first=0">Milwaukee Screwdrivers</option>
+                        <option value="https://www.stanleytools.com/products/hand-tools/screwdrivers-hex-keys">Stanley Screwdrivers</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
                     <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('screwdrivers')">Add to Quote →</div>
+                        <input type="number" min="1" value="1" class="qty-input" id="screwdriver-qty" style="display:none;">
+                        <div class="add-btn" id="screwdriver-add-btn" onclick="addCustomScrewdriverToBasket()" style="display:none;">Add to Quote →</div>
                     </div>
                 </div>
             </div>
 
             <div class="card" id="hex-torx">
-                <img src="Bondhus-hex.jpg" alt="Hex & Torx" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Bondhus-hex.jpg" alt="Hex & Torx" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Hex Keys & Torx</h3>
                     <p>Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
@@ -553,7 +560,9 @@
             </div>
 
             <div class="card" id="specialty">
-                <img src="Texton-pics.jpg" alt="Specialty Tools" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Texton-pics.jpg" alt="Specialty Tools" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Specialty Tools</h3>
                     <p>Pipe wrenches, basin wrenches, pullers, punches, and other task-specific tools.</p>
@@ -694,7 +703,7 @@
             document.getElementById('plier-add-btn').style.display = 'none';
         }
 
-        // Handle Measuring dropdown selection (identical logic)
+        // Handle Measuring dropdown selection
         function handleMeasuringSelect(select) {
             const qtyGroup = document.querySelector('#measuring-qty').parentElement;
             const addBtn = document.getElementById('measuring-add-btn');
@@ -721,6 +730,35 @@
             qtyInput.value = 1;
             document.querySelector('#measuring-qty').parentElement.style.display = 'none';
             document.getElementById('measuring-add-btn').style.display = 'none';
+        }
+
+        // Handle Screwdrivers dropdown selection (now matches wrenches/pliers style)
+        function handleScrewdriverSelect(select) {
+            const qtyGroup = document.querySelector('#screwdriver-qty').parentElement;
+            const addBtn = document.getElementById('screwdriver-add-btn');
+            const qtyInput = document.getElementById('screwdriver-qty');
+
+            if (select.value.startsWith('http')) {
+                qtyGroup.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                qtyGroup.style.display = 'flex';
+                addBtn.style.display = 'block';
+            } else {
+                qtyGroup.style.display = 'none';
+            }
+        }
+
+        function addCustomScrewdriverToBasket() {
+            const qtyInput = document.getElementById('screwdriver-qty');
+            const qty = parseInt(qtyInput.value) || 1;
+            addToBasket('Custom Screwdriver / Other Brand Request', qty);
+            alert(`Added to quote basket:\nCustom Screwdriver / Other Brand Request × ${qty}`);
+            document.getElementById('select-screwdrivers').selectedIndex = 0;
+            qtyInput.value = 1;
+            document.querySelector('#screwdriver-qty').parentElement.style.display = 'none';
+            document.getElementById('screwdriver-add-btn').style.display = 'none';
         }
 
         // Top red banner rotation
