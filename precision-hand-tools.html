@@ -215,7 +215,7 @@
         }
         .custom-section textarea {
             width: 100%;
-            min-height: 120px;
+            min-height: 140px;
             padding: 1rem;
             border: 2px solid #dee2e6;
             border-radius: 14px;
@@ -235,7 +235,7 @@
             padding: 1.3rem;
             border-radius: 14px;
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 10px 30px rgba(200,16,46,0.3);
@@ -276,100 +276,6 @@
         .bulk-section p { font-size:1.5rem; margin-bottom:1.5rem; }
         .text-btn { display:inline-block; background:#0066cc; color:white; padding:1.3rem 3rem; border-radius:50px; font-size:1.35rem; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(0,102,204,0.3); transition:var(--transition); }
         .text-btn:hover { transform:translateY(-5px); opacity:0.9; }
-
-        /* Basket Modal */
-        #basket-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #basket-modal.show { display: flex; }
-        .basket-modal-content {
-            background: white;
-            border-radius: var(--radius);
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-        }
-        .basket-header {
-            padding: 24px 24px 16px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .basket-header h3 {
-            font-size: 1.8rem;
-            color: var(--navy);
-        }
-        .basket-items {
-            padding: 20px 24px;
-        }
-        .basket-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .basket-item:last-child { border-bottom: none; }
-        .basket-item-name {
-            flex: 1;
-            font-size: 1.05rem;
-            color: #333;
-        }
-        .basket-item-qty {
-            margin: 0 16px;
-            font-weight: 600;
-            color: var(--navy);
-        }
-        .basket-remove {
-            background: var(--red);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 1.4rem;
-            cursor: pointer;
-        }
-        .basket-empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            font-size: 1.1rem;
-        }
-        .basket-actions {
-            padding: 20px 24px;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .basket-btn {
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            flex: 1;
-            text-align: center;
-            transition: var(--transition);
-        }
-        .basket-btn-primary {
-            background: var(--red);
-            color: white;
-        }
-        .basket-btn-primary:hover { background: #a00d22; transform: translateY(-3px); }
-        .basket-btn-secondary {
-            background: #eee;
-            color: var(--navy);
-        }
-        .basket-btn-secondary:hover { background: #ddd; }
     </style>
 </head>
 <body>
@@ -417,7 +323,7 @@
                 <div class="card-content">
                     <h3>Wrenches & Torque</h3>
                     <p>Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty. SAE & metric, 90-tooth and XL lengths.</p>
-                    <p class="popular-note">Choose a brand to view their full wrench catalog online, or select "Request Custom Quote" to list specific part numbers.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
                     <select class="tool-select" data-category="Wrenches" onchange="handleSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://www.craftsman.com/en-us/products/hand-tools/wrenches">Craftsman Wrenches</option>
@@ -431,8 +337,8 @@
                     </select>
 
                     <div class="custom-section" id="custom-wrenches">
-                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)&#10;e.g. GW-86710&#10;Knipex 86 03 250&#10;etc."></textarea>
-                        <button class="custom-get-quote" onclick="addCustomToBasket('Wrenches')">Add to Quote →</button>
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)&#10;e.g. GW-86710&#10;Knipex 86 03 250&#10;Any other specific tools you need..."></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Wrenches')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -446,7 +352,7 @@
                 <div class="card-content">
                     <h3>Pliers & Cutters</h3>
                     <p>Needle nose, slip joint, locking, cutters, and more. High-leverage designs for professional use.</p>
-                    <p class="popular-note">Choose a brand to view their full pliers catalog online, or select "Request Custom Quote" to list specific part numbers.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
                     <select class="tool-select" data-category="Pliers" onchange="handleSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://www.dewalt.com/products/hand-tools/pliers-snips">DeWalt Pliers</option>
@@ -460,8 +366,8 @@
                     </select>
 
                     <div class="custom-section" id="custom-pliers">
-                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)&#10;e.g. KNI-8603250&#10;etc."></textarea>
-                        <button class="custom-get-quote" onclick="addCustomToBasket('Pliers')">Add to Quote →</button>
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Pliers')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -474,7 +380,7 @@
                 <div class="card-content">
                     <h3>Measuring & Layout</h3>
                     <p>Tape measures, levels, squares, calipers, and laser tools. Accurate and durable for precise work.</p>
-                    <p class="popular-note">Choose a brand to view their full measuring catalog online, or select "Request Custom Quote" to list specific part numbers.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
                     <select class="tool-select" data-category="Measuring" onchange="handleSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://www.boschtools.com/us/en/measuring-layout-tools-23413-ocs-c/">Bosch Measuring Tools</option>
@@ -487,7 +393,7 @@
 
                     <div class="custom-section" id="custom-measuring">
                         <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="addCustomToBasket('Measuring')">Add to Quote →</button>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Measuring')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -500,7 +406,7 @@
                 <div class="card-content">
                     <h3>Screwdrivers & Sets</h3>
                     <p>Phillips, flathead, Torx, nut drivers, and multi-bit. Insulated and precision options available.</p>
-                    <p class="popular-note">Choose a brand to view their full screwdriver catalog online, or select "Request Custom Quote" to list specific part numbers.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
                     <select class="tool-select" data-category="Screwdrivers" onchange="handleSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://www.craftsman.com/en-us/products/hand-tools/screwdrivers-nut-drivers-keys/">Craftsman Screwdrivers</option>
@@ -514,7 +420,7 @@
 
                     <div class="custom-section" id="custom-screwdrivers">
                         <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="addCustomToBasket('Screwdrivers')">Add to Quote →</button>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Screwdrivers')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -527,7 +433,7 @@
                 <div class="card-content">
                     <h3>Hex Keys & Torx</h3>
                     <p>Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
-                    <p class="popular-note">Choose a brand to view their full hex & torx catalog online, or select "Request Custom Quote" to list specific part numbers.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
                     <select class="tool-select" data-category="Hex & Torx" onchange="handleSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://bondhus.com/pages/new-products">Bondhus Hex Keys</option>
@@ -540,7 +446,7 @@
 
                     <div class="custom-section" id="custom-hex-torx">
                         <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="addCustomToBasket('Hex & Torx')">Add to Quote →</button>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Hex & Torx')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -553,7 +459,7 @@
                 <div class="card-content">
                     <h3>Specialty Tools</h3>
                     <p>Pipe wrenches, chisels, punches, bolt extractors, picks, prying tools, and other task-specific items.</p>
-                    <p class="popular-note">Choose a brand to view their full specialty catalog online, or select "Request Custom Quote" to list specific part numbers.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
                     <select class="tool-select" data-category="Specialty" onchange="handleSelect(this)">
                         <option value="">— Select an option —</option>
                         <option value="https://www.craftsman.com/en-us/products/hand-tools/screw-bolt-extractors">Craftsman Specialty</option>
@@ -567,7 +473,7 @@
 
                     <div class="custom-section" id="custom-specialty">
                         <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="addCustomToBasket('Specialty')">Add to Quote →</button>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Specialty')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -589,49 +495,11 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <div id="basket-modal">
-        <div class="basket-modal-content">
-            <div class="basket-header">
-                <h3>Your Quote Basket</h3>
-            </div>
-            <div class="basket-items" id="basket-items-list"></div>
-            <div class="basket-actions">
-                <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
-                <div class="basket-btn basket-btn-primary" onclick="proceedToQuote()">Send Quote Request</div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        const BASKET_KEY = 'yorktown_quote_basket';
-
-        function getBasket() {
-            const stored = localStorage.getItem(BASKET_KEY);
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function saveBasket(basket) {
-            localStorage.setItem(BASKET_KEY, JSON.stringify(basket));
-        }
-
-        function addToBasket(itemText) {
-            const basket = getBasket();
-            basket.push({ name: itemText, qty: 1 });
-            saveBasket(basket);
-        }
-
-        function removeFromBasketByIndex(index) {
-            const basket = getBasket();
-            if (index >= 0 && index < basket.length) {
-                basket.splice(index, 1);
-                saveBasket(basket);
-            }
-            showBasketModal();
-        }
-
         function handleSelect(select) {
             const category = select.dataset.category;
-            const customSection = document.getElementById(`custom-${category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`);
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
 
             if (select.value.startsWith('http')) {
                 customSection.style.display = 'none';
@@ -644,25 +512,29 @@
             }
         }
 
-        function addCustomToBasket(category) {
-            const customSection = document.getElementById(`custom-${category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`);
+        function sendCustomQuote(category) {
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
             const textarea = customSection.querySelector('textarea');
             const lines = textarea.value.trim().split('\n').filter(line => line.trim() !== '');
 
             if (lines.length === 0) {
-                alert('Please enter at least one part number or description.');
+                alert('Please enter at least one part number or description before requesting a quote.');
                 return;
             }
 
-            const itemHeader = `${category} – Custom Request:`;
-            let itemText = itemHeader + '\n' + lines.map(l => '• ' + l.trim()).join('\n');
+            const itemHeader = `${category} – Custom Quote Request:`;
+            const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
 
-            addToBasket(itemText);
+            const smsBody = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
 
-            alert(`Added ${lines.length} item(s) from ${category} to your quote basket.`);
+            // Reset form
             textarea.value = '';
             customSection.style.display = 'none';
             customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
+
+            // Trigger SMS
+            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
         }
 
         // Banner rotation
@@ -674,7 +546,7 @@
             banners[j].classList.add('active');
         }, 3500);
 
-        // Sticky nav hide/show
+        // Sticky nav hide/show on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -687,54 +559,7 @@
             lastScroll = current;
         });
 
-        // Proceed to quote via SMS
-        function proceedToQuote() {
-            const basket = getBasket();
-            if (basket.length === 0) {
-                alert("Your quote basket is empty!");
-                return;
-            }
-
-            const itemsText = basket.map(i => i.name).join('\n\n');
-            const smsBody = `Quote Request from YorktownTools.com\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
-
-            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
-        }
-
-        // Basket modal
-        function showBasketModal() {
-            const modal = document.getElementById('basket-modal');
-            const list = document.getElementById('basket-items-list');
-            const basket = getBasket();
-
-            if (basket.length === 0) {
-                list.innerHTML = '<div class="basket-empty">Your quote basket is empty.</div>';
-            } else {
-                list.innerHTML = '';
-                basket.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'basket-item';
-                    div.innerHTML = `
-                        <div class="basket-item-name"><pre style="margin:0; white-space: pre-wrap; text-align:left; font-family:inherit;">${item.name}</pre></div>
-                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index})">×</button>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-            modal.classList.add('show');
-        }
-
-        function closeBasketModal() {
-            document.getElementById('basket-modal').classList.remove('show');
-        }
-
-        // Click basket area to open modal (since floating button removed)
-        document.addEventListener('DOMContentLoaded', () => {
-            // You can add a visible "View Quote Basket" button somewhere if desired.
-            // For now, we'll just rely on users clicking "Proceed to Quote" in the modal after adding items.
-        });
-
-        // Smooth scrolling for nav links
+        // Smooth scrolling for internal nav links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -744,11 +569,6 @@
                     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             });
-        });
-
-        // Close modal on outside click
-        document.getElementById('basket-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeBasketModal();
         });
     </script>
 </body>
