@@ -428,7 +428,7 @@
 
         <section class="grid">
 
-            <!-- Updated Wrenches Card – Brand Catalog Links -->
+            <!-- Wrenches Card – Dropdown now directly links to brand catalogs -->
             <div class="card" id="wrenches">
                 <div style="position:relative;">
                     <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
@@ -437,19 +437,19 @@
                 <div class="card-content">
                     <h3>Wrenches & Torque</h3>
                     <p>Ratcheting combination, adjustable, torque wrenches, flare nut, and specialty. SAE & metric, 90-tooth and XL lengths.</p>
-                    <p class="popular-note">Select a brand below to request pricing and availability from their full wrench catalog.</p>
-                    <select class="tool-select" id="select-wrenches">
-                        <option value="">— Choose a brand —</option>
-                        <option value="DeWALT Wrenches Catalog (https://www.dewalt.com/products/hand-tools/wrenches)">DeWALT</option>
-                        <option value="GearWrench Wrenches Catalog (https://www.gearwrench.com/all-tools/wrenches)">GearWrench</option>
-                        <option value="IRWIN Wrenches Catalog (https://www.irwintools.com/products/hand-tools/wrenches)">IRWIN</option>
-                        <option value="Milwaukee Hand Tools Catalog (https://www.milwaukeetool.com/products/hand-tools)">Milwaukee</option>
-                        <option value="Stanley Wrenches Catalog (https://www.stanleytools.com/products/hand-tools/wrenches)">Stanley</option>
-                        <option value="Other / Custom Wrench Request">Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full wrench catalog online, or select "Request Custom Quote" for pricing and availability.</p>
+                    <select class="tool-select" id="select-wrenches" onchange="handleWrenchSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/wrenches">DeWALT Wrenches</option>
+                        <option value="https://www.gearwrench.com/all-tools/wrenches">GearWrench Wrenches</option>
+                        <option value="https://www.irwintools.com/products/hand-tools/wrenches">IRWIN Wrenches</option>
+                        <option value="https://www.milwaukeetool.com/products/hand-tools">Milwaukee Hand Tools</option>
+                        <option value="https://www.stanleytools.com/products/hand-tools/wrenches">Stanley Wrenches</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
                     <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('wrenches')">Add to Quote →</div>
+                        <input type="number" min="1" value="1" class="qty-input" id="wrench-qty" style="display:none;">
+                        <div class="add-btn" id="wrench-add-btn" onclick="addCustomWrenchToBasket()" style="display:none;">Add to Quote →</div>
                     </div>
                 </div>
             </div>
@@ -630,6 +630,36 @@
             showBasketModal(); // Refresh the modal immediately
         }
 
+        // Handle Wrenches dropdown selection
+        function handleWrenchSelect(select) {
+            const qtyGroup = document.querySelector('#wrench-qty').parentElement;
+            const addBtn = document.getElementById('wrench-add-btn');
+            const qtyInput = document.getElementById('wrench-qty');
+
+            if (select.value.startsWith('http')) {
+                // It's a direct link – hide qty/add, open in new tab on change
+                qtyGroup.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0; // reset dropdown
+            } else if (select.value === 'custom') {
+                // Custom request – show qty and add button
+                qtyGroup.style.display = 'flex';
+                addBtn.style.display = 'block';
+            } else {
+                qtyGroup.style.display = 'none';
+            }
+        }
+
+        function addCustomWrenchToBasket() {
+            const qtyInput = document.getElementById('wrench-qty');
+            const qty = parseInt(qtyInput.value) || 1;
+            addToBasket('Custom Wrench / Other Brand Request', qty);
+            alert(`Added to quote basket:\nCustom Wrench / Other Brand Request × ${qty}`);
+            document.getElementById('select-wrenches').selectedIndex = 0;
+            qtyInput.value = 1;
+            document.querySelector('#wrench-qty').parentElement.style.display = 'none';
+        }
+
         // Top red banner rotation
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
@@ -652,7 +682,7 @@
             lastScroll = current;
         });
 
-        // Add to basket
+        // Add to basket (for other categories)
         function addSelectedToBasket(categoryId) {
             const select = document.getElementById('select-' + categoryId);
             if (!select || select.value === "") {
