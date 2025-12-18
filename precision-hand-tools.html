@@ -468,12 +468,12 @@
                     <p class="popular-note">Choose a brand to view their full pliers catalog online, or select "Request Custom Quote" for pricing and availability.</p>
                     <select class="tool-select" id="select-pliers" onchange="handlePlierSelect(this)">
                         <option value="">— Select an option —</option>
-                        <option value="https://www.knipex.com/products">Knipex Pliers</option>
-                        <option value="https://www.kleintools.com/catalog/pliers">Klein Tools Pliers</option>
-                        <option value="https://www.milwaukeetool.com/products/hand-tools/pliers">Milwaukee Pliers</option>
-                        <option value="https://www.irwintools.com/products/hand-tools/pliers-snips/pliers">Irwin Pliers</option>
                         <option value="https://www.dewalt.com/products/hand-tools/pliers-snips">DeWalt Pliers</option>
                         <option value="https://www.gearwrench.com/all-tools/hand-tools/pliers">GearWrench Pliers</option>
+                        <option value="https://www.irwintools.com/products/hand-tools/pliers-snips/pliers">Irwin Pliers</option>
+                        <option value="https://www.kleintools.com/catalog/pliers">Klein Tools Pliers</option>
+                        <option value="https://www.knipex.com/products">Knipex Pliers</option>
+                        <option value="https://www.milwaukeetool.com/products/hand-tools/pliers">Milwaukee Pliers</option>
                         <option value="https://www.stanleytools.com/products/hand-tools/pliers-snips">Stanley Pliers</option>
                         <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
@@ -567,19 +567,21 @@
                 </div>
                 <div class="card-content">
                     <h3>Specialty Tools</h3>
-                    <p>Pipe wrenches, basin wrenches, pullers, punches, and other task-specific tools.</p>
-                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
-                    <select class="tool-select" id="select-specialty">
-                        <option value="">— Choose specialty tool —</option>
-                        <option>Ridgid Pipe Wrench</option>
-                        <option>Basin Wrench Telescoping</option>
-                        <option>Gear Puller Set</option>
-                        <option>Punch and Chisel Set</option>
-                        <option>Other / Custom Request</option>
+                    <p>Pipe wrenches, chisels, punches, bolt extractors, picks, prying tools, and other task-specific items.</p>
+                    <p class="popular-note">Choose a brand to view their full specialty catalog online, or select "Request Custom Quote" for pricing and availability.</p>
+                    <select class="tool-select" id="select-specialty" onchange="handleSpecialtySelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.craftsman.com/en-us/products/hand-tools/screw-bolt-extractors">Craftsman Specialty</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/chisels-punches-files">DeWalt Specialty</option>
+                        <option value="https://www.irwintools.com/products/hand-tools/chisels-punches-files">Irwin Specialty</option>
+                        <option value="https://www.milwaukeetool.com/search?q=Sds%20chisel&first=0">Milwaukee Specialty</option>
+                        <option value="https://www.stanleytools.com/products/hand-tools/chisels-punches-files">Stanley Specialty</option>
+                        <option value="https://www.tekton.com/picks-and-prying">Tekton Specialty</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
                     <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('specialty')">Add to Quote →</div>
+                        <input type="number" min="1" value="1" class="qty-input" id="specialty-qty" style="display:none;">
+                        <div class="add-btn" id="specialty-add-btn" onclick="addCustomSpecialtyToBasket()" style="display:none;">Add to Quote →</div>
                     </div>
                 </div>
             </div>
@@ -777,6 +779,32 @@
             document.getElementById('hex-torx-add-btn').style.display = 'none';
         }
 
+        // Handle Specialty (new catalog style)
+        function handleSpecialtySelect(select) {
+            const qtyGroup = document.querySelector('#specialty-qty').parentElement;
+            const addBtn = document.getElementById('specialty-add-btn');
+            if (select.value.startsWith('http')) {
+                qtyGroup.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                qtyGroup.style.display = 'flex';
+                addBtn.style.display = 'block';
+            } else {
+                qtyGroup.style.display = 'none';
+            }
+        }
+
+        function addCustomSpecialtyToBasket() {
+            const qty = parseInt(document.getElementById('specialty-qty').value) || 1;
+            addToBasket('Custom Specialty Tool / Other Brand Request', qty);
+            alert(`Added to quote basket:\nCustom Specialty Tool / Other Brand Request × ${qty}`);
+            document.getElementById('select-specialty').selectedIndex = 0;
+            document.getElementById('specialty-qty').value = 1;
+            document.querySelector('#specialty-qty').parentElement.style.display = 'none';
+            document.getElementById('specialty-add-btn').style.display = 'none';
+        }
+
         // Top red banner rotation
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
@@ -798,21 +826,6 @@
             }
             lastScroll = current;
         });
-
-        // Add to basket for specialty (direct item selection)
-        function addSelectedToBasket(categoryId) {
-            const select = document.getElementById('select-' + categoryId);
-            if (!select || select.value === "") {
-                alert("Please select an item first.");
-                return;
-            }
-            const qtyInput = select.closest('.card-content').querySelector('.qty-input');
-            const qty = parseInt(qtyInput.value) || 1;
-            addToBasket(select.value, qty);
-            alert(`Added to quote basket:\n${select.value} × ${qty}`);
-            select.selectedIndex = 0;
-            qtyInput.value = 1;
-        }
 
         // Proceed to quote
         function proceedToQuote() {
