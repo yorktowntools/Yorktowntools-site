@@ -428,7 +428,7 @@
 
         <section class="grid">
 
-            <!-- Wrenches Card – Dropdown now directly links to brand catalogs -->
+            <!-- Wrenches Card -->
             <div class="card" id="wrenches">
                 <div style="position:relative;">
                     <img src="GearWrenchset.jpg" alt="Wrenches" loading="lazy">
@@ -454,7 +454,7 @@
                 </div>
             </div>
 
-            <!-- Pliers Card – Now functions identically to Wrenches -->
+            <!-- Pliers Card -->
             <div class="card" id="pliers">
                 <div style="position:relative;">
                     <img src="Knipex-pliers.JPG" alt="Pliers" loading="lazy">
@@ -483,24 +483,27 @@
                 </div>
             </div>
 
+            <!-- Measuring Card – Updated to match Wrenches/Pliers style -->
             <div class="card" id="measuring">
-                <img src="Bosch-laser.jpg" alt="Measuring Tools" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Bosch-laser.jpg" alt="Measuring Tools" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Measuring & Layout</h3>
                     <p>Tape measures, levels, squares, calipers, and laser tools. Accurate and durable for precise work.</p>
-                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
-                    <select class="tool-select" id="select-measuring">
-                        <option value="">— Choose measuring tool —</option>
-                        <option>DeWalt 25' Tape Measure</option>
-                        <option>Milwaukee 48" Level</option>
-                        <option>Bosch Laser Measure</option>
-                        <option>Starrett Combination Square</option>
-                        <option>Mitutoyo Digital Caliper</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full measuring catalog online, or select "Request Custom Quote" for pricing and availability.</p>
+                    <select class="tool-select" id="select-measuring" onchange="handleMeasuringSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/measuring-layout-tools-23413-ocs-c/">Bosch Measuring Tools</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/measure-and-layout-tools">DeWalt Measuring Tools</option>
+                        <option value="https://www.irwintools.com/products/hand-tools/measuring-layout-tools">Irwin Measuring Tools</option>
+                        <option value="https://www.milwaukeetool.com/products/hand-tools/measuring">Milwaukee Measuring Tools</option>
+                        <option value="https://www.stanleytools.com/products/hand-tools/measure-and-layout-tools">Stanley Measuring Tools</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
                     <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('measuring')">Add to Quote →</div>
+                        <input type="number" min="1" value="1" class="qty-input" id="measuring-qty" style="display:none;">
+                        <div class="add-btn" id="measuring-add-btn" onclick="addCustomMeasuringToBasket()" style="display:none;">Add to Quote →</div>
                     </div>
                 </div>
             </div>
@@ -640,12 +643,10 @@
             const qtyInput = document.getElementById('wrench-qty');
 
             if (select.value.startsWith('http')) {
-                // It's a direct link – hide qty/add, open in new tab on change
                 qtyGroup.style.display = 'none';
                 window.open(select.value, '_blank');
-                select.selectedIndex = 0; // reset dropdown
+                select.selectedIndex = 0;
             } else if (select.value === 'custom') {
-                // Custom request – show qty and add button
                 qtyGroup.style.display = 'flex';
                 addBtn.style.display = 'block';
             } else {
@@ -664,7 +665,7 @@
             document.getElementById('wrench-add-btn').style.display = 'none';
         }
 
-        // Handle Pliers dropdown selection (identical to wrenches)
+        // Handle Pliers dropdown selection
         function handlePlierSelect(select) {
             const qtyGroup = document.querySelector('#plier-qty').parentElement;
             const addBtn = document.getElementById('plier-add-btn');
@@ -691,6 +692,35 @@
             qtyInput.value = 1;
             document.querySelector('#plier-qty').parentElement.style.display = 'none';
             document.getElementById('plier-add-btn').style.display = 'none';
+        }
+
+        // Handle Measuring dropdown selection (identical logic)
+        function handleMeasuringSelect(select) {
+            const qtyGroup = document.querySelector('#measuring-qty').parentElement;
+            const addBtn = document.getElementById('measuring-add-btn');
+            const qtyInput = document.getElementById('measuring-qty');
+
+            if (select.value.startsWith('http')) {
+                qtyGroup.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                qtyGroup.style.display = 'flex';
+                addBtn.style.display = 'block';
+            } else {
+                qtyGroup.style.display = 'none';
+            }
+        }
+
+        function addCustomMeasuringToBasket() {
+            const qtyInput = document.getElementById('measuring-qty');
+            const qty = parseInt(qtyInput.value) || 1;
+            addToBasket('Custom Measuring / Other Brand Request', qty);
+            alert(`Added to quote basket:\nCustom Measuring / Other Brand Request × ${qty}`);
+            document.getElementById('select-measuring').selectedIndex = 0;
+            qtyInput.value = 1;
+            document.querySelector('#measuring-qty').parentElement.style.display = 'none';
+            document.getElementById('measuring-add-btn').style.display = 'none';
         }
 
         // Top red banner rotation
