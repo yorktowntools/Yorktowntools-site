@@ -535,6 +535,7 @@
                 </div>
             </div>
 
+            <!-- Hex & Torx Card -->
             <div class="card" id="hex-torx">
                 <div style="position:relative;">
                     <img src="Bondhus-hex.jpg" alt="Hex & Torx" loading="lazy">
@@ -542,23 +543,24 @@
                 <div class="card-content">
                     <h3>Hex Keys & Torx</h3>
                     <p>Allen wrenches, Torx bits, ball-end hex sets. SAE, metric, and tamper-proof.</p>
-                    <p class="popular-note">The dropdown below features our most popular items – we stock and supply the full range from these brands.</p>
-                    <select class="tool-select" id="select-hex-torx">
-                        <option value="">— Choose hex/torx —</option>
-                        <option>Bondhus Ball-End Hex Set (Metric)</option>
-                        <option>Bondhus Ball-End Hex Set (SAE)</option>
-                        <option>Wiha Torx Set</option>
-                        <option>Tekton Long Arm Hex Key Set</option>
-                        <option>GearWrench Torx Bit Set</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full hex & torx catalog online, or select "Request Custom Quote" for pricing and availability.</p>
+                    <select class="tool-select" id="select-hex-torx" onchange="handleHexTorxSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://bondhus.com/pages/new-products">Bondhus Hex Keys</option>
+                        <option value="https://www.craftsman.com/en-us/products/hand-tools/screwdrivers-nut-drivers-keys/hex-keys">Craftsman Hex Keys</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/screwdrivers-hex-keys/hex-keys">DeWalt Hex Keys</option>
+                        <option value="https://www.gearwrench.com/all-tools/hand-tools/hex-keys">GearWrench Hex Keys</option>
+                        <option value="https://www.stanleytools.com/products/hand-tools/screwdrivers-hex-keys/hex-keys">Stanley Hex Keys</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
                     <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('hex-torx')">Add to Quote →</div>
+                        <input type="number" min="1" value="1" class="qty-input" id="hex-torx-qty" style="display:none;">
+                        <div class="add-btn" id="hex-torx-add-btn" onclick="addCustomHexTorxToBasket()" style="display:none;">Add to Quote →</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Specialty Card -->
             <div class="card" id="specialty">
                 <div style="position:relative;">
                     <img src="Texton-pics.jpg" alt="Specialty Tools" loading="lazy">
@@ -642,15 +644,13 @@
                 basket.splice(index, 1);
                 saveBasket(basket);
             }
-            showBasketModal(); // Refresh the modal immediately
+            showBasketModal();
         }
 
-        // Handle Wrenches dropdown selection
+        // Handle Wrenches
         function handleWrenchSelect(select) {
             const qtyGroup = document.querySelector('#wrench-qty').parentElement;
             const addBtn = document.getElementById('wrench-add-btn');
-            const qtyInput = document.getElementById('wrench-qty');
-
             if (select.value.startsWith('http')) {
                 qtyGroup.style.display = 'none';
                 window.open(select.value, '_blank');
@@ -664,22 +664,19 @@
         }
 
         function addCustomWrenchToBasket() {
-            const qtyInput = document.getElementById('wrench-qty');
-            const qty = parseInt(qtyInput.value) || 1;
+            const qty = parseInt(document.getElementById('wrench-qty').value) || 1;
             addToBasket('Custom Wrench / Other Brand Request', qty);
             alert(`Added to quote basket:\nCustom Wrench / Other Brand Request × ${qty}`);
             document.getElementById('select-wrenches').selectedIndex = 0;
-            qtyInput.value = 1;
+            document.getElementById('wrench-qty').value = 1;
             document.querySelector('#wrench-qty').parentElement.style.display = 'none';
             document.getElementById('wrench-add-btn').style.display = 'none';
         }
 
-        // Handle Pliers dropdown selection
+        // Handle Pliers
         function handlePlierSelect(select) {
             const qtyGroup = document.querySelector('#plier-qty').parentElement;
             const addBtn = document.getElementById('plier-add-btn');
-            const qtyInput = document.getElementById('plier-qty');
-
             if (select.value.startsWith('http')) {
                 qtyGroup.style.display = 'none';
                 window.open(select.value, '_blank');
@@ -693,22 +690,19 @@
         }
 
         function addCustomPlierToBasket() {
-            const qtyInput = document.getElementById('plier-qty');
-            const qty = parseInt(qtyInput.value) || 1;
+            const qty = parseInt(document.getElementById('plier-qty').value) || 1;
             addToBasket('Custom Pliers / Other Brand Request', qty);
             alert(`Added to quote basket:\nCustom Pliers / Other Brand Request × ${qty}`);
             document.getElementById('select-pliers').selectedIndex = 0;
-            qtyInput.value = 1;
+            document.getElementById('plier-qty').value = 1;
             document.querySelector('#plier-qty').parentElement.style.display = 'none';
             document.getElementById('plier-add-btn').style.display = 'none';
         }
 
-        // Handle Measuring dropdown selection
+        // Handle Measuring
         function handleMeasuringSelect(select) {
             const qtyGroup = document.querySelector('#measuring-qty').parentElement;
             const addBtn = document.getElementById('measuring-add-btn');
-            const qtyInput = document.getElementById('measuring-qty');
-
             if (select.value.startsWith('http')) {
                 qtyGroup.style.display = 'none';
                 window.open(select.value, '_blank');
@@ -722,22 +716,19 @@
         }
 
         function addCustomMeasuringToBasket() {
-            const qtyInput = document.getElementById('measuring-qty');
-            const qty = parseInt(qtyInput.value) || 1;
+            const qty = parseInt(document.getElementById('measuring-qty').value) || 1;
             addToBasket('Custom Measuring / Other Brand Request', qty);
             alert(`Added to quote basket:\nCustom Measuring / Other Brand Request × ${qty}`);
             document.getElementById('select-measuring').selectedIndex = 0;
-            qtyInput.value = 1;
+            document.getElementById('measuring-qty').value = 1;
             document.querySelector('#measuring-qty').parentElement.style.display = 'none';
             document.getElementById('measuring-add-btn').style.display = 'none';
         }
 
-        // Handle Screwdrivers dropdown selection (now matches wrenches/pliers style)
+        // Handle Screwdrivers
         function handleScrewdriverSelect(select) {
             const qtyGroup = document.querySelector('#screwdriver-qty').parentElement;
             const addBtn = document.getElementById('screwdriver-add-btn');
-            const qtyInput = document.getElementById('screwdriver-qty');
-
             if (select.value.startsWith('http')) {
                 qtyGroup.style.display = 'none';
                 window.open(select.value, '_blank');
@@ -751,14 +742,39 @@
         }
 
         function addCustomScrewdriverToBasket() {
-            const qtyInput = document.getElementById('screwdriver-qty');
-            const qty = parseInt(qtyInput.value) || 1;
+            const qty = parseInt(document.getElementById('screwdriver-qty').value) || 1;
             addToBasket('Custom Screwdriver / Other Brand Request', qty);
             alert(`Added to quote basket:\nCustom Screwdriver / Other Brand Request × ${qty}`);
             document.getElementById('select-screwdrivers').selectedIndex = 0;
-            qtyInput.value = 1;
+            document.getElementById('screwdriver-qty').value = 1;
             document.querySelector('#screwdriver-qty').parentElement.style.display = 'none';
             document.getElementById('screwdriver-add-btn').style.display = 'none';
+        }
+
+        // Handle Hex & Torx
+        function handleHexTorxSelect(select) {
+            const qtyGroup = document.querySelector('#hex-torx-qty').parentElement;
+            const addBtn = document.getElementById('hex-torx-add-btn');
+            if (select.value.startsWith('http')) {
+                qtyGroup.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                qtyGroup.style.display = 'flex';
+                addBtn.style.display = 'block';
+            } else {
+                qtyGroup.style.display = 'none';
+            }
+        }
+
+        function addCustomHexTorxToBasket() {
+            const qty = parseInt(document.getElementById('hex-torx-qty').value) || 1;
+            addToBasket('Custom Hex/Torx Key / Other Brand Request', qty);
+            alert(`Added to quote basket:\nCustom Hex/Torx Key / Other Brand Request × ${qty}`);
+            document.getElementById('select-hex-torx').selectedIndex = 0;
+            document.getElementById('hex-torx-qty').value = 1;
+            document.querySelector('#hex-torx-qty').parentElement.style.display = 'none';
+            document.getElementById('hex-torx-add-btn').style.display = 'none';
         }
 
         // Top red banner rotation
@@ -783,7 +799,7 @@
             lastScroll = current;
         });
 
-        // Add to basket (for other categories)
+        // Add to basket for specialty (direct item selection)
         function addSelectedToBasket(categoryId) {
             const select = document.getElementById('select-' + categoryId);
             if (!select || select.value === "") {
@@ -814,7 +830,7 @@
             }
         }
 
-        // Show modal
+        // Basket modal
         function showBasketModal() {
             const modal = document.getElementById('basket-modal');
             const list = document.getElementById('basket-items-list');
@@ -841,7 +857,7 @@
             document.getElementById('basket-modal').classList.remove('show');
         }
 
-        // Floating button
+        // Floating quote button
         document.addEventListener('DOMContentLoaded', () => {
             const floatingBtn = document.getElementById('quote-basket-btn');
             if (floatingBtn) {
@@ -856,7 +872,7 @@
             }
         });
 
-        // Smooth scrolling
+        // Smooth scrolling for nav links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
