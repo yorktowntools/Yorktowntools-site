@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>OSHA-Compliant Ladders & Access | Yorktown Tools</title>
-    <meta name="description" content="Little Giant, Werner, Louisville fiberglass step ladders, extension ladders, multi-position, podiums, scaffolding, work platforms. OSHA/ANSI compliant. Free delivery Hampton Roads."/>
+    <meta name="description" content="Werner fiberglass platform ladders, step ladders, extension ladders, multi-position articulating ladders. OSHA/ANSI compliant. Free delivery Hampton Roads."/>
 
     <link rel="icon" href="Yorktown.PNG" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -133,35 +133,11 @@
 
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
 
-        .hero { 
-            text-align:center; 
-            padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; 
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); 
-            border-radius:var(--radius); 
-            margin: 3rem 0; 
-            box-shadow: var(--shadow); 
-        }
-        .hero h1 { 
-            font-size: clamp(2.8rem, 9vw, 3.9rem); 
-            margin-bottom:1.2rem; 
-            color: var(--navy); 
-            font-weight: 800; 
-        }
-        .hero > p { 
-            font-size: clamp(1.22rem, 4.8vw, 1.45rem); 
-            margin-bottom:2.8rem; 
-            max-width:900px; 
-            margin-left:auto; 
-            margin-right:auto; 
-            color:#495057; 
-        }
+        .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
+        .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
+        .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
 
-        .grid { 
-            display:grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); 
-            gap: clamp(1.8rem, 4.5vw, 3rem); 
-            margin-bottom:5.5rem; 
-        }
+        .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: clamp(1.8rem, 4.5vw, 3rem); margin-bottom:5.5rem; }
 
         .card {
             background: var(--white);
@@ -197,18 +173,11 @@
             line-height: 1.55;
             margin-bottom: 1.2rem;
         }
-
-        .badge-popular {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            background: var(--red);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.88rem;
-            font-weight: 800;
-            z-index: 2;
+        .card .popular-note {
+            font-size: 0.98rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 0.5rem;
         }
 
         .tool-select {
@@ -227,32 +196,39 @@
             box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
         }
 
-        .qty-add-group {
-            display: flex;
-            gap: 0.8rem;
-            margin: 1.2rem 0 0;
+        .custom-section {
+            margin-top: 1.5rem;
+            display: none;
         }
-        .qty-input {
-            width: 90px;
-            padding: 1.3rem 0.8rem;
+        .custom-section textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 1rem;
             border: 2px solid #dee2e6;
-            border-radius: 12px;
-            text-align: center;
+            border-radius: 14px;
             font-size: 1.05rem;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
         }
-        .add-btn {
-            flex: 1;
+        .custom-section textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+        .custom-get-quote {
             background: var(--red);
             color: white;
             padding: 1.3rem;
             border-radius: 14px;
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+            width: 100%;
         }
-        .add-btn:hover {
+        .custom-get-quote:hover {
             background: #a00d22;
             transform: translateY(-5px);
         }
@@ -274,182 +250,19 @@
             cursor: pointer;
             text-decoration: none;
         }
-        .call-button img { 
-            width: 68%; 
-            height: auto; 
-            border-radius: 50%; 
-            border: 3px solid var(--white); 
-        }
+        .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
 
-        #quote-basket-btn {
-            position: fixed;
-            right: clamp(16px, 4vw, 24px);
-            bottom: calc(clamp(16px, 4vw, 24px) + clamp(72px, 16vw, 88px) + 16px);
-            width: clamp(72px, 16vw, 88px);
-            height: clamp(72px, 16vw, 88px);
-            background: var(--red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
-            z-index: 999;
-            animation: pulse 2.6s infinite;
-            cursor: pointer;
-            color: white;
-            font-weight: 800;
-            font-size: 0.68rem;
-            text-align: center;
-            padding: 8px;
-            line-height: 1.2;
-        }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
-        @keyframes pulse { 
-            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
-            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
-            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
-        }
-
-        footer { 
-            background: var(--navy); 
-            color: var(--white); 
-            text-align:center; 
-            padding:6.5rem 1rem 3rem; 
-            margin-top:8rem; 
-        }
-        .footer-artwork { 
-            max-width: 900px; 
-            width: 95%; 
-            margin: 0 auto 3rem; 
-            opacity: 0.95; 
-        }
-        footer a { 
-            color: #ffffff !important; 
-            text-decoration: underline; 
-        }
+        footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
+        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+        footer a { color: #ffffff !important; text-decoration: underline; }
         footer a:hover { opacity: 0.85; }
 
-        .bulk-section { 
-            text-align:center; 
-            margin:5rem 0 4rem; 
-        }
-        .bulk-section p { 
-            font-size:1.5rem; 
-            margin-bottom:1.5rem; 
-        }
-        .text-btn { 
-            display:inline-block; 
-            background:#0066cc; 
-            color:white; 
-            padding:1.3rem 3rem; 
-            border-radius:50px; 
-            font-size:1.35rem; 
-            font-weight:700; 
-            text-decoration:none; 
-            box-shadow:0 10px 30px rgba(0,102,204,0.3); 
-            transition:var(--transition); 
-        }
-        .text-btn:hover { 
-            transform:translateY(-5px); 
-            opacity:0.9; 
-        }
-
-        /* Basket Modal */
-        #basket-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #basket-modal.show { display: flex; }
-        .basket-modal-content {
-            background: white;
-            border-radius: var(--radius);
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-        }
-        .basket-header {
-            padding: 24px 24px 16px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .basket-header h3 {
-            font-size: 1.8rem;
-            color: var(--navy);
-        }
-        .basket-items {
-            padding: 20px 24px;
-        }
-        .basket-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .basket-item:last-child { border-bottom: none; }
-        .basket-item-name {
-            flex: 1;
-            font-size: 1.05rem;
-            color: #333;
-        }
-        .basket-item-qty {
-            margin: 0 16px;
-            font-weight: 600;
-            color: var(--navy);
-        }
-        .basket-remove {
-            background: var(--red);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 1.4rem;
-            cursor: pointer;
-        }
-        .basket-empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            font-size: 1.1rem;
-        }
-        .basket-actions {
-            padding: 20px 24px;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .basket-btn {
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            flex: 1;
-            text-align: center;
-            transition: var(--transition);
-        }
-        .basket-btn-primary {
-            background: var(--red);
-            color: white;
-        }
-        .basket-btn-primary:hover { 
-            background: #a00d22; 
-            transform: translateY(-3px); 
-        }
-        .basket-btn-secondary {
-            background: #eee;
-            color: var(--navy);
-        }
-        .basket-btn-secondary:hover { background: #ddd; }
+        .bulk-section { text-align:center; margin:5rem 0 4rem; }
+        .bulk-section p { font-size:1.5rem; margin-bottom:1.5rem; }
+        .text-btn { display:inline-block; background:#0066cc; color:white; padding:1.3rem 3rem; border-radius:50px; font-size:1.35rem; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(0,102,204,0.3); transition:var(--transition); }
+        .text-btn:hover { transform:translateY(-5px); opacity:0.9; }
     </style>
 </head>
 <body>
@@ -457,10 +270,6 @@
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="George">
     </a>
-
-    <div id="quote-basket-btn">
-        Get<br>Quote
-    </div>
 
     <div class="top-red-banner">
         <div class="banner-text active">Free Delivery.</div>
@@ -476,105 +285,104 @@
         <div class="mobile-nav">
             <a href="index.html">Home</a>
             <a href="#platform">Platform Ladders</a>
-            <a href="#step-ladders">Step Ladders</a>
+            <a href="#step">Step Ladders</a>
             <a href="#extension">Extension Ladders</a>
-            <a href="#articulating">Articulating Ladders</a>
+            <a href="#articulating">Articulating / Multi-Position</a>
         </div>
     </nav>
 
     <main>
         <section class="hero">
-            <h1>OSHA-Compliant Ladders & Access</h1>
-            <p>Little Giant, Werner, Louisville – fiberglass & aluminum ladders for construction and maintenance.<br>Free delivery in Hampton Roads.</p>
+            <h1>OSHA-Compliant Werner Ladders</h1>
+            <p>Fiberglass platform ladders, step ladders, extension ladders, and multi-position articulating ladders.<br>Free delivery in Hampton Roads – GSA pricing available.</p>
         </section>
 
         <section class="grid">
 
+            <!-- Platform Ladders Card -->
             <div class="card" id="platform">
                 <div style="position:relative;">
                     <img src="Platform ladder.jpg" alt="Platform Ladders" loading="lazy">
-                    <div class="badge-popular">Top Choice</div>
                 </div>
                 <div class="card-content">
                     <h3>Platform Ladders</h3>
-                    <p>Extra-large standing platform, wrap-around guardrail for added safety.</p>
-                    <select class="tool-select" id="select-platform">
-                        <option value="">— Choose platform ladder —</option>
-                        <option>Werner PD6208 8-ft Podium (Type IA)</option>
-                        <option>Louisville PD9000 Series 10-ft</option>
-                        <option>Little Giant Jumbo Step (Fiberglass)</option>
-                        <option>Werner PD7306 6-ft Podium</option>
-                        <option>Other / Custom</option>
+                    <p>Extra-large standing platform, wrap-around guardrail for added safety. Podium-style work platforms.</p>
+                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Platform Ladders" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.wernerco.com/us/products/ladders/work-platforms?page=1#pf-filters=spec:cat/Work%20Platforms">Werner Platform Ladders</option>
+                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('platform')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-platform-ladders">
+                        <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Platform Ladders')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
-            <div class="card" id="step-ladders">
+            <!-- Step Ladders Card -->
+            <div class="card" id="step">
                 <div style="position:relative;">
                     <img src="Wernerstepladder.jpg" alt="Step Ladders" loading="lazy">
                 </div>
                 <div class="card-content">
                     <h3>Step Ladders</h3>
-                    <p>Non-conductive fiberglass, Type IA & IAA (300–375 lb rating), 4–16 ft.</p>
-                    <select class="tool-select" id="select-step-ladders">
-                        <option value="">— Choose step ladder —</option>
-                        <option>Little Giant King Kombo 8-ft (Type IAA)</option>
-                        <option>Werner 6-ft Fiberglass Step (375 lb)</option>
-                        <option>Louisville 10-ft Fiberglass Step (Type IA)</option>
-                        <option>Werner Podium 8-ft (Type IA)</option>
-                        <option>Other / Custom Height</option>
+                    <p>Non-conductive fiberglass, Type IA & IAA (300–375 lb rating), various heights.</p>
+                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Step Ladders" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.wernerco.com/us/products/ladders/step-ladders?page=1#pf-filters=spec:cat/Step%20Ladders">Werner Step Ladders</option>
+                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('step-ladders')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-step-ladders">
+                        <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Step Ladders')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Extension Ladders Card -->
             <div class="card" id="extension">
                 <div style="position:relative;">
                     <img src="Wernerextensionladder.jpg" alt="Extension Ladders" loading="lazy">
                 </div>
                 <div class="card-content">
                     <h3>Extension Ladders</h3>
-                    <p>Fiberglass & aluminum, 16–40 ft, D-rung, Type IA/IAA.</p>
-                    <select class="tool-select" id="select-extension">
-                        <option value="">— Choose extension ladder —</option>
-                        <option>Werner D6200-2 24-ft Fiberglass (Type IA)</option>
-                        <option>Louisville FE3200 32-ft Fiberglass (300 lb)</option>
-                        <option>Werner D1300-2 28-ft Aluminum (Type I)</option>
-                        <option>Little Giant HyperLite 32-ft (Type IAA)</option>
-                        <option>Other / Custom Size</option>
+                    <p>Fiberglass, various lengths, D-rung, Type IA/IAA.</p>
+                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Extension Ladders" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.wernerco.com/us/products/ladders/extension-ladders?page=1#pf-filters=spec:cat/Extension%20Ladders">Werner Extension Ladders</option>
+                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('extension')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-extension-ladders">
+                        <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Extension Ladders')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Articulating Card -->
             <div class="card" id="articulating">
                 <div style="position:relative;">
                     <img src="Wernerarticulatingladder.jpg" alt="Articulating & Multi-Position Ladders" loading="lazy">
                 </div>
                 <div class="card-content">
-                    <h3>Articulating & Multi-Position Ladders</h3>
+                    <h3>Articulating / Multi-Position Ladders</h3>
                     <p>Converts to A-frame, extension, staircase, 90° configurations.</p>
-                    <select class="tool-select" id="select-articulating">
-                        <option value="">— Choose articulating ladder —</option>
-                        <option>Little Giant Velocity M22 (Type IA)</option>
-                        <option>Little Giant Conquest M26 (Type IAA)</option>
-                        <option>Werner MT-22 Multi-Ladder</option>
-                        <option>Little Giant Dark Horse 2.0 (Fiberglass)</option>
-                        <option>Other / Custom</option>
+                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Articulating Ladders" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.wernerco.com/us/products/ladders?page=1#pf-filters=spec:cat/Multi-Ladders|Style/Multi-Position%20Ladder">Werner Multi-Position Ladders</option>
+                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('articulating')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-articulating-ladders">
+                        <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Articulating Ladders')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -582,7 +390,7 @@
         </section>
 
         <section class="bulk-section">
-            <p>Need fleet pricing or GSA ladder packages?</p>
+            <p>Need GSA pricing or bulk ladder orders?</p>
             <a href="sms:7579405171?body=Hi%2C%20need%20ladder%20quote" class="text-btn">Text Us Now</a>
         </section>
     </main>
@@ -596,159 +404,80 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <div id="basket-modal">
-        <div class="basket-modal-content">
-            <div class="basket-header">
-                <h3>Your Quote Basket</h3>
-            </div>
-            <div class="basket-items" id="basket-items-list"></div>
-            <div class="basket-actions">
-                <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
-                <div class="basket-btn basket-btn-primary" onclick="proceedToQuote()">Proceed to Quote</div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Basket functionality
-        function getBasket() {
-            const stored = localStorage.getItem('quoteBasket');
-            return stored ? JSON.parse(stored) : [];
-        }
+        function handleSelect(select) {
+            const category = select.dataset.category;
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-').replace(/[/]/g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
 
-        function saveBasket(basket) {
-            localStorage.setItem('quoteBasket', JSON.stringify(basket));
-        }
-
-        function addToBasket(name, qty) {
-            const basket = getBasket();
-            basket.push({ name, qty });
-            saveBasket(basket);
-        }
-
-        function removeFromBasketByIndex(index) {
-            const basket = getBasket();
-            if (index >= 0 && index < basket.length) {
-                basket.splice(index, 1);
-                saveBasket(basket);
+            if (select.value.startsWith('http')) {
+                customSection.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                customSection.style.display = 'block';
+            } else {
+                customSection.style.display = 'none';
             }
         }
 
-        // Rotating red banner
+        function sendCustomQuote(category) {
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-').replace(/[/]/g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
+            const textarea = customSection.querySelector('textarea');
+            const lines = textarea.value.trim().split('\n').filter(line => line.trim() !== '');
+
+            if (lines.length === 0) {
+                alert('Please enter at least one part number or description before requesting a quote.');
+                return;
+            }
+
+            const itemHeader = `${category} – Custom Quote Request (Ladders):`;
+            const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
+
+            const smsBody = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+
+            // Reset form
+            textarea.value = '';
+            customSection.style.display = 'none';
+            customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
+
+            // Trigger SMS
+            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+        }
+
+        // Banner rotation
         const banners = document.querySelectorAll('.banner-text');
-        let current = 0;
+        let j = 0;
         setInterval(() => {
-            banners[current].classList.remove('active');
-            current = (current + 1) % banners.length;
-            banners[current].classList.add('active');
+            banners[j].classList.remove('active');
+            j = (j + 1) % banners.length;
+            banners[j].classList.add('active');
         }, 3500);
 
-        // Hide/show sticky nav on scroll
+        // Sticky nav hide/show on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-            if (currentScroll > lastScroll && currentScroll > 160) {
+            const current = window.pageYOffset;
+            if (current > lastScroll && current > 160) {
                 nav.classList.add('hidden');
             } else {
                 nav.classList.remove('hidden');
             }
-            lastScroll = currentScroll;
+            lastScroll = current;
         });
 
-        // Add item to basket
-        function addSelectedToBasket(categoryId) {
-            const select = document.getElementById('select-' + categoryId);
-            if (!select || select.value === "") {
-                alert("Please select an item first.");
-                return;
-            }
-            const qtyInput = select.closest('.card-content').querySelector('.qty-input');
-            const qty = parseInt(qtyInput.value) || 1;
-            addToBasket(select.value, qty);
-            alert(`Added to quote basket:\n${select.value} × ${qty}`);
-            select.selectedIndex = 0;
-            qtyInput.value = 1;
-        }
-
-        // Proceed to quote via SMS or redirect
-        function proceedToQuote() {
-            const basket = getBasket();
-            if (basket.length === 0) {
-                alert("Your quote basket is empty!");
-                return;
-            }
-            if (basket.length <= 5) {
-                const itemsText = basket.map(item => `• ${item.name} ×${item.qty}`).join('\n');
-                const smsBody = `Quote Request - Ladders (YorktownTools.com)\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
-                window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
-            } else {
-                window.location.href = 'ladders.html?basket=1';
-            }
-        }
-
-        // Basket modal
-        function showBasketModal() {
-            const modal = document.getElementById('basket-modal');
-            const list = document.getElementById('basket-items-list');
-            const basket = getBasket();
-
-            if (basket.length === 0) {
-                list.innerHTML = '<div class="basket-empty">Your quote basket is empty.</div>';
-            } else {
-                list.innerHTML = '';
-                basket.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'basket-item';
-                    div.innerHTML = `
-                        <div class="basket-item-name">${item.name}</div>
-                        <div class="basket-item-qty">×${item.qty}</div>
-                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index}); showBasketModal();">×</button>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-            modal.classList.add('show');
-        }
-
-        function closeBasketModal() {
-            document.getElementById('basket-modal').classList.remove('show');
-        }
-
-        // Floating quote button
-        document.addEventListener('DOMContentLoaded', () => {
-            const quoteBtn = document.getElementById('quote-basket-btn');
-            if (quoteBtn) {
-                quoteBtn.onclick = () => {
-                    const basket = getBasket();
-                    if (basket.length === 0) {
-                        alert("Your quote basket is empty!");
-                    } else {
-                        showBasketModal();
-                    }
-                };
-            }
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', e => {
-                const href = anchor.getAttribute('href');
+        // Smooth scrolling for internal nav links
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
                 if (href.length > 1) {
                     e.preventDefault();
                     const target = document.querySelector(href);
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             });
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('basket-modal').addEventListener('click', e => {
-            if (e.target === document.getElementById('basket-modal')) {
-                closeBasketModal();
-            }
         });
     </script>
 </body>
