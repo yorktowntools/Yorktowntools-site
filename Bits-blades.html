@@ -173,18 +173,11 @@
             line-height: 1.55;
             margin-bottom: 1.2rem;
         }
-
-        .badge-popular {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            background: var(--red);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 30px;
-            font-size: 0.88rem;
-            font-weight: 800;
-            z-index: 2;
+        .card .popular-note {
+            font-size: 0.98rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 0.5rem;
         }
 
         .tool-select {
@@ -203,32 +196,39 @@
             box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
         }
 
-        .qty-add-group {
-            display: flex;
-            gap: 0.8rem;
-            margin: 1.2rem 0 0;
+        .custom-section {
+            margin-top: 1.5rem;
+            display: none;
         }
-        .qty-input {
-            width: 90px;
-            padding: 1.3rem 0.8rem;
+        .custom-section textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 1rem;
             border: 2px solid #dee2e6;
-            border-radius: 12px;
-            text-align: center;
+            border-radius: 14px;
             font-size: 1.05rem;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
         }
-        .add-btn {
-            flex: 1;
+        .custom-section textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+        .custom-get-quote {
             background: var(--red);
             color: white;
             padding: 1.3rem;
             border-radius: 14px;
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+            width: 100%;
         }
-        .add-btn:hover {
+        .custom-get-quote:hover {
             background: #a00d22;
             transform: translateY(-5px);
         }
@@ -252,29 +252,6 @@
         }
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
 
-        #quote-basket-btn {
-            position: fixed;
-            right: clamp(16px, 4vw, 24px);
-            bottom: calc(clamp(16px, 4vw, 24px) + clamp(72px, 16vw, 88px) + 16px);
-            width: clamp(72px, 16vw, 88px);
-            height: clamp(72px, 16vw, 88px);
-            background: var(--red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
-            z-index: 999;
-            animation: pulse 2.6s infinite;
-            cursor: pointer;
-            color: white;
-            font-weight: 800;
-            font-size: 0.68rem;
-            text-align: center;
-            padding: 8px;
-            line-height: 1.2;
-        }
-
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
         footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
@@ -286,100 +263,6 @@
         .bulk-section p { font-size:1.5rem; margin-bottom:1.5rem; }
         .text-btn { display:inline-block; background:#0066cc; color:white; padding:1.3rem 3rem; border-radius:50px; font-size:1.35rem; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(0,102,204,0.3); transition:var(--transition); }
         .text-btn:hover { transform:translateY(-5px); opacity:0.9; }
-
-        /* Basket Modal */
-        #basket-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #basket-modal.show { display: flex; }
-        .basket-modal-content {
-            background: white;
-            border-radius: var(--radius);
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-        }
-        .basket-header {
-            padding: 24px 24px 16px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .basket-header h3 {
-            font-size: 1.8rem;
-            color: var(--navy);
-        }
-        .basket-items {
-            padding: 20px 24px;
-        }
-        .basket-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .basket-item:last-child { border-bottom: none; }
-        .basket-item-name {
-            flex: 1;
-            font-size: 1.05rem;
-            color: #333;
-        }
-        .basket-item-qty {
-            margin: 0 16px;
-            font-weight: 600;
-            color: var(--navy);
-        }
-        .basket-remove {
-            background: var(--red);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 1.4rem;
-            cursor: pointer;
-        }
-        .basket-empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            font-size: 1.1rem;
-        }
-        .basket-actions {
-            padding: 20px 24px;
-            border-top: 1px solid #eee;
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-        .basket-btn {
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            flex: 1;
-            text-align: center;
-            transition: var(--transition);
-        }
-        .basket-btn-primary {
-            background: var(--red);
-            color: white;
-        }
-        .basket-btn-primary:hover { background: #a00d22; transform: translateY(-3px); }
-        .basket-btn-secondary {
-            background: #eee;
-            color: var(--navy);
-        }
-        .basket-btn-secondary:hover { background: #ddd; }
     </style>
 </head>
 <body>
@@ -387,10 +270,6 @@
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="George">
     </a>
-
-    <div id="quote-basket-btn">
-        Get<br>Quote
-    </div>
 
     <div class="top-red-banner">
         <div class="banner-text active">Free Delivery.</div>
@@ -417,139 +296,168 @@
     <main>
         <section class="hero">
             <h1>Bits, Blades & Abrasives</h1>
-            <p>Diablo, Lenox, Milwaukee, DeWalt, Bosch, Spyder – the longest-lasting consumables on the market.<br>Free delivery in Hampton Roads.</p>
+            <p>Diablo, Lenox, Milwaukee, DeWalt, Bosch, Spyder – the longest-lasting consumables on the market.<br>Free delivery in Hampton Roads – GSA pricing available.</p>
         </section>
 
         <section class="grid">
 
+            <!-- Drill Bits & Driver Bits Card -->
             <div class="card" id="drill-bits">
                 <div style="position:relative;">
                     <img src="Torquebits.jpg" alt="Drill Bits & Driver Bits" loading="lazy">
-                    <div class="badge-popular">Most Popular</div>
                 </div>
                 <div class="card-content">
                     <h3>Drill Bits & Driver Bits</h3>
                     <p>Shockwave impact bits, titanium & cobalt drill bits, step bits, spade bits, masonry.</p>
-                    <select class="tool-select" id="select-drill-bits">
-                        <option value="">— Choose bits —</option>
-                        <option>Milwaukee SHOCKWAVE 100-pc Impact Set</option>
-                        <option>DeWalt MAXFIT + Titanium Drill Bit Set</option>
-                        <option>Bosch Daredevil Spade Bit Set</option>
-                        <option>Irwin Speedbor Supreme 25-pc Set</option>
-                        <option>Diablo Titanium Drill Bit Set</option>
-                        <option>Makita Impact Gold Bit Set</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Drill Bits" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/drilling-43509-ocs-ac/">Bosch Drill Bits</option>
+                        <option value="https://www.dewalt.com/products/accessories/drilling-accessories">DeWalt Drill Bits</option>
+                        <option value="https://www.diablotools.com/explore/mild-stainless-steel-bits/">Diablo Drill Bits</option>
+                        <option value="https://www.irwintools.com/products/accessories/drilling-accessories">Irwin Drill Bits</option>
+                        <option value="https://www.cutwithlenox.com/products/accessories/drilling-accessories/metal-wood-drilling-accessories/step-drills-bits">Lenox Drill Bits</option>
+                        <option value="https://www.makitatools.com/products/accessories/drill-bits-and-hole-saws">Makita Drill Bits</option>
+                        <option value="https://www.milwaukeetool.com/products/accessories">Milwaukee Drill Bits</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('drill-bits')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-drill-bits">
+                        <textarea placeholder="Enter part numbers or bit descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Drill Bits')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Reciprocating Saw Blades Card -->
             <div class="card" id="recip-blades">
                 <div style="position:relative;">
                     <img src="Sawzallblade.jpg" alt="Reciprocating Saw Blades" loading="lazy">
-                    <div class="badge-popular">Top Seller</div>
                 </div>
                 <div class="card-content">
                     <h3>Reciprocating Saw Blades</h3>
                     <p>Demo Demon, Steel Demon, wood/metal/nail-embedded, carbide-tipped blades.</p>
-                    <select class="tool-select" id="select-recip-blades">
-                        <option value="">— Choose recip blades —</option>
-                        <option>Diablo Demo Demon Nail-Embedded Wood</option>
-                        <option>Diablo Steel Demon Metal Cutting</option>
-                        <option>Lenox Gold Power Arc Blades</option>
-                        <option>Milwaukee TORCH Carbide Blades</option>
-                        <option>DeWalt Breakaway Bi-Metal Blades</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Recip Blades" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/reciprocating-saw-blades-43863-ocs-ac/">Bosch Recip Blades</option>
+                        <option value="https://www.dewalt.com/products/accessories/sawing-accessories/reciprocating-saw-blades">DeWalt Recip Blades</option>
+                        <option value="https://www.diablotools.com/explore/reciprocating-blades/">Diablo Recip Blades</option>
+                        <option value="https://www.cutwithlenox.com/products/accessories/sawing-accessories/reciprocating-saw-blades">Lenox Recip Blades</option>
+                        <option value="https://www.milwaukeetool.com/products/accessories/cutting/sawzall-blades">Milwaukee Recip Blades</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('recip-blades')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-recip-blades">
+                        <textarea placeholder="Enter part numbers or blade descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Recip Blades')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Circular Saw Blades Card -->
             <div class="card" id="circular-blades">
-                <img src="Circularsawblade.jpg" alt="Circular Saw Blades" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Circularsawblade.jpg" alt="Circular Saw Blades" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Circular Saw Blades</h3>
                     <p>7-1/4" framing, finish, ultra-fine, metal-cutting, and fiber cement blades.</p>
-                    <select class="tool-select" id="select-circular-blades">
-                        <option value="">— Choose circular blades —</option>
-                        <option>Diablo 7-1/4" 24T Framing Blade</option>
-                        <option>Diablo 7-1/4" 60T Ultra Finish</option>
-                        <option>Diablo Steel Demon Metal Blade</option>
-                        <option>Freud Premier Fusion 40T</option>
-                        <option>Milwaukee 7-1/4" Framing Blade</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Circular Blades" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/circular-saw-blades-43865-ocs-ac/">Bosch Circular Blades</option>
+                        <option value="https://www.dewalt.com/products/accessories/sawing-accessories/circular-saw-blades">DeWalt Circular Blades</option>
+                        <option value="https://www.diablotools.com/explore/circular-saw-blades/">Diablo Circular Blades</option>
+                        <option value="https://www.freudtools.com/gb/en/products/circular-saw-blades/">Freud Circular Blades</option>
+                        <option value="https://www.makitatools.com/products/accessories/Cutting-Blades/circular-saw-blades">Makita Circular Blades</option>
+                        <option value="https://www.milwaukeetool.com/products/accessories/cutting/circular-saw-blades">Milwaukee Circular Blades</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('circular-blades')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-circular-blades">
+                        <textarea placeholder="Enter part numbers or blade descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Circular Blades')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Hole Saws Card -->
             <div class="card" id="hole-saws">
-                <img src="Holesawblade.jpg" alt="Hole Saws" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Holesawblade.jpg" alt="Hole Saws" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Hole Saws & Accessories</h3>
                     <p>Bi-metal, carbide-grit, diamond, arbors, and complete kits.</p>
-                    <select class="tool-select" id="select-hole-saws">
-                        <option value="">— Choose hole saw —</option>
-                        <option>Milwaukee Hole Dozer Bi-Metal Set</option>
-                        <option>Lenox Diamond Hole Saw Set</option>
-                        <option>Spyder Tungsten Carbide Hole Saws</option>
-                        <option>Bosch Diamond Hole Saw (Wet/Dry)</option>
-                        <option>Quick-Change Arbor + Pilot Bits</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Hole Saws" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/hole-saws-43862-ocs-ac/">Bosch Hole Saws</option>
+                        <option value="https://www.dewalt.com/products/accessories/hole-saws-mandrels">DeWalt Hole Saws</option>
+                        <option value="https://www.diablotools.com/explore/hole-saws/">Diablo Hole Saws</option>
+                        <option value="https://www.cutwithlenox.com/products/accessories/hole-saws-accessories/hole-saws">Lenox Hole Saws</option>
+                        <option value="https://www.makitatools.com/products/accessories/drill-bits-and-hole-saws/hole-saws">Makita Hole Saws</option>
+                        <option value="https://www.milwaukeetool.com/products/accessories/hole-saws">Milwaukee Hole Saws</option>
+                        <option value="https://spyderproducts.com/collections/hole-saws">Spyder Hole Saws</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('hole-saws')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-hole-saws">
+                        <textarea placeholder="Enter part numbers or hole saw descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Hole Saws')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Abrasives Card -->
             <div class="card" id="abrasives">
-                <img src="Sandwich.jpg" alt="Abrasives & Sanding" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Sandwich.jpg" alt="Abrasives & Sanding" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Abrasives & Sanding Discs</h3>
                     <p>Flap discs, grinding wheels, sanding sheets, quick-lock discs, wire wheels.</p>
-                    <select class="tool-select" id="select-abrasives">
-                        <option value="">— Choose abrasives —</option>
-                        <option>Diablo 4-1/2" Flap Disc 60-Grit (10pk)</option>
-                        <option>DeWalt HP Grinding Wheel 4-1/2"</option>
-                        <option>Milwaukee 4-1/2" Cut-Off Wheels (25pk)</option>
-                        <option>Norton BlueFire Flap Discs</option>
-                        <option>Sait Quick-Change Discs</option>
-                        <option>Other / Custom Request</option>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Abrasives" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/sanding-polishing-43505-ocs-ac/">Bosch Abrasives</option>
+                        <option value="https://www.dewalt.com/products/accessories/sanding-accessories">DeWalt Abrasives</option>
+                        <option value="https://www.diablotools.com/explore/sanding/">Diablo Abrasives</option>
+                        <option value="https://www.makitatools.com/products/accessories/abrasives-grinding-and-surfacing">Makita Abrasives</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('abrasives')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-abrasives">
+                        <textarea placeholder="Enter part numbers or abrasive descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Abrasives')">Get Quote →</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Bit & Blade Sets Card -->
             <div class="card" id="sets">
-                <img src="Assortedpacksawblades.jpg" alt="Bit & Blade Sets" loading="lazy">
+                <div style="position:relative;">
+                    <img src="Assortedpacksawblades.jpg" alt="Bit & Blade Sets" loading="lazy">
+                </div>
                 <div class="card-content">
                     <h3>Bit & Blade Sets</h3>
                     <p>Bulk packs and contractor kits for crews.</p>
-                    <select class="tool-select" id="select-sets">
-                        <option value="">— Choose set —</option>
-                        <option>Milwaukee SHOCKWAVE 150-pc Master Set</option>
-                        <option>Diablo 40-pc Blade & Bit Contractor Pack</option>
-                        <option>DeWalt 100-pc Drilling & Driving Set</option>
-                        <option>Lenox 26-pc Recip + Circular Blade Set</option>
-                        <option>Other / Custom Bulk Request</option>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <select class="tool-select" data-category="Bit & Blade Sets" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/saw-blade-sets-43868-ocs-ac/">Bosch Sets</option>
+                        <option value="https://www.dewalt.com/searchlanding?search=Blade+Set">DeWalt Sets</option>
+                        <option value="https://www.diablotools.com/explore">Diablo Sets</option>
+                        <option value="https://www.cutwithlenox.com/searchlanding?search=Set">Lenox Sets</option>
+                        <option value="https://www.makitatools.com/products/search?searchtext=Blade%20set">Makita Sets</option>
+                        <option value="https://www.milwaukeetool.com/search?q=Blade%20set&first=0">Milwaukee Sets</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
-                    <div class="qty-add-group">
-                        <input type="number" min="1" value="1" class="qty-input">
-                        <div class="add-btn" onclick="addSelectedToBasket('sets')">Add to Quote →</div>
+
+                    <div class="custom-section" id="custom-bit-&-blade-sets">
+                        <textarea placeholder="Enter part numbers or set descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Bit & Blade Sets')">Get Quote →</button>
                     </div>
                 </div>
             </div>
@@ -571,46 +479,49 @@
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <div id="basket-modal">
-        <div class="basket-modal-content">
-            <div class="basket-header">
-                <h3>Your Quote Basket</h3>
-            </div>
-            <div class="basket-items" id="basket-items-list"></div>
-            <div class="basket-actions">
-                <div class="basket-btn basket-btn-secondary" onclick="closeBasketModal()">Continue Shopping</div>
-                <div class="basket-btn basket-btn-primary" onclick="proceedToQuote()">Proceed to Quote</div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Full inline basket functionality (no external basket.js needed)
+        function handleSelect(select) {
+            const category = select.dataset.category;
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
 
-        function getBasket() {
-            const stored = localStorage.getItem('quoteBasket');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function saveBasket(basket) {
-            localStorage.setItem('quoteBasket', JSON.stringify(basket));
-        }
-
-        function addToBasket(name, qty) {
-            const basket = getBasket();
-            basket.push({ name, qty });
-            saveBasket(basket);
-        }
-
-        function removeFromBasketByIndex(index) {
-            const basket = getBasket();
-            if (index >= 0 && index < basket.length) {
-                basket.splice(index, 1);
-                saveBasket(basket);
+            if (select.value.startsWith('http')) {
+                customSection.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                customSection.style.display = 'block';
+            } else {
+                customSection.style.display = 'none';
             }
         }
 
-        // Top red banner rotation
+        function sendCustomQuote(category) {
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
+            const textarea = customSection.querySelector('textarea');
+            const lines = textarea.value.trim().split('\n').filter(line => line.trim() !== '');
+
+            if (lines.length === 0) {
+                alert('Please enter at least one part number or description before requesting a quote.');
+                return;
+            }
+
+            const itemHeader = `${category} – Custom Quote Request (Bits & Blades):`;
+            const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
+
+            const smsBody = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+
+            // Reset form
+            textarea.value = '';
+            customSection.style.display = 'none';
+            customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
+
+            // Trigger SMS
+            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+        }
+
+        // Banner rotation
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
@@ -632,80 +543,7 @@
             lastScroll = current;
         });
 
-        // Add to basket
-        function addSelectedToBasket(categoryId) {
-            const select = document.getElementById('select-' + categoryId);
-            if (!select || select.value === "") {
-                alert("Please select an item first.");
-                return;
-            }
-            const qtyInput = select.closest('.card-content').querySelector('.qty-input');
-            const qty = parseInt(qtyInput.value) || 1;
-            addToBasket(select.value, qty);
-            alert(`Added to quote basket:\n${select.value} × ${qty}`);
-            select.selectedIndex = 0;
-            qtyInput.value = 1;
-        }
-
-        // Proceed to quote (SMS or redirect)
-        function proceedToQuote() {
-            const basket = getBasket();
-            if (basket.length === 0) {
-                alert("Your quote basket is empty!");
-                return;
-            }
-            if (basket.length <= 5) {
-                const itemsText = basket.map(i => `• ${i.name} ×${i.qty}`).join('\n');
-                const smsBody = `Quote Request from YorktownTools.com\n\n${itemsText}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
-                window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
-            } else {
-                window.location.href = 'index.html?basket=1';
-            }
-        }
-
-        // Show modal and populate items
-        function showBasketModal() {
-            const modal = document.getElementById('basket-modal');
-            const list = document.getElementById('basket-items-list');
-            const basket = getBasket();
-            if (basket.length === 0) {
-                list.innerHTML = '<div class="basket-empty">Your quote basket is empty.</div>';
-            } else {
-                list.innerHTML = '';
-                basket.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'basket-item';
-                    div.innerHTML = `
-                        <div class="basket-item-name">${item.name}</div>
-                        <div class="basket-item-qty">×${item.qty}</div>
-                        <button class="basket-remove" onclick="removeFromBasketByIndex(${index}); showBasketModal();">×</button>
-                    `;
-                    list.appendChild(div);
-                });
-            }
-            modal.classList.add('show');
-        }
-
-        function closeBasketModal() {
-            document.getElementById('basket-modal').classList.remove('show');
-        }
-
-        // Floating quote button click
-        document.addEventListener('DOMContentLoaded', () => {
-            const floatingBtn = document.getElementById('quote-basket-btn');
-            if (floatingBtn) {
-                floatingBtn.onclick = () => {
-                    const basket = getBasket();
-                    if (basket.length === 0) {
-                        alert("Your quote basket is empty!");
-                    } else {
-                        showBasketModal();
-                    }
-                };
-            }
-        });
-
-        // Smooth scrolling for nav links
+        // Smooth scrolling for internal nav links
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
@@ -715,11 +553,6 @@
                     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             });
-        });
-
-        // Close modal on outside click
-        document.getElementById('basket-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeBasketModal();
         });
     </script>
 </body>
