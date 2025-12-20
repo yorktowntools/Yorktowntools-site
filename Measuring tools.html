@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Measuring & Layout – Levels, Lasers & Tapes | Yorktown Tools</title>
+    <meta name="description" content="Professional-grade levels, laser distance measurers, line lasers, tape measures & squares from Stabila, DeWalt, Milwaukee, Bosch, Empire & more. Precision for military base & commercial jobs. Free delivery in Hampton Roads.">
+
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy: #0b1e3f;
+            --red: #c8102e;
+            --white: #ffffff;
+            --light: #f8f9fa;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw; height: 140vw;
+            max-width: 1400px; max-height: 1400px;
+            background: url('george-mascot.PNG') center center / contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            margin-top: -80px;
+        }
+
+        .top-red-banner {
+            background: var(--red);
+            color: var(--white);
+            text-align: center;
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            min-height: 52px;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner-text {
+            position: absolute;
+            width: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .banner-text.active { opacity: 1; }
+
+        .logo-header {
+            text-align: center;
+            padding: 1.4rem 1rem 1rem;
+            background: var(--white);
+        }
+        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+
+        nav {
+            background: var(--navy);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav.hidden { transform: translateY(-100%); }
+
+        .mobile-nav {
+            display: flex;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding: 0.75rem 0;
+            gap: 0.8rem;
+        }
+        .mobile-nav::-webkit-scrollbar { display: none; }
+
+        .mobile-nav a {
+            flex: 0 0 auto;
+            background: rgba(255,255,255,0.12);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.94rem;
+            padding: 0.65rem 1.1rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .mobile-nav a:hover, .mobile-nav a.active {
+            background: rgba(255,255,255,1);
+            color: var(--navy);
+        }
+
+        @media (min-width: 768px) {
+            .mobile-nav {
+                justify-content: center;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem 0;
+            }
+            .mobile-nav a {
+                background: transparent;
+                padding: 0.6rem 1rem;
+            }
+            .mobile-nav a:hover, .mobile-nav a.active {
+                background: rgba(255,255,255,0.18);
+                color: var(--red);
+            }
+        }
+
+        main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
+
+        .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
+        .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
+        .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
+
+        .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: clamp(1.8rem, 4.5vw, 3rem); margin-bottom:5.5rem; }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-top: 5px solid var(--red);
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 55px rgba(0,0,0,0.18);
+        }
+        .card img {
+            width: 100%;
+            height: clamp(200px, 38vw, 260px);
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 1.6rem 1.4rem 2rem;
+            text-align: center;
+        }
+        .card h3 {
+            color: var(--navy);
+            margin: 0 0 0.8rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .card p {
+            color: #444;
+            font-size: 1.05rem;
+            line-height: 1.55;
+            margin-bottom: 1.2rem;
+        }
+        .card .popular-note {
+            font-size: 0.98rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        .tool-select {
+            width: 100%;
+            padding: 1.3rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            margin: 1rem 0 0;
+            background: white;
+            transition: border 0.3s;
+        }
+        .tool-select:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+
+        .custom-section {
+            margin-top: 1.5rem;
+            display: none;
+        }
+        .custom-section textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+        .custom-section textarea:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+        .custom-get-quote {
+            background: var(--red);
+            color: white;
+            padding: 1.3rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+            width: 100%;
+        }
+        .custom-get-quote:hover {
+            background: #a00d22;
+            transform: translateY(-5px);
+        }
+
+        .call-button {
+            position: fixed;
+            right: clamp(16px, 4vw, 24px);
+            bottom: clamp(16px, 4vw, 24px);
+            width: clamp(72px, 16vw, 88px);
+            height: clamp(72px, 16vw, 88px);
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            z-index: 999;
+            animation: pulse 2.6s infinite;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
+
+        footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
+        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+        footer a { color: #ffffff !important; text-decoration: underline; }
+        footer a:hover { opacity: 0.85; }
+
+        .bulk-section { text-align:center; margin:5rem 0 4rem; }
+        .bulk-section p { font-size:1.5rem; margin-bottom:1.5rem; }
+        .text-btn { display:inline-block; background:#0066cc; color:white; padding:1.3rem 3rem; border-radius:50px; font-size:1.35rem; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(0,102,204,0.3); transition:var(--transition); }
+        .text-btn:hover { transform:translateY(-5px); opacity:0.9; }
+    </style>
+</head>
+<body>
+
+    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
+        <img src="Yorktown.PNG" alt="George">
+    </a>
+
+    <div class="top-red-banner">
+        <div class="banner-text active">Free Delivery.</div>
+        <div class="banner-text">Free Quote.</div>
+        <div class="banner-text">No Hassle.</div>
+    </div>
+
+    <div class="logo-header">
+        <img src="Yorktown.PNG" alt="Yorktown Tools">
+    </div>
+
+    <nav id="main-nav">
+        <div class="mobile-nav">
+            <a href="#levels">Levels</a>
+            <a href="#lasers">Lasers & Distance Measurers</a>
+            <a href="#tapes">Tape Measures</a>
+            <a href="#squares">Squares & Marking</a>
+            <a href="#accessories">Accessories & Kits</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Measuring & Layout for Precision Work</h1>
+            <p>Professional levels, lasers, tapes, squares & marking tools from Stabila, DeWalt, Milwaukee, Bosch, Empire & more.<br>Dead-accurate layout for military bases, commercial sites & demanding jobs. Free delivery in Hampton Roads – GSA pricing available.</p>
+        </section>
+
+        <section class="grid">
+
+            <!-- Levels Card -->
+            <div class="card" id="levels">
+                <div style="position:relative;">
+                    <img src="Stabila level.JPG" alt="Levels" loading="lazy"> <!-- Replace with your actual image -->
+                </div>
+                <div class="card-content">
+                    <h3>Levels – Box, Torpedo & Digital</h3>
+                    <p>Precision bubble, digital & I-beam levels. Stabila, Empire, DeWalt & Milwaukee for plumb, level & angle work.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" for specific models.</p>
+                    <select class="tool-select" data-category="Levels" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.stabila.com/en-US/products/list/levels.html">Stabila Levels</option>
+                        <option value="https://www.empirelevel.com/box-levels.php">Empire Levels</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/measuring-layout-tools/levels">DeWalt Levels</option>
+                        <option value="https://www.milwaukeetool.com/Products/Hand-Tools/Layout/Levels">Milwaukee Levels</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
+                    </select>
+
+                    <div class="custom-section" id="custom-levels">
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Levels')">Get Quote →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lasers Card -->
+            <div class="card" id="lasers">
+                <div style="position:relative;">
+                    <img src="Bosch laser.JPG" alt="Lasers & Distance Measurers" loading="lazy"> <!-- Replace with your actual image -->
+                </div>
+                <div class="card-content">
+                    <h3>Lasers & Distance Measurers</h3>
+                    <p>Line lasers, rotary, cross-line & laser distance meters. Bosch, DeWalt, Milwaukee, Makita & Leica.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" for specific models.</p>
+                    <select class="tool-select" data-category="Lasers" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.boschtools.com/us/en/line-lasers-41057-ocs-c/">Bosch Lasers</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/lasers-instruments">DeWalt Lasers</option>
+                        <option value="https://www.milwaukeetool.com/Products/Hand-Tools/Layout/Lasers">Milwaukee Lasers</option>
+                        <option value="https://www.makitatools.com/products/tools/cordless/measuring">Makita Lasers</option>
+                        <option value="https://shop.leica-geosystems.com/measurement-tools/disto">Leica DISTO</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
+                    </select>
+
+                    <div class="custom-section" id="custom-lasers">
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Lasers')">Get Quote →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tapes Card -->
+            <div class="card" id="tapes">
+                <div style="position:relative;">
+                    <img src="Milwaukee tape.JPG" alt="Tape Measures" loading="lazy"> <!-- Replace with your actual image -->
+                </div>
+                <div class="card-content">
+                    <h3>Tape Measures</h3>
+                    <p>Compact, magnetic & long tapes. Milwaukee, DeWalt, Stanley & Tajima for everyday layout.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" for bulk/special orders.</p>
+                    <select class="tool-select" data-category="Tapes" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.milwaukeetool.com/products/hand-tools/measuring/short-tape-measures">Milwaukee Tapes</option>
+                        <option value="https://www.dewalt.com/products/hand-tools/measure-and-layout-tools/tape-measures">DeWalt Tapes</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
+                    </select>
+
+                    <div class="custom-section" id="custom-tapes">
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Tapes')">Get Quote →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Squares Card -->
+            <div class="card" id="squares">
+                <div style="position:relative;">
+                    <img src="Empire square.JPG" alt="Squares & Marking" loading="lazy"> <!-- Replace with your actual image -->
+                </div>
+                <div class="card-content">
+                    <h3>Squares & Marking Tools</h3>
+                    <p>Rafter, framing, combo squares, chalk lines & markers. Empire, Swanson & more.</p>
+                    <p class="popular-note">Choose a brand to view their full catalog online, or select "Request Custom Quote" for specific items.</p>
+                    <select class="tool-select" data-category="Squares" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="https://www.empirelevel.com/rafter-squares.php">Empire Squares</option>
+                        <option value="custom">Request Custom Quote / Other Brand</option>
+                    </select>
+
+                    <div class="custom-section" id="custom-squares">
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Squares')">Get Quote →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accessories Card -->
+            <div class="card" id="accessories">
+                <div style="position:relative;">
+                    <img src="Laser accessories.JPG" alt="Accessories & Kits" loading="lazy"> <!-- Replace with your actual image -->
+                </div>
+                <div class="card-content">
+                    <h3>Accessories & Kits</h3>
+                    <p>Tripods, receivers, targets, chargers & combo kits for complete layout setups.</p>
+                    <p class="popular-note">Select "Request Custom Quote" to build a custom kit or get GSA pricing.</p>
+                    <select class="tool-select" data-category="Accessories" onchange="handleSelect(this)">
+                        <option value="">— Select an option —</option>
+                        <option value="custom">Request Custom Quote / Build a Kit</option>
+                    </select>
+
+                    <div class="custom-section" id="custom-accessories">
+                        <textarea placeholder="Enter part numbers or tool descriptions (one per line)"></textarea>
+                        <button class="custom-get-quote" onclick="sendCustomQuote('Accessories')">Get Quote →</button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="bulk-section">
+            <p>Need GSA pricing or bulk crew orders?</p>
+            <a href="sms:7579405171?body=Hi%2C%20need%20measuring%20tool%20quote" class="text-btn">Text Us Now</a>
+        </section>
+    </main>
+
+    <footer>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function handleSelect(select) {
+            const category = select.dataset.category;
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
+
+            if (select.value.startsWith('http')) {
+                customSection.style.display = 'none';
+                window.open(select.value, '_blank');
+                select.selectedIndex = 0;
+            } else if (select.value === 'custom') {
+                customSection.style.display = 'block';
+            } else {
+                customSection.style.display = 'none';
+            }
+        }
+
+        function sendCustomQuote(category) {
+            const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+            const customSection = document.getElementById(`custom-${normalized}`);
+            const textarea = customSection.querySelector('textarea');
+            const lines = textarea.value.trim().split('\n').filter(line => line.trim() !== '');
+
+            if (lines.length === 0) {
+                alert('Please enter at least one part number or description before requesting a quote.');
+                return;
+            }
+
+            const itemHeader = `${category} – Custom Quote Request (Measuring & Layout):`;
+            const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
+
+            const smsBody = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+
+            // Reset form
+            textarea.value = '';
+            customSection.style.display = 'none';
+            customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
+
+            // Trigger SMS
+            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+        }
+
+        // Banner rotation
+        const banners = document.querySelectorAll('.banner-text');
+        let j = 0;
+        setInterval(() => {
+            banners[j].classList.remove('active');
+            j = (j + 1) % banners.length;
+            banners[j].classList.add('active');
+        }, 3500);
+
+        // Sticky nav hide/show on scroll
+        const nav = document.getElementById('main-nav');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const current = window.pageYOffset;
+            if (current > lastScroll && current > 160) {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+            lastScroll = current;
+        });
+
+        // Smooth scrolling for internal nav links
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
