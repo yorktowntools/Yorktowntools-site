@@ -216,9 +216,13 @@
             border-color: var(--navy);
             box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
         }
-        .custom-get-quote {
-            background: var(--red);
-            color: white;
+
+        .quote-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .quote-btn {
             padding: 1.3rem;
             border-radius: 14px;
             font-weight: 700;
@@ -226,11 +230,29 @@
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 10px 30px rgba(200,16,46,0.3);
-            width: 100%;
+            flex: 1;
         }
-        .custom-get-quote:hover {
+        .text-quote {
+            background: var(--red);
+            color: white;
+        }
+        .text-quote:hover {
             background: #a00d22;
             transform: translateY(-5px);
+        }
+        .email-quote {
+            background: var(--navy);
+            color: white;
+        }
+        .email-quote:hover {
+            background: #08152e;
+            transform: translateY(-5px);
+        }
+
+        @media (min-width: 480px) {
+            .quote-buttons {
+                flex-direction: row;
+            }
         }
 
         .call-button {
@@ -324,7 +346,10 @@
 
                     <div class="custom-section" id="custom-drill-bits">
                         <textarea placeholder="Enter part numbers or bit descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Drill Bits')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Drill Bits', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Drill Bits', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -350,7 +375,10 @@
 
                     <div class="custom-section" id="custom-recip-blades">
                         <textarea placeholder="Enter part numbers or blade descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Recip Blades')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Recip Blades', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Recip Blades', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -377,7 +405,10 @@
 
                     <div class="custom-section" id="custom-circular-blades">
                         <textarea placeholder="Enter part numbers or blade descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Circular Blades')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Circular Blades', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Circular Blades', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -405,7 +436,10 @@
 
                     <div class="custom-section" id="custom-hole-saws">
                         <textarea placeholder="Enter part numbers or hole saw descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Hole Saws')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Hole Saws', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Hole Saws', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -430,7 +464,10 @@
 
                     <div class="custom-section" id="custom-abrasives">
                         <textarea placeholder="Enter part numbers or abrasive descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Abrasives')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Abrasives', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Abrasives', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -457,7 +494,10 @@
 
                     <div class="custom-section" id="custom-bit-&-blade-sets">
                         <textarea placeholder="Enter part numbers or set descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Bit & Blade Sets')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Bit & Blade Sets', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Bit & Blade Sets', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -496,7 +536,7 @@
             }
         }
 
-        function sendCustomQuote(category) {
+        function sendCustomQuote(category, method) {
             const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
             const customSection = document.getElementById(`custom-${normalized}`);
             const textarea = customSection.querySelector('textarea');
@@ -510,15 +550,21 @@
             const itemHeader = `${category} – Custom Quote Request (Bits & Blades):`;
             const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
 
-            const smsBody = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+            const bodyText = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
 
             // Reset form
             textarea.value = '';
             customSection.style.display = 'none';
             customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
 
-            // Trigger SMS
-            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+            if (method === 'text') {
+                // Trigger SMS (works on mobile)
+                window.location.href = `sms:7579405171?body=${encodeURIComponent(bodyText)}`;
+            } else if (method === 'email') {
+                // Trigger Email (works on all devices)
+                const subject = encodeURIComponent(`${category} Custom Quote Request`);
+                window.location.href = `mailto:yorktowntools@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+            }
         }
 
         // Banner rotation
