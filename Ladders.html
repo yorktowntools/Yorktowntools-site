@@ -216,9 +216,13 @@
             border-color: var(--navy);
             box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
         }
-        .custom-get-quote {
-            background: var(--red);
-            color: white;
+
+        .quote-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .quote-btn {
             padding: 1.3rem;
             border-radius: 14px;
             font-weight: 700;
@@ -226,11 +230,29 @@
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 10px 30px rgba(200,16,46,0.3);
-            width: 100%;
+            flex: 1;
         }
-        .custom-get-quote:hover {
+        .text-quote {
+            background: var(--red);
+            color: white;
+        }
+        .text-quote:hover {
             background: #a00d22;
             transform: translateY(-5px);
+        }
+        .email-quote {
+            background: var(--navy);
+            color: white;
+        }
+        .email-quote:hover {
+            background: #08152e;
+            transform: translateY(-5px);
+        }
+
+        @media (min-width: 480px) {
+            .quote-buttons {
+                flex-direction: row;
+            }
         }
 
         .call-button {
@@ -316,7 +338,10 @@
 
                     <div class="custom-section" id="custom-platform-ladders">
                         <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Platform Ladders')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Platform Ladders', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Platform Ladders', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -338,7 +363,10 @@
 
                     <div class="custom-section" id="custom-step-ladders">
                         <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Step Ladders')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Step Ladders', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Step Ladders', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -360,7 +388,10 @@
 
                     <div class="custom-section" id="custom-extension-ladders">
                         <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Extension Ladders')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Extension Ladders', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Extension Ladders', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -382,7 +413,10 @@
 
                     <div class="custom-section" id="custom-articulating-ladders">
                         <textarea placeholder="Enter part numbers or ladder descriptions (one per line)"></textarea>
-                        <button class="custom-get-quote" onclick="sendCustomQuote('Articulating Ladders')">Get Quote →</button>
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendCustomQuote('Articulating Ladders', 'text')">Text Quote →</button>
+                            <button class="quote-btn email-quote" onclick="sendCustomQuote('Articulating Ladders', 'email')">Email Quote →</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -421,7 +455,7 @@
             }
         }
 
-        function sendCustomQuote(category) {
+        function sendCustomQuote(category, method) {
             const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-').replace(/[/]/g, '-');
             const customSection = document.getElementById(`custom-${normalized}`);
             const textarea = customSection.querySelector('textarea');
@@ -435,15 +469,21 @@
             const itemHeader = `${category} – Custom Quote Request (Ladders):`;
             const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
 
-            const smsBody = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
+            const bodyText = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
 
             // Reset form
             textarea.value = '';
             customSection.style.display = 'none';
             customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
 
-            // Trigger SMS
-            window.location.href = `sms:7579405171?body=${encodeURIComponent(smsBody)}`;
+            if (method === 'text') {
+                // Trigger SMS (works on mobile)
+                window.location.href = `sms:7579405171?body=${encodeURIComponent(bodyText)}`;
+            } else if (method === 'email') {
+                // Trigger Email (works on all devices)
+                const subject = encodeURIComponent(`${category} Custom Quote Request`);
+                window.location.href = `mailto:yorktowntools@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+            }
         }
 
         // Banner rotation
