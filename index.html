@@ -225,7 +225,7 @@
 
         .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start; }
         .founder-photo { max-width: 280px; border-radius: 16px; border: 6px solid var(--navy); box-shadow: var(--shadow); justify-self: center; }
-        .mission-box { background: var(--light); padding: 3rem; border-radius: var(--radius); border-left: 10px solid var(--red); }
+        .mission-box { background: var(--light); padding: 3rem; border-radius: var(--radius); border-left: 10px solid var(--red); text-align: center; }
         .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); }
 
         footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
@@ -436,7 +436,9 @@
                 </div>
                 <div class="mission-box">
                     <h3>Our Mission</h3>
-                    <p>Deliver <strong>mission-critical tools</strong> that contractors depend on — on time, every time — with the reliability America was built on.</p>
+                    <p style="margin: 0; font-size: clamp(1.25rem, 3.5vw, 1.55rem); line-height: 1.5; font-weight: 400;">
+                        Deliver <strong>mission-critical tools</strong> that contractors depend on — on time, every time — with the reliability America was built on.
+                    </p>
                 </div>
             </div>
         </section>
@@ -447,15 +449,15 @@
             <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
                 <div class="form-group">
                     <label for="name">Name <span class="required">*</span></label>
-                    <input type="text" id="name" name="name" required placeholder="Zachary Barber">
+                    <input type="text" id="name" name="name" required placeholder="john doe">
                 </div>
                 <div class="form-group">
                     <label for="company">Company / Organization <span class="required">*</span></label>
-                    <input type="text" id="company" name="company" required placeholder=LawnBarber>
+                    <input type="text" id="company" name="company" required placeholder="JDContractors">
                 </div>
                 <div class="form-group">
                     <label for="email">Email <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="valawnbarber@gmail.com">
+                    <input type="email" id="email" name="email" required placeholder="John@JDContractors.com">
                 </div>
                 <div class="form-group">
                     <label for="phone">Phone</label>
