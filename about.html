@@ -164,14 +164,30 @@
         .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
 
         .about-content { margin: 4rem 0; }
-        .about-content h2 { font-size: clamp(2.1rem, 6.5vw, 2.7rem); margin-bottom:1.5rem; color:var(--navy); text-align:center; font-weight: 700; }
-        .about-content p { font-size: 1.1rem; margin-bottom: 1.8rem; max-width: 900px; margin-left: auto; margin-right: auto; }
 
         .founder-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start; margin: 5rem 0; }
         .founder-photo { max-width: 380px; border-radius: 16px; border: 6px solid var(--navy); box-shadow: var(--shadow); justify-self: center; width: 100%; height: auto; }
         .founder-bio { text-align: left; }
         .founder-bio h3 { color: var(--navy); font-size: 1.8rem; margin-bottom: 0.8rem; }
         .founder-bio p { font-size: 1.1rem; margin-bottom: 1.4rem; }
+
+        /* New boxed promise section */
+        .promise-box {
+            background: var(--light);
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            border: 4px solid var(--red);
+            text-align: center;
+            margin: 4rem auto;
+            max-width: 900px;
+            box-shadow: var(--shadow);
+        }
+        .promise-box strong {
+            display: block;
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            color: var(--navy);
+        }
 
         .commitment-box { background: var(--light); padding: 3rem; border-radius: var(--radius); border-left: 10px solid var(--red); text-align: center; margin: 5rem auto; max-width: 900px; }
         .commitment-box h3 { color: var(--navy); margin-bottom: 1.5rem; font-size: 2rem; }
@@ -200,7 +216,7 @@
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
-        footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
+        footer { background: var(--navy); color: var(--white); text-align:center; padding: 6.5rem 1rem 3rem; margin-top:8rem; }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
         footer a { color: #ffffff !important; text-decoration: underline; }
         footer a:hover { opacity: 0.85; }
@@ -254,17 +270,16 @@
             <p style="text-align:center; font-size:1.25rem; max-width:1000px; margin:0 auto 3rem;">
                 Yorktown Tools was founded in 2025 by Zachary Barber, a 20-year U.S. Army veteran with a lifelong passion for tools and mechanics. We supply name-brand, high-quality tools and accessories to commercial contractors and government agencies who keep America running.
             </p>
-            <p style="text-align:center; max-width:900px; margin:0 auto;">
-                <strong>Our promise:</strong> You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
-            </p>
+
+            <div class="promise-box">
+                <strong>Our promise:</strong>
+                You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
+            </div>
         </section>
 
         <section class="founder-section">
             <div>
-                <!-- Replace these src attributes with your actual uniform photo filenames -->
                 <img src="IMG_1549.jpeg" alt="Zachary Barber in U.S. Army uniform" class="founder-photo" loading="lazy">
-                <!-- If you have a second photo, uncomment the line below -->
-                <!-- <img src="uniform-photo-2.jpg" alt="Zachary Barber in U.S. Army uniform" class="founder-photo" loading="lazy" style="margin-top:2rem;"> -->
             </div>
             <div class="founder-bio">
                 <h3>Meet the Founder: Zachary Barber</h3>
@@ -272,7 +287,6 @@
                 <p>In 2007, he enlisted in the U.S. Army as a turbine engine technician (MOS 15B). Over a 20-year career, he rose to Company First Sergeant and Battalion Operations NCOIC, serving at bases across the U.S., Korea, Hawaii, and completing two combat deployments to Afghanistan.</p>
                 <p>His military service taught him leadership, how to manage diverse teams under pressure, and the critical importance of having the right tool for the job — lessons he carries into every aspect of Yorktown Tools.</p>
                 <p>Before retiring, Zachary earned an A.S. in Aeronautics and a B.S. in Project Management from Embry-Riddle Aeronautical University and now founding Yorktown Tools allowed him to combine military discipline, community pride, and a desire to make a real difference for his family and the hardworking contractors he serves.</p>
-                <p><strong>Education:</strong><br>A.S. Aeronautics | B.S. Project Management<br>Embry-Riddle Aeronautical University</p>
             </div>
         </section>
 
