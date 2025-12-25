@@ -222,7 +222,7 @@
             margin: 0;
         }
 
-        /* Simplified Google Reviews Section – now with a single button */
+        /* Google Reviews Section – with 5 yellow stars above the heading */
         .reviews-section {
             background: var(--light);
             padding: clamp(3.2rem, 8vw, 4.5rem);
@@ -230,6 +230,12 @@
             box-shadow: var(--shadow);
             text-align: center;
             margin-bottom: 5.5rem;
+        }
+        .reviews-stars {
+            font-size: 2.8rem;
+            color: #ffc107;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.2rem;
         }
         .reviews-section h2 {
             margin-bottom: 1rem;
@@ -434,8 +440,9 @@
             </div>
         </section>
 
-        <!-- Google Reviews Section – now simplified to a single button -->
+        <!-- Google Reviews Section – now with 5 yellow stars above the heading -->
         <section class="reviews-section">
+            <div class="reviews-stars">★★★★★</div>
             <h2>Customer Reviews on Google</h2>
             <p>See what contractors are saying about us on Google. Your feedback helps us improve and helps others find a reliable supplier.</p>
             <div class="reviews-buttons">
