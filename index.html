@@ -185,7 +185,6 @@
         h2 { font-size: clamp(2.1rem, 6.5vw, 2.7rem); margin-bottom:2rem; color:var(--navy); text-align:center; font-weight: 700; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap: clamp(1.8rem, 4.5vw, 3rem); }
         
-        /* Updated Card Style – Now Full Clickable Links */
         .card {
             background: var(--white);
             border-radius: var(--radius);
@@ -221,6 +220,26 @@
             font-size: 1.05rem;
             line-height: 1.55;
             margin: 0;
+        }
+
+        /* Google Reviews Section */
+        .reviews-section {
+            background: var(--light);
+            padding: clamp(3.2rem, 8vw, 4.5rem);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin-bottom: 5.5rem;
+        }
+        .reviews-section .btn + .btn {
+            margin-left: 1rem;
+        }
+        @media (max-width: 600px) {
+            .reviews-section .btn + .btn {
+                margin-left: 0;
+                margin-top: 1rem;
+                display: block;
+            }
         }
 
         .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -335,7 +354,6 @@
             </div>
         </section>
 
-        <!-- TOOLS SECTION -->
         <section id="tools">
             <h2>High-Performance Tools That Win Bids & Finish Jobs Faster</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">
@@ -343,8 +361,6 @@
             </p>
 
             <div class="grid">
-
-                <!-- HAND TOOLS -->
                 <a href="precision-hand-tools.html" class="card">
                     <img src="Pliers.PNG" alt="Precision hand tools that last a lifetime" loading="lazy">
                     <div class="card-content">
@@ -353,7 +369,6 @@
                     </div>
                 </a>
 
-                <!-- POWER TOOLS -->
                 <a href="Power-tools.html" class="card">
                     <img src="Dewalttoolpile.PNG" alt="Cordless power tools for fast, reliable work" loading="lazy">
                     <div class="card-content">
@@ -362,7 +377,6 @@
                     </div>
                 </a>
 
-                <!-- MEASURING & LAYOUT (replaces old Specialty) -->
                 <a href="Measuring tools.html" class="card">
                     <img src="Bosch-laser.jpg" alt="Measuring and layout tools for dead-accurate work" loading="lazy">
                     <div class="card-content">
@@ -377,7 +391,6 @@
             <h2>Stay Organized, Compliant & Protected</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Everything your crew needs to work safer, smarter, and faster — delivered free to your site or base.</p>
             <div class="grid">
-
                 <a href="Bits-blades.html" class="card">
                     <img src="Blades.PNG" alt="Long-lasting bits and blades" loading="lazy">
                     <div class="card-content">
@@ -418,7 +431,17 @@
             </div>
         </section>
 
-        <!-- CONTACT -->
+        <!-- Google Reviews Section -->
+        <section class="reviews-section">
+            <h2>What Our Customers Say</h2>
+            <p style="max-width:900px;margin:0 auto 2rem;color:#555;">
+                Check out our Google reviews and feel free to leave your own — your feedback helps other contractors find a reliable tool supplier.
+            </p>
+            <a href="https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID_HERE" target="_blank" class="btn" style="background:var(--navy);">Leave a Review</a>
+            <a href="https://www.google.com/search?q=yorktown+tools+reviews" target="_blank" class="btn">View All Reviews</a>
+        </section>
+
+        <!-- Contact Form -->
         <section id="contact" class="contact-form">
             <h2>Get Your Quote Today</h2>
             <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options in 24 hours or less.</p>
