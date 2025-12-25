@@ -222,7 +222,7 @@
             margin: 0;
         }
 
-        /* Google Reviews Section */
+        /* Simplified Google Reviews Section – mimicking Google's clean look */
         .reviews-section {
             background: var(--light);
             padding: clamp(3.2rem, 8vw, 4.5rem);
@@ -231,15 +231,35 @@
             text-align: center;
             margin-bottom: 5.5rem;
         }
-        .reviews-section .btn + .btn {
-            margin-left: 1rem;
+        .reviews-section h2 {
+            margin-bottom: 1rem;
         }
-        @media (max-width: 600px) {
-            .reviews-section .btn + .btn {
-                margin-left: 0;
-                margin-top: 1rem;
-                display: block;
-            }
+        .reviews-section p {
+            max-width: 900px;
+            margin: 0 auto 2.5rem;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        .reviews-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .reviews-buttons .btn {
+            min-width: 240px;
+            padding: 1.1rem 2rem;
+            font-size: 1.1rem;
+        }
+        .reviews-buttons .btn.google-style {
+            background: #fff;
+            color: #1a73e8;
+            border: 2px solid #dadce0;
+            box-shadow: none;
+        }
+        .reviews-buttons .btn.google-style:hover {
+            background: #f8f9fa;
+            transform: translateY(-3px);
         }
 
         .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -431,14 +451,14 @@
             </div>
         </section>
 
-        <!-- Google Reviews Section -->
+        <!-- Simplified Google Reviews Section -->
         <section class="reviews-section">
-            <h2>What Our Customers Say</h2>
-            <p style="max-width:900px;margin:0 auto 2rem;color:#555;">
-                Check out our Google reviews and feel free to leave your own — your feedback helps other contractors find a reliable tool supplier.
-            </p>
-            <a href="https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID_HERE" target="_blank" class="btn" style="background:var(--navy);">Leave a Review</a>
-            <a href="https://www.google.com/search?q=yorktown+tools+reviews" target="_blank" class="btn">View All Reviews</a>
+            <h2>Customer Reviews on Google</h2>
+            <p>See what contractors are saying about us on Google. Your feedback helps us improve and helps others find a reliable supplier.</p>
+            <div class="reviews-buttons">
+                <a href="https://search.google.com/local/writereview?placeid=REPLACE_WITH_YOUR_PLACE_ID" target="_blank" class="btn google-style">Write a review</a>
+                <a href="https://www.google.com/search?q=yorktown+tools+reviews" target="_blank" class="btn">View all reviews</a>
+            </div>
         </section>
 
         <!-- Contact Form -->
