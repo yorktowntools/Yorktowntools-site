@@ -253,7 +253,7 @@
             position: relative;
             max-width: 700px;
             margin: 0 auto 3rem;
-            min-height: 300px;
+            min-height: 320px; /* slightly taller to accommodate expand button */
         }
         .review-card {
             position: absolute;
@@ -261,7 +261,7 @@
             top: 0;
             left: 0;
             opacity: 0;
-            transition: opacity 1.2s ease;
+            transition: opacity 1.5s ease; /* slower fade for smoother feel */
             background: var(--white);
             padding: 2rem 1.8rem;
             border-radius: 16px;
@@ -304,6 +304,29 @@
             font-size: 1.05rem;
             line-height: 1.6;
             color: #444;
+            max-height: 180px; /* approx 8–10 lines at 1.6 line-height */
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            position: relative;
+        }
+        .review-text.truncated {
+            max-height: 180px;
+        }
+        .review-text.expanded {
+            max-height: none;
+        }
+        .expand-btn {
+            margin-top: 1rem;
+            background: none;
+            border: none;
+            color: var(--navy);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.98rem;
+        }
+        .expand-btn:hover {
+            color: var(--red);
         }
 
         .social-icons {
@@ -555,7 +578,7 @@
             <p>See what contractors are saying about us on Google. Your feedback helps us improve and helps others find a reliable supplier.</p>
 
             <div class="reviews-rotator">
-                <div class="review-card active">
+                <div class="review-card active" data-long="true">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
                         <div class="reviewer-info">
@@ -564,10 +587,11 @@
                         </div>
                     </div>
                     <div class="review-stars">★★★★★</div>
-                    <p class="review-text">When every local company tapped out and told me the equipment I needed “couldn’t be sourced,” Zach at Yorktown Tools stepped up and proved everyone wrong. This man didn’t just find the tools I needed he made it happen like it was nothing. That’s the kind of hustle you don’t see anymore. Yorktown Tools kept my job site moving, saved me time, and earned a customer for life. If you get the chance to work with Zach, buckle up because you’ll be coming back again and again. 10/10. Zero hesitation. Yorktown Tools is the move you won’t be disappointed.</p>
+                    <p class="review-text truncated">When every local company tapped out and told me the equipment I needed “couldn’t be sourced,” Zach at Yorktown Tools stepped up and proved everyone wrong. This man didn’t just find the tools I needed he made it happen like it was nothing. That’s the kind of hustle you don’t see anymore. Yorktown Tools kept my job site moving, saved me time, and earned a customer for life. If you get the chance to work with Zach, buckle up because you’ll be coming back again and again. 10/10. Zero hesitation. Yorktown Tools is the move you won’t be disappointed.</p>
+                    <button class="expand-btn">Read more</button>
                 </div>
 
-                <div class="review-card">
+                <div class="review-card" data-long="false">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
                         <div class="reviewer-info">
@@ -676,7 +700,7 @@
             lastScroll = current;
         });
 
-        // Rotating taglines
+        // Rotating taglines (unchanged)
         const taglines = document.querySelectorAll('.tagline');
         let i = 0;
         setInterval(() => {
@@ -685,7 +709,7 @@
             taglines[i].classList.add('active');
         }, 7000);
 
-        // Top banner rotation
+        // Top banner rotation (unchanged)
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
@@ -694,14 +718,41 @@
             banners[j].classList.add('active');
         }, 2000);
 
-        // Reviews rotator - every 10 seconds
+        // Reviews rotator – slowed down to 18 seconds
         const reviews = document.querySelectorAll('.review-card');
         let currentReview = 0;
         setInterval(() => {
             reviews[currentReview].classList.remove('active');
             currentReview = (currentReview + 1) % reviews.length;
             reviews[currentReview].classList.add('active');
-        }, 10000);
+        }, 18000);
+
+        // Expand/collapse long reviews
+        document.querySelectorAll('.expand-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const text = this.previousElementSibling;
+                const isExpanded = text.classList.contains('expanded');
+                
+                if (isExpanded) {
+                    text.classList.remove('expanded');
+                    text.classList.add('truncated');
+                    this.textContent = 'Read more';
+                } else {
+                    text.classList.remove('truncated');
+                    text.classList.add('expanded');
+                    this.textContent = 'Read less';
+                }
+            });
+        });
+
+        // Ensure only long reviews show the button (fallback in case more reviews are added)
+        document.querySelectorAll('.review-card').forEach(card => {
+            const text = card.querySelector('.review-text');
+            const btn = card.querySelector('.expand-btn');
+            if (card.dataset.long === "false" || text.scrollHeight <= text.clientHeight + 10) {
+                if (btn) btn.style.display = 'none';
+            }
+        });
 
         // Add another item row in form
         function addItem() {
