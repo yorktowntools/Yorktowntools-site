@@ -265,38 +265,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Eye-catching call bubble (fixed on left side) */
-        .call-bubble {
-            position: fixed;
-            top: 50%;
-            left: clamp(10px, 3vw, 20px);
-            transform: translateY(-50%);
-            background: var(--red);
-            color: white;
-            padding: 1.4rem 1.8rem;
-            border-radius: 50px;
-            box-shadow: 0 10px 40px rgba(200,16,46,0.5);
-            font-weight: 700;
-            font-size: 1.15rem;
-            text-align: center;
-            z-index: 998;
-            animation: pulse 2.6s infinite;
-            max-width: 200px;
-            line-height: 1.4;
-        }
-        .call-bubble a {
-            color: white;
-            text-decoration: none;
-        }
-        .call-bubble a:hover {
-            opacity: 0.9;
-        }
-        @keyframes pulse { 
-            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
-            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
-            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
-        }
-
         /* Social icons */
         .social-icons {
             display: flex;
@@ -372,6 +340,12 @@
         }
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
 
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
+            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
+            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
+        }
+
         .quote-form { display:grid; gap:1.9rem; }
         .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
         .required { color:var(--red); }
@@ -392,13 +366,6 @@
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="George">
     </a>
-
-    <!-- Eye-catching Call Bubble (fixed left side) -->
-    <div class="call-bubble">
-        <a href="tel:757-940-5171">
-            Call Us Now<br><strong>757-940-5171</strong>
-        </a>
-    </div>
 
     <div class="top-red-banner">
         <div class="banner-text active">Free Delivery.</div>
@@ -429,7 +396,7 @@
             <a href="Safety-PPE.html">Safety & PPE</a>
             <a href="Ladders.html">Ladders</a>
             <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a> <!-- New Contact Us link -->
+            <a href="contact.html">Contact Us</a>
             <a href="#contact">Get Quote</a>
         </div>
     </nav>
@@ -548,17 +515,9 @@
             <h2>Customer Reviews on Google</h2>
             <p>See what contractors are saying about us on Google. Your feedback helps us improve and helps others find a reliable supplier.</p>
 
-            <!-- Google Reviews Widget Placeholder -->
-            <!-- Replace the content below with your actual embed code from a service like Elfsight, SociableKIT, or EmbedSocial -->
-            <div style="max-width:900px; margin:2.5rem auto; min-height:500px; background:#f5f5f5; border:2px dashed #ccc; padding:2rem; text-align:center; border-radius: var(--radius);">
-                <p style="font-size:1.1rem; color:#666;">
-                    <strong>Embed your Google Reviews widget here</strong><br><br>
-                    Sign up for a free widget at <a href="https://elfsight.com/google-reviews-widget/" target="_blank">Elfsight</a>, 
-                    <a href="https://sociablekit.com/google-reviews/" target="_blank">SociableKIT</a>, or similar.<br>
-                    Connect your Google Business Profile using this link: <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank">Your Review Link</a><br><br>
-                    Then paste the provided script/embed code here.
-                </p>
-            </div>
+            <!-- Elfsight Google Reviews Widget -->
+            <script src="https://elfsightcdn.com/platform.js" async></script>
+            <div class="elfsight-app-44d756e0-b28a-4e78-a5f5-8364af031cf8" data-elfsight-app-lazy></div>
 
             <div class="reviews-buttons">
                 <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review</a>
