@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" hreflang="en-us">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact Yorktown Tools: Veteran-owned supplier of premium tools with free delivery in Hampton Roads. Get in touch for quotes, questions, or support.">
+    <meta name="keywords" content="yorktown tools contact, veteran owned tools contact, tool supplier hampton roads, free delivery tools contact">
+    <meta name="author" content="Zachary Barber">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Contact Us | Yorktown Tools">
+    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery to all of Hampton Roads contractors.">
+    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
+    <meta property="og:url" content="https://yorktowntools.com/contact.html">
+    <meta property="og:type" content="website">
+    <title>Contact Us | Yorktown Tools</title>
+
+    <link rel="icon" href="Yorktown.PNG" type="image/png">
+    <link rel="apple-touch-icon" sizes="180x180" href="Yt-logo.PNG">
+    <link rel="icon" type="image/png" sizes="32x32" href="Yt-logo.PNG">
+    <link rel="icon" type="image/png" sizes="16x16" href="Yt-logo.PNG">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google tag (gtag.js) - Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWR4T7LNEH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JWR4T7LNEH');
+    </script>
+
+    <style>
+        :root {
+            --navy: #0b1e3f;
+            --red: #c8102e;
+            --white: #ffffff;
+            --light: #f8f9fa;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
+        }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            line-height:1.65;
+            color:#212529;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140vw; height: 140vw;
+            max-width: 1400px; max-height: 1400px;
+            background: url('george-mascot.PNG') center center / contain no-repeat;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            margin-top: -80px;
+        }
+
+        .top-red-banner {
+            background: var(--red);
+            color: var(--white);
+            text-align: center;
+            padding: 0.8rem 1rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            min-height: 52px;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner-text {
+            position: absolute;
+            width: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .banner-text.active { opacity: 1; }
+
+        .gov-ids-header {
+            background: var(--navy);
+            color: var(--white);
+            padding: 0.5rem 0;
+            font-size: 0.86rem;
+            font-weight: 500;
+        }
+        .gov-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.3rem;
+            white-space: nowrap;
+            padding: 0.4rem 1rem;
+            flex-wrap: wrap;
+        }
+        .gov-items strong { color: #ffeb3b; }
+
+        .logo-header {
+            text-align: center;
+            padding: 1.4rem 1rem 1rem;
+            background: var(--white);
+        }
+        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+
+        nav {
+            background: var(--navy);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav.hidden { transform: translateY(-100%); }
+
+        .mobile-nav {
+            display: flex;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding: 0.75rem 0;
+            gap: 0.8rem;
+        }
+        .mobile-nav::-webkit-scrollbar { display: none; }
+
+        .mobile-nav a {
+            flex: 0 0 auto;
+            background: rgba(255,255,255,0.12);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.94rem;
+            padding: 0.65rem 1.1rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .mobile-nav a:hover, .mobile-nav a.active {
+            background: rgba(255,255,255,1);
+            color: var(--navy);
+        }
+
+        @media (min-width: 768px) {
+            .mobile-nav {
+                justify-content: center;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem 0;
+            }
+            .mobile-nav a {
+                background: transparent;
+                padding: 0.6rem 1rem;
+            }
+            .mobile-nav a:hover, .mobile-nav a.active {
+                background: rgba(255,255,255,0.18);
+                color: var(--red);
+            }
+        }
+
+        main { max-width:1200px; margin:0 auto; padding:0 1.4rem; }
+
+        .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
+        .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
+        .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
+
+        .btn { display:inline-block; background:var(--red); color:#fff; padding:1.3rem 3.4rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1.25rem; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); }
+        .btn:hover { background:#a00d22; transform:translateY(-5px); }
+
+        .contact-info {
+            background: var(--navy);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: var(--radius);
+            margin: 4rem 0;
+            text-align: center;
+        }
+        .contact-info h2 { color: white; margin-bottom: 1.5rem; }
+        .contact-info p { margin-bottom: 1rem; font-size: 1.1rem; }
+        .contact-info a { color: #ffeb3b; text-decoration: underline; }
+        .contact-info a:hover { opacity: 0.85; }
+
+        .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); margin: 4rem 0; }
+
+        .quote-form { display:grid; gap:1.9rem; }
+        .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
+        .required { color:var(--red); }
+        .quote-form input, .quote-form textarea { padding:1.3rem; border:2px solid #dee2e6; border-radius:14px; font-size:1.05rem; transition:border 0.3s; width:100%; }
+        .quote-form input:focus, .quote-form textarea:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 5px rgba(11,30,63,0.12); }
+        #item-list { display:flex; flex-direction:column; gap:1rem; margin-top:0.6rem; }
+        .item-row { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+        .item-name { flex:3; min-width:200px; }
+        .item-qty { flex:1; min-width:90px; text-align:center; }
+        .remove-item { background:var(--red); color:#fff; border:none; width:40px; height:40px; border-radius:50%; font-size:1.6rem; cursor:pointer; }
+        .add-item-btn { align-self:flex-start; background:transparent; color:var(--navy); border:2px solid var(--navy); padding:0.8rem 1.6rem; border-radius:12px; font-weight:600; cursor:pointer; }
+        .add-item-btn:hover { background:var(--navy); color:#fff; }
+
+        footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
+        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+        footer a { color: #ffffff !important; text-decoration: underline; }
+        footer a:hover { opacity: 0.85; }
+
+        .call-button {
+            position: fixed;
+            right: clamp(16px, 4vw, 24px);
+            bottom: clamp(16px, 4vw, 24px);
+            width: clamp(72px, 16vw, 88px);
+            height: clamp(72px, 16vw, 88px);
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
+            z-index: 999;
+            animation: pulse 2.6s infinite;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
+
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
+            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
+            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Call Button -->
+    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
+        <img src="Yorktown.PNG" alt="George">
+    </a>
+
+    <div class="top-red-banner">
+        <div class="banner-text active">Free Delivery.</div>
+        <div class="banner-text">Free Quote.</div>
+        <div class="banner-text">No Hassle.</div>
+    </div>
+
+    <div class="gov-ids-header">
+        <div class="gov-items">
+            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
+            <span><strong>CAGE:</strong> 16LD9</span>
+            <span><strong>SAM.gov</strong></span>
+        </div>
+    </div>
+
+    <div class="logo-header">
+        <img src="Yorktown.PNG" alt="Yorktown Tools">
+    </div>
+
+    <nav id="main-nav">
+        <div class="mobile-nav">
+            <a href="index.html">Home</a>
+            <a href="precision-hand-tools.html">Hand Tools</a>
+            <a href="Power-tools.html">Power Tools</a>
+            <a href="Measuring tools.html">Measuring & Layout</a>
+            <a href="Bits-blades.html">Bits & Blades</a>
+            <a href="Storage-organization.html">Storage</a>
+            <a href="Safety-PPE.html">Safety & PPE</a>
+            <a href="Ladders.html">Ladders</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html" class="active">Contact Us</a>
+            <a href="#contact-form">Get Quote</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Contact Yorktown Tools</h1>
+            <p>Have questions? Need a custom quote? We're here to help — reach out anytime.</p>
+        </section>
+
+        <section class="contact-info">
+            <h2>Get In Touch</h2>
+            <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a></p>
+            <p><strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+            <p><strong>Location:</strong> Yorktown, Virginia</p>
+            <p><strong>Service Area:</strong> Free delivery from Richmond to Virginia Beach</p>
+            <p><strong>Hours:</strong> Monday – Friday, 8:00 AM – 5:00 PM</p>
+            <p>Veteran-Owned Small Business • SAM.gov Registered</p>
+            <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        </section>
+
+        <section id="contact-form" class="contact-form">
+            <h2>Send Us a Message</h2>
+            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">Whether it's a quick question, tool recommendation, or bulk order inquiry — we'll get back to you fast.</p>
+            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
+                <div class="form-group">
+                    <label for="name">Name <span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="company">Company / Organization</label>
+                    <input type="text" id="company" name="company" placeholder="JD Contractors">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="john@jdcontractors.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message <span class="required">*</span></label>
+                    <textarea id="message" name="message" rows="6" required placeholder="How can we help you today?"></textarea>
+                </div>
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+        </section>
+
+        <section class="contact-form">
+            <h2>Or Request a Quote</h2>
+            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">Need pricing and availability? List your tools below — free quote in 24 hours or less.</p>
+            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
+                <div class="form-group">
+                    <label for="q_name">Name <span class="required">*</span></label>
+                    <input type="text" id="q_name" name="name" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="q_company">Company / Organization <span class="required">*</span></label>
+                    <input type="text" id="q_company" name="company" required placeholder="JD Contractors">
+                </div>
+                <div class="form-group">
+                    <label for="q_email">Email <span class="required">*</span></label>
+                    <input type="email" id="q_email" name="email" required placeholder="john@jdcontractors.com">
+                </div>
+                <div class="form-group">
+                    <label for="q_phone">Phone</label>
+                    <input type="tel" id="q_phone" name="phone" placeholder="(757) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="q_delivery">Delivery Location <small>(Optional)</small></label>
+                    <input type="text" id="q_delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234">
+                </div>
+                <div class="form-group">
+                    <label>Requested Items <small>(Optional)</small></label>
+                    <div id="item-list">
+                        <div class="item-row">
+                            <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
+                </div>
+                <div class="form-group">
+                    <label for="q_message">Additional Notes</label>
+                    <textarea id="q_message" name="message" rows="4" placeholder="Urgent delivery? Specific brands? Let us know."></textarea>
+                </div>
+                <button type="submit" class="btn">Send Quote Request</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        <p>© 2025 Yorktown Tools. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Sticky nav hide/show on scroll
+        const nav = document.getElementById('main-nav');
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const current = window.pageYOffset;
+            if (current > lastScroll && current > 160) {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+            lastScroll = current;
+        });
+
+        // Top banner rotation
+        const banners = document.querySelectorAll('.banner-text');
+        let j = 0;
+        setInterval(() => {
+            banners[j].classList.remove('active');
+            j = (j + 1) % banners.length;
+            banners[j].classList.add('active');
+        }, 2000);
+
+        // Add another item row in form (only one item-list on the page)
+        function addItem() {
+            const container = document.getElementById('item-list');
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                             <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                             <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
+            container.appendChild(row);
+        }
+    </script>
+</body>
+</html>
