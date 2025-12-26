@@ -24,6 +24,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Font Awesome for social icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <!-- Google tag (gtag.js) - Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWR4T7LNEH"></script>
     <script>
@@ -257,6 +260,65 @@
         .reviews-buttons {
             display: flex;
             justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        /* Eye-catching call bubble (fixed on left side) */
+        .call-bubble {
+            position: fixed;
+            top: 50%;
+            left: clamp(10px, 3vw, 20px);
+            transform: translateY(-50%);
+            background: var(--red);
+            color: white;
+            padding: 1.4rem 1.8rem;
+            border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(200,16,46,0.5);
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-align: center;
+            z-index: 998;
+            animation: pulse 2.6s infinite;
+            max-width: 200px;
+            line-height: 1.4;
+        }
+        .call-bubble a {
+            color: white;
+            text-decoration: none;
+        }
+        .call-bubble a:hover {
+            opacity: 0.9;
+        }
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
+            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
+            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
+        }
+
+        /* Social icons */
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1.8rem;
+            margin-top: 1rem;
+        }
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: var(--navy);
+            color: white;
+            border-radius: 50%;
+            font-size: 2rem;
+            transition: var(--transition);
+        }
+        .social-icons a:hover {
+            background: var(--red);
+            transform: translateY(-6px);
         }
 
         /* Newsletter Section */
@@ -309,7 +371,6 @@
             text-decoration: none;
         }
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
 
         .quote-form { display:grid; gap:1.9rem; }
         .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
@@ -327,10 +388,17 @@
 </head>
 <body>
 
-    <!-- Floating Call Button -->
+    <!-- Floating Call Button (bottom right) -->
     <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
         <img src="Yorktown.PNG" alt="George">
     </a>
+
+    <!-- Eye-catching Call Bubble (fixed left side) -->
+    <div class="call-bubble">
+        <a href="tel:757-940-5171">
+            Call Us Now<br><strong>757-940-5171</strong>
+        </a>
+    </div>
 
     <div class="top-red-banner">
         <div class="banner-text active">Free Delivery.</div>
@@ -361,6 +429,7 @@
             <a href="Safety-PPE.html">Safety & PPE</a>
             <a href="Ladders.html">Ladders</a>
             <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a> <!-- New Contact Us link -->
             <a href="#contact">Get Quote</a>
         </div>
     </nav>
@@ -478,8 +547,31 @@
             <div class="reviews-stars">★★★★★</div>
             <h2>Customer Reviews on Google</h2>
             <p>See what contractors are saying about us on Google. Your feedback helps us improve and helps others find a reliable supplier.</p>
+
+            <!-- Google Reviews Widget Placeholder -->
+            <!-- Replace the content below with your actual embed code from a service like Elfsight, SociableKIT, or EmbedSocial -->
+            <div style="max-width:900px; margin:2.5rem auto; min-height:500px; background:#f5f5f5; border:2px dashed #ccc; padding:2rem; text-align:center; border-radius: var(--radius);">
+                <p style="font-size:1.1rem; color:#666;">
+                    <strong>Embed your Google Reviews widget here</strong><br><br>
+                    Sign up for a free widget at <a href="https://elfsight.com/google-reviews-widget/" target="_blank">Elfsight</a>, 
+                    <a href="https://sociablekit.com/google-reviews/" target="_blank">SociableKIT</a>, or similar.<br>
+                    Connect your Google Business Profile using this link: <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank">Your Review Link</a><br><br>
+                    Then paste the provided script/embed code here.
+                </p>
+            </div>
+
             <div class="reviews-buttons">
                 <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review</a>
+            </div>
+
+            <!-- Social Media Icons -->
+            <div class="social-icons">
+                <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.facebook.com/share/14V4GeG3P67/" target="_blank" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
             </div>
         </section>
 
@@ -489,7 +581,6 @@
             <p style="max-width:800px;margin:0 auto 2rem;color:#555;">
                 Get new tool arrivals, exclusive contractor deals, manufacturer updates, and job-site tips delivered straight to your inbox every month.
             </p>
-            <!-- Replace the action URL with your actual Mailchimp embed URL after creating the list -->
             <form action="https://yorktowntools.usX.list-manage.com/subscribe/post?u=REPLACE_WITH_YOUR_ID&amp;id=REPLACE_WITH_YOUR_LIST_ID" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" target="_blank">
                 <input type="email" name="EMAIL" placeholder="your@email.com" required>
                 <button type="submit" class="btn">Subscribe Now</button>
