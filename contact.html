@@ -222,39 +222,15 @@
             height: 450px;
             border: 0;
             border-radius: var(--radius);
+            margin-bottom: 1.5rem;
         }
-
-        .reviews-section {
-            background: var(--light);
-            padding: clamp(3.2rem, 8vw, 4.5rem);
+        .location-image {
+            width: 100%;
+            max-height: 450px;
+            object-fit: cover;
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            margin: 4rem 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
-        .reviews-stars { font-size: 2.8rem; color: #ffc107; margin-bottom: 0.8rem; letter-spacing: 0.2rem; }
-        .reviews-rotator { position: relative; max-width: 700px; margin: 3.5rem auto 3rem; min-height: 380px; }
-        .review-card { position: absolute; width: 100%; top: 0; left: 0; opacity: 0; transition: opacity 1.5s ease; background: var(--white); padding: 2rem 1.8rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: left; }
-        .review-card.active { opacity: 1; position: relative; }
-        .review-header { display: flex; align-items: center; margin-bottom: 1rem; }
-        .reviewer-photo { width: 48px; height: 48px; border-radius: 50%; background: #e0e0e0; margin-right: 1rem; flex-shrink: 0; }
-        .reviewer-info h4 { margin: 0; font-size: 1.15rem; color: var(--navy); font-weight: 600; }
-        .review-date { font-size: 0.92rem; color: #777; }
-        .review-stars { color: #ffc107; font-size: 1.5rem; margin-bottom: 1rem; }
-        .review-text { font-size: 1.05rem; line-height: 1.6; color: #444; position: relative; }
-        .review-text.truncated { max-height: 180px; overflow: hidden; }
-        .review-text.truncated::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; background: linear-gradient(to bottom, transparent, white); }
-        .expand-btn { margin-top: 1rem; background: none; border: none; color: var(--navy); font-weight: 600; cursor: pointer; text-decoration: underline; font-size: 0.98rem; display: inline-block; }
-        .expand-btn:hover { color: var(--red); }
-        .expand-btn.hidden { display: none; }
-
-        .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); margin: 4rem 0; }
-
-        .quote-form { display:grid; gap:1.9rem; }
-        .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
-        .required { color:var(--red); }
-        .quote-form input, .quote-form textarea { padding:1.3rem; border:2px solid #dee2e6; border-radius:14px; font-size:1.05rem; transition:border 0.3s; width:100%; }
-        .quote-form input:focus, .quote-form textarea:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 5px rgba(11,30,63,0.12); }
 
         footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
@@ -339,11 +315,8 @@
                 <ul>
                     <li><strong>Phone (Call or Text):</strong> <a href="tel:757-940-5171">(757) 940-5171</a></li>
                     <li><strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></li>
-                    <li><strong>Base Location:</strong> Yorktown, VA (ZIP 23692)</li>
-                    <li><strong>Service Area:</strong> Free delivery within ~1 hour drive<br>(Richmond to Virginia Beach, including all Hampton Roads bases)</li>
+                    <li><strong>Base Location:</strong> Yorktown, VA</li>
                     <li><strong>Business Hours:</strong> Monday – Friday<br>8:00 AM – 5:00 PM</li>
-                    <li>Veteran-Owned Small Business • SAM.gov Registered</li>
-                    <li><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</li>
                 </ul>
                 <div class="social-links">
                     <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -352,86 +325,16 @@
             </section>
 
             <section class="map-section">
-                <h2>Our Service Area (~1 Hour Drive Radius)</h2>
-                <p>Free delivery anywhere inside the highlighted area centered on Yorktown, VA (23692). This covers all of Hampton Roads and beyond.</p>
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d204800.00000000003!2d-76.509437!3d37.226848!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b083c2a2e6d3d9%3A0xexample!2sYorktown%2C%20VA%2023692!5e0!3m2!1sen!2sus!4v1737000000000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                <p style="font-size:0.9rem; margin-top:1rem; color:#666;">(Approximate radius shown; actual drive times may vary by traffic.)</p>
+                <h2>Our Service Area</h2>
+                <p>Free delivery anywhere inside the highlighted area centered on Yorktown, VA. This covers all of Hampton Roads and beyond.</p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d204800.00000000003!2d-76.509437!3d37.226848!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b083c2a2e6d3d9%3A0xexample!2sYorktown%2C%20VA!5e0!3m2!1sen!2sus!4v1737000000000" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <p style="font-size:0.9rem; margin-top:1rem; color:#666;">(Approximate ~1 hour drive radius shown; actual drive times may vary by traffic.)</p>
+                
+                <h2 style="margin-top: 3rem;">Our Location / Delivery Truck</h2>
+                <p>Replace the image below with a photo of your location, warehouse, or delivery truck.</p>
+                <img src="truck-or-location.jpg" alt="Yorktown Tools Location or Delivery Truck" class="location-image" loading="lazy">
             </section>
         </div>
-
-        <section class="reviews-section">
-            <div class="reviews-stars">★★★★★</div>
-            <h2>Customer Reviews on Google</h2>
-            <p>See what contractors are saying about us. Your review helps others find a reliable supplier.</p>
-
-            <div class="reviews-rotator">
-                <div class="review-card active">
-                    <div class="review-header">
-                        <div class="reviewer-photo"></div>
-                        <div class="reviewer-info">
-                            <h4>Rob M.</h4>
-                            <p class="review-date">December 2025</p>
-                        </div>
-                    </div>
-                    <div class="review-stars">★★★★★</div>
-                    <p class="review-text truncated">
-                        When every local company tapped out and told me the equipment I needed “couldn’t be sourced,” Zach at Yorktown Tools stepped up and proved everyone wrong. This man didn’t just find the tools I needed he made it happen like it was nothing. That’s the kind of hustle you don’t see anymore.<br><br>
-                        Yorktown Tools kept my job site moving, saved me time, and earned a customer for life. If you get the chance to work with Zach, buckle up because you’ll be coming back again and again.<br><br>
-                        10/10. Zero hesitation. Yorktown Tools is the move you won’t be disappointed.
-                    </p>
-                    <button class="expand-btn">Read more</button>
-                </div>
-
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="reviewer-photo"></div>
-                        <div class="reviewer-info">
-                            <h4>Ben Peralta</h4>
-                            <p class="review-date">December 2025</p>
-                        </div>
-                    </div>
-                    <div class="review-stars">★★★★★</div>
-                    <p class="review-text">
-                        I was searching for a local tool company and needed to place an inquiry for a specific tool. I contacted Zach who reached out to his supplier. The custom order was shipped and delivered to not delay our jobsite project. He followed up to ensure it exceeded my needs. I will use Yorktown Tools in the future. Great service, highly recommend!
-                    </p>
-                    <button class="expand-btn hidden">Read more</button>
-                </div>
-            </div>
-
-            <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review</a>
-        </section>
-
-        <section class="contact-form">
-            <h2>Send Us a Message or Request a Quote</h2>
-            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">Quick question, tool recommendation, or need pricing? We usually reply within a few hours during business days.</p>
-            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
-                <div class="form-group">
-                    <label for="name">Name <span class="required">*</span></label>
-                    <input type="text" id="name" name="name" required placeholder="John Doe">
-                </div>
-                <div class="form-group">
-                    <label for="company">Company / Organization</label>
-                    <input type="text" id="company" name="company" placeholder="JD Contractors">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="john@jdcontractors.com">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
-                </div>
-                <div class="form-group">
-                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
-                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234">
-                </div>
-                <div class="form-group">
-                    <label for="message">Message / Additional Notes <span class="required">*</span></label>
-                    <textarea id="message" name="message" rows="6" required placeholder="How can we help? List tools needed, questions, or anything else."></textarea>
-                </div>
-                <button type="submit" class="btn">Send Message</button>
-            </form>
-        </section>
     </main>
 
     <footer>
@@ -465,56 +368,6 @@
             j = (j + 1) % banners.length;
             banners[j].classList.add('active');
         }, 2000);
-
-        // Reviews rotator and expand functionality
-        const reviews = document.querySelectorAll('.review-card');
-        let currentReview = 0;
-        function rotateReviews() {
-            reviews[currentReview].classList.remove('active');
-            currentReview = (currentReview + 1) % reviews.length;
-            reviews[currentReview].classList.add('active');
-
-            const activeText = reviews[currentReview].querySelector('.review-text');
-            const activeBtn = reviews[currentReview].querySelector('.expand-btn');
-            if (activeText.scrollHeight <= 200) {
-                activeBtn.classList.add('hidden');
-                activeText.classList.remove('truncated');
-            } else {
-                activeBtn.classList.remove('hidden');
-                if (!activeText.classList.contains('expanded')) {
-                    activeText.classList.add('truncated');
-                }
-            }
-        }
-        setInterval(rotateReviews, 18000);
-
-        document.querySelectorAll('.expand-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const text = this.previousElementSibling;
-                if (text.classList.contains('truncated')) {
-                    text.classList.remove('truncated');
-                    text.classList.add('expanded');
-                    this.textContent = 'Read less';
-                } else {
-                    text.classList.add('truncated');
-                    text.classList.remove('expanded');
-                    this.textContent = 'Read more';
-                }
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            reviews.forEach(card => {
-                const text = card.querySelector('.review-text');
-                const btn = card.querySelector('.expand-btn');
-                if (text.scrollHeight <= 200) {
-                    btn.classList.add('hidden');
-                    text.classList.remove('truncated');
-                } else {
-                    text.classList.add('truncated');
-                }
-            });
-        });
     </script>
 </body>
 </html>
