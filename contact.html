@@ -182,18 +182,71 @@
         .btn { display:inline-block; background:var(--red); color:#fff; padding:1.3rem 3.4rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1.25rem; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
 
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+            margin: 4rem 0;
+        }
+        @media (min-width: 768px) {
+            .contact-grid { grid-template-columns: 1fr 1fr; }
+        }
+
         .contact-info {
             background: var(--navy);
             color: white;
-            padding: 3rem 2rem;
+            padding: 3rem 2.5rem;
             border-radius: var(--radius);
-            margin: 4rem 0;
+            box-shadow: var(--shadow);
             text-align: center;
         }
-        .contact-info h2 { color: white; margin-bottom: 1.5rem; }
-        .contact-info p { margin-bottom: 1rem; font-size: 1.1rem; }
-        .contact-info a { color: #ffeb3b; text-decoration: underline; }
+        .contact-info h2 { color: white; margin-bottom: 2rem; font-size: clamp(2rem, 5vw, 2.4rem); }
+        .contact-info ul { list-style: none; font-size: 1.15rem; }
+        .contact-info li { margin-bottom: 1.2rem; }
+        .contact-info a { color: #ffeb3b; text-decoration: underline; font-weight: 600; }
         .contact-info a:hover { opacity: 0.85; }
+        .contact-info .social-links { display: flex; justify-content: center; gap: 1.5rem; margin-top: 2rem; }
+        .contact-info .social-links a { font-size: 2rem; color: white; transition: var(--transition); }
+        .contact-info .social-links a:hover { color: var(--red); transform: translateY(-4px); }
+
+        .map-section {
+            background: var(--light);
+            padding: 3rem 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        .map-section h2 { margin-bottom: 1.5rem; }
+        .map-section iframe {
+            width: 100%;
+            height: 450px;
+            border: 0;
+            border-radius: var(--radius);
+        }
+
+        .reviews-section {
+            background: var(--light);
+            padding: clamp(3.2rem, 8vw, 4.5rem);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin: 4rem 0;
+        }
+        .reviews-stars { font-size: 2.8rem; color: #ffc107; margin-bottom: 0.8rem; letter-spacing: 0.2rem; }
+        .reviews-rotator { position: relative; max-width: 700px; margin: 3.5rem auto 3rem; min-height: 380px; }
+        .review-card { position: absolute; width: 100%; top: 0; left: 0; opacity: 0; transition: opacity 1.5s ease; background: var(--white); padding: 2rem 1.8rem; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); text-align: left; }
+        .review-card.active { opacity: 1; position: relative; }
+        .review-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .reviewer-photo { width: 48px; height: 48px; border-radius: 50%; background: #e0e0e0; margin-right: 1rem; flex-shrink: 0; }
+        .reviewer-info h4 { margin: 0; font-size: 1.15rem; color: var(--navy); font-weight: 600; }
+        .review-date { font-size: 0.92rem; color: #777; }
+        .review-stars { color: #ffc107; font-size: 1.5rem; margin-bottom: 1rem; }
+        .review-text { font-size: 1.05rem; line-height: 1.6; color: #444; position: relative; }
+        .review-text.truncated { max-height: 180px; overflow: hidden; }
+        .review-text.truncated::after { content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 80px; background: linear-gradient(to bottom, transparent, white); }
+        .expand-btn { margin-top: 1rem; background: none; border: none; color: var(--navy); font-weight: 600; cursor: pointer; text-decoration: underline; font-size: 0.98rem; display: inline-block; }
+        .expand-btn:hover { color: var(--red); }
+        .expand-btn.hidden { display: none; }
 
         .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); margin: 4rem 0; }
 
@@ -202,13 +255,6 @@
         .required { color:var(--red); }
         .quote-form input, .quote-form textarea { padding:1.3rem; border:2px solid #dee2e6; border-radius:14px; font-size:1.05rem; transition:border 0.3s; width:100%; }
         .quote-form input:focus, .quote-form textarea:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 5px rgba(11,30,63,0.12); }
-        #item-list { display:flex; flex-direction:column; gap:1rem; margin-top:0.6rem; }
-        .item-row { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
-        .item-name { flex:3; min-width:200px; }
-        .item-qty { flex:1; min-width:90px; text-align:center; }
-        .remove-item { background:var(--red); color:#fff; border:none; width:40px; height:40px; border-radius:50%; font-size:1.6rem; cursor:pointer; }
-        .add-item-btn { align-self:flex-start; background:transparent; color:var(--navy); border:2px solid var(--navy); padding:0.8rem 1.6rem; border-radius:12px; font-weight:600; cursor:pointer; }
-        .add-item-btn:hover { background:var(--navy); color:#fff; }
 
         footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
@@ -278,30 +324,85 @@
             <a href="Ladders.html">Ladders</a>
             <a href="about.html">About Us</a>
             <a href="contact.html" class="active">Contact Us</a>
-            <a href="#contact-form">Get Quote</a>
         </div>
     </nav>
 
     <main>
         <section class="hero">
             <h1>Contact Yorktown Tools</h1>
-            <p>Have questions? Need a custom quote? We're here to help — reach out anytime.</p>
+            <p>We’re here to help — call, text, email, or send a message. Fast response guaranteed.</p>
         </section>
 
-        <section class="contact-info">
-            <h2>Get In Touch</h2>
-            <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a></p>
-            <p><strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
-            <p><strong>Location:</strong> Yorktown, Virginia</p>
-            <p><strong>Service Area:</strong> Free delivery from Richmond to Virginia Beach</p>
-            <p><strong>Hours:</strong> Monday – Friday, 8:00 AM – 5:00 PM</p>
-            <p>Veteran-Owned Small Business • SAM.gov Registered</p>
-            <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        <div class="contact-grid">
+            <section class="contact-info">
+                <h2>Contact Information</h2>
+                <ul>
+                    <li><strong>Phone (Call or Text):</strong> <a href="tel:757-940-5171">(757) 940-5171</a></li>
+                    <li><strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></li>
+                    <li><strong>Location:</strong> 605 Piney Point Rd, Yorktown, VA 23692</li>
+                    <li><strong>Service Area:</strong> Free delivery within ~1 hour drive<br>(Richmond to Virginia Beach, including all Hampton Roads bases)</li>
+                    <li><strong>Business Hours:</strong> Monday – Friday<br>8:00 AM – 5:00 PM</li>
+                    <li>Veteran-Owned Small Business • SAM.gov Registered</li>
+                    <li><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</li>
+                </ul>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/share/14V4GeG3P67/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                </div>
+            </section>
+
+            <section class="map-section">
+                <h2>Our Service Area (~1 Hour Drive Radius)</h2>
+                <p>Free delivery anywhere inside the highlighted area from our location in Yorktown, VA.</p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d102771.922413499!2d-76.509437!3d37.226848!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b0830000000000%3A0x0!2zMzfCsDEzJzM2LjYiTiA3NsKwMjYnMzIuOSJX!5e0!3m2!1sen!2sus!4v1735699200000!5m2!1sen!2sus" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </section>
+        </div>
+
+        <section class="reviews-section">
+            <div class="reviews-stars">★★★★★</div>
+            <h2>Customer Reviews on Google</h2>
+            <p>See what contractors are saying about us. Your review helps others find a reliable supplier.</p>
+
+            <div class="reviews-rotator">
+                <div class="review-card active">
+                    <div class="review-header">
+                        <div class="reviewer-photo"></div>
+                        <div class="reviewer-info">
+                            <h4>Rob M.</h4>
+                            <p class="review-date">December 2025</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text truncated">
+                        When every local company tapped out and told me the equipment I needed “couldn’t be sourced,” Zach at Yorktown Tools stepped up and proved everyone wrong. This man didn’t just find the tools I needed he made it happen like it was nothing. That’s the kind of hustle you don’t see anymore.<br><br>
+                        Yorktown Tools kept my job site moving, saved me time, and earned a customer for life. If you get the chance to work with Zach, buckle up because you’ll be coming back again and again.<br><br>
+                        10/10. Zero hesitation. Yorktown Tools is the move you won’t be disappointed.
+                    </p>
+                    <button class="expand-btn">Read more</button>
+                </div>
+
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="reviewer-photo"></div>
+                        <div class="reviewer-info">
+                            <h4>Ben Peralta</h4>
+                            <p class="review-date">December 2025</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">
+                        I was searching for a local tool company and needed to place an inquiry for a specific tool. I contacted Zach who reached out to his supplier. The custom order was shipped and delivered to not delay our jobsite project. He followed up to ensure it exceeded my needs. I will use Yorktown Tools in the future. Great service, highly recommend!
+                    </p>
+                    <button class="expand-btn hidden">Read more</button>
+                </div>
+            </div>
+
+            <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review</a>
         </section>
 
-        <section id="contact-form" class="contact-form">
-            <h2>Send Us a Message</h2>
-            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">Whether it's a quick question, tool recommendation, or bulk order inquiry — we'll get back to you fast.</p>
+        <section class="contact-form">
+            <h2>Send Us a Message or Request a Quote</h2>
+            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">Quick question, tool recommendation, or need pricing? We usually reply within a few hours during business days.</p>
             <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
                 <div class="form-group">
                     <label for="name">Name <span class="required">*</span></label>
@@ -320,53 +421,14 @@
                     <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
                 </div>
                 <div class="form-group">
-                    <label for="message">Message <span class="required">*</span></label>
-                    <textarea id="message" name="message" rows="6" required placeholder="How can we help you today?"></textarea>
+                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234">
+                </div>
+                <div class="form-group">
+                    <label for="message">Message / Additional Notes <span class="required">*</span></label>
+                    <textarea id="message" name="message" rows="6" required placeholder="How can we help? List tools needed, questions, or anything else."></textarea>
                 </div>
                 <button type="submit" class="btn">Send Message</button>
-            </form>
-        </section>
-
-        <section class="contact-form">
-            <h2>Or Request a Quote</h2>
-            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">Need pricing and availability? List your tools below — free quote in 24 hours or less.</p>
-            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
-                <div class="form-group">
-                    <label for="q_name">Name <span class="required">*</span></label>
-                    <input type="text" id="q_name" name="name" required placeholder="John Doe">
-                </div>
-                <div class="form-group">
-                    <label for="q_company">Company / Organization <span class="required">*</span></label>
-                    <input type="text" id="q_company" name="company" required placeholder="JD Contractors">
-                </div>
-                <div class="form-group">
-                    <label for="q_email">Email <span class="required">*</span></label>
-                    <input type="email" id="q_email" name="email" required placeholder="john@jdcontractors.com">
-                </div>
-                <div class="form-group">
-                    <label for="q_phone">Phone</label>
-                    <input type="tel" id="q_phone" name="phone" placeholder="(757) 555-1234">
-                </div>
-                <div class="form-group">
-                    <label for="q_delivery">Delivery Location <small>(Optional)</small></label>
-                    <input type="text" id="q_delivery" name="delivery" placeholder="e.g., Fort Eustis, Bldg 1234">
-                </div>
-                <div class="form-group">
-                    <label>Requested Items <small>(Optional)</small></label>
-                    <div id="item-list">
-                        <div class="item-row">
-                            <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
-                </div>
-                <div class="form-group">
-                    <label for="q_message">Additional Notes</label>
-                    <textarea id="q_message" name="message" rows="4" placeholder="Urgent delivery? Specific brands? Let us know."></textarea>
-                </div>
-                <button type="submit" class="btn">Send Quote Request</button>
             </form>
         </section>
     </main>
@@ -375,7 +437,7 @@
         <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:yorktowntools@gmail.com">yorktowntools@gmail.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p>605 Piney Point Rd, Yorktown, VA 23692 – Veteran-Owned Small Business & SAM.gov Registered</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p>© 2025 Yorktown Tools. All rights reserved.</p>
     </footer>
@@ -403,16 +465,55 @@
             banners[j].classList.add('active');
         }, 2000);
 
-        // Add another item row in form (only one item-list on the page)
-        function addItem() {
-            const container = document.getElementById('item-list');
-            const row = document.createElement('div');
-            row.className = 'item-row';
-            row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                             <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                             <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
-            container.appendChild(row);
+        // Reviews rotator and expand functionality (same as before)
+        const reviews = document.querySelectorAll('.review-card');
+        let currentReview = 0;
+        function rotateReviews() {
+            reviews[currentReview].classList.remove('active');
+            currentReview = (currentReview + 1) % reviews.length;
+            reviews[currentReview].classList.add('active');
+
+            const activeText = reviews[currentReview].querySelector('.review-text');
+            const activeBtn = reviews[currentReview].querySelector('.expand-btn');
+            if (activeText.scrollHeight <= 200) {
+                activeBtn.classList.add('hidden');
+                activeText.classList.remove('truncated');
+            } else {
+                activeBtn.classList.remove('hidden');
+                if (!activeText.classList.contains('expanded')) {
+                    activeText.classList.add('truncated');
+                }
+            }
         }
+        setInterval(rotateReviews, 18000);
+
+        document.querySelectorAll('.expand-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const text = this.previousElementSibling;
+                if (text.classList.contains('truncated')) {
+                    text.classList.remove('truncated');
+                    text.classList.add('expanded');
+                    this.textContent = 'Read less';
+                } else {
+                    text.classList.add('truncated');
+                    text.classList.remove('expanded');
+                    this.textContent = 'Read more';
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            reviews.forEach(card => {
+                const text = card.querySelector('.review-text');
+                const btn = card.querySelector('.expand-btn');
+                if (text.scrollHeight <= 200) {
+                    btn.classList.add('hidden');
+                    text.classList.remove('truncated');
+                } else {
+                    text.classList.add('truncated');
+                }
+            });
+        });
     </script>
 </body>
 </html>
