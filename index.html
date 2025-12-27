@@ -643,14 +643,15 @@
             <p style="max-width:800px;margin:0 auto 2rem;color:#555;">
                 Get new tool arrivals, exclusive contractor deals, manufacturer updates, and job-site tips delivered straight to your inbox every month.
             </p>
-            <form action="https://yorktowntools.usX.list-manage.com/subscribe/post?u=REPLACE_WITH_YOUR_ID&amp;id=REPLACE_WITH_YOUR_LIST_ID" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" target="_blank">
-                <input type="email" name="EMAIL" placeholder="your@email.com" required>
+            
+            <form id="newsletter-form" action="https://formspree.io/f/2901648326229228787" method="POST">
+                <input type="email" name="email" placeholder="your@email.com" required>
                 <button type="submit" class="btn">Subscribe Now</button>
-                
-                <div style="position: absolute; left: -5000px;" aria-hidden="true">
-                    <input type="text" name="b_REPLACE_WITH_YOUR_ID_REPLACE_WITH_YOUR_LIST_ID" tabindex="-1" value="">
-                </div>
             </form>
+
+            <div id="newsletter-thankyou" style="display:none; text-align:center; margin-top:1.5rem; font-size:1.2rem; color:green;">
+                Thank you for subscribing! We'll send you monthly tool updates.
+            </div>
         </section>
 
         <section id="contact" class="contact-form">
@@ -801,6 +802,35 @@
                              <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
             container.appendChild(row);
         }
+
+        // Newsletter form AJAX submission with inline thank you
+        const newsletterForm = document.getElementById('newsletter-form');
+        const thankyouMsg = document.getElementById('newsletter-thankyou');
+
+        newsletterForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(newsletterForm);
+            
+            try {
+                const response = await fetch(newsletterForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    newsletterForm.style.display = 'none';
+                    thankyouMsg.style.display = 'block';
+                } else {
+                    alert('Oops! Something went wrong. Please try again.');
+                }
+            } catch (error) {
+                alert('Oops! Something went wrong. Please try again.');
+            }
+        });
     </script>
 </body>
 </html>
