@@ -174,7 +174,7 @@
         .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
         .hero h1 { font-size: clamp(2.8rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
         .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
-        .hero-banner { width:100%; max-width:1200px; border-radius:var(--radius); box-shadow:var(--shadow); margin: 2rem auto; display:block; }
+        .hero-banner { width:100%; max-width:1200px; border-radius:var(--radius); box-shadow:var(--shadow); margin: 2rem auto; display:block; cursor: zoom-in; }
 
         .btn { display:inline-block; background:var(--red); color:#fff; padding:1.3rem 3.4rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1.25rem; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
@@ -218,33 +218,90 @@
 
         /* Swag-specific styles */
         .shirt-images {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            padding: 2rem;
             background: var(--light);
-        }
-        .view {
+            padding: 2.5rem 1.5rem;
             text-align: center;
         }
-        .view img {
+        .main-shirt-img {
             width: 100%;
+            max-width: 700px;
             height: auto;
             object-fit: contain;
             border-radius: 12px;
+            box-shadow: var(--shadow);
+            cursor: zoom-in;
+            transition: var(--transition);
+        }
+        .main-shirt-img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
         }
         .label {
             font-weight: 700;
             color: var(--navy);
-            margin-top: 0.8rem;
-            font-size: 1.1rem;
+            margin: 1.2rem 0 0.5rem;
+            font-size: 1.2rem;
         }
-        @media (min-width: 768px) {
-            .shirt-images {
-                grid-template-columns: 1.3fr 0.7fr;
-                gap: 3rem;
-                align-items: center;
-            }
+        .view-controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.8rem;
+            flex-wrap: wrap;
+        }
+        .view-btn {
+            background: rgba(11,30,63,0.12);
+            color: var(--navy);
+            border: 2px solid var(--navy);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .view-btn:hover {
+            background: var(--navy);
+            color: #fff;
+        }
+        .view-btn.active {
+            background: var(--red);
+            color: #fff;
+            border-color: var(--red);
+        }
+
+        /* Lightbox modal */
+        dialog#image-modal {
+            padding: 0;
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: transparent;
+            max-width: 95vw;
+            max-height: 95vh;
+        }
+        dialog#image-modal::backdrop {
+            background: rgba(0,0,0,0.85);
+        }
+        dialog#image-modal img {
+            max-width: 95vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: var(--radius);
+        }
+        dialog#image-modal button {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
         }
 
         .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -339,31 +396,27 @@
             <h1>Yorktown Tools Swag</h1>
             <p>Exclusive premium t-shirts for the real fans — show your support for a veteran-owned tool supplier.</p>
             
-            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag Banner" class="hero-banner" loading="lazy">
+            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag Banner" class="hero-banner" loading="lazy" onclick="openLightbox(this.src, this.alt)">
 
             <a href="#shirts" class="btn">View Shirts – $25 Each</a>
         </section>
 
         <section id="shirts">
             <h2>Available T-Shirts</h2>
-            <p style="text-align:center; max-width:900px; margin:0 auto 1.5rem; color:#555;">
-                All shirts are $25 each. High-quality, comfortable fit. Contact us below for sizes (S–3XL) and to place your order.
-            </p>
             <p style="text-align:center; max-width:900px; margin:0 auto 3rem; color:#555;">
-                All shirts share the same premium front design. Unique artwork is on the back.
+                All shirts are $25 each. High-quality, comfortable fit. All shirts share the same premium front design. Unique artwork is on the back.<br>
+                Click any image to enlarge. Use the buttons to switch between back (default) and front.
             </p>
 
             <div class="grid">
                 <!-- Shirt 1: Yorktown Tools Classic -->
                 <div class="card">
-                    <div class="shirt-images">
-                        <div class="view">
-                            <img src="Ytclassic.heic" alt="Yorktown Tools Classic - Back" loading="lazy">
-                            <p class="label">Back</p>
-                        </div>
-                        <div class="view">
-                            <img src="Ytclassicfront.heic" alt="Yorktown Tools - Front (same on all shirts)" loading="lazy">
-                            <p class="label">Front (same on all)</p>
+                    <div class="shirt-images" id="shirt-1">
+                        <img src="Ytclassic.heic" alt="Yorktown Tools Classic - Back" class="main-shirt-img" id="main-img-1" onclick="openLightbox(this.src, this.alt)" loading="lazy">
+                        <p class="label current-view-label">Back</p>
+                        <div class="view-controls">
+                            <button class="view-btn back-btn active" onclick="switchTo(1, 'back')">View Back</button>
+                            <button class="view-btn front-btn" onclick="switchTo(1, 'front')">View Front</button>
                         </div>
                     </div>
                     <div class="card-content">
@@ -376,14 +429,12 @@
 
                 <!-- Shirt 2: Tools Worth Fighting For -->
                 <div class="card">
-                    <div class="shirt-images">
-                        <div class="view">
-                            <img src="Toolswortgfightingfor.heic" alt="Tools Worth Fighting For - Back" loading="lazy">
-                            <p class="label">Back</p>
-                        </div>
-                        <div class="view">
-                            <img src="Ytclassicfront.heic" alt="Yorktown Tools - Front (same on all shirts)" loading="lazy">
-                            <p class="label">Front (same on all)</p>
+                    <div class="shirt-images" id="shirt-2">
+                        <img src="Toolswortgfightingfor.heic" alt="Tools Worth Fighting For - Back" class="main-shirt-img" id="main-img-2" onclick="openLightbox(this.src, this.alt)" loading="lazy">
+                        <p class="label current-view-label">Back</p>
+                        <div class="view-controls">
+                            <button class="view-btn back-btn active" onclick="switchTo(2, 'back')">View Back</button>
+                            <button class="view-btn front-btn" onclick="switchTo(2, 'front')">View Front</button>
                         </div>
                     </div>
                     <div class="card-content">
@@ -396,14 +447,12 @@
 
                 <!-- Shirt 3: George Washington -->
                 <div class="card">
-                    <div class="shirt-images">
-                        <div class="view">
-                            <img src="Gwshirt.jpg" alt="George Washington - Back" loading="lazy">
-                            <p class="label">Back</p>
-                        </div>
-                        <div class="view">
-                            <img src="Ytclassicfront.heic" alt="Yorktown Tools - Front (same on all shirts)" loading="lazy">
-                            <p class="label">Front (same on all)</p>
+                    <div class="shirt-images" id="shirt-3">
+                        <img src="Gwshirt.jpg" alt="George Washington - Back" class="main-shirt-img" id="main-img-3" onclick="openLightbox(this.src, this.alt)" loading="lazy">
+                        <p class="label current-view-label">Back</p>
+                        <div class="view-controls">
+                            <button class="view-btn back-btn active" onclick="switchTo(3, 'back')">View Back</button>
+                            <button class="view-btn front-btn" onclick="switchTo(3, 'front')">View Front</button>
                         </div>
                     </div>
                     <div class="card-content">
@@ -458,6 +507,12 @@
         </section>
     </main>
 
+    <!-- Lightbox modal -->
+    <dialog id="image-modal">
+        <img id="modal-image" src="" alt="Enlarged shirt view">
+        <button onclick="document.getElementById('image-modal').close()" aria-label="Close">×</button>
+    </dialog>
+
     <footer>
         <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
@@ -489,6 +544,49 @@
             j = (j + 1) % banners.length;
             banners[j].classList.add('active');
         }, 2000);
+
+        // Shirt view switching
+        const frontSrc = 'Ytclassicfront.heic';
+        const backSrcs = {
+            1: 'Ytclassic.heic',
+            2: 'Toolswortgfightingfor.heic',
+            3: 'Gwshirt.jpg'
+        };
+        const shirtNames = {
+            1: 'Yorktown Tools Classic',
+            2: 'Tools Worth Fighting For',
+            3: 'George Washington'
+        };
+
+        function switchTo(shirtId, view) {
+            const img = document.getElementById(`main-img-${shirtId}`);
+            const backBtn = document.querySelector(`#shirt-${shirtId} .back-btn`);
+            const frontBtn = document.querySelector(`#shirt-${shirtId} .front-btn`);
+            const label = document.querySelector(`#shirt-${shirtId} .current-view-label`);
+
+            if (view === 'back') {
+                img.src = backSrcs[shirtId];
+                img.alt = `${shirtNames[shirtId]} - Back`;
+                label.textContent = 'Back';
+                backBtn.classList.add('active');
+                frontBtn.classList.remove('active');
+            } else {
+                img.src = frontSrc;
+                img.alt = 'Yorktown Tools - Front (same on all shirts)';
+                label.textContent = 'Front (same on all)';
+                frontBtn.classList.add('active');
+                backBtn.classList.remove('active');
+            }
+        }
+
+        // Lightbox
+        function openLightbox(src, alt = 'Enlarged view') {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            modalImg.src = src;
+            modalImg.alt = alt;
+            modal.showModal();
+        }
 
         // Add another item row in form
         function addItem() {
