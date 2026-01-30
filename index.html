@@ -366,7 +366,8 @@
             padding: 8px;
         }
 
-        #newsletter {
+        /* Swag section (replaces newsletter) */
+        #swag {
             background: var(--light);
             padding: clamp(3.2rem, 8vw, 4.5rem);
             border-radius: var(--radius);
@@ -374,20 +375,31 @@
             text-align: center;
             margin: 5.5rem 0;
         }
-        #newsletter form {
-            display: inline-flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            max-width: 100%;
+        .swag-rotator {
+            position: relative;
+            max-width: 900px;
+            margin: 3rem auto;
+            height: clamp(320px, 65vw, 600px);
+            overflow: hidden;
+            border-radius: var(--radius);
+            background: var(--white);
+            box-shadow: var(--shadow);
         }
-        #newsletter input[type="email"] {
-            padding: 1.2rem 1.5rem;
-            border: 2px solid #dee2e6;
-            border-radius: 14px;
-            font-size: 1.05rem;
-            min-width: 280px;
-            flex: 1;
+        .swag-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .swag-image.active {
+            opacity: 1;
         }
 
         .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -470,6 +482,7 @@
             <a href="Storage-organization.html">Storage</a>
             <a href="Safety-PPE.html">Safety & PPE</a>
             <a href="Ladders.html">Ladders</a>
+            <a href="swag.html">Swag</a>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact Us</a>
             <a href="#contact">Get Quote</a>
@@ -641,20 +654,21 @@
             </div>
         </section>
 
-        <section id="newsletter">
-            <h2>Join Our Monthly Tool Updates</h2>
-            <p style="max-width:800px;margin:0 auto 2rem;color:#555;">
-                Get new tool arrivals, exclusive contractor deals, manufacturer updates, and job-site tips delivered straight to your inbox every month.
+        <!-- Replaced newsletter with rotating swag showcase -->
+        <section id="swag">
+            <h2>For the Real Yorktown Tools Fans: Exclusive Swag</h2>
+            <p style="max-width:800px;margin:0 auto 2.5rem;color:#555;">
+                Rep the brand that reps you. T-shirts, hats, mugs, stickers — premium gear for true supporters.
             </p>
-            
-            <form id="newsletter-form" action="https://formspree.io/f/2901648326229228787" method="POST">
-                <input type="email" name="email" placeholder="your@email.com" required>
-                <button type="submit" class="btn">Subscribe Now</button>
-            </form>
 
-            <div id="newsletter-thankyou" style="display:none; text-align:center; margin-top:1.5rem; font-size:1.2rem; color:green;">
-                Thank you for subscribing! We'll send you monthly tool updates.
+            <div class="swag-rotator">
+                <img src="swag-tshirt.jpg" alt="Yorktown Tools T-Shirt" class="swag-image active" loading="lazy">
+                <img src="swag-hat.jpg" alt="Yorktown Tools Hat" class="swag-image" loading="lazy">
+                <img src="swag-mug.jpg" alt="Yorktown Tools Mug" class="swag-image" loading="lazy">
+                <img src="swag-sticker.jpg" alt="Yorktown Tools Sticker Pack" class="swag-image" loading="lazy">
             </div>
+
+            <a href="swag.html" class="btn" style="margin-top:2rem;">Shop Swag Now</a>
         </section>
 
         <section id="contact" class="contact-form">
@@ -765,6 +779,15 @@
         }
         setInterval(rotateReviews, 18000);
 
+        // Swag images rotator
+        const swagImages = document.querySelectorAll('.swag-image');
+        let currentSwag = 0;
+        setInterval(() => {
+            swagImages[currentSwag].classList.remove('active');
+            currentSwag = (currentSwag + 1) % swagImages.length;
+            swagImages[currentSwag].classList.add('active');
+        }, 6000);
+
         // Expand/collapse functionality
         document.querySelectorAll('.expand-btn').forEach(btn => {
             btn.addEventListener('click', function () {
@@ -781,7 +804,7 @@
             });
         });
 
-        // Initial check on load
+        // Initial check on load for reviews truncation
         document.addEventListener('DOMContentLoaded', () => {
             reviews.forEach(card => {
                 const text = card.querySelector('.review-text');
@@ -805,35 +828,6 @@
                              <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
             container.appendChild(row);
         }
-
-        // Newsletter form AJAX submission with inline thank you
-        const newsletterForm = document.getElementById('newsletter-form');
-        const thankyouMsg = document.getElementById('newsletter-thankyou');
-
-        newsletterForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(newsletterForm);
-            
-            try {
-                const response = await fetch(newsletterForm.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    newsletterForm.style.display = 'none';
-                    thankyouMsg.style.display = 'block';
-                } else {
-                    alert('Oops! Something went wrong. Please try again.');
-                }
-            } catch (error) {
-                alert('Oops! Something went wrong. Please try again.');
-            }
-        });
     </script>
 </body>
 </html>
