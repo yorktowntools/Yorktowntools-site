@@ -176,9 +176,6 @@
         .hero > p { font-size: clamp(1.22rem, 4.8vw, 1.45rem); margin-bottom:2.8rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
         .hero-banner { width:100%; max-width:1200px; border-radius:var(--radius); box-shadow:var(--shadow); margin: 2rem auto; display:block; cursor: zoom-in; }
 
-        .btn { display:inline-block; background:var(--red); color:#fff; padding:1.3rem 3.4rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1.25rem; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); }
-        .btn:hover { background:#a00d22; transform:translateY(-5px); }
-
         section { margin-bottom:5.5rem; }
         h2 { font-size: clamp(2.1rem, 6.5vw, 2.7rem); margin-bottom:2rem; color:var(--navy); text-align:center; font-weight: 700; }
         .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); gap: clamp(2rem, 5vw, 4rem); }
@@ -270,6 +267,81 @@
             border-color: var(--red);
         }
 
+        /* Order controls (adapted from hand tools page) */
+        .tool-select {
+            width: 100%;
+            padding: 1.3rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            margin: 1.5rem 0 0;
+            background: white;
+            transition: border 0.3s;
+        }
+        .tool-select:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+
+        .qty-input {
+            width: 100%;
+            max-width: 260px;
+            margin: 1rem auto 0;
+            padding: 1.3rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            text-align: center;
+            transition: border 0.3s;
+            display: none;
+        }
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+
+        .quote-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+        .quote-btn {
+            padding: 1.3rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(200,16,46,0.3);
+            flex: 1;
+        }
+        .text-quote {
+            background: var(--red);
+            color: white;
+        }
+        .text-quote:hover {
+            background: #a00d22;
+            transform: translateY(-5px);
+        }
+        .email-quote {
+            background: var(--navy);
+            color: white;
+        }
+        .email-quote:hover {
+            background: #08152e;
+            transform: translateY(-5px);
+        }
+
+        @media (min-width: 480px) {
+            .quote-buttons {
+                flex-direction: row;
+            }
+        }
+
         /* Lightbox modal */
         dialog#image-modal {
             padding: 0;
@@ -304,8 +376,6 @@
             line-height: 1;
         }
 
-        .contact-form { background: var(--light); padding: clamp(3.2rem, 8vw, 4.5rem); border-radius: var(--radius); box-shadow: var(--shadow); }
-
         footer { background: var(--navy); color: var(--white); text-align:center; padding:6.5rem 1rem 3rem; margin-top:8rem; }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
         footer a { color: #ffffff !important; text-decoration: underline; }
@@ -335,19 +405,6 @@
             70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
             100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
         }
-
-        .quote-form { display:grid; gap:1.9rem; }
-        .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
-        .required { color:var(--red); }
-        .quote-form input, .quote-form textarea { padding:1.3rem; border:2px solid #dee2e6; border-radius:14px; font-size:1.05rem; transition:border 0.3s; width:100%; }
-        .quote-form input:focus, .quote-form textarea:focus { outline:none; border-color:var(--navy); box-shadow:0 0 0 5px rgba(11,30,63,0.12); }
-        #item-list { display:flex; flex-direction:column; gap:1rem; margin-top:0.6rem; }
-        .item-row { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
-        .item-name { flex:3; min-width:200px; }
-        .item-qty { flex:1; min-width:90px; text-align:center; }
-        .remove-item { background:var(--red); color:#fff; border:none; width:40px; height:40px; border-radius:50%; font-size:1.6rem; cursor:pointer; }
-        .add-item-btn { align-self:flex-start; background:transparent; color:var(--navy); border:2px solid var(--navy); padding:0.8rem 1.6rem; border-radius:12px; font-weight:600; cursor:pointer; }
-        .add-item-btn:hover { background:var(--navy); color:#fff; }
     </style>
 </head>
 <body>
@@ -397,15 +454,13 @@
             <p>Exclusive premium t-shirts for the real fans — show your support for a veteran-owned tool supplier.</p>
             
             <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag Banner" class="hero-banner" loading="lazy" onclick="openLightbox(this.src, this.alt)">
-
-            <a href="#shirts" class="btn">View Shirts – $25 Each</a>
         </section>
 
         <section id="shirts">
-            <h2>Available T-Shirts</h2>
+            <h2>Available T-Shirts – $25 Each</h2>
             <p style="text-align:center; max-width:900px; margin:0 auto 3rem; color:#555;">
-                All shirts are $25 each. High-quality, comfortable fit. All shirts share the same premium front design. Unique artwork is on the back.<br>
-                Click any image to enlarge. Use the buttons to switch between back (default) and front.
+                High-quality, comfortable fit (sizes S–3XL). All shirts share the same premium front design. Unique artwork is on the back.<br>
+                Click any image to enlarge • Use buttons to switch views • Select size below to order.
             </p>
 
             <div class="grid">
@@ -423,7 +478,23 @@
                         <h3>Yorktown Tools Classic Tee</h3>
                         <p class="price">$25.00</p>
                         <p>Timeless Yorktown Tools branding on the back.</p>
-                        <a href="#contact" class="btn">Order This Shirt</a>
+
+                        <select class="tool-select" onchange="handleSizeSelect(this)">
+                            <option value="">— Select Size —</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="X-Large">X-Large</option>
+                            <option value="2X-Large">2X-Large</option>
+                            <option value="3X-Large">3X-Large</option>
+                        </select>
+
+                        <input type="number" class="qty-input" min="1" value="1" placeholder="Quantity">
+
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendShirtOrder(this, 'text')">Text Order →</button>
+                            <button class="quote-btn email-quote" onclick="sendShirtOrder(this, 'email')">Email Order →</button>
+                        </div>
                     </div>
                 </div>
 
@@ -441,7 +512,23 @@
                         <h3>Tools Worth Fighting For Tee</h3>
                         <p class="price">$25.00</p>
                         <p>Classic design featuring our signature slogan.</p>
-                        <a href="#contact" class="btn">Order This Shirt</a>
+
+                        <select class="tool-select" onchange="handleSizeSelect(this)">
+                            <option value="">— Select Size —</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="X-Large">X-Large</option>
+                            <option value="2X-Large">2X-Large</option>
+                            <option value="3X-Large">3X-Large</option>
+                        </select>
+
+                        <input type="number" class="qty-input" min="1" value="1" placeholder="Quantity">
+
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendShirtOrder(this, 'text')">Text Order →</button>
+                            <button class="quote-btn email-quote" onclick="sendShirtOrder(this, 'email')">Email Order →</button>
+                        </div>
                     </div>
                 </div>
 
@@ -459,51 +546,26 @@
                         <h3>George Washington Tee</h3>
                         <p class="price">$25.00</p>
                         <p>Patriotic design featuring George Washington.</p>
-                        <a href="#contact" class="btn">Order This Shirt</a>
+
+                        <select class="tool-select" onchange="handleSizeSelect(this)">
+                            <option value="">— Select Size —</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="X-Large">X-Large</option>
+                            <option value="2X-Large">2X-Large</option>
+                            <option value="3X-Large">3X-Large</option>
+                        </select>
+
+                        <input type="number" class="qty-input" min="1" value="1" placeholder="Quantity">
+
+                        <div class="quote-buttons">
+                            <button class="quote-btn text-quote" onclick="sendShirtOrder(this, 'text')">Text Order →</button>
+                            <button class="quote-btn email-quote" onclick="sendShirtOrder(this, 'email')">Email Order →</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <section id="contact" class="contact-form">
-            <h2>Order Your Swag</h2>
-            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">
-                Fill out the form with the shirt(s) you want, quantity, and size(s). We'll reply with payment details and confirm your order.
-            </p>
-            <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
-                <div class="form-group">
-                    <label for="name">Name <span class="required">*</span></label>
-                    <input type="text" id="name" name="name" required placeholder="John Doe">
-                </div>
-                <div class="form-group">
-                    <label for="company">Company / Organization</label>
-                    <input type="text" id="company" name="company" placeholder="Optional">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="john@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone <span class="required">*</span></label>
-                    <input type="tel" id="phone" name="phone" required placeholder="(757) 555-1234">
-                </div>
-                <div class="form-group">
-                    <label>Shirt Orders <span class="required">*</span></label>
-                    <div id="item-list">
-                        <div class="item-row">
-                            <input type="text" name="item_name[]" placeholder="e.g., Yorktown Tools Classic Tee - Large" class="item-name">
-                            <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Shirt</button>
-                </div>
-                <div class="form-group">
-                    <label for="message">Additional Notes</label>
-                    <textarea id="message" name="message" rows="4" placeholder="Shipping address, special requests, etc."></textarea>
-                </div>
-                <button type="submit" class="btn">Submit Order Request</button>
-            </form>
         </section>
     </main>
 
@@ -588,15 +650,61 @@
             modal.showModal();
         }
 
-        // Add another item row in form
-        function addItem() {
-            const container = document.getElementById('item-list');
-            const row = document.createElement('div');
-            row.className = 'item-row';
-            row.innerHTML = `<input type="text" name="item_name[]" placeholder="e.g., Tools Worth Fighting For Tee - Large" class="item-name">
-                             <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                             <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
-            container.appendChild(row);
+        // Size selection – show quantity & order buttons
+        function handleSizeSelect(select) {
+            const card = select.closest('.card');
+            const qtyInput = card.querySelector('.qty-input');
+            const buttons = card.querySelector('.quote-buttons');
+
+            if (select.value) {
+                qtyInput.style.display = 'block';
+                buttons.style.display = 'flex';
+            } else {
+                qtyInput.style.display = 'none';
+                buttons.style.display = 'none';
+            }
+        }
+
+        // Send shirt order via text or email
+        function sendShirtOrder(button, method) {
+            const card = button.closest('.card');
+            const shirtName = card.querySelector('h3').textContent.trim();
+            const sizeSelect = card.querySelector('.tool-select');
+            const size = sizeSelect.options[sizeSelect.selectedIndex].text;
+            const qtyInput = card.querySelector('.qty-input');
+            let qty = parseInt(qtyInput.value);
+            if (isNaN(qty) || qty < 1) qty = 1;
+
+            if (!size || size === '— Select Size —') {
+                alert('Please select a size before ordering.');
+                return;
+            }
+
+            const priceEach = 25;
+            const total = priceEach * qty;
+
+            let bodyText = `Swag Order from YorktownTools.com\n\n`;
+            bodyText += `Shirt: ${shirtName}\n`;
+            bodyText += `Size: ${size}\n`;
+            bodyText += `Quantity: ${qty}\n\n`;
+            bodyText += `Price: $${priceEach} each\n`;
+            bodyText += `Total: $${total}\n\n`;
+            bodyText += `Please reply with payment options (Venmo, PayPal, etc.), shipping address (free local delivery or actual shipping cost), or pickup details.\nThank you!`;
+
+            // Reset controls
+            sizeSelect.selectedIndex = 0;
+            qtyInput.value = 1;
+            qtyInput.style.display = 'none';
+            card.querySelector('.quote-buttons').style.display = 'none';
+
+            const encodedBody = encodeURIComponent(bodyText);
+
+            if (method === 'text') {
+                window.location.href = `sms:7579405171?body=${encodedBody}`;
+            } else if (method === 'email') {
+                const subject = encodeURIComponent(`Swag Order: ${shirtName} - ${size} × ${qty}`);
+                window.location.href = `mailto:sales@yorktowntools.com?subject=${subject}&body=${encodedBody}`;
+            }
         }
     </script>
 </body>
