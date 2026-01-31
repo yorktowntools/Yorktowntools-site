@@ -12,8 +12,7 @@
     <meta property="og:image" content="https://yorktowntools.com/Yorktowntoolsswag.png">
     <meta property="og:url" content="https://yorktowntools.com/swag.html">
     <meta property="og:type" content="website">
-    <title>Yorktown Tools Swag | Exclusive Merch</title>
-
+    <title>Yorktown Tools Swag
     <link rel="icon" href="/Yorktown.PNG" type="image/png">
     <link rel="apple-touch-icon" href="/Yorktown.PNG">
     <link rel="manifest" href="/site.webmanifest">
@@ -242,20 +241,21 @@
         .view-controls {
             display: flex;
             justify-content: center;
-            gap: 2rem;
-            margin-top: 1.8rem;
-            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            flex-wrap: nowrap;
         }
         .view-btn {
             background: rgba(11,30,63,0.12);
             color: var(--navy);
             border: 2px solid var(--navy);
-            padding: 0.8rem 2rem;
+            padding: 0.6rem 1.2rem;
             border-radius: 30px;
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: var(--transition);
+            min-width: 90px;
         }
         .view-btn:hover {
             background: var(--navy);
@@ -267,7 +267,7 @@
             border-color: var(--red);
         }
 
-        /* Order controls (adapted from hand tools page) */
+        /* Order controls */
         .tool-select {
             width: 100%;
             padding: 1.3rem;
@@ -460,7 +460,7 @@
             <h2>Available T-Shirts – $25 Each</h2>
             <p style="text-align:center; max-width:900px; margin:0 auto 3rem; color:#555;">
                 High-quality, comfortable fit (sizes S–3XL). All shirts share the same premium front design. Unique artwork is on the back.<br>
-                Click any image to enlarge • Use buttons to switch views • Select size below to order.
+                Click any image to enlarge • Tap Back/Front buttons to switch views • Select size below to order.
             </p>
 
             <div class="grid">
@@ -470,8 +470,8 @@
                         <img src="Ytclassic.PNG" alt="Yorktown Tools Classic - Back" class="main-shirt-img" id="main-img-1" onclick="openLightbox(this.src, this.alt)" loading="lazy">
                         <p class="label current-view-label">Back</p>
                         <div class="view-controls">
-                            <button class="view-btn back-btn active" onclick="switchTo(1, 'back')">View Back</button>
-                            <button class="view-btn front-btn" onclick="switchTo(1, 'front')">View Front</button>
+                            <button class="view-btn back-btn active" onclick="switchTo(1, 'back')">Back</button>
+                            <button class="view-btn front-btn" onclick="switchTo(1, 'front')">Front</button>
                         </div>
                     </div>
                     <div class="card-content">
@@ -504,8 +504,8 @@
                         <img src="Toolswortgfightingfor.heic" alt="Tools Worth Fighting For - Back" class="main-shirt-img" id="main-img-2" onclick="openLightbox(this.src, this.alt)" loading="lazy">
                         <p class="label current-view-label">Back</p>
                         <div class="view-controls">
-                            <button class="view-btn back-btn active" onclick="switchTo(2, 'back')">View Back</button>
-                            <button class="view-btn front-btn" onclick="switchTo(2, 'front')">View Front</button>
+                            <button class="view-btn back-btn active" onclick="switchTo(2, 'back')">Back</button>
+                            <button class="view-btn front-btn" onclick="switchTo(2, 'front')">Front</button>
                         </div>
                     </div>
                     <div class="card-content">
@@ -538,8 +538,8 @@
                         <img src="Gwshirt.jpg" alt="George Washington - Back" class="main-shirt-img" id="main-img-3" onclick="openLightbox(this.src, this.alt)" loading="lazy">
                         <p class="label current-view-label">Back</p>
                         <div class="view-controls">
-                            <button class="view-btn back-btn active" onclick="switchTo(3, 'back')">View Back</button>
-                            <button class="view-btn front-btn" onclick="switchTo(3, 'front')">View Front</button>
+                            <button class="view-btn back-btn active" onclick="switchTo(3, 'back')">Back</button>
+                            <button class="view-btn front-btn" onclick="switchTo(3, 'front')">Front</button>
                         </div>
                     </div>
                     <div class="card-content">
