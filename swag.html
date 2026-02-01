@@ -89,24 +89,6 @@
         }
         .banner-text.active { opacity: 1; }
 
-        .gov-ids-header {
-            background: var(--navy);
-            color: var(--white);
-            padding: 0.5rem 0;
-            font-size: 0.86rem;
-            font-weight: 500;
-        }
-        .gov-items {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1.3rem;
-            white-space: nowrap;
-            padding: 0.4rem 1rem;
-            flex-wrap: wrap;
-        }
-        .gov-items strong { color: #ffeb3b; }
-
         .logo-header {
             text-align: center;
             padding: 1.4rem 1rem 1rem;
@@ -420,14 +402,6 @@
         <div class="banner-text">No Hassle.</div>
     </div>
 
-    <div class="gov-ids-header">
-        <div class="gov-items">
-            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
-            <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.gov</strong></span>
-        </div>
-    </div>
-
     <div class="logo-header">
         <img src="Yorktown.PNG" alt="Yorktown Tools">
     </div>
@@ -502,7 +476,8 @@
                 <!-- Shirt 2: Tools Worth Fighting For -->
                 <div class="card">
                     <div class="shirt-images" id="shirt-2">
-                        <img src="Toolswortgfightingfor.heic" alt="Tools Worth Fighting For - Back" class="main-shirt-img" id="main-img-2" onclick="openLightbox(this.src, this.alt)" loading="lazy">
+                        <!-- Changed .heic → .png (convert your file and upload as Toolsworthfightingfor.png or .jpg) -->
+                        <img src="Toolsworthfightingfor.png" alt="Tools Worth Fighting For - Back" class="main-shirt-img" id="main-img-2" onclick="openLightbox(this.src, this.alt)" loading="lazy">
                         <p class="label current-view-label">Back</p>
                         <div class="view-controls">
                             <button class="view-btn back-btn active" onclick="switchTo(2, 'back')">Back</button>
@@ -544,7 +519,7 @@
                         </div>
                     </div>
                     <div class="card-content">
-                        <h3>George Washington</h3>
+                        <h3>Concrete George</h3>
                         <p class="price">$25.00</p>
                         <p>Patriotic design featuring George Washington.</p>
 
@@ -581,7 +556,6 @@
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
-        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
 
@@ -612,7 +586,7 @@
         const frontSrc = 'Ytfront.png';
         const backSrcs = {
             1: 'Ytclassic.PNG',
-            2: 'Toolswortgfightingfor.heic',
+            2: 'Toolsworthfightingfor.png',  // ← updated filename
             3: 'Gwshirt.jpg'
         };
         const shirtNames = {
