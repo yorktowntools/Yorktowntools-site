@@ -158,6 +158,15 @@
             }
         }
 
+        /* New style for the About Us hero image */
+        .about-hero-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
         main { max-width:1200px; margin:0 auto; padding:0 1.4rem 5rem; }
 
         .hero { text-align:center; padding: clamp(4rem, 13vw, 7rem) 1rem 4rem; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius:var(--radius); margin: 3rem 0; box-shadow: var(--shadow); }
@@ -171,7 +180,6 @@
         .founder-bio h3 { color: var(--navy); font-size: 1.8rem; margin-bottom: 0.8rem; }
         .founder-bio p { font-size: 1.1rem; margin-bottom: 1.4rem; }
 
-        /* New boxed promise section */
         .promise-box {
             background: var(--light);
             padding: 2.5rem;
@@ -261,6 +269,9 @@
         </div>
     </nav>
 
+    <!-- New About Us image placed right below the navigation -->
+    <img src="About us.jpg" alt="About Yorktown Tools" class="about-hero-image" loading="lazy">
+
     <main>
         <section class="hero">
             <h1>About Yorktown Tools</h1>
@@ -301,7 +312,7 @@
     <footer>
         <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
-           <strong>Email:</strong> <a href="mailto:">sales@yorktowntools.com</a></p>
+           <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p>© Yorktown Tools. All rights reserved.</p>
