@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Yorktown Tools: Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear for commercial and government contractors. Free delivery throughout Hampton Roads – serving Yorktown, Newport News, Hampton, Williamsburg, Norfolk, and beyond.">
-    <meta name="keywords" content="veteran owned tools, commercial contractor tools, government contractor tools, hand tools, power tools, OSHA ladders, safety PPE, tool storage, free delivery Hampton Roads, military installation access, Yorktown tools, Newport News tools, Hampton tools, Williamsburg tools, Norfolk tools">
+    <meta name="keywords" content="veteran owned tools, commercial contractor tools, government contractor tools, hand tools, power tools, OSHA ladders, safety PPE, tool storage, free delivery Hampton Roads, military installation access, Yorktown tools">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Yorktown Tools | Premium Tools with Free Delivery">
-    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery throughout Hampton Roads – Yorktown, Newport News, Hampton, Williamsburg, Norfolk & more.">
+    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Free delivery throughout Hampton Roads – fast, no minimums, full military access.">
     <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWR4T7LNEH"></script>
     <script>
@@ -427,6 +427,56 @@
         .remove-item { background:var(--red); color:#fff; border:none; width:40px; height:40px; border-radius:50%; font-size:1.6rem; cursor:pointer; }
         .add-item-btn { align-self:flex-start; background:transparent; color:var(--navy); border:2px solid var(--navy); padding:0.8rem 1.6rem; border-radius:12px; font-weight:600; cursor:pointer; }
         .add-item-btn:hover { background:var(--navy); color:#fff; }
+
+        /* Delivery Reach Section */
+        #delivery-reach .intro-text {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            color: #555;
+            font-size: 1.15rem;
+            line-height: 1.6;
+        }
+        .badge-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .badge {
+            background: var(--light);
+            border: 2px solid var(--navy);
+            border-radius: 16px;
+            padding: 1.6rem 1.8rem;
+            text-align: center;
+            min-width: 240px;
+            max-width: 320px;
+            transition: var(--transition);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+        .badge:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            border-color: var(--red);
+        }
+        .badge i {
+            font-size: 2.6rem;
+            color: var(--red);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .badge h3 {
+            margin: 0.5rem 0 0.4rem;
+            font-size: 1.35rem;
+            color: var(--navy);
+        }
+        .badge p {
+            margin: 0;
+            font-size: 1rem;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -445,7 +495,7 @@
         <div class="gov-items">
             <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
             <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.gov</strong></span>
+            <span><strong>SAM.gov Registered</strong></span>
         </div>
     </div>
 
@@ -465,7 +515,7 @@
             <a href="/Ladders.html">Ladders</a>
             <a href="/swag.html">Swag</a>
             <a href="/about.html">About Us</a>
-            <a href="/contact.html">Contact Us</a>
+            <a href="/contact.html">Contact</a>
             <a href="#contact">Get Quote</a>
         </div>
     </nav>
@@ -507,29 +557,26 @@
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">
                 Tools trusted by commercial and government contractors — delivered free, priced right, and ready when you are.
             </p>
-
             <div class="grid">
                 <a href="/precision-hand-tools.html" class="card">
-                    <img src="/Pliers.PNG" alt="Precision hand tools that last a lifetime" loading="lazy">
+                    <img src="/Pliers.PNG" alt="Precision hand tools" loading="lazy">
                     <div class="card-content">
                         <h3>Precision Hand Tools</h3>
-                        <p>Eliminate slippage, stripped bolts, and callbacks. Get torque-perfect results every time with wrenches, pliers, levels, and layout tools built for daily abuse.</p>
+                        <p>Eliminate slippage, stripped bolts, and callbacks. Torque-perfect results every time with wrenches, pliers, levels, and layout tools built for daily abuse.</p>
                     </div>
                 </a>
-
                 <a href="/Power-tools.html" class="card">
-                    <img src="/Dewalttoolpile.PNG" alt="Cordless power tools for fast, reliable work" loading="lazy">
+                    <img src="/Dewalttoolpile.PNG" alt="Cordless power tools" loading="lazy">
                     <div class="card-content">
                         <h3>Power Tools & Combo Kits</h3>
-                        <p>Cut faster, drill straighter, drive stronger. Stock up on systems that keep your crew productive — includes high-output batteries and rapid chargers so you're never waiting.</p>
+                        <p>Cut faster, drill straighter, drive stronger. High-output batteries and rapid chargers so your crew stays productive — never waiting.</p>
                     </div>
                 </a>
-
                 <a href="/Measuring tools.html" class="card">
-                    <img src="/Bosch-laser.jpg" alt="Measuring and layout tools for dead-accurate work" loading="lazy">
+                    <img src="/Bosch-laser.jpg" alt="Measuring and layout tools" loading="lazy">
                     <div class="card-content">
                         <h3>Measuring & Layout</h3>
-                        <p>Dead-accurate levels, lasers, tapes, and squares that eliminate rework and speed layout on base and commercial projects — premium brands like Stabila, Bosch, and Dewalt for precision you can trust.</p>
+                        <p>Dead-accurate levels, lasers, tapes, and squares. Premium brands like Stabila, Bosch, Dewalt — eliminate rework and speed layout.</p>
                     </div>
                 </a>
             </div>
@@ -537,29 +584,29 @@
 
         <section id="accessories">
             <h2>Stay Organized, Compliant & Protected</h2>
-            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Everything your crew needs to work safer, smarter, and faster — delivered free to your site or base.</p>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">
+                Everything your crew needs to work safer, smarter, and faster — delivered free to your site or base.
+            </p>
             <div class="grid">
                 <a href="/Bits-blades.html" class="card">
-                    <img src="/Blades.PNG" alt="Long-lasting bits and blades" loading="lazy">
+                    <img src="/Blades.PNG" alt="Bits and blades" loading="lazy">
                     <div class="card-content">
                         <h3>Bits, Blades & Abrasives</h3>
-                        <p>Stop wasting time on dull consumables. Get blades that stay sharp 3–5× longer — fewer changeouts, less downtime, lower cost per cut.</p>
+                        <p>Stop wasting time on dull consumables. Blades that stay sharp 3–5× longer — fewer changeouts, less downtime.</p>
                     </div>
                 </a>
-
                 <a href="/Storage-organization.html" class="card">
-                    <img src="/Knaack.PNG" alt="Jobsite storage and organization" loading="lazy">
+                    <img src="/Knaack.PNG" alt="Jobsite storage" loading="lazy">
                     <div class="card-content">
                         <h3>Storage & Organization</h3>
-                        <p>End lost tools and theft. Lockable boxes keep your investment secure and your crew rolling from job to job without missing a beat.</p>
+                        <p>End lost tools and theft. Lockable boxes keep your investment secure and your crew moving job to job.</p>
                     </div>
                 </a>
-
                 <a href="/Safety-PPE.html" class="card">
-                    <img src="/IMG_4175.jpg" alt="OSHA-compliant safety gear" loading="lazy">
+                    <img src="/IMG_4175.jpg" alt="Safety gear" loading="lazy">
                     <div class="card-content">
                         <h3>Safety & PPE</h3>
-                        <p>Pass every safety inspection on day one. ANSI/OSHA-compliant gloves, eyewear, hearing protection, hi-vis, and fall protection — in stock and delivered free so your crew stays safe and on schedule.</p>
+                        <p>Pass every inspection first time. ANSI/OSHA-compliant gloves, eyewear, hearing, hi-vis, fall protection — in stock, delivered free.</p>
                     </div>
                 </a>
             </div>
@@ -567,71 +614,64 @@
 
         <section id="ladders">
             <h2>OSHA-Compliant Ladders & Access</h2>
-            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Heavy-duty fiberglass ladders that won’t fail inspections or your crew — Type IA & IAA rated for daily commercial use.</p>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">
+                Heavy-duty fiberglass ladders built for daily commercial use — Type IA & IAA rated, inspection-ready.
+            </p>
             <div class="grid">
                 <a href="/Ladders.html" class="card">
-                    <img src="/Laddercloseup.png" alt="Professional ladders for safe access" loading="lazy">
+                    <img src="/Laddercloseup.png" alt="Professional ladders" loading="lazy">
                     <div class="card-content">
                         <h3>Professional Ladders & Platforms</h3>
-                        <p>Werner ladders that adjust in seconds, support 375+ lbs, and pass base safety checks every time — free delivery direct to your job trailer.</p>
+                        <p>Werner ladders that adjust fast, hold 375+ lbs, and clear base safety checks — delivered free to your trailer.</p>
                     </div>
                 </a>
             </div>
         </section>
 
-        <!-- NEW: Service Areas section -->
-        <section id="service-areas">
-            <h2>Service Areas – Free Delivery Across Hampton Roads</h2>
-            <p style="text-align:center; max-width:900px; margin:0 auto 3rem; color:#555;">
-                Proudly serving contractors throughout the region with fast, free delivery – no minimums, full military access support.
+        <section id="delivery-reach">
+            <h2>Free Delivery – Hampton Roads & Military Sites</h2>
+            <p class="intro-text">
+                Born in Yorktown with full base access. We know these roads, gates, and job sites.<br>
+                No minimums, no fuel fees, no delays — premium tools delivered free to your location.
             </p>
-            <div class="grid">
-                <a href="/yorktown/" class="card">
-                    <img src="/Yorktown.PNG" alt="Yorktown VA – Home base" loading="lazy" style="object-position:center;">
-                    <div class="card-content">
-                        <h3>Yorktown</h3>
-                        <p>Our hometown – Naval Weapons Station, Yorktown Battlefield, local York County projects.</p>
-                    </div>
-                </a>
-
-                <a href="/newport-news/" class="card">
-                    <img src="/Dewalttoolpile.PNG" alt="Newport News VA" loading="lazy">
-                    <div class="card-content">
-                        <h3>Newport News</h3>
-                        <p>Newport News Shipbuilding, Fort Eustis / Joint Base Langley-Eustis, Peninsula builds.</p>
-                    </div>
-                </a>
-
-                <a href="/hampton/" class="card">
-                    <img src="/Bosch-laser.jpg" alt="Hampton VA" loading="lazy">
-                    <div class="card-content">
-                        <h3>Hampton</h3>
-                        <p>Langley AFB / Joint Base Langley-Eustis, NASA Langley, defense & aerospace work.</p>
-                    </div>
-                </a>
-
-                <a href="/williamsburg/" class="card">
-                    <img src="/Pliers.PNG" alt="Williamsburg VA" loading="lazy">
-                    <div class="card-content">
-                        <h3>Williamsburg</h3>
-                        <p>Colonial Williamsburg restoration, William & Mary, historic & commercial projects.</p>
-                    </div>
-                </a>
-
-                <a href="/norfolk/" class="card">
-                    <img src="/Knaack.PNG" alt="Norfolk VA" loading="lazy">
-                    <div class="card-content">
-                        <h3>Norfolk</h3>
-                        <p>Naval Station Norfolk, Norfolk Naval Shipyard, maritime & defense contractors.</p>
-                    </div>
-                </a>
+            <div class="badge-grid">
+                <div class="badge">
+                    <i class="fas fa-anchor"></i>
+                    <h3>Yorktown / Naval Weapons Station</h3>
+                    <p>Home base — fastest response in the 757.</p>
+                </div>
+                <div class="badge">
+                    <i class="fas fa-ship"></i>
+                    <h3>Newport News Shipbuilding</h3>
+                    <p>Supporting the big steel on the Peninsula daily.</p>
+                </div>
+                <div class="badge">
+                    <i class="fas fa-plane"></i>
+                    <h3>Hampton / Joint Base Langley-Eustis</h3>
+                    <p>Airfield & defense projects — covered.</p>
+                </div>
+                <div class="badge">
+                    <i class="fas fa-landmark-dome"></i>
+                    <h3>Williamsburg</h3>
+                    <p>Historic restoration to new builds — we deliver.</p>
+                </div>
+                <div class="badge">
+                    <i class="fas fa-water"></i>
+                    <h3>Norfolk / Naval Station</h3>
+                    <p>Fleet & maritime — on time, every time.</p>
+                </div>
+                <div class="badge" style="flex-basis:100%; max-width:480px;">
+                    <i class="fas fa-truck-fast"></i>
+                    <h3>Entire Hampton Roads + Beyond</h3>
+                    <p>Virginia Beach to Fort Eustis to secure facilities — if you're building here, we're already rolling.</p>
+                </div>
             </div>
         </section>
 
         <section class="reviews-section">
             <div class="reviews-stars">★★★★★</div>
-            <h2>Customer Reviews on Google</h2>
-            <p>See what contractors are saying about us on Google. Your feedback helps us improve and helps others find a reliable supplier.</p>
+            <h2>Contractor Reviews on Google</h2>
+            <p>What real jobsite guys are saying. Your review helps others find a reliable local supplier.</p>
 
             <div class="reviews-rotator">
                 <div class="review-card active">
@@ -644,9 +684,9 @@
                     </div>
                     <div class="review-stars">★★★★★</div>
                     <p class="review-text truncated">
-                        When every local company tapped out and told me the equipment I needed “couldn’t be sourced,” Zach at Yorktown Tools stepped up and proved everyone wrong. This man didn’t just find the tools I needed he made it happen like it was nothing. That’s the kind of hustle you don’t see anymore.<br><br>
-                        Yorktown Tools kept my job site moving, saved me time, and earned a customer for life. If you get the chance to work with Zach, buckle up because you’ll be coming back again and again.<br><br>
-                        10/10. Zero hesitation. Yorktown Tools is the move you won’t be disappointed.
+                        When every local supplier said “can’t be sourced,” Zach made it happen like it was nothing.<br><br>
+                        Yorktown Tools kept my site moving, saved days, and earned a customer for life.<br><br>
+                        10/10. If you get the chance — do it. You won’t be disappointed.
                     </p>
                     <button class="expand-btn">Read more</button>
                 </div>
@@ -661,15 +701,14 @@
                     </div>
                     <div class="review-stars">★★★★★</div>
                     <p class="review-text">
-                        I was searching for a local tool company and needed to place an inquiry for a specific tool. I contacted Zach who reached out to his supplier. The custom order was shipped and delivered to not delay our jobsite project. He followed up to ensure it exceeded my needs. I will use Yorktown Tools in the future. Great service, highly recommend!
+                        Needed a specific tool fast. Zach reached out to suppliers, got it ordered, and delivered without delaying the job.<br><br>
+                        Followed up to make sure it was perfect. Will definitely use Yorktown Tools again. Highly recommend.
                     </p>
                     <button class="expand-btn hidden">Read more</button>
                 </div>
             </div>
 
-            <div class="reviews-buttons" style="margin-top: 1rem;">
-                <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review</a>
-            </div>
+            <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review</a>
 
             <div class="social-icons">
                 <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram">
@@ -685,56 +724,52 @@
         </section>
 
         <section id="swag">
-            <h2>Yorktown Tools: Swag</h2>
+            <h2>Yorktown Tools Swag</h2>
             <p style="max-width:800px;margin:0 auto 2.5rem;color:#555;">
-                Rep the brand that reps you. T-shirts, hats, mugs, stickers — premium gear for true supporters.
+                Rep the brand that reps you. Hats, tees, mugs, stickers — built for the crew.
             </p>
-
             <div class="swag-rotator">
-                <img src="/Yorktowntoolsswag.png" alt="Yorktown Tools Swag Collection – hats, t-shirts, mugs, koozies, and more" loading="lazy">
+                <img src="/Yorktowntoolsswag.png" alt="Yorktown Tools swag collection" loading="lazy">
             </div>
-
-            <a href="/swag.html" class="btn" style="margin-top:2rem;">Shop Swag Now</a>
+            <a href="/swag.html" class="btn" style="margin-top:2rem;">Shop Swag</a>
         </section>
 
         <section id="contact" class="contact-form">
             <h2>Get Your Quote Today</h2>
-            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options in 24 hours or less.</p>
+            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">
+                Tell us what tools and quantities you need — we'll reply with pricing, stock, and free delivery details in ≤24 hours.
+            </p>
             <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
                 <div class="form-group">
                     <label for="name">Name <span class="required">*</span></label>
-                    <input type="text" id="name" name="name" required placeholder="john doe">
-                </div>
-                <div class="form-group">
-                    <label for="company">Company / Organization <span class="required">*</span></label>
-                    <input type="text" id="company" name="company" required placeholder="JDContractors">
+                    <input type="text" id="name" name="name" required placeholder="John Doe">
                 </div>
                 <div class="form-group">
                     <label for="email">Email <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="John@JDContractors.com">
+                    <input type="email" id="email" name="email" required placeholder="john@yourcompany.com">
                 </div>
                 <div class="form-group">
                     <label for="phone">Phone</label>
                     <input type="tel" id="phone" name="phone" placeholder="(757) 555-1234">
                 </div>
                 <div class="form-group">
-                    <label for="delivery">Delivery Location <small>(Optional)</small></label>
-                    <input type="text" id="delivery" name="delivery" placeholder="e.g., Naval Weapons Station Yorktown, Fort Eustis, Naval Station Norfolk, or local site">
+                    <label for="delivery">Delivery Location <small>(optional)</small></label>
+                    <input type="text" id="delivery" name="delivery" placeholder="e.g. Naval Weapons Station, Fort Eustis, job trailer">
                 </div>
                 <div class="form-group">
-                    <label>Requested Items <small>(Optional)</small></label>
+                    <label>Items Needed <small>(optional)</small></label>
                     <div id="item-list">
                         <div class="item-row">
-                            <input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
+                            <input type="text" name="item_name[]" placeholder="Item name or description" class="item-name">
                             <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>
+                            <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
                         </div>
                     </div>
-                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Another Item</button>
+                    <button type="button" class="add-item-btn" onclick="addItem()">+ Add Item</button>
                 </div>
                 <div class="form-group">
-                    <label for="message">Additional Notes</label>
-                    <textarea id="message" name="message" rows="4" placeholder="Urgent delivery? Specific brands? Let us know."></textarea>
+                    <label for="message">Notes / Urgency</label>
+                    <textarea id="message" name="message" rows="4" placeholder="Rush order? Preferred brands? Special instructions?"></textarea>
                 </div>
                 <button type="submit" class="btn">Send Quote Request</button>
             </form>
@@ -742,69 +777,64 @@
     </main>
 
     <footer>
-        <img src="/hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
+        <img src="/hero.png" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
-        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business • SAM.gov Registered</p>
+        <p><strong>UEI:</strong> SMYXDLJDJMZ4  |  <strong>CAGE:</strong> 16LD9</p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
 
     <script>
-        // Sticky nav hide/show on scroll
+        // Sticky nav hide/show
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
             const current = window.pageYOffset;
-            if (current > lastScroll && current > 160) {
-                nav.classList.add('hidden');
-            } else {
-                nav.classList.remove('hidden');
-            }
+            if (current > lastScroll && current > 160) nav.classList.add('hidden');
+            else nav.classList.remove('hidden');
             lastScroll = current;
         });
 
-        // Rotating taglines
+        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
-        let i = 0;
+        let tagIdx = 0;
         setInterval(() => {
-            taglines[i].classList.remove('active');
-            i = (i + 1) % taglines.length;
-            taglines[i].classList.add('active');
+            taglines[tagIdx].classList.remove('active');
+            tagIdx = (tagIdx + 1) % taglines.length;
+            taglines[tagIdx].classList.add('active');
         }, 7000);
 
-        // Top banner rotation
+        // Banner rotator
         const banners = document.querySelectorAll('.banner-text');
-        let j = 0;
+        let bannerIdx = 0;
         setInterval(() => {
-            banners[j].classList.remove('active');
-            j = (j + 1) % banners.length;
-            banners[j].classList.add('active');
+            banners[bannerIdx].classList.remove('active');
+            bannerIdx = (bannerIdx + 1) % banners.length;
+            banners[bannerIdx].classList.add('active');
         }, 2000);
 
         // Reviews rotator
         const reviews = document.querySelectorAll('.review-card');
-        let currentReview = 0;
+        let reviewIdx = 0;
         function rotateReviews() {
-            reviews[currentReview].classList.remove('active');
-            currentReview = (currentReview + 1) % reviews.length;
-            reviews[currentReview].classList.add('active');
+            reviews[reviewIdx].classList.remove('active');
+            reviewIdx = (reviewIdx + 1) % reviews.length;
+            reviews[reviewIdx].classList.add('active');
 
-            const activeText = reviews[currentReview].querySelector('.review-text');
-            const activeBtn = reviews[currentReview].querySelector('.expand-btn');
-            if (activeText.scrollHeight <= 180 + 20) {
-                activeBtn.classList.add('hidden');
-                activeText.classList.remove('truncated');
+            const text = reviews[reviewIdx].querySelector('.review-text');
+            const btn = reviews[reviewIdx].querySelector('.expand-btn');
+            if (text.scrollHeight <= 200) {
+                btn.classList.add('hidden');
+                text.classList.remove('truncated');
             } else {
-                activeBtn.classList.remove('hidden');
-                if (!activeText.classList.contains('expanded')) {
-                    activeText.classList.add('truncated');
-                }
+                btn.classList.remove('hidden');
+                if (!text.classList.contains('expanded')) text.classList.add('truncated');
             }
         }
         setInterval(rotateReviews, 18000);
 
-        // Expand/collapse functionality
+        // Review expand/collapse
         document.querySelectorAll('.expand-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const text = this.previousElementSibling;
@@ -820,12 +850,12 @@
             });
         });
 
-        // Initial check on load for reviews truncation
+        // Initial review truncation check
         document.addEventListener('DOMContentLoaded', () => {
             reviews.forEach(card => {
                 const text = card.querySelector('.review-text');
                 const btn = card.querySelector('.expand-btn');
-                if (text.scrollHeight <= 180 + 20) {
+                if (text.scrollHeight <= 200) {
                     btn.classList.add('hidden');
                     text.classList.remove('truncated');
                 } else {
@@ -834,15 +864,17 @@
             });
         });
 
-        // Add another item row in form
+        // Dynamic item rows in quote form
         function addItem() {
-            const container = document.getElementById('item-list');
+            const list = document.getElementById('item-list');
             const row = document.createElement('div');
             row.className = 'item-row';
-            row.innerHTML = `<input type="text" name="item_name[]" placeholder="Item name / description" class="item-name">
-                             <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
-                             <button type="button" class="remove-item" onclick="this.parentElement.remove()">X</button>`;
-            container.appendChild(row);
+            row.innerHTML = `
+                <input type="text" name="item_name[]" placeholder="Item name or description" class="item-name">
+                <input type="number" name="quantity[]" placeholder="Qty" min="1" value="1" class="item-qty">
+                <button type="button" class="remove-item" onclick="this.parentElement.remove()">×</button>
+            `;
+            list.appendChild(row);
         }
     </script>
 </body>
