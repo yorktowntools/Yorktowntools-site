@@ -43,6 +43,7 @@
             --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             --radius: 20px;
             --shadow: 0 12px 40px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
         }
 
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -239,36 +240,78 @@
         }
         .delivery-section h2 { color: var(--navy); margin-bottom: 2rem; font-size: clamp(2.1rem, 5.5vw, 2.8rem); }
         .intro-text { max-width: 900px; margin: 0 auto 2.5rem; color: #444; font-size: 1.18rem; line-height: 1.7; }
-        .service-list {
-            list-style: none;
-            padding: 0;
+
+        /* ── New town buttons ─────────────────────────────────────── */
+        .town-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
             margin: 3rem auto;
-            max-width: 800px;
-            font-size: 1.2rem;
-            line-height: 1.9;
+            max-width: 1000px;
         }
-        .service-list li {
-            margin-bottom: 1.5rem;
-            position: relative;
-            padding-left: 2.6rem;
-            text-align: left;
-            transition: transform 0.25s ease;
+
+        @media (min-width: 600px) {
+            .town-buttons { grid-template-columns: repeat(2, 1fr); }
         }
-        .service-list li:hover { transform: translateX(8px); }
-        .service-list li i {
-            position: absolute;
-            left: 0;
-            top: 0.4rem;
-            color: var(--red);
-            font-size: 1.6rem;
+
+        @media (min-width: 992px) {
+            .town-buttons { grid-template-columns: repeat(3, 1fr); }
         }
-        .service-list a {
-            color: var(--navy);
-            font-weight: 600;
+
+        .town-btn {
+            display: block;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            padding: 1.8rem 1.6rem;
             text-decoration: none;
+            color: var(--navy);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
-        .service-list a:hover { color: var(--red); text-decoration: underline; }
-        .closing-text { text-align:center; margin-top: 3rem; color:#444; font-size:1.18rem; max-width:900px; margin-left:auto; margin-right:auto; }
+
+        .town-btn:hover,
+        .town-btn:focus {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            outline: none;
+        }
+
+        .town-btn:hover::after {
+            opacity: 1;
+        }
+
+        .town-btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(200,16,46,0.07), rgba(200,16,46,0.02));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .town-btn i {
+            font-size: 2.1rem;
+            color: var(--red);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .town-btn strong {
+            font-size: 1.35rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.6rem;
+        }
+
+        .town-btn span {
+            font-size: 1.05rem;
+            color: #555;
+            line-height: 1.5;
+        }
+        /* ─────────────────────────────────────────────────────────── */
 
         .map-wrapper { margin-top: 4rem; text-align: center; }
         .map-wrapper h3 { margin-bottom: 1.5rem; color: var(--navy); }
@@ -411,7 +454,7 @@
                     <li><strong>Location:</strong> Yorktown, VA (York County)</li>
                     <li><strong>Hours:</strong> Monday–Friday, 8:00 AM – 5:00 PM</li>
                 </ul>
-                <p class="response-promise">We respond promply — for urgent jobsite needs.</p>
+                <p class="response-promise">We respond promptly — for urgent jobsite needs.</p>
                 <div class="social-links">
                     <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram"><img src="Instagram.png" alt="Instagram"></a>
                     <a href="https://www.facebook.com/share/14V4GeG3P67/" target="_blank" aria-label="Facebook"><img src="Facebook.png" alt="Facebook"></a>
@@ -426,13 +469,37 @@
                     We deliver premium tools directly to your job site, trailer, shipyard, hangar, or secure facility — keeping your crew productive and on schedule.
                 </p>
 
-                <ul class="service-list">
-                    <li><i class="fas fa-map-marker-alt"></i> <a href="https://yorktowntools.com/yorktown/">Yorktown</a> – Home base, Naval Weapons Station Yorktown, Cheatham Annex, York County projects, historic sites</li>
-                    <li><i class="fas fa-map-marker-alt"></i> <a href="https://yorktowntools.com/newport-news/">Newport News</a> – Newport News Shipbuilding, Fort Eustis / Joint Base Langley-Eustis, Peninsula builds</li>
-                    <li><i class="fas fa-map-marker-alt"></i> <a href="https://yorktowntools.com/hampton/">Hampton</a> – Langley AFB / Joint Base, NASA Langley, defense & aerospace contractors</li>
-                    <li><i class="fas fa-map-marker-alt"></i> <a href="https://yorktowntools.com/williamsburg/">Williamsburg</a> – Colonial Williamsburg restoration, William & Mary, historic projects</li>
-                    <li><i class="fas fa-map-marker-alt"></i> <a href="https://yorktowntools.com/norfolk/">Norfolk</a> – Naval Station Norfolk, Norfolk Naval Shipyard, maritime & port projects</li>
-                </ul>
+                <div class="town-buttons">
+                    <a href="https://yorktowntools.com/yorktown/" class="town-btn">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>Yorktown</strong>
+                        <span>Home base, Naval Weapons Station Yorktown, Cheatham Annex, York County projects, historic sites</span>
+                    </a>
+
+                    <a href="https://yorktowntools.com/newport-news/" class="town-btn">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>Newport News</strong>
+                        <span>Newport News Shipbuilding, Fort Eustis / Joint Base Langley-Eustis, Peninsula builds</span>
+                    </a>
+
+                    <a href="https://yorktowntools.com/hampton/" class="town-btn">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>Hampton</strong>
+                        <span>Langley AFB / Joint Base, NASA Langley, defense & aerospace contractors</span>
+                    </a>
+
+                    <a href="https://yorktowntools.com/williamsburg/" class="town-btn">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>Williamsburg</strong>
+                        <span>Colonial Williamsburg restoration, William & Mary, historic projects</span>
+                    </a>
+
+                    <a href="https://yorktowntools.com/norfolk/" class="town-btn">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>Norfolk</strong>
+                        <span>Naval Station Norfolk, Norfolk Naval Shipyard, maritime & port projects</span>
+                    </a>
+                </div>
 
                 <p class="closing-text">
                     And beyond — including Virginia Beach, Fort Story, all of the Peninsula, and surrounding areas. If you're building in Hampton Roads, we're already on the way with free delivery.
