@@ -50,7 +50,7 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            line-height:1.65;
+            line-height:1.6;
             color:#212529;
             background: var(--white);
             min-height: 100vh;
@@ -75,10 +75,10 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.9rem 1rem;
+            padding: 0.8rem 1rem;
             font-weight: 700;
-            font-size: 1.05rem;
-            min-height: 52px;
+            font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+            min-height: 48px;
             position: relative;
             overflow: hidden;
         }
@@ -97,28 +97,31 @@
         .gov-ids-header {
             background: var(--navy);
             color: var(--white);
-            padding: 0.6rem 0;
-            font-size: 0.875rem;
+            padding: 0.5rem 0;
+            font-size: clamp(0.8rem, 2.8vw, 0.875rem);
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .gov-items {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1.4rem;
-            white-space: nowrap;
-            padding: 0.5rem 1rem;
-            flex-wrap: wrap;
+            gap: clamp(0.8rem, 2vw, 1.4rem);
+            padding: 0.4rem 1rem;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
+        .gov-items::-webkit-scrollbar { display: none; }
         .gov-items strong { color: #ffeb3b; }
 
         .logo-header {
             text-align: center;
-            padding: 1.6rem 1rem 1rem;
+            padding: clamp(1.2rem, 4vw, 1.6rem) 1rem 1rem;
             background: var(--white);
         }
-        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+        .logo-header img { max-width: 260px; width: 90%; height: auto; }
 
         nav {
             background: var(--navy);
@@ -135,8 +138,8 @@
             overflow-x: auto;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
-            padding: 0.9rem 1rem;
-            gap: 0.9rem;
+            padding: 0.8rem 1rem;
+            gap: 0.8rem;
         }
         .mobile-nav::-webkit-scrollbar { display: none; }
 
@@ -146,8 +149,8 @@
             color: var(--white);
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.96rem;
-            padding: 0.7rem 1.2rem;
+            font-size: clamp(0.9rem, 3.2vw, 0.96rem);
+            padding: 0.6rem 1.1rem;
             border-radius: 30px;
             white-space: nowrap;
             transition: var(--transition);
@@ -162,12 +165,12 @@
                 justify-content: center;
                 overflow-x: visible;
                 flex-wrap: wrap;
-                gap: 1.1rem;
-                padding: 1.1rem 0;
+                gap: 1rem;
+                padding: 1rem 0;
             }
             .mobile-nav a {
                 background: transparent;
-                padding: 0.7rem 1.2rem;
+                padding: 0.6rem 1.1rem;
             }
             .mobile-nav a:hover, .mobile-nav a.active {
                 background: rgba(255,255,255,0.18);
@@ -175,53 +178,53 @@
             }
         }
 
-        main { max-width:1200px; margin:0 auto; padding:0 1.5rem; }
+        main { max-width:1200px; margin:0 auto; padding:0 1rem; }
 
         .hero {
             text-align:center;
-            padding: clamp(5rem, 15vw, 9rem) 1rem 5rem;
+            padding: clamp(3.5rem, 12vw, 7rem) 1rem 3.5rem;
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
             border-radius:var(--radius);
-            margin: 3rem 0;
+            margin: 2rem 0;
             box-shadow: var(--shadow);
         }
-        .hero h1 { font-size: clamp(2.8rem, 9vw, 4.2rem); margin-bottom:1.4rem; color: var(--navy); font-weight: 800; }
-        .hero p { font-size: clamp(1.25rem, 5vw, 1.55rem); max-width:900px; margin:0 auto 2.5rem; color:#495057; }
+        .hero h1 { font-size: clamp(2.4rem, 8vw, 4rem); margin-bottom:1rem; color: var(--navy); font-weight: 800; }
+        .hero p { font-size: clamp(1.1rem, 4vw, 1.4rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
 
         .contact-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 3rem;
-            margin: 5rem 0;
+            gap: 2.5rem;
+            margin: 3rem 0;
         }
         @media (min-width: 992px) {
-            .contact-grid { grid-template-columns: 1fr 1fr; }
+            .contact-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
         }
 
         .contact-card {
             background: var(--navy);
             color: white;
-            padding: 3.5rem 2.5rem;
+            padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2.5rem);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             text-align: center;
         }
-        .contact-card h2 { color: white; margin-bottom: 2.5rem; font-size: clamp(2rem, 5vw, 2.6rem); }
-        .contact-card ul { list-style: none; font-size: 1.2rem; }
-        .contact-card li { margin-bottom: 1.6rem; }
+        .contact-card h2 { color: white; margin-bottom: 2rem; font-size: clamp(1.8rem, 5vw, 2.4rem); }
+        .contact-card ul { list-style: none; font-size: clamp(1rem, 3.5vw, 1.15rem); padding: 0; }
+        .contact-card li { margin-bottom: 1.4rem; }
         .contact-card a { color: #ffeb3b; text-decoration: none; font-weight: 600; }
         .contact-card a:hover { text-decoration: underline; opacity: 0.9; }
-        .response-promise { font-size: 1.1rem; margin: 2rem 0; font-style: italic; color: #d4e4ff; }
+        .response-promise { font-size: clamp(0.95rem, 3vw, 1.05rem); margin: 1.8rem 0; font-style: italic; color: #d4e4ff; }
 
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 2rem;
-            margin-top: 3rem;
+            gap: 1.8rem;
+            margin-top: 2.5rem;
         }
         .social-links a {
-            width: 48px;
-            height: 48px;
+            width: clamp(42px, 10vw, 48px);
+            height: clamp(42px, 10vw, 48px);
             background: rgba(255,255,255,0.15);
             border-radius: 12px;
             display: flex;
@@ -232,27 +235,26 @@
         .social-links a:hover { background: var(--red); transform: translateY(-4px); }
         .social-links img { width: 60%; height: auto; }
 
-        /* ── Updated free delivery section ─────────────────────────────────────── */
         .delivery-section {
             background: var(--light);
-            padding: clamp(3rem, 6vw, 4.5rem) 1.5rem;
+            padding: clamp(2.5rem, 6vw, 4rem) 1.2rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             text-align: center;
-            margin: 3rem auto;
+            margin: 2.5rem auto;
             max-width: 1100px;
         }
 
         .delivery-section h2 {
             color: var(--navy);
-            margin-bottom: 1.8rem;
-            font-size: clamp(1.9rem, 5vw, 2.4rem);
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.8rem, 5.5vw, 2.4rem);
         }
 
         .delivery-section p {
-            font-size: 1.18rem;
+            font-size: clamp(1.05rem, 3.8vw, 1.18rem);
             color: #444;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
             max-width: 900px;
             margin-left: auto;
             margin-right: auto;
@@ -261,21 +263,28 @@
 
         .delivery-cities {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.2rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
             max-width: 1000px;
-            margin: 0 auto 2rem;
+            margin: 0 auto 1.8rem;
+        }
+
+        @media (max-width: 480px) {
+            .delivery-cities {
+                grid-template-columns: 1fr;
+                gap: 0.9rem;
+            }
         }
 
         .delivery-cities a {
             background: white;
-            padding: 1.1rem 1.4rem;
+            padding: clamp(0.9rem, 3vw, 1.1rem) 1.2rem;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             text-decoration: none;
             color: var(--navy);
             font-weight: 600;
-            font-size: 1.05rem;
+            font-size: clamp(0.95rem, 3.5vw, 1.05rem);
             transition: var(--transition);
             border: 1px solid rgba(200,16,46,0.12);
         }
@@ -288,38 +297,37 @@
         }
 
         .closing-text {
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 3.5vw, 1.1rem);
             color: #555;
             max-width: 900px;
-            margin: 0 auto 3rem;
+            margin: 0 auto 2.5rem;
         }
-        /* ─────────────────────────────────────────────────────────── */
 
-        .map-wrapper { margin-top: 4rem; text-align: center; }
-        .map-wrapper h3 { margin-bottom: 1.5rem; color: var(--navy); }
+        .map-wrapper { margin-top: 3rem; text-align: center; }
+        .map-wrapper h3 { margin-bottom: 1.2rem; color: var(--navy); font-size: clamp(1.4rem, 4.5vw, 1.7rem); }
         .map-wrapper iframe {
             width: 100%;
-            height: 450px;
+            height: clamp(300px, 60vw, 450px);
             border: 0;
             border-radius: var(--radius);
         }
 
         .quote-form {
             background: var(--light);
-            padding: 3.5rem 2.5rem;
+            padding: clamp(2.5rem, 6vw, 3.5rem) clamp(1.2rem, 4vw, 2.5rem);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            margin: 5rem 0;
+            margin: 4rem 0;
         }
-        .quote-form h2 { color: var(--navy); margin-bottom: 2rem; text-align: center; }
-        .form-group { margin-bottom: 1.8rem; }
-        .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.7rem; display:block; }
+        .quote-form h2 { color: var(--navy); margin-bottom: 1.8rem; text-align: center; font-size: clamp(1.8rem, 5.5vw, 2.4rem); }
+        .form-group { margin-bottom: 1.6rem; }
+        .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; font-size: clamp(0.95rem, 3.2vw, 1rem); }
         .required { color:var(--red); }
         .quote-form input, .quote-form textarea {
-            padding:1.4rem;
+            padding:1.2rem;
             border:2px solid #dee2e6;
             border-radius:14px;
-            font-size:1.1rem;
+            font-size: clamp(1rem, 3.5vw, 1.1rem);
             width:100%;
             transition:border 0.3s;
         }
@@ -331,15 +339,15 @@
         .btn {
             display:block;
             width:100%;
-            max-width:400px;
-            margin:2rem auto 0;
+            max-width: clamp(280px, 70vw, 400px);
+            margin:1.8rem auto 0;
             background:var(--red);
             color:#fff;
-            padding:1.4rem 3rem;
+            padding:1.2rem 2.5rem;
             border:none;
             border-radius:50px;
             font-weight:700;
-            font-size:1.3rem;
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
             cursor:pointer;
             transition:var(--transition);
             box-shadow:0 10px 30px rgba(200,16,46,0.3);
@@ -350,35 +358,42 @@
             background: var(--navy);
             color: var(--white);
             text-align:center;
-            padding:7rem 1.5rem 4rem;
-            margin-top:10rem;
+            padding: clamp(5rem, 12vw, 7rem) 1rem 3rem;
+            margin-top:8rem;
         }
-        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3.5rem; opacity: 0.95; }
+        .footer-artwork { max-width: 900px; width: 92%; margin: 0 auto 2.5rem; opacity: 0.95; }
         footer a { color: #ffffff !important; text-decoration: underline; }
         footer a:hover { opacity: 0.85; }
+        footer p { margin: 0.6rem 0; font-size: clamp(0.9rem, 3vw, 1rem); }
 
         .call-button {
             position: fixed;
-            right: clamp(18px, 4vw, 28px);
-            bottom: clamp(18px, 4vw, 28px);
-            width: clamp(80px, 17vw, 96px);
-            height: clamp(80px, 17vw, 96px);
+            right: clamp(14px, 4vw, 24px);
+            bottom: clamp(14px, 4vw, 24px);
+            width: clamp(64px, 16vw, 88px);
+            height: clamp(64px, 16vw, 88px);
             background: var(--red);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 35px rgba(200,16,46,0.55);
+            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
             z-index: 999;
-            animation: pulse 2.8s infinite;
+            animation: pulse 2.6s infinite;
             cursor: pointer;
         }
-        .call-button img { width: 66%; height: auto; border-radius: 50%; border: 4px solid var(--white); }
+        .call-button img { width: 64%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
 
         @keyframes pulse {
             0%   { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); }
-            70%  { box-shadow: 0 0 0 30px rgba(200,16,46,0); }
+            70%  { box-shadow: 0 0 0 25px rgba(200,16,46,0); }
             100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); }
+        }
+
+        @media (max-width: 480px) {
+            main { padding: 0 0.8rem; }
+            .hero { margin: 1.5rem 0; padding: 3rem 0.8rem 2.5rem; }
+            .quote-form { padding: 2rem 1rem; margin: 3rem 0; }
         }
     </style>
 </head>
@@ -463,14 +478,14 @@
                 <div class="map-wrapper">
                     <h3>Our Service Area</h3>
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d204800!2d-76.85!3d37.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b16f1a8b4c5d3d%3A0x4e0b0c0b0b0b0b0b!2sHampton%20Roads%2C%20Virginia!5e0!3m2!1sen!2sus!4v1737000000000!5m2!1sen!2sus" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    <p style="margin-top:1.2rem; color:#555; font-size:0.95rem;">Coverage: Full Hampton Roads + military installations</p>
+                    <p style="margin-top:1rem; color:#555; font-size:0.9rem;">Coverage: Full Hampton Roads + military installations</p>
                 </div>
             </section>
         </div>
 
         <section class="quote-form">
             <h2>Request a Quote</h2>
-            <p style="text-align:center; max-width:800px; margin:0 auto 3rem; color:#555;">
+            <p style="text-align:center; max-width:800px; margin:0 auto 2rem; color:#555; font-size: clamp(1rem, 3.5vw, 1.1rem);">
                 Tell us what you need — we'll get back with pricing, availability, and free delivery details quickly (usually same day).
             </p>
             <form action="https://formspree.io/f/xanlvyan" method="POST">
@@ -510,7 +525,7 @@
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
             const current = window.pageYOffset;
-            if (current > lastScroll && current > 180) nav.classList.add('hidden');
+            if (current > lastScroll && current > 140) nav.classList.add('hidden');
             else nav.classList.remove('hidden');
             lastScroll = current;
         });
