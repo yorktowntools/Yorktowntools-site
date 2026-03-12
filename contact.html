@@ -232,84 +232,66 @@
         .social-links a:hover { background: var(--red); transform: translateY(-4px); }
         .social-links img { width: 60%; height: auto; }
 
+        /* ── Updated free delivery section ─────────────────────────────────────── */
         .delivery-section {
             background: var(--light);
-            padding: 3.5rem 2.5rem;
+            padding: clamp(3rem, 6vw, 4.5rem) 1.5rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-        }
-        .delivery-section h2 { color: var(--navy); margin-bottom: 2rem; font-size: clamp(2.1rem, 5.5vw, 2.8rem); }
-        .intro-text { max-width: 900px; margin: 0 auto 2.5rem; color: #444; font-size: 1.18rem; line-height: 1.7; }
-
-        /* ── New town buttons ─────────────────────────────────────── */
-        .town-buttons {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
+            text-align: center;
             margin: 3rem auto;
+            max-width: 1100px;
+        }
+
+        .delivery-section h2 {
+            color: var(--navy);
+            margin-bottom: 1.8rem;
+            font-size: clamp(1.9rem, 5vw, 2.4rem);
+        }
+
+        .delivery-section p {
+            font-size: 1.18rem;
+            color: #444;
+            margin-bottom: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        .delivery-cities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
             max-width: 1000px;
+            margin: 0 auto 2rem;
         }
 
-        @media (min-width: 600px) {
-            .town-buttons { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (min-width: 992px) {
-            .town-buttons { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        .town-btn {
-            display: block;
+        .delivery-cities a {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-            padding: 1.8rem 1.6rem;
+            padding: 1.1rem 1.4rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             text-decoration: none;
             color: var(--navy);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .town-btn:hover,
-        .town-btn:focus {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-            outline: none;
-        }
-
-        .town-btn:hover::after {
-            opacity: 1;
-        }
-
-        .town-btn::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(200,16,46,0.07), rgba(200,16,46,0.02));
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .town-btn i {
-            font-size: 2.1rem;
-            color: var(--red);
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .town-btn strong {
-            font-size: 1.35rem;
-            font-weight: 700;
-            display: block;
-            margin-bottom: 0.6rem;
-        }
-
-        .town-btn span {
+            font-weight: 600;
             font-size: 1.05rem;
+            transition: var(--transition);
+            border: 1px solid rgba(200,16,46,0.12);
+        }
+
+        .delivery-cities a:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(200,16,46,0.2);
+        }
+
+        .closing-text {
+            font-size: 1.1rem;
             color: #555;
-            line-height: 1.5;
+            max-width: 900px;
+            margin: 0 auto 3rem;
         }
         /* ─────────────────────────────────────────────────────────── */
 
@@ -463,52 +445,25 @@
             </section>
 
             <section class="delivery-section" id="delivery">
-                <h2>Free Delivery Across Hampton Roads & Military Sites</h2>
-                <p class="intro-text">
-                    As a veteran-owned supplier based right here in Yorktown, we provide fast, free delivery throughout the entire Hampton Roads region — no minimums, no fuel fees, and full military/base access support.<br><br>
-                    We deliver premium tools directly to your job site, trailer, shipyard, hangar, or secure facility — keeping your crew productive and on schedule.
-                </p>
-
-                <div class="town-buttons">
-                    <a href="https://yorktowntools.com/yorktown/" class="town-btn">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Yorktown</strong>
-                        <span>Home base, Naval Weapons Station Yorktown, Cheatham Annex, York County projects, historic sites</span>
-                    </a>
-
-                    <a href="https://yorktowntools.com/newport-news/" class="town-btn">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Newport News</strong>
-                        <span>Newport News Shipbuilding, Fort Eustis / Joint Base Langley-Eustis, Peninsula builds</span>
-                    </a>
-
-                    <a href="https://yorktowntools.com/hampton/" class="town-btn">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Hampton</strong>
-                        <span>Langley AFB / Joint Base, NASA Langley, defense & aerospace contractors</span>
-                    </a>
-
-                    <a href="https://yorktowntools.com/williamsburg/" class="town-btn">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Williamsburg</strong>
-                        <span>Colonial Williamsburg restoration, William & Mary, historic projects</span>
-                    </a>
-
-                    <a href="https://yorktowntools.com/norfolk/" class="town-btn">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Norfolk</strong>
-                        <span>Naval Station Norfolk, Norfolk Naval Shipyard, maritime & port projects</span>
-                    </a>
+                <h2>Free Delivery Across Hampton Roads</h2>
+                <p>Yorktown Tools delivers free throughout the entire Hampton Roads region — fast, no minimums, straight to your jobsite, trailer, or base.</p>
+                <div class="delivery-cities">
+                    <a href="https://yorktowntools.com/yorktown/">Yorktown</a>
+                    <a href="https://yorktowntools.com/newport-news/">Newport News</a>
+                    <a href="https://yorktowntools.com/hampton/">Hampton</a>
+                    <a href="https://yorktowntools.com/williamsburg/">Williamsburg</a>
+                    <a href="https://yorktowntools.com/norfolk/">Norfolk</a>
+                    <a href="https://yorktowntools.com/gloucester/">Gloucester</a>
+                    <a href="https://yorktowntools.com/portsmouth/">Portsmouth</a>
+                    <a href="https://yorktowntools.com/chesapeake/">Chesapeake</a>
+                    <a href="https://yorktowntools.com/virginiabeach/">Virginia Beach</a>
                 </div>
-
-                <p class="closing-text">
-                    And beyond — including Virginia Beach, Fort Story, all of the Peninsula, and surrounding areas. If you're building in Hampton Roads, we're already on the way with free delivery.
-                </p>
+                <p class="closing-text">Including military installations, shipyards, hangars, and job sites across the region — we're already on the way with free delivery.</p>
 
                 <div class="map-wrapper">
                     <h3>Our Service Area</h3>
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d204800!2d-76.85!3d37.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b16f1a8b4c5d3d%3A0x4e0b0c0b0b0b0b0b!2sHampton%20Roads%2C%20Virginia!5e0!3m2!1sen!2sus!4v1737000000000!5m2!1sen!2sus" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    <p style="margin-top:1.2rem; color:#555; font-size:0.95rem;">Coverage: Richmond to Virginia Beach + military installations</p>
+                    <p style="margin-top:1.2rem; color:#555; font-size:0.95rem;">Coverage: Full Hampton Roads + military installations</p>
                 </div>
             </section>
         </div>
