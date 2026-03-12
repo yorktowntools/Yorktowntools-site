@@ -183,6 +183,59 @@
         .btn { display:inline-block; background:var(--red); color:#fff; padding:1.3rem 3.4rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1.25rem; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
 
+        #free-delivery {
+            background: var(--light);
+            padding: clamp(3rem, 6vw, 4.5rem) 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin: 3rem auto;
+            max-width: 1100px;
+        }
+
+        #free-delivery h2 {
+            color: var(--navy);
+            margin-bottom: 1.8rem;
+            font-size: clamp(1.9rem, 5vw, 2.4rem);
+        }
+
+        #free-delivery p {
+            font-size: 1.18rem;
+            color: #444;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .delivery-cities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .delivery-cities a {
+            background: white;
+            padding: 1.1rem 1.4rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: var(--navy);
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: var(--transition);
+            border: 1px solid rgba(200,16,46,0.12);
+        }
+
+        .delivery-cities a:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(200,16,46,0.2);
+        }
+
         #free-resources { background: var(--navy); color: white; padding: 3rem 1.5rem; border-radius: var(--radius); margin: 4rem auto; text-align: center; }
         #free-resources h2 { color: white; margin-bottom: 2rem; font-size: clamp(1.9rem, 5vw, 2.4rem); }
         .free-resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto; }
@@ -473,7 +526,7 @@
     <main>
         <section id="home" class="hero">
             <h1>Tools Worth Fighting For</h1>
-            <p>Free delivery throughout Hampton Roads – serving Yorktown, Newport News, Hampton, Williamsburg, Norfolk & beyond from Virginia Beach to Richmond.</p>
+            <p>Free delivery throughout Hampton Roads – serving Yorktown, Newport News, Hampton, Williamsburg, Norfolk, Virginia Beach & beyond.</p>
             <div class="tagline-rotator">
                 <div class="tagline active">
                     Stop hunting tools for hours.<br>Get back to the job fast — free quote + free delivery.
@@ -486,6 +539,23 @@
                 </div>
             </div>
             <a href="#contact" class="btn">Get Your Quote Now</a>
+        </section>
+
+        <!-- NEW FREE DELIVERY SECTION -->
+        <section id="free-delivery">
+            <h2>Free Delivery Across Hampton Roads</h2>
+            <p>Yorktown Tools delivers free throughout the entire Hampton Roads region — fast, no minimums, straight to your jobsite, trailer, or base.</p>
+            <div class="delivery-cities">
+                <a href="https://yorktowntools.com/yorktown/">Yorktown</a>
+                <a href="https://yorktowntools.com/newport-news/">Newport News</a>
+                <a href="https://yorktowntools.com/hampton/">Hampton</a>
+                <a href="https://yorktowntools.com/williamsburg/">Williamsburg</a>
+                <a href="https://yorktowntools.com/norfolk/">Norfolk</a>
+                <a href="https://yorktowntools.com/gloucester/">Gloucester</a>
+                <a href="https://yorktowntools.com/portsmouth/">Portsmouth</a>
+                <a href="https://yorktowntools.com/chesapeake/">Chesapeake</a>
+                <a href="https://yorktowntools.com/virginiabeach/">Virginia Beach</a>
+            </div>
         </section>
 
         <section id="free-resources">
@@ -531,6 +601,8 @@
                 </a>
             </div>
         </section>
+
+        <!-- Rest of your sections remain unchanged... -->
 
         <section id="accessories">
             <h2>Stay Organized, Compliant & Protected</h2>
