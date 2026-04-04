@@ -86,6 +86,8 @@
             transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 1s ease;
+            font-weight: 600;           /* Slightly thinner */
+            font-size: 1.02rem;         /* Reduced thickness */
         }
         .banner-text.active { opacity: 1; }
 
@@ -100,7 +102,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1.4rem;
+            gap: 1.6rem;
             white-space: nowrap;
             padding: 0.45rem 1rem;
             flex-wrap: wrap;
@@ -425,17 +427,18 @@
         <img src="/Yorktown.PNG" alt="George">
     </a>
 
+    <!-- Red banner with white phone number -->
     <div class="top-red-banner">
-        <div class="banner-text active">757-940-5171</div>
-        <div class="banner-text">Free Delivery.</div>
-        <div class="banner-text">Free Quote.</div>
+        <div class="banner-text active" style="color:#ffffff !important;">757-940-5171</div>
+        <div class="banner-text" style="color:#ffffff !important;">Free Delivery.</div>
+        <div class="banner-text" style="color:#ffffff !important;">Free Quote.</div>
     </div>
 
+    <!-- Gov IDs - UEI and CAGE only, on one clean line -->
     <div class="gov-ids-header">
         <div class="gov-items">
             <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
             <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.GOV</strong></span>
         </div>
     </div>
 
@@ -472,7 +475,6 @@
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
 
-        <!-- Free Resources - Without "Can We Pour Today" -->
         <section id="free-resources">
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
@@ -692,7 +694,7 @@
         <img src="/hero.png" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:#ffffff !important;">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business • SAM.GOV</p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4  |  <strong>CAGE:</strong> 16LD9</p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
@@ -717,7 +719,7 @@
             taglines[tagIdx].classList.add('active');
         }, 7000);
 
-        // Banner rotator - slowed to 4 seconds
+        // Banner rotator - 4 seconds
         const banners = document.querySelectorAll('.banner-text');
         let bannerIdx = 0;
         setInterval(() => {
@@ -726,7 +728,7 @@
             banners[bannerIdx].classList.add('active');
         }, 4000);
 
-        // Reviews rotator (5 reviews)
+        // Reviews rotator
         const reviews = document.querySelectorAll('.review-card');
         let reviewIdx = 0;
         function rotateReviews() {
@@ -736,7 +738,7 @@
         }
         setInterval(rotateReviews, 15000);
 
-        // Dynamic item rows in quote form
+        // Dynamic item rows
         function addItem() {
             const list = document.getElementById('item-list');
             const row = document.createElement('div');
@@ -749,7 +751,6 @@
             list.appendChild(row);
         }
 
-        // Initial setup
         document.addEventListener('DOMContentLoaded', () => {
             if (reviews.length > 0) reviews[0].classList.add('active');
         });
