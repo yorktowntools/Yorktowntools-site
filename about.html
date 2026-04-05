@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="About Yorktown Tools – Veteran-owned supplier of premium tools with free job-site delivery for commercial contractors and government agencies in Hampton Roads.">
-    <meta name="keywords" content="veteran owned tools, Yorktown Tools, Zachary Barber, commercial contractor tools, government contractor tools, free delivery Hampton Roads">
+    <meta name="description" content="About Yorktown Tools – Veteran-owned supplier of premium tools with free job-site delivery. Founded by U.S. Army veteran Zachary Barber. Read Founder Insights & Lessons from the first six months.">
+    <meta name="keywords" content="veteran owned tools, Yorktown Tools, Zachary Barber, commercial contractor tools, government contractor tools, free delivery Hampton Roads, founder insights">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="About Yorktown Tools | Veteran-Owned Tool Supplier">
-    <meta property="og:description" content="Founded by 20-year U.S. Army veteran Zachary Barber. Free quotes, free delivery, zero hassle for contractors across Hampton Roads.">
+    <meta property="og:description" content="Founded by 20-year U.S. Army veteran Zachary Barber. Free quotes, free delivery, zero hassle. Read real Founder Insights & Lessons from the first six months.">
     <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
     <meta property="og:url" content="https://yorktowntools.com/about.html">
     <meta property="og:type" content="website">
@@ -23,6 +23,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
         :root {
             --navy: #0b1e3f;
@@ -36,7 +38,7 @@
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
         body {
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             line-height:1.65;
             color:#212529;
             background: var(--white);
@@ -62,10 +64,10 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.8rem 1rem;
+            padding: 0.85rem 1rem;
             font-weight: 700;
             font-size: 1.05rem;
-            min-height: 52px;
+            min-height: 54px;
             position: relative;
             overflow: hidden;
         }
@@ -77,6 +79,10 @@
             transform: translate(-50%, -50%);
             opacity: 0;
             transition: opacity 1s ease;
+            font-weight: 600;
+            font-size: 1.02rem;
+            color: #ffffff !important;
+            text-decoration: none;
         }
         .banner-text.active { opacity: 1; }
 
@@ -84,23 +90,23 @@
             background: var(--navy);
             color: var(--white);
             padding: 0.5rem 0;
-            font-size: 0.86rem;
+            font-size: 0.87rem;
             font-weight: 500;
         }
         .gov-items {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 1.3rem;
+            gap: 1.6rem;
             white-space: nowrap;
-            padding: 0.4rem 1rem;
+            padding: 0.45rem 1rem;
             flex-wrap: wrap;
         }
         .gov-items strong { color: #ffeb3b; }
 
         .logo-header {
             text-align: center;
-            padding: 1.4rem 1rem 1rem;
+            padding: 1.5rem 1rem 1rem;
             background: var(--white);
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
@@ -111,15 +117,16 @@
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        nav.hidden { transform: translateY(-100%); }
 
         .mobile-nav {
             display: flex;
             overflow-x: auto;
             scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-            padding: 0.75rem 0;
-            gap: 0.8rem;
+            padding: 0.9rem 0.8rem;
+            gap: 0.75rem;
         }
         .mobile-nav::-webkit-scrollbar { display: none; }
 
@@ -130,7 +137,7 @@
             text-decoration: none;
             font-weight: 600;
             font-size: 0.94rem;
-            padding: 0.65rem 1.1rem;
+            padding: 0.72rem 1.15rem;
             border-radius: 30px;
             white-space: nowrap;
             transition: var(--transition);
@@ -145,12 +152,13 @@
                 justify-content: center;
                 overflow-x: visible;
                 flex-wrap: wrap;
-                gap: 1rem;
-                padding: 1rem 0;
+                gap: 1.1rem;
+                padding: 1.2rem 0;
             }
             .mobile-nav a {
                 background: transparent;
-                padding: 0.6rem 1rem;
+                padding: 0.7rem 1.2rem;
+                font-size: 1rem;
             }
             .mobile-nav a:hover, .mobile-nav a.active {
                 background: rgba(255,255,255,0.18);
@@ -186,13 +194,51 @@
             font-weight: 800;
         }
 
-        .about-content { margin: 4rem 0; }
+        .about-content { margin: 4rem 0; text-align: center; font-size: 1.15rem; max-width: 1000px; margin-left: auto; margin-right: auto; }
 
-        .founder-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start; margin: 5rem 0; }
-        .founder-photo { max-width: 380px; border-radius: 16px; border: 6px solid var(--navy); box-shadow: var(--shadow); justify-self: center; width: 100%; height: auto; }
-        .founder-bio { text-align: left; }
+        .founder-section { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 4rem; 
+            align-items: start; 
+            margin: 5rem 0; 
+        }
+        .founder-photo { 
+            max-width: 380px; 
+            border-radius: 16px; 
+            border: 6px solid var(--navy); 
+            box-shadow: var(--shadow); 
+            width: 100%; 
+            height: auto; 
+        }
         .founder-bio h3 { color: var(--navy); font-size: 1.8rem; margin-bottom: 0.8rem; }
-        .founder-bio p { font-size: 1.1rem; margin-bottom: 1.4rem; }
+        .founder-bio p { font-size: 1.1rem; margin-bottom: 1.4rem; line-height: 1.65; }
+
+        .insights-section {
+            background: var(--light);
+            padding: 3.5rem 2rem;
+            border-radius: var(--radius);
+            margin: 5rem 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .insights-section h2 { color: var(--navy); margin-bottom: 1.5rem; }
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.8rem;
+            max-width: 1000px;
+            margin: 2rem auto 0;
+        }
+        .insight-card {
+            background: var(--white);
+            padding: 1.8rem 1.4rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: var(--transition);
+        }
+        .insight-card:hover { transform: translateY(-6px); }
+        .insight-card h3 { color: var(--navy); margin-bottom: 0.8rem; }
 
         .promise-box {
             background: var(--light);
@@ -204,18 +250,30 @@
             max-width: 900px;
             box-shadow: var(--shadow);
         }
-        .promise-box strong {
-            display: block;
-            font-size: 1.4rem;
-            margin-bottom: 0.8rem;
-            color: var(--navy);
+
+        .commitment-box { 
+            background: var(--light); 
+            padding: 3rem; 
+            border-radius: var(--radius); 
+            border-left: 10px solid var(--red); 
+            text-align: center; 
+            margin: 5rem auto; 
+            max-width: 900px; 
         }
-
-        .commitment-box { background: var(--light); padding: 3rem; border-radius: var(--radius); border-left: 10px solid var(--red); text-align: center; margin: 5rem auto; max-width: 900px; }
         .commitment-box h3 { color: var(--navy); margin-bottom: 1.5rem; font-size: 2rem; }
-        .commitment-box p { font-size: 1.25rem; line-height: 1.6; }
 
-        .btn { display:inline-block; background:var(--red); color:#fff; padding:1.3rem 3.4rem; border-radius:50px; text-decoration:none; font-weight:700; font-size:1.25rem; transition:var(--transition); box-shadow:0 10px 30px rgba(200,16,46,0.3); margin: 2rem auto; }
+        .btn { 
+            display:inline-block; 
+            background:var(--red); 
+            color:#fff; 
+            padding:1.3rem 3.4rem; 
+            border-radius:50px; 
+            text-decoration:none; 
+            font-weight:700; 
+            font-size:1.25rem; 
+            transition:var(--transition); 
+            box-shadow:0 10px 30px rgba(200,16,46,0.3); 
+        }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
 
         .call-button {
@@ -236,12 +294,21 @@
             text-decoration: none;
         }
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } }
+        @keyframes pulse { 
+            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
+            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
+            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
+        }
 
-        footer { background: var(--navy); color: var(--white); text-align:center; padding: 6.5rem 1rem 3rem; margin-top:8rem; }
+        footer { 
+            background: var(--navy); 
+            color: var(--white); 
+            text-align:center; 
+            padding: 6.5rem 1rem 3rem; 
+            margin-top:8rem; 
+        }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
-        footer a { color: #ffffff !important; text-decoration: underline; }
-        footer a:hover { opacity: 0.85; }
+        footer a { color: #ffffff !important; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -250,17 +317,17 @@
         <img src="Yorktown.PNG" alt="George">
     </a>
 
+    <!-- Red banner with white phone number -->
     <div class="top-red-banner">
-        <div class="banner-text active">Free Delivery.</div>
+        <div class="banner-text active">757-940-5171</div>
+        <div class="banner-text">Free Delivery.</div>
         <div class="banner-text">Free Quote.</div>
-        <div class="banner-text">No Hassle.</div>
     </div>
 
     <div class="gov-ids-header">
         <div class="gov-items">
             <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
             <span><strong>CAGE:</strong> 16LD9</span>
-            <span><strong>SAM.gov</strong></span>
         </div>
     </div>
 
@@ -290,15 +357,13 @@
         </section>
 
         <section class="about-content">
-            <p style="text-align:center; font-size:1.25rem; max-width:1000px; margin:0 auto 3rem;">
-                Yorktown Tools was founded in 2025 by lifelong passion for tools and mechanics. We supply name-brand, high-quality tools and accessories to commercial contractors and government agencies who keep America running.
-            </p>
-
-            <div class="promise-box">
-                <strong>Our promise:</strong>
-                You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
-            </div>
+            <p>Yorktown Tools was founded in 2025 by a 20-year U.S. Army veteran with a lifelong passion for tools and mechanics. We supply premium name-brand hand tools, power tools, ladders, safety gear, and accessories to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and zero hassle.</p>
         </section>
+
+        <div class="promise-box">
+            <strong>Our Promise:</strong>
+            You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
+        </div>
 
         <section class="founder-section">
             <div>
@@ -306,27 +371,59 @@
             </div>
             <div class="founder-bio">
                 <h3>Meet the Founder: Zachary Barber</h3>
-                <p>Born and raised in Baltimore, Maryland. Zachary developed an early hands-on interest in tools and mechanics. He trained in automotive and diesel technology before gaining industry experience at companies like Ingersoll Rand, AutoZone, R&L Carriers, and Tools & Accessories.</p>
-                <p>In 2007, he enlisted in the U.S. Army as a turbine engine technician (MOS 15B). Over a 20-year career, he rose to Company First Sergeant and Battalion Operations NCOIC, serving at bases across the U.S., Korea, Hawaii, and completing two combat deployments to Afghanistan.</p>
-                <p>His military service taught him leadership, how to manage diverse teams under pressure, and the critical importance of having the right tool for the job — lessons he carries into every aspect of Yorktown Tools.</p>
-                <p>Before retiring, Zachary earned an A.S. in Aeronautics and a B.S. in Project Management from Embry-Riddle Aeronautical University and now founding Yorktown Tools allowed him to combine military discipline, community pride, and a desire to make a real difference for his family, the community and the hardworking contractors we serve.</p>
+                <p>Born and raised in Baltimore, Maryland, Zachary developed an early hands-on passion for tools and mechanics. He trained in automotive and diesel technology and gained industry experience at companies like Ingersoll Rand, AutoZone, R&L Carriers, and a Tools & Accessories firm.</p>
+                <p>In 2007, he enlisted in the U.S. Army as a turbine engine technician (MOS 15B). Over a 20-year career, he rose to Company First Sergeant and Battalion Operations NCOIC, serving across the U.S., Korea, and Hawaii, with two combat deployments to Afghanistan.</p>
+                <p>Zachary earned an A.S. in Aeronautics and a B.S. in Project Management from Embry-Riddle Aeronautical University. His military service instilled discipline, leadership under pressure, and the critical importance of having the right tool for the job — values that now drive every aspect of Yorktown Tools.</p>
+                <p>Founding this company allows him to support his family, the local community, and fellow contractors (including veterans) with reliable service and premium tools.</p>
             </div>
+        </section>
+
+        <!-- New Founder Insights & Lessons Section -->
+        <section class="insights-section">
+            <h2>Founder Insights & Lessons</h2>
+            <p style="max-width:800px; margin:0 auto 2rem;">Real-time stories and practical lessons from the first six months of building Yorktown Tools. Follow Zachary's journey as he shares the unfiltered realities of starting a veteran-owned tool supply business.</p>
+            
+            <div class="insights-grid">
+                <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="insight-card">
+                    <h3>From the Beginning</h3>
+                    <p>Why and how the decision was made to launch Yorktown Tools.</p>
+                </a>
+                <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="insight-card">
+                    <h3>Branding</h3>
+                    <p>Choosing the name, designing the logo, and crafting the slogan: “You build the project. We deliver the tools.”</p>
+                </a>
+                <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="insight-card">
+                    <h3>Legal Paperwork</h3>
+                    <p>The administrative and legal steps required to officially launch the business.</p>
+                </a>
+                <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="insight-card">
+                    <h3>Sourcing</h3>
+                    <p>Finding and securing suppliers for premium tools and equipment.</p>
+                </a>
+                <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="insight-card">
+                    <h3>Mentors</h3>
+                    <p>The value of guidance and who has helped along the way.</p>
+                </a>
+            </div>
+
+            <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn" style="margin-top:2.5rem;">Read the Full Series →</a>
+            <p style="margin-top:1rem; font-size:0.95rem; color:#555;">New posts added regularly — subscribe to follow the journey.</p>
         </section>
 
         <section class="commitment-box">
             <h3>Our Commitment</h3>
-            <p>We’re proud to be veteran-owned and built on the values from military service: precision, reliability, and real support. Our biggest advantage is simple — <strong>we deliver directly to your job site</strong> from Richmond to Virginia Beach. No wasted trips, just the tools you need, when you need them.</p>
-            <p>We salute everyone who has served and stand ready to back the blue-collar professionals who build our nation.</p>
+            <p>We’re proud to be veteran-owned and built on the values of precision, reliability, and real support. Our biggest advantage is simple — we deliver directly to your job site from Richmond to Virginia Beach. No wasted trips, just the tools you need, when you need them.</p>
+            <p>We salute everyone who has served and stand ready to support the blue-collar professionals who build our nation.</p>
             <a href="index.html#contact" class="btn">Get Your Free Quote Today</a>
         </section>
     </main>
 
     <footer>
         <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
-        <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:#ffffff !important; text-decoration:none;">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
-        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
+        <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
 
@@ -338,7 +435,7 @@
             banners[j].classList.remove('active');
             j = (j + 1) % banners.length;
             banners[j].classList.add('active');
-        }, 2000);
+        }, 4000);  // Slowed to 4 seconds
     </script>
 </body>
 </html>
