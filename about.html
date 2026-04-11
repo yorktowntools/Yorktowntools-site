@@ -8,7 +8,7 @@
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="About Yorktown Tools | Veteran-Owned Tool Supplier">
-    <meta property="og:description" content="Founded by 20-year U.S. Army veteran Zachary Barber. Free quotes, free delivery, zero hassle. Read real Founder Insights from the first six months.">
+    <meta property="og:description" content="Founded by 20-year U.S. Army veteran Zachary Barber. Free quotes, free delivery, zero hassle.">
     <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
     <meta property="og:url" content="https://yorktowntools.com/about.html">
     <meta property="og:type" content="website">
@@ -203,6 +203,45 @@
             margin-right: auto; 
         }
 
+        .founder-section { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 3rem; 
+            align-items: start; 
+            margin: 5rem 0; 
+        }
+        .founder-photo { 
+            max-width: 380px; 
+            border-radius: 16px; 
+            border: 6px solid var(--navy); 
+            box-shadow: var(--shadow); 
+            width: 100%; 
+            height: auto; 
+        }
+        .founder-bio h3 { color: var(--navy); font-size: 1.85rem; margin-bottom: 1rem; }
+        .founder-bio p { font-size: 1.1rem; line-height: 1.65; margin-bottom: 1.2rem; }
+
+        .newsletter-card {
+            background: var(--light);
+            padding: 3rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            margin: 4rem auto;
+            max-width: 900px;
+        }
+        .newsletter-card h2 {
+            color: var(--navy);
+            margin-bottom: 1.2rem;
+        }
+        .newsletter-card p {
+            font-size: 1.12rem;
+            line-height: 1.65;
+            color: #444;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
         .promise-box { 
             background: var(--light); 
             padding: 2.5rem; 
@@ -212,28 +251,6 @@
             margin: 4rem auto; 
             max-width: 900px; 
             box-shadow: var(--shadow);
-        }
-
-        .newsletter-card {
-            background: var(--light);
-            padding: 3rem 2rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            margin: 5rem auto;
-            max-width: 900px;
-        }
-        .newsletter-card h2 {
-            color: var(--navy);
-            margin-bottom: 1.2rem;
-            font-size: 2.1rem;
-        }
-        .newsletter-card p {
-            font-size: 1.12rem;
-            line-height: 1.65;
-            color: #444;
-            max-width: 700px;
-            margin: 0 auto 2rem;
         }
 
         .btn { 
@@ -331,7 +348,7 @@
         </section>
 
         <section class="about-content">
-            <p>Yorktown Tools was founded in 2025 by a 20-year U.S. Army veteran with a lifelong passion for tools and mechanics. We supply premium name-brand hand tools, power tools, ladders, safety gear, and accessories to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and zero hassle.</p>
+            <p>Yorktown Tools was founded in 2025 by a 20-year U.S. Army veteran with a lifelong passion for tools and mechanics. We supply premium name-brand tools to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and zero hassle.</p>
         </section>
 
         <div class="promise-box">
@@ -339,11 +356,22 @@
             You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
         </div>
 
-        <!-- Single Newsletter Card -->
+        <!-- Meet the Founder + Newsletter Card -->
+        <section class="founder-section">
+            <div>
+                <img src="IMG_1549.jpeg" alt="Zachary Barber in U.S. Army uniform" class="founder-photo" loading="lazy">
+            </div>
+            <div class="founder-bio">
+                <h3>Meet the Founder: Zachary Barber</h3>
+                <p>Born and raised in Baltimore, Zachary developed a passion for tools and mechanics early in life. After training in automotive and diesel technology, he enlisted in the U.S. Army in 2007 as a turbine engine technician. Over 20 years of service, he rose to Company First Sergeant and Battalion Operations NCOIC, with deployments to Afghanistan.</p>
+                <p>Zachary founded Yorktown Tools to serve fellow contractors and government teams with honest pricing, fast delivery, and real support.</p>
+            </div>
+        </section>
+
+        <!-- Newsletter Card -->
         <section class="newsletter-card">
             <h2>Starting a Tool Company – First 6 Months</h2>
-            <p>Raw, unfiltered stories from the trenches of launching Yorktown Tools. Zachary shares the real challenges, lessons learned, supplier negotiations, branding decisions, legal hurdles, and what it actually takes to build a veteran-owned tool business from the ground up.</p>
-            <p>New posts are added regularly — no fluff, just honest insights from the founder.</p>
+            <p>This newsletter is Zachary’s personal journal about building Yorktown Tools from the ground up. He shares honest stories about the challenges, lessons learned, supplier negotiations, branding decisions, legal hurdles, and the team he is actively building. It’s raw, real, and updated regularly — perfect for anyone interested in entrepreneurship, veteran-owned businesses, or the tool industry.</p>
             <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn">Subscribe to the Newsletter →</a>
         </section>
     </main>
