@@ -341,7 +341,6 @@
                         <option value="https://www.cutwithlenox.com/products/accessories/drilling-accessories/metal-wood-drilling-accessories/step-drills-bits">Lenox Drill Bits</option>
                         <option value="https://www.makitatools.com/products/accessories/drill-bits-and-hole-saws">Makita Drill Bits</option>
                         <option value="https://www.milwaukeetool.com/products/accessories">Milwaukee Drill Bits</option>
-                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
 
                     <div class="custom-section" id="custom-drill-bits">
@@ -370,7 +369,6 @@
                         <option value="https://www.diablotools.com/explore/reciprocating-blades/">Diablo Recip Blades</option>
                         <option value="https://www.cutwithlenox.com/products/accessories/sawing-accessories/reciprocating-saw-blades">Lenox Recip Blades</option>
                         <option value="https://www.milwaukeetool.com/products/accessories/cutting/sawzall-blades">Milwaukee Recip Blades</option>
-                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
 
                     <div class="custom-section" id="custom-recip-blades">
@@ -400,7 +398,6 @@
                         <option value="https://www.freudtools.com/gb/en/products/circular-saw-blades/">Freud Circular Blades</option>
                         <option value="https://www.makitatools.com/products/accessories/Cutting-Blades/circular-saw-blades">Makita Circular Blades</option>
                         <option value="https://www.milwaukeetool.com/products/accessories/cutting/circular-saw-blades">Milwaukee Circular Blades</option>
-                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
 
                     <div class="custom-section" id="custom-circular-blades">
@@ -431,7 +428,6 @@
                         <option value="https://www.makitatools.com/products/accessories/drill-bits-and-hole-saws/hole-saws">Makita Hole Saws</option>
                         <option value="https://www.milwaukeetool.com/products/accessories/hole-saws">Milwaukee Hole Saws</option>
                         <option value="https://spyderproducts.com/collections/hole-saws">Spyder Hole Saws</option>
-                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
 
                     <div class="custom-section" id="custom-hole-saws">
@@ -459,7 +455,6 @@
                         <option value="https://www.dewalt.com/products/accessories/sanding-accessories">DeWalt Abrasives</option>
                         <option value="https://www.diablotools.com/explore/sanding/">Diablo Abrasives</option>
                         <option value="https://www.makitatools.com/products/accessories/abrasives-grinding-and-surfacing">Makita Abrasives</option>
-                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
 
                     <div class="custom-section" id="custom-abrasives">
@@ -489,7 +484,6 @@
                         <option value="https://www.cutwithlenox.com/searchlanding?search=Set">Lenox Sets</option>
                         <option value="https://www.makitatools.com/products/search?searchtext=Blade%20set">Makita Sets</option>
                         <option value="https://www.milwaukeetool.com/search?q=Blade%20set&first=0">Milwaukee Sets</option>
-                        <option value="custom">Request Custom Quote / Other Brand</option>
                     </select>
 
                     <div class="custom-section" id="custom-bit-&-blade-sets">
@@ -528,11 +522,10 @@
             if (select.value.startsWith('http')) {
                 customSection.style.display = 'none';
                 window.open(select.value, '_blank');
-                select.selectedIndex = 0;
-            } else if (select.value === 'custom') {
-                customSection.style.display = 'block';
+                select.selectedIndex = 0;   // Reset to "Request Quote / Other Brands"
             } else {
-                customSection.style.display = 'none';
+                // Any non-URL selection (including the first option) shows custom quote
+                customSection.style.display = 'block';
             }
         }
 
@@ -558,10 +551,8 @@
             customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
 
             if (method === 'text') {
-                // Trigger SMS (works on mobile)
                 window.location.href = `sms:7579405171?body=${encodeURIComponent(bodyText)}`;
             } else if (method === 'email') {
-                // Trigger Email (works on all devices)
                 const subject = encodeURIComponent(`${category} Custom Quote Request`);
                 window.location.href = `mailto:sales@yorktowntools.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
             }
