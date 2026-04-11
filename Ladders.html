@@ -321,19 +321,17 @@
 
         <section class="grid">
 
-            <!-- Platform Ladders Card -->
+            <!-- Platform Ladders -->
             <div class="card" id="platform">
-                <div style="position:relative;">
-                    <img src="Platformladder.png" alt="Platform Ladders" loading="lazy">
-                </div>
+                <div style="position:relative;"><img src="Platformladder.png" alt="Platform Ladders" loading="lazy"></div>
                 <div class="card-content">
                     <h3>Platform Ladders</h3>
                     <p>Extra-large standing platform, wrap-around guardrail for added safety. Podium-style work platforms.</p>
-                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <p class="popular-note">Choose Werner to view the full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Platform Ladders" onchange="handleSelect(this)">
-                        <option value="">— Select an option —</option>
+                        <option value="">— Select Option —</option>
+                        <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.wernerco.com/us/products/ladders/work-platforms?page=1#pf-filters=spec:cat/Work%20Platforms">Werner Platform Ladders</option>
-                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
 
                     <div class="custom-section" id="custom-platform-ladders">
@@ -346,19 +344,17 @@
                 </div>
             </div>
 
-            <!-- Step Ladders Card -->
+            <!-- Step Ladders -->
             <div class="card" id="step">
-                <div style="position:relative;">
-                    <img src="Wernerstepladder.jpg" alt="Step Ladders" loading="lazy">
-                </div>
+                <div style="position:relative;"><img src="Wernerstepladder.jpg" alt="Step Ladders" loading="lazy"></div>
                 <div class="card-content">
                     <h3>Step Ladders</h3>
                     <p>Non-conductive fiberglass, Type IA & IAA (300–375 lb rating), various heights.</p>
-                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <p class="popular-note">Choose Werner to view the full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Step Ladders" onchange="handleSelect(this)">
-                        <option value="">— Select an option —</option>
+                        <option value="">— Select Option —</option>
+                        <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.wernerco.com/us/products/ladders/step-ladders?page=1#pf-filters=spec:cat/Step%20Ladders">Werner Step Ladders</option>
-                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
 
                     <div class="custom-section" id="custom-step-ladders">
@@ -371,19 +367,17 @@
                 </div>
             </div>
 
-            <!-- Extension Ladders Card -->
+            <!-- Extension Ladders -->
             <div class="card" id="extension">
-                <div style="position:relative;">
-                    <img src="Wernerextensionladder.jpg" alt="Extension Ladders" loading="lazy">
-                </div>
+                <div style="position:relative;"><img src="Wernerextensionladder.jpg" alt="Extension Ladders" loading="lazy"></div>
                 <div class="card-content">
                     <h3>Extension Ladders</h3>
                     <p>Fiberglass, various lengths, D-rung, Type IA/IAA.</p>
-                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <p class="popular-note">Choose Werner to view the full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Extension Ladders" onchange="handleSelect(this)">
-                        <option value="">— Select an option —</option>
+                        <option value="">— Select Option —</option>
+                        <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.wernerco.com/us/products/ladders/extension-ladders?page=1#pf-filters=spec:cat/Extension%20Ladders">Werner Extension Ladders</option>
-                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
 
                     <div class="custom-section" id="custom-extension-ladders">
@@ -396,19 +390,17 @@
                 </div>
             </div>
 
-            <!-- Articulating Card -->
+            <!-- Articulating / Multi-Position -->
             <div class="card" id="articulating">
-                <div style="position:relative;">
-                    <img src="Wernerarticulatingladder.jpg" alt="Articulating & Multi-Position Ladders" loading="lazy">
-                </div>
+                <div style="position:relative;"><img src="Wernerarticulatingladder.jpg" alt="Articulating & Multi-Position Ladders" loading="lazy"></div>
                 <div class="card-content">
                     <h3>Articulating / Multi-Position Ladders</h3>
                     <p>Converts to A-frame, extension, staircase, 90° configurations.</p>
-                    <p class="popular-note">View the full Werner catalog online, or select "Request Custom Quote" to send us specific part numbers.</p>
+                    <p class="popular-note">Choose Werner to view the full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Articulating Ladders" onchange="handleSelect(this)">
-                        <option value="">— Select an option —</option>
+                        <option value="">— Select Option —</option>
+                        <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.wernerco.com/us/products/ladders?page=1#pf-filters=spec:cat/Multi-Ladders|Style/Multi-Position%20Ladder">Werner Multi-Position Ladders</option>
-                        <option value="custom">Request Custom Quote / Specific Model</option>
                     </select>
 
                     <div class="custom-section" id="custom-articulating-ladders">
@@ -445,9 +437,7 @@
             const customSection = document.getElementById(`custom-${normalized}`);
 
             if (select.value.startsWith('http')) {
-                customSection.style.display = 'none';
-                window.open(select.value, '_blank');
-                select.selectedIndex = 0;
+                window.location.href = select.value;   // Open in same tab
             } else if (select.value === 'custom') {
                 customSection.style.display = 'block';
             } else {
@@ -468,19 +458,15 @@
 
             const itemHeader = `${category} – Custom Quote Request (Ladders):`;
             const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
-
             const bodyText = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
 
-            // Reset form
             textarea.value = '';
             customSection.style.display = 'none';
             customSection.parentElement.querySelector('.tool-select').selectedIndex = 0;
 
             if (method === 'text') {
-                // Trigger SMS (works on mobile)
                 window.location.href = `sms:7579405171?body=${encodeURIComponent(bodyText)}`;
             } else if (method === 'email') {
-                // Trigger Email (works on all devices)
                 const subject = encodeURIComponent(`${category} Custom Quote Request`);
                 window.location.href = `mailto:sales@yorktowntools.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
             }
@@ -495,7 +481,7 @@
             banners[j].classList.add('active');
         }, 3500);
 
-        // Sticky nav hide/show on scroll
+        // Sticky nav
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -508,7 +494,7 @@
             lastScroll = current;
         });
 
-        // Smooth scrolling for internal nav links
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
                 const href = a.getAttribute('href');
