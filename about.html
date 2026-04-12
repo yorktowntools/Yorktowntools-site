@@ -17,9 +17,7 @@
             --red: #c8102e;
             --white: #ffffff;
             --light: #f8f9fa;
-            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             --radius: 20px;
-            --shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
         *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
@@ -28,7 +26,6 @@
             line-height:1.65;
             color:#212529;
             background: var(--white);
-            min-height: 100vh;
         }
 
         .top-red-banner {
@@ -38,41 +35,27 @@
             padding: 0.85rem 1rem;
             font-weight: 700;
             font-size: 1.05rem;
-            min-height: 54px;
-            position: relative;
         }
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 1s ease;
-            font-weight: 600;
-        }
-        .banner-text.active { opacity: 1; }
 
         .logo-header {
             text-align: center;
-            padding: 1.8rem 1rem 1.2rem;
+            padding: 1.5rem 1rem;
         }
-        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+        .logo-header img { max-width: 260px; width: 92%; }
 
         nav {
             background: var(--navy);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
         }
 
         .mobile-nav {
             display: flex;
             overflow-x: auto;
-            scrollbar-width: none;
             padding: 1rem 0.8rem;
             gap: 0.7rem;
+            scrollbar-width: none;
         }
         .mobile-nav::-webkit-scrollbar { display: none; }
 
@@ -80,122 +63,124 @@
             flex: 0 0 auto;
             background: rgba(255,255,255,0.12);
             color: var(--white);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.93rem;
             padding: 0.75rem 1.1rem;
             border-radius: 30px;
             white-space: nowrap;
+            font-weight: 600;
+            font-size: 0.93rem;
         }
-        .mobile-nav a:hover, .mobile-nav a.active {
-            background: rgba(255,255,255,1);
-            color: var(--navy);
-        }
+        .mobile-nav a.active { background: white; color: var(--navy); }
 
         main { max-width:1200px; margin:0 auto; padding:0 1rem 4rem; }
 
-        .hero {
-            text-align:center;
-            padding: clamp(2rem, 8vw, 4rem) 1rem;
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-            border-radius:var(--radius);
-            margin: 2rem 0;
-            box-shadow: var(--shadow);
-        }
-
+        /* ALL IMAGES - STRICT MOBILE CONTROL */
         .hero-image {
             width: 100%;
-            max-height: 320px;        /* Reduced for mobile */
+            max-height: 220px;
             object-fit: cover;
             border-radius: var(--radius);
-            margin-bottom: 1.8rem;
+            display: block;
+            margin: 0 auto 1.5rem;
         }
 
-        .hero h1 {
-            font-size: clamp(2.6rem, 8.5vw, 3.8rem);
-            color: var(--navy);
-            font-weight: 800;
-            margin-bottom: 0.8rem;
-        }
-
-        .about-content, .commitment-box, .section {
-            margin: 4rem 0;
-        }
-
-        .about-content p {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            max-width: 900px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .commitment-box {
-            background: var(--light);
-            padding: 2.5rem 1.8rem;
-            border-radius: var(--radius);
-            border-left: 8px solid var(--red);
-            text-align: center;
-            box-shadow: var(--shadow);
-        }
-
-        .founder-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2.5rem;
-            align-items: center;
-        }
         .founder-photo {
             width: 100%;
-            max-height: 420px;
+            max-height: 340px;
             object-fit: cover;
             border-radius: 16px;
             border: 6px solid var(--navy);
-            box-shadow: var(--shadow);
         }
 
-        .section-card {
-            background: var(--light);
-            padding: 2.8rem 1.8rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .swag-section img {
+        .swag-image {
             width: 100%;
-            max-height: 420px;
-            object-fit: contain;        /* Changed to contain to prevent distortion */
+            max-height: 340px;
+            object-fit: contain;
             border-radius: 12px;
             margin: 1.5rem 0;
         }
 
+        .footer-image {
+            width: 100%;
+            max-width: 900px;
+            max-height: 280px;
+            object-fit: contain;
+            display: block;
+            margin: 2rem auto 1.5rem;
+            opacity: 0.95;
+        }
+
+        .hero h1 { font-size: clamp(2.4rem, 7.5vw, 3.5rem); color: var(--navy); font-weight: 800; }
+
+        .about-content p, .commitment-box {
+            font-size: 1.08rem;
+            line-height: 1.7;
+            text-align: center;
+            max-width: 900px;
+            margin: 2.5rem auto;
+        }
+
+        .commitment-box {
+            background: var(--light);
+            padding: 2rem 1.5rem;
+            border-radius: var(--radius);
+            border-left: 8px solid var(--red);
+        }
+
+        .section-card {
+            background: var(--light);
+            padding: 2.5rem 1.5rem;
+            border-radius: var(--radius);
+            text-align: center;
+            margin: 4rem 0;
+        }
+
         .btn { 
-            display:inline-block; 
-            background:var(--red); 
-            color:#fff; 
-            padding:1.25rem 3rem; 
-            border-radius:50px; 
-            text-decoration:none; 
-            font-weight:700; 
-            font-size:1.2rem; 
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            padding: 1.2rem 2.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
             margin-top: 1rem;
         }
-        .btn:hover { background:#a00d22; transform:translateY(-4px); }
+
+        .call-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 78px;
+            height: 78px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(200,16,46,0.5);
+            z-index: 999;
+        }
+        .call-button img { width: 65%; border-radius: 50%; border: 3px solid white; }
 
         footer { 
             background: var(--navy); 
-            color: var(--white); 
-            text-align:center; 
-            padding: 5rem 1rem 3rem; 
-            margin-top:6rem; 
+            color: white; 
+            text-align: center; 
+            padding: 4rem 1rem 2.5rem; 
+        }
+
+        /* Extra mobile protection */
+        @media (max-width: 480px) {
+            .hero-image { max-height: 200px; }
+            .founder-photo { max-height: 300px; }
+            .swag-image { max-height: 300px; }
+            .footer-image { max-height: 220px; }
         }
     </style>
 </head>
 <body>
 
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
-        <img src="Yorktown.PNG" alt="George">
+    <a href="tel:757-940-5171" class="call-button">
+        <img src="Yorktown.PNG" alt="Call">
     </a>
 
     <div class="top-red-banner">
@@ -239,38 +224,34 @@
             You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
         </div>
 
-        <!-- Meet the Founder -->
-        <section class="section founder-section">
-            <div>
-                <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
-            </div>
-            <div>
-                <h3>Meet the Founder: Zachary Barber</h3>
-                <p>U.S. Army veteran and founder of Yorktown Tools.</p>
-                <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn">Read Our Mission and Vision →</a>
-            </div>
+        <!-- 1. Meet the Founder -->
+        <section class="founder-section section-card">
+            <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
+            <h3>Meet the Founder: Zachary Barber</h3>
+            <p>U.S. Army veteran and founder of Yorktown Tools.</p>
+            <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn">Read Our Mission and Vision →</a>
         </section>
 
-        <!-- Starting a Tool Company -->
-        <section class="section section-card">
+        <!-- 2. Newsletter -->
+        <section class="section-card">
             <h2>Starting a Tool Company – First 6 Months</h2>
             <p>Real stories and lessons from the first six months of building Yorktown Tools. Zachary shares the journey, challenges, and vision behind the company.</p>
             <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn">Read the Full Newsletter Series →</a>
         </section>
 
-        <!-- Swag -->
-        <section class="section section-card swag-section">
+        <!-- 3. Swag -->
+        <section class="section-card swag-section">
             <h2>Yorktown Tools Swag</h2>
-            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag" loading="lazy">
-            <p>Rep the brand that reps you. Hats, tees, hoodies, stickers, and more — built for the crew.</p>
+            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag" class="swag-image" loading="lazy">
+            <p>Rep the brand that reps you. Hats, tees, hoodies, stickers, and more.</p>
             <a href="swag.html" class="btn">Shop Swag Now →</a>
         </section>
     </main>
 
     <footer>
-        <img src="hero.png" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
-        <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:#ffffff !important; text-decoration:none;">(757) 940-5171</a> | 
-           <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
+        <img src="hero.png" alt="Yorktown Tools" class="footer-image" loading="lazy">
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:white;">(757) 940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com" style="color:white;">sales@yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p>© Yorktown Tools. All rights reserved.</p>
