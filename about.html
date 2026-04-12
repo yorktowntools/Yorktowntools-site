@@ -105,7 +105,7 @@
 
         .hero-image {
             width: 100%;
-            max-height: 380px;
+            max-height: 320px;        /* Reduced for mobile */
             object-fit: cover;
             border-radius: var(--radius);
             margin-bottom: 1.8rem;
@@ -147,7 +147,8 @@
         }
         .founder-photo {
             width: 100%;
-            max-width: 380px;
+            max-height: 420px;
+            object-fit: cover;
             border-radius: 16px;
             border: 6px solid var(--navy);
             box-shadow: var(--shadow);
@@ -162,7 +163,9 @@
         }
 
         .swag-section img {
-            max-width: 100%;
+            width: 100%;
+            max-height: 420px;
+            object-fit: contain;        /* Changed to contain to prevent distortion */
             border-radius: 12px;
             margin: 1.5rem 0;
         }
@@ -248,7 +251,7 @@
             </div>
         </section>
 
-        <!-- Starting a Tool Company Newsletter -->
+        <!-- Starting a Tool Company -->
         <section class="section section-card">
             <h2>Starting a Tool Company – First 6 Months</h2>
             <p>Real stories and lessons from the first six months of building Yorktown Tools. Zachary shares the journey, challenges, and vision behind the company.</p>
