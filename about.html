@@ -3,27 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="About Yorktown Tools – Veteran-owned supplier of premium tools with free job-site delivery. Founded by U.S. Army veteran Zachary Barber. Read real Founder Insights from the first six months.">
-    <meta name="keywords" content="veteran owned tools, Yorktown Tools, Zachary Barber, commercial contractor tools, government contractor tools, free delivery Hampton Roads, founder insights">
-    <meta name="author" content="Zachary Barber">
-    <meta name="robots" content="index, follow">
-    <meta property="og:title" content="About Yorktown Tools | Veteran-Owned Tool Supplier">
-    <meta property="og:description" content="Founded by 20-year U.S. Army veteran Zachary Barber. Free quotes, free delivery, zero hassle.">
-    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
-    <meta property="og:url" content="https://yorktowntools.com/about.html">
-    <meta property="og:type" content="website">
+    <meta name="description" content="About Yorktown Tools – Veteran-owned supplier of premium tools with free job-site delivery. Founded by U.S. Army veteran Zachary Barber.">
     <title>About Us | Yorktown Tools</title>
 
     <link rel="icon" href="Yorktown.PNG" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="Yt-logo.PNG">
-    <link rel="icon" type="image/png" sizes="32x32" href="Yt-logo.PNG">
-    <link rel="icon" type="image/png" sizes="16x16" href="Yt-logo.PNG">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
         :root {
@@ -82,7 +68,6 @@
             font-weight: 600;
             font-size: 1.02rem;
             color: #ffffff !important;
-            text-decoration: none;
         }
         .banner-text.active { opacity: 1; }
 
@@ -96,7 +81,6 @@
         .gov-items {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 1.6rem;
             white-space: nowrap;
             padding: 0.45rem 1rem;
@@ -150,7 +134,6 @@
         @media (min-width: 768px) {
             .mobile-nav {
                 justify-content: center;
-                overflow-x: visible;
                 flex-wrap: wrap;
                 gap: 1.1rem;
                 padding: 1.2rem 0;
@@ -159,10 +142,6 @@
                 background: transparent;
                 padding: 0.7rem 1.2rem;
                 font-size: 1rem;
-            }
-            .mobile-nav a:hover, .mobile-nav a.active {
-                background: rgba(255,255,255,0.18);
-                color: var(--red);
             }
         }
 
@@ -175,7 +154,6 @@
             border-radius:var(--radius);
             margin: 3rem 0;
             box-shadow: var(--shadow);
-            overflow: hidden;
         }
 
         .hero-image {
@@ -203,12 +181,14 @@
             margin-right: auto; 
         }
 
+        .founder-section, .newsletter-section, .swag-section { 
+            margin: 5rem 0; 
+        }
         .founder-section { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
             gap: 3rem; 
             align-items: start; 
-            margin: 5rem 0; 
         }
         .founder-photo { 
             max-width: 380px; 
@@ -219,39 +199,15 @@
             height: auto; 
         }
         .founder-bio h3 { color: var(--navy); font-size: 1.85rem; margin-bottom: 1rem; }
-        .founder-bio p { font-size: 1.1rem; line-height: 1.65; margin-bottom: 1.2rem; }
 
-        .newsletter-card {
+        .section-card {
             background: var(--light);
             padding: 3rem 2rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             text-align: center;
-            margin: 4rem auto;
-            max-width: 900px;
         }
-        .newsletter-card h2 {
-            color: var(--navy);
-            margin-bottom: 1.2rem;
-        }
-        .newsletter-card p {
-            font-size: 1.12rem;
-            line-height: 1.65;
-            color: #444;
-            max-width: 700px;
-            margin: 0 auto 2rem;
-        }
-
-        .promise-box { 
-            background: var(--light); 
-            padding: 2.5rem; 
-            border-radius: var(--radius); 
-            border: 4px solid var(--red); 
-            text-align: center; 
-            margin: 4rem auto; 
-            max-width: 900px; 
-            box-shadow: var(--shadow);
-        }
+        .section-card h2 { color: var(--navy); margin-bottom: 1.2rem; }
 
         .btn { 
             display:inline-block; 
@@ -281,7 +237,6 @@
             box-shadow: 0 8px 30px rgba(200,16,46,0.5);
             z-index: 999;
             animation: pulse 2.6s infinite;
-            cursor: pointer;
             text-decoration: none;
         }
         .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
@@ -356,7 +311,7 @@
             You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
         </div>
 
-        <!-- Meet the Founder + Newsletter Card -->
+        <!-- Section 1: Meet the Founder -->
         <section class="founder-section">
             <div>
                 <img src="IMG_1549.jpeg" alt="Zachary Barber in U.S. Army uniform" class="founder-photo" loading="lazy">
@@ -364,15 +319,24 @@
             <div class="founder-bio">
                 <h3>Meet the Founder: Zachary Barber</h3>
                 <p>Born and raised in Baltimore, Zachary developed a passion for tools and mechanics early in life. After training in automotive and diesel technology, he enlisted in the U.S. Army in 2007 as a turbine engine technician. Over 20 years of service, he rose to Company First Sergeant and Battalion Operations NCOIC, with deployments to Afghanistan.</p>
-                <p>Zachary founded Yorktown Tools to serve fellow contractors and government teams with honest pricing, fast delivery, and real support.</p>
+                <p>He founded Yorktown Tools to provide contractors and government teams with premium tools, honest pricing, and reliable free delivery.</p>
+                <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn" style="margin-top:1.5rem;">Read Our Mission and Vision →</a>
             </div>
         </section>
 
-        <!-- Newsletter Card -->
-        <section class="newsletter-card">
+        <!-- Section 2: Starting a Tool Company – First 6 Months -->
+        <section class="newsletter-section section-card">
             <h2>Starting a Tool Company – First 6 Months</h2>
-            <p>This newsletter is Zachary’s personal journal about building Yorktown Tools from the ground up. He shares honest stories about the challenges, lessons learned, supplier negotiations, branding decisions, legal hurdles, and the team he is actively building. It’s raw, real, and updated regularly — perfect for anyone interested in entrepreneurship, veteran-owned businesses, or the tool industry.</p>
-            <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn">Subscribe to the Newsletter →</a>
+            <p>Follow Zachary’s real-time journey building Yorktown Tools. This newsletter series shares the honest challenges, lessons learned, supplier stories, branding decisions, and the team he is building — no fluff, just real insights from the first six months of a veteran-owned business.</p>
+            <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn">Read the Full Newsletter Series →</a>
+        </section>
+
+        <!-- Section 3: Swag -->
+        <section class="swag-section section-card">
+            <h2>Yorktown Tools Swag</h2>
+            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag Collection" loading="lazy">
+            <p>Rep the brand that reps you. Hats, tees, hoodies, stickers, and more — built for the crew.</p>
+            <a href="swag.html" class="btn">Shop Swag Now →</a>
         </section>
     </main>
 
@@ -386,7 +350,6 @@
     </footer>
 
     <script>
-        // Top banner rotation
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
