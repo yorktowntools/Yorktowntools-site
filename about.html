@@ -29,21 +29,6 @@
             color:#212529;
             background: var(--white);
             min-height: 100vh;
-            position: relative;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 140vw; height: 140vw;
-            max-width: 1400px; max-height: 1400px;
-            background: url('george-mascot.PNG') center center / contain no-repeat;
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: -1;
-            margin-top: -80px;
         }
 
         .top-red-banner {
@@ -55,7 +40,6 @@
             font-size: 1.05rem;
             min-height: 54px;
             position: relative;
-            overflow: hidden;
         }
         .banner-text {
             position: absolute;
@@ -67,31 +51,12 @@
             transition: opacity 1s ease;
             font-weight: 600;
             font-size: 1.02rem;
-            color: #ffffff !important;
         }
         .banner-text.active { opacity: 1; }
-
-        .gov-ids-header {
-            background: var(--navy);
-            color: var(--white);
-            padding: 0.5rem 0;
-            font-size: 0.87rem;
-            font-weight: 500;
-        }
-        .gov-items {
-            display: flex;
-            justify-content: center;
-            gap: 1.6rem;
-            white-space: nowrap;
-            padding: 0.45rem 1rem;
-            flex-wrap: wrap;
-        }
-        .gov-items strong { color: #ffeb3b; }
 
         .logo-header {
             text-align: center;
             padding: 1.5rem 1rem 1rem;
-            background: var(--white);
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
@@ -101,9 +66,7 @@
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(11,30,63,0.18);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        nav.hidden { transform: translateY(-100%); }
 
         .mobile-nav {
             display: flex;
@@ -124,137 +87,89 @@
             padding: 0.72rem 1.15rem;
             border-radius: 30px;
             white-space: nowrap;
-            transition: var(--transition);
         }
         .mobile-nav a:hover, .mobile-nav a.active {
             background: rgba(255,255,255,1);
             color: var(--navy);
         }
 
-        @media (min-width: 768px) {
-            .mobile-nav {
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 1.1rem;
-                padding: 1.2rem 0;
-            }
-            .mobile-nav a {
-                background: transparent;
-                padding: 0.7rem 1.2rem;
-                font-size: 1rem;
-            }
-        }
-
-        main { max-width:1200px; margin:0 auto; padding:0 1.4rem 5rem; }
+        main { max-width:1200px; margin:0 auto; padding:0 1rem 4rem; }
 
         .hero {
             text-align:center;
-            padding: clamp(1.5rem, 5vw, 3rem) 1rem clamp(3rem, 10vw, 5rem);
+            padding: clamp(2rem, 8vw, 4rem) 1rem;
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
             border-radius:var(--radius);
-            margin: 3rem 0;
+            margin: 2rem 0;
             box-shadow: var(--shadow);
         }
 
         .hero-image {
             width: 100%;
-            max-height: 420px;
+            max-height: 380px;
             object-fit: cover;
-            border-radius: var(--radius) var(--radius) 0 0;
-            display: block;
-            margin-bottom: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
         }
 
         .hero h1 {
-            font-size: clamp(2.8rem, 9vw, 3.9rem);
-            margin-bottom:1.2rem;
+            font-size: clamp(2.6rem, 8vw, 3.8rem);
             color: var(--navy);
             font-weight: 800;
         }
 
-        .about-content { 
-            margin: 4rem 0; 
-            text-align: center; 
-            font-size: 1.15rem; 
-            max-width: 1000px; 
-            margin-left: auto; 
-            margin-right: auto; 
+        .section {
+            margin: 4.5rem 0;
         }
 
-        .founder-section, .newsletter-section, .swag-section { 
-            margin: 5rem 0; 
+        .founder-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            align-items: center;
         }
-        .founder-section { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 3rem; 
-            align-items: start; 
+        .founder-photo {
+            width: 100%;
+            max-width: 380px;
+            border-radius: 16px;
+            border: 6px solid var(--navy);
+            box-shadow: var(--shadow);
         }
-        .founder-photo { 
-            max-width: 380px; 
-            border-radius: 16px; 
-            border: 6px solid var(--navy); 
-            box-shadow: var(--shadow); 
-            width: 100%; 
-            height: auto; 
-        }
-        .founder-bio h3 { color: var(--navy); font-size: 1.85rem; margin-bottom: 1rem; }
 
         .section-card {
             background: var(--light);
-            padding: 3rem 2rem;
+            padding: 2.8rem 1.8rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             text-align: center;
         }
-        .section-card h2 { color: var(--navy); margin-bottom: 1.2rem; }
+
+        .swag-section img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
 
         .btn { 
             display:inline-block; 
             background:var(--red); 
             color:#fff; 
-            padding:1.3rem 3.4rem; 
+            padding:1.25rem 3rem; 
             border-radius:50px; 
             text-decoration:none; 
             font-weight:700; 
-            font-size:1.25rem; 
-            transition:var(--transition); 
-            box-shadow:0 10px 30px rgba(200,16,46,0.3); 
+            font-size:1.2rem; 
+            margin-top: 1rem;
         }
-        .btn:hover { background:#a00d22; transform:translateY(-5px); }
-
-        .call-button {
-            position: fixed;
-            right: clamp(16px, 4vw, 24px);
-            bottom: clamp(16px, 4vw, 24px);
-            width: clamp(72px, 16vw, 88px);
-            height: clamp(72px, 16vw, 88px);
-            background: var(--red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
-            z-index: 999;
-            animation: pulse 2.6s infinite;
-            text-decoration: none;
-        }
-        .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
-        @keyframes pulse { 
-            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
-            70% { box-shadow: 0 0 0 25px rgba(200,16,46,0); } 
-            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
-        }
+        .btn:hover { background:#a00d22; transform:translateY(-4px); }
 
         footer { 
             background: var(--navy); 
             color: var(--white); 
             text-align:center; 
-            padding: 6.5rem 1rem 3rem; 
-            margin-top:8rem; 
+            padding: 5rem 1rem 3rem; 
+            margin-top:6rem; 
         }
-        .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
-        footer a { color: #ffffff !important; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -267,13 +182,6 @@
         <div class="banner-text active">757-940-5171</div>
         <div class="banner-text">Free Delivery.</div>
         <div class="banner-text">Free Quote.</div>
-    </div>
-
-    <div class="gov-ids-header">
-        <div class="gov-items">
-            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
-            <span><strong>CAGE:</strong> 16LD9</span>
-        </div>
     </div>
 
     <div class="logo-header">
@@ -302,40 +210,30 @@
             <h1>About Yorktown Tools</h1>
         </section>
 
-        <section class="about-content">
-            <p>Yorktown Tools was founded in 2025 by a 20-year U.S. Army veteran with a lifelong passion for tools and mechanics. We supply premium name-brand tools to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and zero hassle.</p>
-        </section>
-
-        <div class="promise-box">
-            <strong>Our Promise:</strong><br>
-            You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
-        </div>
-
         <!-- Section 1: Meet the Founder -->
-        <section class="founder-section">
+        <section class="section founder-section">
             <div>
-                <img src="IMG_1549.jpeg" alt="Zachary Barber in U.S. Army uniform" class="founder-photo" loading="lazy">
+                <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
             </div>
-            <div class="founder-bio">
+            <div>
                 <h3>Meet the Founder: Zachary Barber</h3>
-                <p>Born and raised in Baltimore, Zachary developed a passion for tools and mechanics early in life. After training in automotive and diesel technology, he enlisted in the U.S. Army in 2007 as a turbine engine technician. Over 20 years of service, he rose to Company First Sergeant and Battalion Operations NCOIC, with deployments to Afghanistan.</p>
-                <p>He founded Yorktown Tools to provide contractors and government teams with premium tools, honest pricing, and reliable free delivery.</p>
-                <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn" style="margin-top:1.5rem;">Read Our Mission and Vision →</a>
+                <p>U.S. Army veteran and founder of Yorktown Tools.</p>
+                <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn">Read Our Mission and Vision →</a>
             </div>
         </section>
 
-        <!-- Section 2: Starting a Tool Company – First 6 Months -->
-        <section class="newsletter-section section-card">
+        <!-- Section 2: Starting a Tool Company -->
+        <section class="section section-card">
             <h2>Starting a Tool Company – First 6 Months</h2>
-            <p>Follow Zachary’s real-time journey building Yorktown Tools. This newsletter series shares the honest challenges, lessons learned, supplier stories, branding decisions, and the team he is building — no fluff, just real insights from the first six months of a veteran-owned business.</p>
+            <p>Real stories and lessons from the first six months of building Yorktown Tools. Zachary shares the journey, challenges, and vision behind the company.</p>
             <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn">Read the Full Newsletter Series →</a>
         </section>
 
         <!-- Section 3: Swag -->
-        <section class="swag-section section-card">
+        <section class="section section-card swag-section">
             <h2>Yorktown Tools Swag</h2>
-            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag Collection" loading="lazy">
-            <p>Rep the brand that reps you. Hats, tees, hoodies, stickers, and more — built for the crew.</p>
+            <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag" loading="lazy">
+            <p>Rep the brand that reps you.</p>
             <a href="swag.html" class="btn">Shop Swag Now →</a>
         </section>
     </main>
@@ -350,6 +248,7 @@
     </footer>
 
     <script>
+        // Banner rotation
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
