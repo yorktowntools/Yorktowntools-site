@@ -69,9 +69,11 @@
         }
         .banner-text.active { opacity: 1; }
 
+        /* White area between banner and nav */
         .logo-header {
             text-align: center;
-            padding: 1.5rem 1rem 1rem;
+            padding: 1.8rem 1rem 1.2rem;
+            background: var(--white);
         }
         .logo-header img { max-width: 260px; width: 92%; height: auto; }
 
@@ -122,7 +124,7 @@
 
         .hero-image {
             width: 100%;
-            max-height: 260px;
+            max-height: 280px;   /* Increased to prevent head cutoff */
             object-fit: cover;
             border-radius: var(--radius);
             margin-bottom: 1.8rem;
@@ -171,7 +173,7 @@
 
         .founder-photo, .swag-image {
             width: 100%;
-            max-height: 360px;
+            max-height: 380px;   /* Increased to prevent head cutoff */
             object-fit: cover;
             border-radius: 16px;
             margin-bottom: 1.5rem;
@@ -224,7 +226,7 @@
         }
 
         @media (max-width: 480px) {
-            .hero-image, .founder-photo, .swag-image { max-height: 300px; }
+            .hero-image, .founder-photo, .swag-image { max-height: 320px; }
         }
     </style>
 </head>
@@ -267,7 +269,7 @@
         </section>
 
         <section class="about-content">
-            <p>Yorktown Tools was founded in 2025 by a 20-year U.S. Army veteran with a lifelong passion for tools and mechanics. We supply premium name-brand tools to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and zero hassle.</p>
+            <p>Yorktown Tools was founded in 2025 by an Army Veteran with a lifelong passion for tools and mechanics. We supply premium name-brand tools to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and zero hassle.</p>
         </section>
 
         <div class="commitment-box">
@@ -279,8 +281,7 @@
         <section class="section-card">
             <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
             <h3>Meet the Founder: Zachary Barber</h3>
-            <p>U.S. Army veteran and founder of Yorktown Tools.</p>
-            <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn">Read Our Mission and Vision →</a>
+            <a href="https://yorktowntools.beehiiv.com/p/our-mission-and-vision" target="_blank" class="btn">My Story and the Team I Am Building →</a>
         </section>
 
         <!-- 2. Newsletter -->
