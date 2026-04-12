@@ -28,14 +28,28 @@
             background: var(--white);
         }
 
+        /* Top Rotating Banner */
         .top-red-banner {
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.85rem 1rem;
+            padding: 0.9rem 1rem;
             font-weight: 700;
             font-size: 1.05rem;
+            position: relative;
+            overflow: hidden;
+            min-height: 54px;
         }
+        .banner-text {
+            position: absolute;
+            width: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .banner-text.active { opacity: 1; }
 
         .logo-header {
             text-align: center;
@@ -73,50 +87,44 @@
 
         main { max-width:1200px; margin:0 auto; padding:0 1rem 4rem; }
 
-        /* ALL IMAGES - STRICT MOBILE CONTROL */
+        /* Spacing after nav */
+        .hero {
+            text-align:center;
+            padding: 2.5rem 1rem 2rem;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            margin: 1.2rem 0 3rem;
+        }
+
         .hero-image {
             width: 100%;
             max-height: 220px;
             object-fit: cover;
             border-radius: var(--radius);
             display: block;
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 1.8rem;
         }
 
-        .founder-photo {
-            width: 100%;
-            max-height: 340px;
-            object-fit: cover;
-            border-radius: 16px;
-            border: 6px solid var(--navy);
+        .hero h1 {
+            font-size: clamp(2.4rem, 7.5vw, 3.5rem);
+            color: var(--navy);
+            font-weight: 800;
+            text-align: center;
         }
 
-        .swag-image {
-            width: 100%;
-            max-height: 340px;
-            object-fit: contain;
-            border-radius: 12px;
-            margin: 1.5rem 0;
+        h2, h3 {
+            color: var(--navy);
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 1rem;
         }
-
-        .footer-image {
-            width: 100%;
-            max-width: 900px;
-            max-height: 280px;
-            object-fit: contain;
-            display: block;
-            margin: 2rem auto 1.5rem;
-            opacity: 0.95;
-        }
-
-        .hero h1 { font-size: clamp(2.4rem, 7.5vw, 3.5rem); color: var(--navy); font-weight: 800; }
 
         .about-content p, .commitment-box {
             font-size: 1.08rem;
             line-height: 1.7;
             text-align: center;
             max-width: 900px;
-            margin: 2.5rem auto;
+            margin: 2.2rem auto;
         }
 
         .commitment-box {
@@ -131,7 +139,19 @@
             padding: 2.5rem 1.5rem;
             border-radius: var(--radius);
             text-align: center;
-            margin: 4rem 0;
+            margin: 3.5rem 0;
+        }
+
+        .founder-photo, .swag-image {
+            width: 100%;
+            max-height: 340px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .swag-image {
+            object-fit: contain;
         }
 
         .btn { 
@@ -167,13 +187,16 @@
             text-align: center; 
             padding: 4rem 1rem 2.5rem; 
         }
+        .footer-image {
+            max-width: 900px;
+            width: 95%;
+            display: block;
+            margin: 2rem auto;
+            opacity: 0.95;
+        }
 
-        /* Extra mobile protection */
         @media (max-width: 480px) {
-            .hero-image { max-height: 200px; }
-            .founder-photo { max-height: 300px; }
-            .swag-image { max-height: 300px; }
-            .footer-image { max-height: 220px; }
+            .hero-image, .founder-photo, .swag-image { max-height: 300px; }
         }
     </style>
 </head>
@@ -225,7 +248,7 @@
         </div>
 
         <!-- 1. Meet the Founder -->
-        <section class="founder-section section-card">
+        <section class="section-card">
             <img src="IMG_1549.jpeg" alt="Zachary Barber" class="founder-photo" loading="lazy">
             <h3>Meet the Founder: Zachary Barber</h3>
             <p>U.S. Army veteran and founder of Yorktown Tools.</p>
@@ -240,7 +263,7 @@
         </section>
 
         <!-- 3. Swag -->
-        <section class="section-card swag-section">
+        <section class="section-card">
             <h2>Yorktown Tools Swag</h2>
             <img src="Yorktowntoolsswag.png" alt="Yorktown Tools Swag" class="swag-image" loading="lazy">
             <p>Rep the brand that reps you. Hats, tees, hoodies, stickers, and more.</p>
@@ -258,13 +281,14 @@
     </footer>
 
     <script>
+        // Rotating Banner
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
             banners[j].classList.remove('active');
             j = (j + 1) % banners.length;
             banners[j].classList.add('active');
-        }, 4000);
+        }, 3500);
     </script>
 </body>
 </html>
