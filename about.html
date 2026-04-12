@@ -32,7 +32,6 @@
             position: relative;
         }
 
-        /* George Mascot Background */
         body::after {
             content: "";
             position: fixed;
@@ -69,7 +68,6 @@
         }
         .banner-text.active { opacity: 1; }
 
-        /* White area between banner and nav */
         .logo-header {
             text-align: center;
             padding: 1.8rem 1rem 1.2rem;
@@ -124,7 +122,7 @@
 
         .hero-image {
             width: 100%;
-            max-height: 280px;   /* Increased to prevent head cutoff */
+            max-height: 300px;
             object-fit: cover;
             border-radius: var(--radius);
             margin-bottom: 1.8rem;
@@ -171,14 +169,15 @@
             margin: 4rem 0;
         }
 
+        /* Full photos - no cropping */
         .founder-photo, .swag-image {
             width: 100%;
-            max-height: 380px;   /* Increased to prevent head cutoff */
-            object-fit: cover;
+            max-height: 420px;     /* Increased for full visibility */
+            object-fit: contain;   /* Shows entire photo */
             border-radius: 16px;
             margin-bottom: 1.5rem;
+            background: #f8f9fa;   /* Clean background if letterboxed */
         }
-        .swag-image { object-fit: contain; }
 
         .btn { 
             display:inline-block; 
@@ -226,7 +225,7 @@
         }
 
         @media (max-width: 480px) {
-            .hero-image, .founder-photo, .swag-image { max-height: 320px; }
+            .hero-image, .founder-photo, .swag-image { max-height: 360px; }
         }
     </style>
 </head>
@@ -310,7 +309,6 @@
     </footer>
 
     <script>
-        // Rotating Banner
         const banners = document.querySelectorAll('.banner-text');
         let j = 0;
         setInterval(() => {
