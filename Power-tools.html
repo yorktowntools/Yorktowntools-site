@@ -1,16 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" hreflang="en-us">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Power Tools – Drills, Saws & Impacts | Yorktown Tools</title>
-    <meta name="description" content="Milwaukee, DeWalt, Makita, Bosch corded & cordless drills, circular saws, reciprocating saws, impact drivers & wrenches. M18, FLEXVOLT, XGT platforms. Free delivery in Hampton Roads.">
+    
+    <!-- Optimized SEO Meta -->
+    <title>Power Tools for Contractors | Milwaukee, DeWalt, Makita | Free Delivery Hampton Roads</title>
+    <meta name="description" content="Cordless power tools for commercial and government contractors. Milwaukee M18/FLEXVOLT, DeWalt 20V/60V, Makita XGT, Bosch drills, saws, impacts & combo kits. Free delivery to Yorktown, Newport News, Hampton, Norfolk, Virginia Beach & military bases.">
+    <meta name="keywords" content="power tools contractors Hampton Roads, Milwaukee M18 tools, DeWalt power tools, Makita XGT, cordless drills saws impacts, veteran owned tools Yorktown, free tool delivery Hampton Roads, government contractor power tools">
+
+    <meta name="geo.region" content="US-VA">
+    <meta name="geo.placename" content="Yorktown, Virginia">
+    <link rel="canonical" href="https://yorktowntools.com/Power-tools.html">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Power Tools for Contractors - Milwaukee, DeWalt, Makita - Free Delivery">
+    <meta property="og:description" content="High-performance cordless drills, saws, impacts & combo kits with free delivery to job sites and bases in Hampton Roads. Veteran-owned.">
+    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
+    <meta property="og:url" content="https://yorktowntools.com/Power-tools.html">
+    <meta property="og:type" content="website">
 
     <link rel="icon" href="Yorktown.PNG" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Power Tools",
+      "description": "Cordless and corded power tools for contractors including drills, saws, impacts and combo kits with free delivery in Hampton Roads.",
+      "url": "https://yorktowntools.com/Power-tools.html",
+      "isPartOf": {
+        "@type": "LocalBusiness",
+        "name": "Yorktown Tools",
+        "telephone": "+1-757-940-5171"
+      },
+      "about": {
+        "@type": "Product",
+        "name": "Contractor Power Tools",
+        "description": "Milwaukee, DeWalt, Makita, Bosch drills, saws, impact drivers and combo kits",
+        "brand": ["Milwaukee", "DeWalt", "Makita", "Bosch"],
+        "offers": {
+          "@type": "Offer",
+          "description": "Free delivery to Hampton Roads job sites and military bases"
+        }
+      }
+    }
+    </script>
 
     <style>
         :root {
@@ -316,8 +356,8 @@
 
     <main>
         <section class="hero">
-            <h1>Power Tools for Demanding Jobs</h1>
-            <p>Corded & cordless drills, saws, impact drivers from Milwaukee M18, DeWalt 20V/60V, Makita XGT, Bosch & more.<br>Free delivery in Hampton Roads – GSA pricing available.</p>
+            <h1>Power Tools for Contractors</h1>
+            <p>Milwaukee M18/FLEXVOLT, DeWalt 20V/60V, Makita XGT, Bosch drills, saws, impacts & combo kits.<br><strong>Veteran-owned • Free delivery • No minimums</strong></p>
         </section>
 
         <section class="grid">
@@ -479,7 +519,7 @@
             const customSection = document.getElementById(`custom-${normalized}`);
 
             if (select.value.startsWith('http')) {
-                window.location.href = select.value;   // Open in same tab
+                window.location.href = select.value;
             } else if (select.value === 'custom') {
                 customSection.style.display = 'block';
             } else {
