@@ -1,16 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" hreflang="en-us">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>Precision Hand Tools | Yorktown Tools</title>
-    <meta name="description" content="Premium hand tools for contractors & government: GearWrench, Knipex, Crescent, Craftsman, Tekton, Milwaukee, DeWalt, Bondhus, Bosch. Free delivery in Hampton Roads.">
+    
+    <!-- Optimized SEO Meta -->
+    <title>Precision Hand Tools for Contractors | Veteran-Owned | Free Delivery Hampton Roads</title>
+    <meta name="description" content="Premium precision hand tools for commercial and government contractors. GearWrench, Knipex, DeWalt, Milwaukee, Klein, Bondhus & more. Free delivery to Yorktown, Newport News, Hampton, Norfolk, Virginia Beach & military bases. No minimums.">
+    <meta name="keywords" content="precision hand tools contractors, veteran owned tools Hampton Roads, GearWrench, Knipex pliers, DeWalt wrenches, contractor tools Yorktown VA, free tool delivery Hampton Roads, government contractor hand tools">
+    
+    <meta name="geo.region" content="US-VA">
+    <meta name="geo.placename" content="Yorktown, Virginia">
+    <link rel="canonical" href="https://yorktowntools.com/precision-hand-tools.html">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Precision Hand Tools for Contractors - Free Delivery Hampton Roads">
+    <meta property="og:description" content="Veteran-owned supplier of professional wrenches, pliers, screwdrivers, levels & more. Fast free delivery to job sites and bases.">
+    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
+    <meta property="og:url" content="https://yorktowntools.com/precision-hand-tools.html">
+    <meta property="og:type" content="website">
 
     <link rel="icon" href="Yorktown.PNG" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Precision Hand Tools",
+      "description": "Premium hand tools for commercial and government contractors with free delivery in Hampton Roads.",
+      "url": "https://yorktowntools.com/precision-hand-tools.html",
+      "isPartOf": {
+        "@type": "LocalBusiness",
+        "name": "Yorktown Tools",
+        "telephone": "+1-757-940-5171"
+      },
+      "about": {
+        "@type": "Product",
+        "name": "Precision Hand Tools",
+        "description": "Wrenches, pliers, screwdrivers, measuring tools, hex keys and specialty tools for contractors",
+        "brand": ["GearWrench", "Knipex", "DeWalt", "Milwaukee", "Klein Tools", "Bondhus"],
+        "offers": {
+          "@type": "Offer",
+          "description": "Free delivery to Hampton Roads job sites and military bases"
+        }
+      }
+    }
+    </script>
 
     <style>
         :root {
@@ -317,8 +357,8 @@
 
     <main>
         <section class="hero">
-            <h1>Precision Hand Tools</h1>
-            <p>Professional-grade tools from the brands you trust.<br>Free delivery across Hampton Roads.</p>
+            <h1>Precision Hand Tools for Contractors</h1>
+            <p>Professional-grade wrenches, pliers, screwdrivers, and layout tools trusted on jobsites across Hampton Roads.<br><strong>Veteran-owned • Free delivery • No minimums</strong></p>
         </section>
 
         <section class="grid">
@@ -515,7 +555,7 @@
             const customSection = document.getElementById(`custom-${normalized}`);
 
             if (select.value.startsWith('http')) {
-                window.location.href = select.value;   // Open in same tab
+                window.location.href = select.value;
             } else if (select.value === 'custom') {
                 customSection.style.display = 'block';
             } else {
