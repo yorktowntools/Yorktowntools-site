@@ -40,8 +40,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWR4T7LNEH"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -50,24 +51,20 @@
       gtag('config', 'G-JWR4T7LNEH');
     </script>
 
-    <!-- JSON-LD Schema (LocalBusiness + ServiceArea) -->
+    <!-- Fixed JSON-LD Schema (B2B-friendly - No Product/Offer error) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "Yorktown Tools",
-      "description": "Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear serving contractors in Newport News, VA with free delivery.",
+      "description": "Veteran-owned supplier of premium hand tools, power tools, ladders, safety PPE, and storage solutions with free delivery to contractors in Newport News, Virginia.",
       "url": "https://yorktowntools.com/newport-news/",
       "telephone": "+1-757-940-5171",
       "email": "sales@yorktowntools.com",
-      "image": "https://yorktowntools.com/hero-artwork.jpg",
-      "logo": "https://yorktowntools.com/Yorktown.PNG",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Newport News, VA",
         "addressLocality": "Newport News",
         "addressRegion": "VA",
-        "postalCode": "23607",
         "addressCountry": "US"
       },
       "geo": {
@@ -75,49 +72,27 @@
         "latitude": 37.0871,
         "longitude": -76.4730
       },
-      "areaServed": {
-        "@type": "City",
-        "name": "Newport News",
-        "containsPlace": {
-          "@type": "AdministrativeArea",
-          "name": "Newport News"
-        }
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Contractor Tools & Equipment",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Power Tools"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Hand Tools"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Ladders & Safety Equipment"
-            }
-          }
-        ]
-      },
-      "paymentAccepted": "Cash, Credit Card, Check, Purchase Order",
+      "areaServed": ["Newport News", "Fort Eustis", "Hampton Roads", "Yorktown", "Hampton", "Norfolk", "Virginia Beach"],
       "priceRange": "$$",
-      "openingHours": "Mo-Fr 07:00-17:00",
-      "additionalProperty": {
-        "@type": "PropertyValue",
-        "name": "Veteran Owned",
-        "value": "Yes"
-      }
+      "paymentAccepted": ["Credit Card", "Cash", "Check", "Government Purchase Order"],
+      "currenciesAccepted": "USD",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "08:00",
+          "closes": "17:00"
+        }
+      ],
+      "image": "https://yorktowntools.com/hero-artwork.jpg",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "12"
+      },
+      "sameAs": [
+        "https://g.page/r/CdyaqAOKgsOzEBI"
+      ]
     }
     </script>
 
@@ -395,15 +370,6 @@
             max-height: 180px;
             overflow: hidden;
         }
-        .review-text.truncated::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(to bottom, transparent, white);
-        }
         .expand-btn {
             margin-top: 1rem;
             background: none;
@@ -579,7 +545,7 @@
 
         <section style="max-width:1000px; margin:0 auto 5rem; text-align:center; color:#444; font-size:1.1rem; line-height:1.7; background:#f8f9fa; padding:2rem; border-radius:var(--radius); box-shadow:var(--shadow);">
             <h2>Fast, Free Tool Delivery for Newport News Contractors</h2>
-            <p>As a veteran-owned, SAM.gov-registered supplier based right in Yorktown, we provide fast, free delivery throughout Newport News and the entire Peninsula. We support the massive workforce at <strong>Newport News Shipbuilding</strong> (Huntington Ingalls Industries), government and maintenance projects at <strong>Fort Eustis</strong> / Joint Base Langley-Eustis, commercial construction, infrastructure work, and downtown redevelopment (including major Navy housing and retail projects). No minimum orders, full military installation access support, and same-area response times that keep your crew on schedule.</p>
+            <p>As a veteran-owned, SAM.gov-registered supplier based right in Yorktown, we provide fast, free delivery throughout Newport News and the entire Peninsula. We support the massive workforce at <strong>Newport News Shipbuilding</strong> (Huntington Ingalls Industries), government and maintenance projects at <strong>Fort Eustis</strong> / Joint Base Langley-Eustis, commercial construction, infrastructure work, and downtown redevelopment. No minimum orders, full military installation access support, and same-area response times that keep your crew on schedule.</p>
             <p>Stock up on premium brands — DeWalt, Milwaukee, Stabila, Werner, Klein, and more — for power tools, precision hand tools, measuring/layout equipment, bits & blades, jobsite storage, OSHA-compliant ladders, and safety/PPE. Get your quote in 24 hours or less and stay equipped without the hassle.</p>
         </section>
 
@@ -835,18 +801,6 @@
             reviews[currentReview].classList.remove('active');
             currentReview = (currentReview + 1) % reviews.length;
             reviews[currentReview].classList.add('active');
-
-            const activeText = reviews[currentReview].querySelector('.review-text');
-            const activeBtn = reviews[currentReview].querySelector('.expand-btn');
-            if (activeText.scrollHeight <= 180 + 20) {
-                activeBtn.classList.add('hidden');
-                activeText.classList.remove('truncated');
-            } else {
-                activeBtn.classList.remove('hidden');
-                if (!activeText.classList.contains('expanded')) {
-                    activeText.classList.add('truncated');
-                }
-            }
         }
         setInterval(rotateReviews, 18000);
 
@@ -893,4 +847,3 @@
     </script>
 </body>
 </html>
-```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
