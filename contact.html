@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWR4T7LNEH"></script>
     <script>
@@ -41,13 +41,13 @@
       gtag('config', 'G-JWR4T7LNEH');
     </script>
 
-    <!-- JSON-LD Schema -->
+    <!-- Clean JSON-LD Schema (LocalBusiness - consistent with other pages) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "Yorktown Tools",
-      "description": "Veteran-owned supplier of premium tools with free delivery throughout Hampton Roads and to military bases.",
+      "description": "Veteran-owned supplier of premium hand tools, power tools, ladders, safety PPE and storage solutions with free delivery throughout Hampton Roads and to military bases.",
       "url": "https://yorktowntools.com/contact.html",
       "telephone": "+1-757-940-5171",
       "email": "sales@yorktowntools.com",
@@ -57,12 +57,20 @@
         "addressRegion": "VA",
         "addressCountry": "US"
       },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 37.2384,
+        "longitude": -76.5075
+      },
       "areaServed": [
         "Yorktown", "Newport News", "Hampton", "Williamsburg", "Norfolk", "Virginia Beach", 
         "Portsmouth", "Chesapeake", "Gloucester", "Hampton Roads",
-        "Naval Weapons Station Yorktown", "Fort Eustis", "Joint Base Langley-Eustis"
+        "Naval Weapons Station Yorktown", "Fort Eustis", "Joint Base Langley-Eustis",
+        "Norfolk Naval Base", "Naval Station Norfolk"
       ],
-      "hasMap": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d204800!2d-76.85!3d37.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b16f1a8b4c5d3d%3A0x4e0b0c0b0b0b0b0b!2sHampton%20Roads%2C%20Virginia",
+      "priceRange": "$$",
+      "paymentAccepted": ["Credit Card", "Cash", "Check", "Government Purchase Order"],
+      "currenciesAccepted": "USD",
       "openingHoursSpecification": [
         {
           "@type": "OpeningHoursSpecification",
@@ -70,6 +78,15 @@
           "opens": "08:00",
           "closes": "17:00"
         }
+      ],
+      "image": "https://yorktowntools.com/hero-artwork.jpg",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "12"
+      },
+      "sameAs": [
+        "https://g.page/r/CdyaqAOKgsOzEBI"
       ]
     }
     </script>
@@ -111,7 +128,6 @@
             margin-top: -80px;
         }
 
-        /* Your original styles continue unchanged from here... */
         .top-red-banner {
             background: var(--red);
             color: var(--white);
@@ -232,7 +248,6 @@
         .hero h1 { font-size: clamp(2.4rem, 8vw, 4rem); margin-bottom:1rem; color: var(--navy); font-weight: 800; }
         .hero p { font-size: clamp(1.1rem, 4vw, 1.4rem); max-width:900px; margin:0 auto 2rem; color:#495057; }
 
-        /* The rest of your original styles remain unchanged */
         .contact-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -484,7 +499,6 @@
             <p>Free delivery throughout Hampton Roads and to military bases. Veteran-owned tool supplier ready to support your next project.</p>
         </section>
 
-        <!-- Rest of your original content remains completely unchanged -->
         <div class="contact-grid">
             <section class="contact-card">
                 <h2>Reach Out Today</h2>
