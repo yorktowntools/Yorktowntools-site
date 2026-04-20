@@ -51,7 +51,7 @@
       gtag('config', 'G-JWR4T7LNEH');
     </script>
 
-    <!-- Fixed JSON-LD Schema (B2B-friendly - No Product/Offer error) -->
+    <!-- Fixed JSON-LD Schema - LocalBusiness (B2B-friendly - No Product errors) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -65,14 +65,15 @@
         "@type": "PostalAddress",
         "addressLocality": "Newport News",
         "addressRegion": "VA",
-        "addressCountry": "US"
+        "addressCountry": "US",
+        "streetAddress": "Yorktown, VA"
       },
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": 37.0871,
         "longitude": -76.4730
       },
-      "areaServed": ["Newport News", "Fort Eustis", "Hampton Roads", "Yorktown", "Hampton", "Norfolk", "Virginia Beach"],
+      "areaServed": ["Newport News", "Yorktown", "Hampton", "Fort Eustis", "Hampton Roads", "Norfolk", "Virginia Beach"],
       "priceRange": "$$",
       "paymentAccepted": ["Credit Card", "Cash", "Check", "Government Purchase Order"],
       "currenciesAccepted": "USD",
@@ -810,11 +811,9 @@
                 const text = this.previousElementSibling;
                 if (text.classList.contains('truncated')) {
                     text.classList.remove('truncated');
-                    text.classList.add('expanded');
                     this.textContent = 'Read less';
                 } else {
                     text.classList.add('truncated');
-                    text.classList.remove('expanded');
                     this.textContent = 'Read more';
                 }
             });
