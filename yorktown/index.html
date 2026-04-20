@@ -40,8 +40,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWR4T7LNEH"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -50,75 +51,49 @@
       gtag('config', 'G-JWR4T7LNEH');
     </script>
 
-    <!-- JSON-LD Schema (LocalBusiness + ServiceArea) -->
+    <!-- Clean JSON-LD Schema - LocalBusiness (No Product/OfferCatalog errors) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
       "name": "Yorktown Tools",
-      "description": "Veteran-owned supplier of premium hand tools, power tools, ladders, and safety gear serving contractors in Yorktown, VA with free delivery.",
+      "description": "Veteran-owned supplier of premium hand tools, power tools, ladders, safety PPE, and storage solutions with free delivery to contractors in Yorktown, Virginia.",
       "url": "https://yorktowntools.com/yorktown/",
       "telephone": "+1-757-940-5171",
       "email": "sales@yorktowntools.com",
-      "image": "https://yorktowntools.com/hero-artwork.jpg",
-      "logo": "https://yorktowntools.com/Yorktown.PNG",
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Yorktown, VA",
         "addressLocality": "Yorktown",
         "addressRegion": "VA",
-        "postalCode": "23690",
-        "addressCountry": "US"
+        "addressCountry": "US",
+        "streetAddress": "Yorktown, VA"
       },
       "geo": {
         "@type": "GeoCoordinates",
         "latitude": 37.2388,
         "longitude": -76.5075
       },
-      "areaServed": {
-        "@type": "City",
-        "name": "Yorktown",
-        "containsPlace": {
-          "@type": "AdministrativeArea",
-          "name": "York County"
-        }
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Contractor Tools & Equipment",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Power Tools"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Hand Tools"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Product",
-              "name": "Ladders & Safety Equipment"
-            }
-          }
-        ]
-      },
-      "paymentAccepted": "Cash, Credit Card, Check, Purchase Order",
+      "areaServed": ["Yorktown", "York County", "Naval Weapons Station Yorktown", "Hampton Roads", "Newport News", "Hampton", "Norfolk", "Virginia Beach"],
       "priceRange": "$$",
-      "openingHours": "Mo-Fr 07:00-17:00",
-      "servesCuisine": "No",
-      "additionalProperty": {
-        "@type": "PropertyValue",
-        "name": "Veteran Owned",
-        "value": "Yes"
-      }
+      "paymentAccepted": ["Credit Card", "Cash", "Check", "Government Purchase Order"],
+      "currenciesAccepted": "USD",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "08:00",
+          "closes": "17:00"
+        }
+      ],
+      "image": "https://yorktowntools.com/hero-artwork.jpg",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "12"
+      },
+      "sameAs": [
+        "https://g.page/r/CdyaqAOKgsOzEBI"
+      ]
     }
     </script>
 
@@ -395,15 +370,6 @@
         .review-text.truncated {
             max-height: 180px;
             overflow: hidden;
-        }
-        .review-text.truncated::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(to bottom, transparent, white);
         }
         .expand-btn {
             margin-top: 1rem;
@@ -836,18 +802,6 @@
             reviews[currentReview].classList.remove('active');
             currentReview = (currentReview + 1) % reviews.length;
             reviews[currentReview].classList.add('active');
-
-            const activeText = reviews[currentReview].querySelector('.review-text');
-            const activeBtn = reviews[currentReview].querySelector('.expand-btn');
-            if (activeText.scrollHeight <= 180 + 20) {
-                activeBtn.classList.add('hidden');
-                activeText.classList.remove('truncated');
-            } else {
-                activeBtn.classList.remove('hidden');
-                if (!activeText.classList.contains('expanded')) {
-                    activeText.classList.add('truncated');
-                }
-            }
         }
         setInterval(rotateReviews, 18000);
 
@@ -894,4 +848,3 @@
     </script>
 </body>
 </html>
-```​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
