@@ -79,9 +79,7 @@
       "currenciesAccepted": "USD",
       "image": "https://yorktowntools.com/hero-artwork.jpg",
       "slogan": "Tools Worth Fighting For",
-      "sameAs": [
-        "https://g.page/r/CdyaqAOKgsOzEBI"
-      ]
+      "sameAs": ["https://g.page/r/CdyaqAOKgsOzEBI"]
     }
     </script>
 
@@ -138,10 +136,9 @@
             top: 50%;
             transform: translate(-50%, -50%);
             opacity: 0;
-            transition: opacity 1s ease;
+            transition: opacity 0.9s ease;
             font-weight: 600;
             font-size: 1.02rem;
-            color: #ffffff !important;
         }
         .banner-text.active { opacity: 1; }
 
@@ -321,7 +318,6 @@
             gap: 0.9rem; 
             min-height: 210px;
         }
-
         .free-resource-card:hover { 
             background: rgba(255,255,255,0.24); 
             transform: translateY(-6px); 
@@ -342,7 +338,6 @@
             margin: 0.4rem 0 0.3rem;
             font-weight: 600;
         }
-
         .free-resource-card p {
             font-size: 0.97rem;
             line-height: 1.45;
@@ -363,9 +358,18 @@
             text-decoration: none;
             color: inherit;
             display: block;
+            will-change: transform;
         }
-        .card:hover { transform: translateY(-12px); box-shadow: 0 25px 55px rgba(0,0,0,0.18); }
-        .card img { width: 100%; height: clamp(200px, 37vw, 255px); object-fit: cover; }
+        .card:hover { 
+            transform: translateY(-12px); 
+            box-shadow: 0 25px 55px rgba(0,0,0,0.18); 
+        }
+        .card img { 
+            width: 100%; 
+            height: clamp(200px, 37vw, 255px); 
+            object-fit: cover; 
+            display: block;
+        }
         .card-content { padding: 1.6rem 1.4rem 2rem; text-align: center; }
         .card h3 { color: var(--navy); margin: 0 0 0.8rem; font-size: 1.38rem; font-weight: 700; }
         .card p { color: #444; font-size: 1.03rem; line-height: 1.55; }
@@ -413,6 +417,7 @@
             box-shadow: var(--shadow);
         }
 
+        /* Optimized Call Button */
         .call-button {
             position: fixed;
             right: clamp(16px, 4vw, 24px);
@@ -426,10 +431,16 @@
             justify-content: center;
             box-shadow: 0 8px 30px rgba(200,16,46,0.5);
             z-index: 999;
-            animation: pulse 2.8s infinite;
             text-decoration: none;
+            animation: pulse 2.8s infinite;
+            will-change: transform;
         }
-        .call-button img { width: 68%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
+        .call-button img { 
+            width: 68%; 
+            height: auto; 
+            border-radius: 50%; 
+            border: 3px solid var(--white);
+        }
 
         @keyframes pulse { 
             0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
@@ -482,8 +493,9 @@
 </head>
 <body>
 
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools">
-        <img src="/Yorktown.PNG" alt="George">
+    <!-- Floating Call Button -->
+    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools" id="call-button">
+        <img src="/Yorktown.PNG" alt="George" loading="eager" decoding="async">
     </a>
 
     <div class="top-red-banner">
@@ -500,7 +512,7 @@
     </div>
 
     <div class="logo-header">
-        <img src="/Yorktown.PNG" alt="Yorktown Tools">
+        <img src="/Yorktown.PNG" alt="Yorktown Tools" loading="eager">
     </div>
 
     <nav id="main-nav">
@@ -533,28 +545,23 @@
         <section id="free-resources">
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
-
-                <!-- Newsletter -->
                 <a href="https://yorktowntools.beehiiv.com" target="_blank" class="free-resource-card">
-                    <img src="/IMG_6190.jpeg" alt="Yorktown Tools Newsletter" class="resource-image">
+                    <img src="/IMG_6190.jpeg" alt="Yorktown Tools Newsletter" class="resource-image" loading="lazy" decoding="async">
                     <h3>Yorktown Tools Newsletter</h3>
                     <p>Founder insights on starting and growing a tool business — real stories, lessons, and behind-the-scenes tips</p>
                 </a>
 
-                <!-- Line Card -->
                 <a href="/Yorktown-Tools-Line-Card-2026.pdf" target="_blank" class="free-resource-card">
-                    <img src="/IMG_5353.jpeg" alt="Yorktown Tools Line Card 2026" class="resource-image">
+                    <img src="/IMG_5353.jpeg" alt="Yorktown Tools Line Card 2026" class="resource-image" loading="lazy" decoding="async">
                     <h3>Yorktown Tools Line Card</h3>
                     <p>Download our product catalog with brands and tools</p>
                 </a>
 
-                <!-- Credit Application -->
                 <a href="/yorktown tools credit application.pdf" target="_blank" class="free-resource-card">
-                    <img src="/IMG_6180.jpeg" alt="Yorktown Tools Credit Application" class="resource-image">
+                    <img src="/IMG_6180.jpeg" alt="Yorktown Tools Credit Application" class="resource-image" loading="lazy" decoding="async">
                     <h3>Credit Application</h3>
                     <p>Apply for net 30 terms — fast approval for qualified contractors & government accounts</p>
                 </a>
-
             </div>
         </section>
 
@@ -565,21 +572,21 @@
             </p>
             <div class="grid">
                 <a href="/precision-hand-tools.html" class="card">
-                    <img src="/Pliers.PNG" alt="Precision hand tools" loading="lazy">
+                    <img src="/Pliers.PNG" alt="Precision hand tools" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Precision Hand Tools</h3>
                         <p>Eliminate slippage, stripped bolts, and callbacks. Torque-perfect results every time with wrenches, pliers, levels, and layout tools built for daily abuse.</p>
                     </div>
                 </a>
                 <a href="/Power-tools.html" class="card">
-                    <img src="/Dewalttoolpile.PNG" alt="Cordless power tools" loading="lazy">
+                    <img src="EDA4F95B-582F-40AC-965C-1D0351B6448A.jpeg" alt="Cordless power tools" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Power Tools & Combo Kits</h3>
                         <p>Cut faster, drill straighter, drive stronger. High-output batteries and rapid chargers so your crew stays productive — never waiting.</p>
                     </div>
                 </a>
                 <a href="/Measuring tools.html" class="card">
-                    <img src="/Bosch-laser.jpg" alt="Measuring and layout tools" loading="lazy">
+                    <img src="/Bosch-laser.jpg" alt="Measuring and layout tools" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Measuring & Layout</h3>
                         <p>Dead-accurate levels, lasers, tapes, and squares. Premium brands like Stabila, Bosch, Dewalt — eliminate rework and speed layout.</p>
@@ -595,21 +602,21 @@
             </p>
             <div class="grid">
                 <a href="/Bits-blades.html" class="card">
-                    <img src="/Blades.PNG" alt="Bits and blades" loading="lazy">
+                    <img src="/Blades.PNG" alt="Bits and blades" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Bits, Blades & Abrasives</h3>
                         <p>Stop wasting time on dull consumables. Blades that stay sharp 3–5× longer — fewer changeouts, less downtime.</p>
                     </div>
                 </a>
                 <a href="/Storage-organization.html" class="card">
-                    <img src="/Knaack.PNG" alt="Jobsite storage" loading="lazy">
+                    <img src="/Knaack.PNG" alt="Jobsite storage" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Storage & Organization</h3>
                         <p>End lost tools and theft. Lockable boxes keep your investment secure and your crew moving job to job.</p>
                     </div>
                 </a>
                 <a href="/Safety-PPE.html" class="card">
-                    <img src="/IMG_4175.jpg" alt="Safety gear" loading="lazy">
+                    <img src="/IMG_4175.jpg" alt="Safety gear" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Safety & PPE</h3>
                         <p>Pass every inspection first time. ANSI/OSHA-compliant gloves, eyewear, hearing, hi-vis, fall protection — in stock, delivered free.</p>
@@ -625,7 +632,7 @@
             </p>
             <div class="grid">
                 <a href="/Ladders.html" class="card">
-                    <img src="/Laddercloseup.png" alt="Professional ladders" loading="lazy">
+                    <img src="/Laddercloseup.png" alt="Professional ladders" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Professional Ladders & Platforms</h3>
                         <p>Werner ladders that adjust fast, hold 375+ lbs, and clear base safety checks — delivered free to your trailer.</p>
@@ -747,7 +754,7 @@
     </main>
 
     <footer>
-        <img src="/hero.png" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy">
+        <img src="/hero.png" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy" decoding="async">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:#ffffff !important; text-decoration:none;">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
@@ -756,15 +763,30 @@
     </footer>
 
     <script>
+        // Optimized Scroll Handler using requestAnimationFrame
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
-        window.addEventListener('scroll', () => {
+        let ticking = false;
+
+        function onScroll() {
             const current = window.pageYOffset;
-            if (current > lastScroll && current > 160) nav.classList.add('hidden');
-            else nav.classList.remove('hidden');
+            if (current > lastScroll && current > 160) {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
             lastScroll = current;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(onScroll);
+                ticking = true;
+            }
         });
 
+        // Tagline Rotator
         const taglines = document.querySelectorAll('.tagline');
         let tagIdx = 0;
         setInterval(() => {
@@ -773,6 +795,7 @@
             taglines[tagIdx].classList.add('active');
         }, 7000);
 
+        // Banner Rotator
         const banners = document.querySelectorAll('.banner-text');
         let bannerIdx = 0;
         setInterval(() => {
@@ -781,6 +804,7 @@
             banners[bannerIdx].classList.add('active');
         }, 4000);
 
+        // Reviews Rotator
         const reviews = document.querySelectorAll('.review-card');
         let reviewIdx = 0;
         function rotateReviews() {
@@ -790,6 +814,7 @@
         }
         setInterval(rotateReviews, 15000);
 
+        // Add Item Function
         function addItem() {
             const list = document.getElementById('item-list');
             const row = document.createElement('div');
@@ -802,6 +827,7 @@
             list.appendChild(row);
         }
 
+        // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             if (reviews.length > 0) reviews[0].classList.add('active');
         });
