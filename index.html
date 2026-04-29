@@ -11,10 +11,8 @@
     <meta name="geo.placename" content="Yorktown, Virginia">
     <link rel="canonical" href="https://yorktowntools.com">
 
-    <!-- Optimized Title -->
     <title>Yorktown Tools | Veteran-Owned Contractor Tools with Free Delivery Hampton Roads</title>
 
-    <!-- Open Graph / Social -->
     <meta property="og:title" content="Yorktown Tools | Premium Contractor Tools - Free Delivery Hampton Roads">
     <meta property="og:description" content="Veteran-owned supplier of hand tools, power tools, ladders & safety gear. Fast free delivery to job sites & military bases in Yorktown, Newport News, Hampton, Norfolk & beyond.">
     <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
@@ -40,7 +38,6 @@
       gtag('config', 'G-JWR4T7LNEH');
     </script>
 
-    <!-- Clean JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -290,39 +287,39 @@
         #free-resources { 
             background: var(--navy); 
             color: white; 
-            padding: 3.2rem 1.2rem; 
+            padding: 3.5rem 1.2rem; 
             border-radius: var(--radius); 
             margin: 4rem auto; 
             text-align: center; 
         }
         #free-resources h2 { 
             color: white; 
-            margin-bottom: 2.4rem; 
+            margin-bottom: 2.5rem; 
             font-size: clamp(1.9rem, 5.2vw, 2.4rem); 
         }
 
         .free-resources-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 1.8rem; 
-            max-width: 1100px; 
+            gap: 1.9rem; 
+            max-width: 1150px; 
             margin: 0 auto; 
         }
 
         .free-resource-card { 
             background: rgba(255,255,255,0.13); 
-            padding: 1.9rem 1.4rem; 
+            padding: 1.6rem 1.2rem; 
             border-radius: 16px; 
             text-decoration: none; 
             color: white; 
             transition: var(--transition); 
-            border: 1px solid rgba(255,255,255,0.16); 
+            border: 1px solid rgba(255,255,255,0.18); 
             text-align: center; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; 
-            gap: 0.7rem; 
-            min-height: 168px;
+            align-items: center;
+            gap: 0.9rem; 
+            min-height: 210px;
         }
 
         .free-resource-card:hover { 
@@ -330,16 +327,26 @@
             transform: translateY(-6px); 
         }
 
+        .resource-image {
+            width: 100%;
+            max-width: 220px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
         .free-resource-card h3 { 
-            font-size: 1.28rem; 
-            margin-bottom: 0.4rem; 
+            font-size: 1.25rem; 
+            margin: 0.4rem 0 0.3rem;
             font-weight: 600;
         }
 
-        .free-resource-card i {
-            font-size: 1.6rem;
-            margin-bottom: 0.6rem;
-            opacity: 0.9;
+        .free-resource-card p {
+            font-size: 0.97rem;
+            line-height: 1.45;
+            opacity: 0.95;
         }
 
         section { margin-bottom:5.5rem; }
@@ -398,22 +405,6 @@
         .review-date { font-size:0.91rem; color:#777; }
         .review-stars { color:#ffc107; font-size:1.48rem; margin-bottom:0.9rem; }
         .review-text { font-size:1.04rem; line-height:1.58; color:#444; }
-
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 1.7rem;
-            margin-top: 1.8rem;
-        }
-        .social-icons a {
-            width: 56px; height: 56px;
-            background: var(--navy);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        .social-icons a:hover { background: var(--red); transform: translateY(-6px); }
-        .social-icons img { width:100%; height:100%; object-fit:contain; padding:8px; }
 
         .contact-form {
             background: var(--light);
@@ -495,7 +486,6 @@
         <img src="/Yorktown.PNG" alt="George">
     </a>
 
-    <!-- Red banner -->
     <div class="top-red-banner">
         <div class="banner-text active">757-940-5171</div>
         <div class="banner-text">Free Delivery.</div>
@@ -543,26 +533,28 @@
         <section id="free-resources">
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
-                <!-- Rebar Calculator -->
-                <a href="/rebar-calculator.html" target="_blank" class="free-resource-card">
-                    <i class="fas fa-calculator"></i>
-                    <h3>Rebar Lap Splice Calculator</h3>
-                    <p>Instant ACI 318 lap lengths — no code book needed</p>
+
+                <!-- Newsletter -->
+                <a href="https://yorktowntools.beehiiv.com" target="_blank" class="free-resource-card">
+                    <img src="/newsletter-thumb.jpg" alt="Yorktown Tools Newsletter" class="resource-image">
+                    <h3>Yorktown Tools Newsletter</h3>
+                    <p>Founder insights on starting and growing a tool business — real stories, lessons, and behind-the-scenes tips</p>
                 </a>
 
                 <!-- Line Card -->
                 <a href="/Yorktown-Tools-Line-Card-2026.pdf" target="_blank" class="free-resource-card">
-                    <i class="fas fa-file-pdf"></i>
-                    <h3>Yorktown Tools Line Card</h3>
-                    <p>Download our product catalog with brands and tools</p>
+                    <img src="/line-card-thumb.jpg" alt="Yorktown Tools Line Card 2026" class="resource-image">
+                    <h3>Yorktown Tools Line Card 2026</h3>
+                    <p>Download our complete product catalog with brands, tools, and current pricing tiers</p>
                 </a>
 
                 <!-- Credit Application -->
                 <a href="/yorktown tools credit application.pdf" target="_blank" class="free-resource-card">
-                    <i class="fas fa-file-pdf"></i>
+                    <img src="/credit-app-thumb.jpg" alt="Yorktown Tools Credit Application" class="resource-image">
                     <h3>Credit Application</h3>
                     <p>Apply for net 30 terms — fast approval for qualified contractors & government accounts</p>
                 </a>
+
             </div>
         </section>
 
@@ -648,7 +640,6 @@
             <p>Real feedback from jobsites across Hampton Roads.</p>
 
             <div class="reviews-rotator">
-                <!-- Review 1 -->
                 <div class="review-card active">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
@@ -661,7 +652,6 @@
                     <p class="review-text">When every local supplier said “can’t be sourced,” Zach made it happen like it was nothing. Yorktown Tools kept my site moving, saved days, and earned a customer for life. 10/10.</p>
                 </div>
 
-                <!-- Review 2 -->
                 <div class="review-card">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
@@ -674,7 +664,6 @@
                     <p class="review-text">Needed a specific tool fast. Zach reached out to suppliers, got it ordered, and delivered without delaying the job. Followed up to make sure it was perfect. Highly recommend.</p>
                 </div>
 
-                <!-- Real Review - Nick -->
                 <div class="review-card">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
@@ -687,7 +676,6 @@
                     <p class="review-text">Excellent experience working with this company! Zach was great to deal with from start to finish. Very professional, responsive and honest. Offered fair pricing and made the whole process smooth and straightforward. It’s always great supporting a veteran owned business. Couldn’t recommend Yorktown Tools enough, I will definitely be using them again in the near future.</p>
                 </div>
 
-                <!-- Real Review - Collin Chambers -->
                 <div class="review-card">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
@@ -700,7 +688,6 @@
                     <p class="review-text">What impressed me most was their commitment to customer service. When other local suppliers couldn’t source a particular tool I needed, Yorktown Tools stepped up and delivered without delay. Their expertise and hustle kept my project moving, and I’ll definitely be returning for future jobs. Highly recommend them if you want reliable tools, solid advice, and personal service!</p>
                 </div>
 
-                <!-- Real Review - Adam Albini -->
                 <div class="review-card">
                     <div class="review-header">
                         <div class="reviewer-photo"></div>
@@ -769,7 +756,6 @@
     </footer>
 
     <script>
-        // Sticky nav hide/show
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         window.addEventListener('scroll', () => {
@@ -779,7 +765,6 @@
             lastScroll = current;
         });
 
-        // Tagline rotator
         const taglines = document.querySelectorAll('.tagline');
         let tagIdx = 0;
         setInterval(() => {
@@ -788,7 +773,6 @@
             taglines[tagIdx].classList.add('active');
         }, 7000);
 
-        // Banner rotator
         const banners = document.querySelectorAll('.banner-text');
         let bannerIdx = 0;
         setInterval(() => {
@@ -797,7 +781,6 @@
             banners[bannerIdx].classList.add('active');
         }, 4000);
 
-        // Reviews rotator
         const reviews = document.querySelectorAll('.review-card');
         let reviewIdx = 0;
         function rotateReviews() {
@@ -807,7 +790,6 @@
         }
         setInterval(rotateReviews, 15000);
 
-        // Dynamic item rows in quote form
         function addItem() {
             const list = document.getElementById('item-list');
             const row = document.createElement('div');
