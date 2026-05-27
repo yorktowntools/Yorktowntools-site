@@ -486,6 +486,74 @@
         }
         footer a { color: #ffffff !important; text-decoration: none; }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
+
+        /* Jackery Ad Modal */
+        #jackery-ad {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .ad-content {
+            background: white;
+            max-width: 520px;
+            width: 92%;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.4);
+            position: relative;
+        }
+        .ad-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            line-height: 1;
+        }
+        .ad-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .ad-body {
+            padding: 1.8rem 1.8rem 2.2rem;
+            text-align: center;
+        }
+        .ad-body h3 {
+            color: var(--red);
+            margin: 0 0 1rem;
+            font-size: 1.55rem;
+        }
+        .ad-cta {
+            background: var(--red);
+            color: white;
+            padding: 1.1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: inline-block;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .ad-cta:hover {
+            background: #a00d22;
+            transform: translateY(-4px);
+        }
     </style>
 </head>
 <body>
@@ -512,7 +580,6 @@
         <img src="/Yorktown.PNG" alt="Yorktown Tools" loading="eager">
     </div>
 
-    <!-- Updated Navigation -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="/" class="active">Home</a>
@@ -545,9 +612,9 @@
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
                 <a href="https://yorktowntools.beehiiv.com" target="_blank" class="free-resource-card">
-                    <img src="/IMG_6190.jpeg" alt="Yorktown Tools Newsletter" class="resource-image" loading="lazy" decoding="async">
-                    <h3>Yorktown Tools Newsletter</h3>
-                    <p>Founder insights on starting and growing a tool business — real stories, lessons, and behind-the-scenes tips</p>
+                    <img src="/IMG_6190.jpeg" alt="Yorktown Tools Journal" class="resource-image" loading="lazy" decoding="async">
+                    <h3>Yorktown Tools Journal</h3>
+                    <p>Founder insights on starting and growing a tool business — real stories, lessons, and behind-the-scenes tips from the front lines.</p>
                 </a>
 
                 <a href="/Yorktown-Tools-Line-Card-2026.pdf" target="_blank" class="free-resource-card">
@@ -584,7 +651,6 @@
                         <p>Cut faster, drill straighter, drive stronger. High-output batteries and rapid chargers so your crew stays productive — never waiting.</p>
                     </div>
                 </a>
-                <!-- Generic Portable Power Card -->
                 <a href="/portable-power.html" class="card">
                     <img src="/Jackerygenerator.JPG" alt="Portable Power Solutions for Job Sites" loading="lazy" decoding="async">
                     <div class="card-content">
@@ -623,7 +689,7 @@
                     </div>
                 </a>
                 <a href="/Safety-PPE.html" class="card">
-                    <img src="/IMG_4175.jpg" alt="Safety gear" loading="lazy" decoding="async">
+                    <img src="/Gloves.JPG" alt="Safety gear" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Safety & PPE</h3>
                         <p>Pass every inspection first time. ANSI/OSHA-compliant gloves, eyewear, hearing, hi-vis, fall protection — in stock, delivered free.</p>
@@ -665,7 +731,6 @@
                     <div class="review-stars">★★★★★</div>
                     <p class="review-text">When every local supplier said “can’t be sourced,” Zach made it happen like it was nothing. Yorktown Tools kept my site moving, saved days, and earned a customer for life. 10/10.</p>
                 </div>
-                <!-- Additional review cards from your original code... -->
             </div>
 
             <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review on Google</a>
@@ -722,6 +787,18 @@
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
 
+    <!-- Jackery Ad -->
+    <div id="jackery-ad">
+        <div class="ad-content">
+            <div class="ad-close" onclick="closeAd()">×</div>
+            <img src="/Jackeryad.PNG" alt="Jackery Special Offer - While Supplies Last" class="ad-image">
+            <div class="ad-body">
+                <h3>While Supplies Last</h3>
+                <a href="#contact" class="ad-cta" onclick="closeAd()">Get Your Quote Now</a>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Scroll Handler
         const nav = document.getElementById('main-nav');
@@ -764,7 +841,7 @@
             banners[bannerIdx].classList.add('active');
         }, 4000);
 
-        // Reviews Rotator (add more review cards if needed)
+        // Reviews Rotator
         const reviews = document.querySelectorAll('.review-card');
         let reviewIdx = 0;
         function rotateReviews() {
@@ -785,6 +862,24 @@
             `;
             list.appendChild(row);
         }
+
+        // Jackery Ad Functions
+        function showAd() {
+            document.getElementById('jackery-ad').style.display = 'flex';
+        }
+        function closeAd() {
+            document.getElementById('jackery-ad').style.display = 'none';
+        }
+
+        // Show ad after 4 seconds
+        window.addEventListener('load', () => {
+            setTimeout(showAd, 4000);
+        });
+
+        // Close when clicking outside
+        document.getElementById('jackery-ad').addEventListener('click', function(e) {
+            if (e.target === this) closeAd();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             if (reviews.length > 0) reviews[0].classList.add('active');
