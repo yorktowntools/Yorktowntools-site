@@ -487,8 +487,8 @@
         footer a { color: #ffffff !important; text-decoration: none; }
         .footer-artwork { max-width: 900px; width: 95%; margin: 0 auto 3rem; opacity: 0.95; }
 
-        /* Jackery Ad Modal */
-        #jackery-ad {
+        /* Victory Series Ad Modal */
+        #victory-ad {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
@@ -787,14 +787,21 @@
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
 
-    <!-- Jackery Ad -->
-    <div id="jackery-ad">
+    <!-- Victory Series Gloves Popup Ad -->
+    <div id="victory-ad">
         <div class="ad-content">
             <div class="ad-close" onclick="closeAd()">×</div>
-            <img src="/Jackeryad.PNG" alt="Jackery Special Offer - While Supplies Last" class="ad-image">
+            <img src="Victoryglovevisual.PNG" alt="Victory Series Drivers Gloves - Coming Soon" class="ad-image">
             <div class="ad-body">
-                <h3>While Supplies Last</h3>
-                <a href="#contact" class="ad-cta" onclick="closeAd()">Get Your Quote Now</a>
+                <h3>Victory Series Drivers Gloves</h3>
+                <p style="margin: 0.8rem 0 1.4rem; color:#333; font-size:1.08rem;">
+                    Premium white goat leather with navy TPR impact protection.<br>
+                    <strong>Limited first run dropping soon.</strong>
+                </p>
+                <a href="https://yorktowntools.com/victory-gloves.html?fbclid=IwdGRleASi0CpleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAo2NjI4NTY4Mzc5AAEe6JaXf1aql6ZN_XVTkIAMH3lQWjGKl9QqlOlhyKHiUyj15sdDWjxS-RtPJtw_aem_1bUDXiPwfhR8LzU_HSGBIg" 
+                   class="ad-cta" onclick="closeAd()">
+                    JOIN THE WAITLIST →
+                </a>
             </div>
         </div>
     </div>
@@ -863,12 +870,12 @@
             list.appendChild(row);
         }
 
-        // Jackery Ad Functions
+        // Victory Series Ad Functions
         function showAd() {
-            document.getElementById('jackery-ad').style.display = 'flex';
+            document.getElementById('victory-ad').style.display = 'flex';
         }
         function closeAd() {
-            document.getElementById('jackery-ad').style.display = 'none';
+            document.getElementById('victory-ad').style.display = 'none';
         }
 
         // Show ad after 4 seconds
@@ -877,7 +884,7 @@
         });
 
         // Close when clicking outside
-        document.getElementById('jackery-ad').addEventListener('click', function(e) {
+        document.getElementById('victory-ad').addEventListener('click', function(e) {
             if (e.target === this) closeAd();
         });
 
