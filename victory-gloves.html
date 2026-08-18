@@ -22,6 +22,7 @@
             --red: #c8102e;
             --gold: #d4af37;
             --white: #ffffff;
+            --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -37,6 +38,112 @@
             background: #f8f9fa;
         }
 
+        /* ===== Shared site header / nav (same as homepage) ===== */
+        .top-red-banner {
+            background: var(--red);
+            color: var(--white);
+            text-align: center;
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            font-size: 1.05rem;
+            min-height: 54px;
+            position: relative;
+            overflow: hidden;
+        }
+        .banner-text {
+            position: absolute;
+            width: 100%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.9s ease;
+            font-weight: 600;
+            font-size: 1.02rem;
+        }
+        .banner-text.active { opacity: 1; }
+
+        .gov-ids-header {
+            background: var(--navy);
+            color: var(--white);
+            padding: 0.5rem 0;
+            font-size: 0.87rem;
+            font-weight: 500;
+        }
+        .gov-items {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.6rem;
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            flex-wrap: wrap;
+        }
+        .gov-items strong { color: #ffeb3b; }
+
+        .logo-header {
+            text-align: center;
+            padding: 1.5rem 1rem 1rem;
+            background: var(--white);
+        }
+        .logo-header img { max-width: 260px; width: 92%; height: auto; }
+
+        nav {
+            background: var(--navy);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(11,30,63,0.18);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        nav.hidden { transform: translateY(-100%); }
+
+        .mobile-nav {
+            display: flex;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 0.9rem 0.8rem;
+            gap: 0.75rem;
+        }
+        .mobile-nav::-webkit-scrollbar { display: none; }
+
+        .mobile-nav a {
+            flex: 0 0 auto;
+            background: rgba(255,255,255,0.12);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.94rem;
+            padding: 0.72rem 1.15rem;
+            border-radius: 30px;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+        .mobile-nav a:hover, .mobile-nav a.active {
+            background: rgba(255,255,255,1);
+            color: var(--navy);
+        }
+
+        @media (min-width: 768px) {
+            .mobile-nav {
+                justify-content: center;
+                overflow-x: visible;
+                flex-wrap: wrap;
+                gap: 1.1rem;
+                padding: 1.2rem 0;
+            }
+            .mobile-nav a {
+                background: transparent;
+                padding: 0.7rem 1.2rem;
+                font-size: 1rem;
+            }
+            .mobile-nav a:hover, .mobile-nav a.active {
+                background: rgba(255,255,255,0.18);
+                color: var(--red);
+            }
+        }
+
+        /* ===== Page styles ===== */
         .hero {
             background: linear-gradient(rgba(11, 30, 63, 0.93), rgba(11, 30, 63, 0.9)),
                         url('/george-mascot.PNG') center/cover no-repeat;
@@ -266,6 +373,43 @@
 </head>
 <body>
 
+    <!-- Top red banner -->
+    <div class="top-red-banner">
+        <div class="banner-text active">757-940-5171</div>
+        <div class="banner-text">Free Delivery.</div>
+        <div class="banner-text">Free Quote.</div>
+    </div>
+
+    <!-- Gov IDs -->
+    <div class="gov-ids-header">
+        <div class="gov-items">
+            <span><strong>UEI:</strong> SMYXDLJDJMZ4</span>
+            <span><strong>CAGE:</strong> 16LD9</span>
+        </div>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo-header">
+        <img src="/Yorktown.PNG" alt="Yorktown Tools" loading="eager">
+    </div>
+
+    <!-- Navigation (same as homepage) -->
+    <nav id="main-nav">
+        <div class="mobile-nav">
+            <a href="/">Home</a>
+            <a href="/precision-hand-tools.html">Hand Tools</a>
+            <a href="/Power-tools.html">Power Tools</a>
+            <a href="/portable-power.html">Portable Power</a>
+            <a href="/Measuring tools.html">Measuring & Layout</a>
+            <a href="/Bits-blades.html">Bits & Blades</a>
+            <a href="/Storage-organization.html">Storage</a>
+            <a href="/Safety-PPE.html">Safety & PPE</a>
+            <a href="/Ladders.html">Ladders</a>
+            <a href="/about.html">About Us</a>
+            <a href="/contact.html">Service Area</a>
+        </div>
+    </nav>
+
     <!-- Hero -->
     <section class="hero">
         <h1>VICTORY SERIES</h1>
@@ -370,8 +514,40 @@
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2026 Yorktown Tools. All Rights Reserved.</p>
     </footer>
 
-    <!-- Image Rotator Script -->
     <script>
+        // Nav hide on scroll (same as homepage)
+        const nav = document.getElementById('main-nav');
+        let lastScroll = 0;
+        let ticking = false;
+
+        function onScroll() {
+            const current = window.pageYOffset;
+            if (current > lastScroll && current > 160) {
+                nav.classList.add('hidden');
+            } else {
+                nav.classList.remove('hidden');
+            }
+            lastScroll = current;
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(onScroll);
+                ticking = true;
+            }
+        });
+
+        // Banner rotator
+        const banners = document.querySelectorAll('.banner-text');
+        let bannerIdx = 0;
+        setInterval(() => {
+            banners[bannerIdx].classList.remove('active');
+            bannerIdx = (bannerIdx + 1) % banners.length;
+            banners[bannerIdx].classList.add('active');
+        }, 4000);
+
+        // Image rotator
         const images = document.querySelectorAll('#rotator img');
         const dots = document.querySelectorAll('#dots span');
         let current = 0;
@@ -386,13 +562,11 @@
             current = index;
         }
 
-        // Auto-rotate every 4 seconds
         setInterval(() => {
             let next = (current + 1) % total;
             showImage(next);
         }, 4000);
 
-        // Click dots to switch
         dots.forEach(dot => {
             dot.addEventListener('click', () => {
                 showImage(parseInt(dot.dataset.index));
