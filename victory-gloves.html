@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Victory Series Drivers Gloves - Premium white goat leather work gloves. Buy now.">
+    <meta name="description" content="Victory Series Drivers Gloves - Premium white goat leather work gloves. $34.99. Sizes Small–X-Large.">
     <title>Victory Series | Yorktown Tools</title>
 
     <!-- Open Graph -->
     <meta property="og:title" content="Victory Series Drivers Gloves">
-    <meta property="og:description" content="Tools Worth Fighting For">
+    <meta property="og:description" content="Premium white goat leather drivers gloves. $34.99. Tools Worth Fighting For.">
     <meta property="og:image" content="https://yorktowntools.com/VictoryRetailStand.jpg">
     <meta property="og:url" content="https://yorktowntools.com/victory-gloves">
     <meta property="og:type" content="website">
@@ -22,7 +22,10 @@
             --red: #c8102e;
             --gold: #d4af37;
             --white: #ffffff;
+            --light: #f8f9fa;
             --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 20px;
+            --shadow: 0 12px 40px rgba(0,0,0,0.1);
         }
 
         * {
@@ -38,7 +41,7 @@
             background: #f8f9fa;
         }
 
-        /* ===== Shared site header / nav (same as homepage) ===== */
+        /* ===== Shared site header / nav ===== */
         .top-red-banner {
             background: var(--red);
             color: var(--white);
@@ -171,7 +174,6 @@
             margin: 0 auto;
         }
 
-        /* Image Rotation / Showcase */
         .glove-showcase {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -199,6 +201,7 @@
             object-fit: cover;
             opacity: 0;
             transition: opacity 1s ease-in-out;
+            cursor: zoom-in;
         }
 
         .image-rotator img.active {
@@ -225,57 +228,113 @@
             background: var(--navy);
         }
 
-        /* Buy Now Section */
-        .buy-now-section {
-            background: linear-gradient(135deg, var(--navy), #1a2f5c);
-            color: white;
-            padding: 3.5rem 1.5rem;
+        /* Order card (t-shirt style) */
+        .order-card {
+            background: white;
             border-radius: 24px;
-            text-align: center;
-            max-width: 700px;
-            margin: 3rem auto;
-            box-shadow: 0 20px 50px rgba(11, 30, 63, 0.3);
-        }
-
-        .buy-now-section h2 {
-            font-size: clamp(1.9rem, 5vw, 2.6rem);
-            margin-bottom: 1rem;
-            color: var(--gold);
-        }
-
-        .buy-now-section p {
-            font-size: 1.15rem;
-            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border-top: 5px solid var(--red);
             max-width: 520px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
+            text-align: center;
         }
 
-        .buy-button {
-            display: inline-block;
+        .order-card-content {
+            padding: 2rem 1.5rem 2.5rem;
+        }
+
+        .order-card h3 {
+            color: var(--navy);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--red);
+            margin: 0.8rem 0 1.2rem;
+        }
+
+        .tool-select {
+            width: 100%;
+            padding: 1.2rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            margin: 0.5rem 0 0;
+            background: white;
+            transition: border 0.3s;
+        }
+        .tool-select:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+
+        .qty-input {
+            width: 100%;
+            max-width: 260px;
+            margin: 1rem auto 0;
+            padding: 1.2rem;
+            border: 2px solid #dee2e6;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            text-align: center;
+            transition: border 0.3s;
+            display: none;
+        }
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 5px rgba(11,30,63,0.12);
+        }
+
+        .quote-buttons {
+            display: none;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        .quote-btn {
+            padding: 1.2rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .text-quote {
             background: var(--red);
             color: white;
-            text-decoration: none;
-            padding: 1.3rem 3.5rem;
-            font-size: 1.35rem;
-            font-weight: 700;
-            border-radius: 50px;
-            transition: background 0.2s, transform 0.2s;
-            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.4);
         }
-
-        .buy-button:hover {
+        .text-quote:hover {
             background: #a00d22;
-            transform: scale(1.05);
+            transform: translateY(-4px);
+        }
+        .email-quote {
+            background: var(--navy);
+            color: white;
+        }
+        .email-quote:hover {
+            background: #08152e;
+            transform: translateY(-4px);
         }
 
-        .shipping-note {
-            margin-top: 1.5rem;
-            font-size: 0.95rem;
-            opacity: 0.9;
+        @media (min-width: 480px) {
+            .quote-buttons {
+                flex-direction: row;
+            }
+            .quote-btn {
+                flex: 1;
+            }
         }
 
-        /* Video Section */
+        /* Video */
         .video-section {
             background: white;
             border-radius: 24px;
@@ -320,7 +379,7 @@
             border: none;
         }
 
-        /* Email List */
+        /* Email list */
         .waitlist-form {
             background: var(--navy);
             color: white;
@@ -358,6 +417,40 @@
             transform: scale(1.05);
         }
 
+        /* Lightbox */
+        dialog#image-modal {
+            padding: 0;
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: transparent;
+            max-width: 95vw;
+            max-height: 95vh;
+        }
+        dialog#image-modal::backdrop {
+            background: rgba(0,0,0,0.85);
+        }
+        dialog#image-modal img {
+            max-width: 95vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: var(--radius);
+        }
+        dialog#image-modal button {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+
         footer {
             background: var(--navy);
             color: white;
@@ -368,6 +461,10 @@
         footer img {
             max-width: 220px;
             margin-bottom: 1rem;
+        }
+        footer a {
+            color: #ffffff !important;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -393,7 +490,7 @@
         <img src="/Yorktown.PNG" alt="Yorktown Tools" loading="eager">
     </div>
 
-    <!-- Navigation (same as homepage) -->
+    <!-- Navigation -->
     <nav id="main-nav">
         <div class="mobile-nav">
             <a href="/">Home</a>
@@ -420,13 +517,13 @@
         </p>
     </section>
 
-    <!-- Product Showcase with Image Rotation -->
+    <!-- Product Showcase -->
     <div class="section">
         <div class="glove-showcase">
             <div>
                 <div class="image-rotator" id="rotator">
-                    <img src="VictoryRetailStand.jpg" alt="Victory Series Drivers Gloves - Retail Display" class="active">
-                    <img src="Victoryglovescloseup.jpg" alt="Victory Series Drivers Gloves Close-up">
+                    <img src="VictoryRetailStand.jpg" alt="Victory Series Drivers Gloves - Retail Display" class="active" onclick="openLightbox(this.src, this.alt)">
+                    <img src="Victoryglovescloseup.jpg" alt="Victory Series Drivers Gloves Close-up" onclick="openLightbox(this.src, this.alt)">
                 </div>
                 <div class="rotator-dots" id="dots">
                     <span class="active" data-index="0"></span>
@@ -435,7 +532,7 @@
             </div>
 
             <div>
-                <h2 style="text-align: left; margin-bottom: 1.5rem;">Battle-Ready Features</h2>
+                <h2 style="text-align: left; margin-bottom: 1.5rem; color: var(--navy);">Battle-Ready Features</h2>
                 <ul style="font-size: 1.15rem; line-height: 2.1;">
                     <li><strong>Premium White Goat Leather</strong></li>
                     <li><strong>Double Leather Palm</strong> with reinforced stitching</li>
@@ -448,25 +545,29 @@
         </div>
     </div>
 
-    <!-- Buy Now -->
+    <!-- Order section (same flow as t-shirts) -->
     <div class="section">
-        <div class="buy-now-section">
-            <h2>Ready to Gear Up?</h2>
-            <p>
-                Get your pair of Victory Series Drivers Gloves today.<br>
-                Secure checkout powered by Square — shipping address collected at checkout.
-            </p>
-            
-            <a href="https://square.link/u/rJHIUP6A" 
-               class="buy-button" 
-               target="_blank" 
-               rel="noopener noreferrer">
-                BUY NOW →
-            </a>
-            
-            <p class="shipping-note">
-                Shipping address will be requested during checkout.
-            </p>
+        <div class="order-card">
+            <div class="order-card-content">
+                <h3>Victory Series Drivers Gloves</h3>
+                <p class="price">$34.99</p>
+                <p style="color:#555; margin-bottom: 1rem;">Select your size to order. Free local delivery available.</p>
+
+                <select class="tool-select" id="glove-size" onchange="handleSizeSelect(this)">
+                    <option value="">— Select Size —</option>
+                    <option value="Small">Small</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large">Large</option>
+                    <option value="X-Large">X-Large</option>
+                </select>
+
+                <input type="number" class="qty-input" id="glove-qty" min="1" value="1" placeholder="Quantity">
+
+                <div class="quote-buttons" id="glove-buttons">
+                    <button class="quote-btn text-quote" onclick="sendGloveOrder('text')">Text Order →</button>
+                    <button class="quote-btn email-quote" onclick="sendGloveOrder('email')">Email Order →</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -506,16 +607,24 @@
         </form>
     </div>
 
+    <!-- Lightbox -->
+    <dialog id="image-modal">
+        <img id="modal-image" src="" alt="Enlarged view">
+        <button onclick="document.getElementById('image-modal').close()" aria-label="Close">×</button>
+    </dialog>
+
     <!-- Footer -->
     <footer>
         <img src="/Yorktown.PNG" alt="Yorktown Tools">
-        <p><strong>Yorktown Tools</strong> www.yorktowntools.com Yorktown, Virginia</p>
+        <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
+           <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
+        <p><strong>Yorktown Tools</strong> — Yorktown, Virginia</p>
         <p>Tools Worth Fighting For</p>
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2026 Yorktown Tools. All Rights Reserved.</p>
     </footer>
 
     <script>
-        // Nav hide on scroll (same as homepage)
+        // Nav hide on scroll
         const nav = document.getElementById('main-nav');
         let lastScroll = 0;
         let ticking = false;
@@ -556,15 +665,13 @@
         function showImage(index) {
             images.forEach(img => img.classList.remove('active'));
             dots.forEach(dot => dot.classList.remove('active'));
-            
             images[index].classList.add('active');
             dots[index].classList.add('active');
             current = index;
         }
 
         setInterval(() => {
-            let next = (current + 1) % total;
-            showImage(next);
+            showImage((current + 1) % total);
         }, 4000);
 
         dots.forEach(dot => {
@@ -572,6 +679,70 @@
                 showImage(parseInt(dot.dataset.index));
             });
         });
+
+        // Lightbox
+        function openLightbox(src, alt = 'Enlarged view') {
+            const modal = document.getElementById('image-modal');
+            const modalImg = document.getElementById('modal-image');
+            modalImg.src = src;
+            modalImg.alt = alt;
+            modal.showModal();
+        }
+
+        // Size selection – show quantity & order buttons (same as t-shirts)
+        function handleSizeSelect(select) {
+            const qtyInput = document.getElementById('glove-qty');
+            const buttons = document.getElementById('glove-buttons');
+
+            if (select.value) {
+                qtyInput.style.display = 'block';
+                buttons.style.display = 'flex';
+            } else {
+                qtyInput.style.display = 'none';
+                buttons.style.display = 'none';
+            }
+        }
+
+        // Send glove order via text or email (same pattern as shirts)
+        function sendGloveOrder(method) {
+            const sizeSelect = document.getElementById('glove-size');
+            const size = sizeSelect.options[sizeSelect.selectedIndex].text;
+            const qtyInput = document.getElementById('glove-qty');
+            let qty = parseInt(qtyInput.value);
+            if (isNaN(qty) || qty < 1) qty = 1;
+
+            if (!sizeSelect.value || size === '— Select Size —') {
+                alert('Please select a size before ordering.');
+                return;
+            }
+
+            const productName = 'Victory Series Drivers Gloves';
+            const priceEach = 34.99;
+            const total = (priceEach * qty).toFixed(2);
+
+            let bodyText = `Order from YorktownTools.com\n\n`;
+            bodyText += `Product: ${productName}\n`;
+            bodyText += `Size: ${size}\n`;
+            bodyText += `Quantity: ${qty}\n\n`;
+            bodyText += `Price: $${priceEach.toFixed(2)} each\n`;
+            bodyText += `Total: $${total}\n\n`;
+            bodyText += `Please reply with payment options (Venmo, PayPal, etc.), shipping address (free local delivery or actual shipping cost), or pickup details.\nThank you!`;
+
+            // Reset controls
+            sizeSelect.selectedIndex = 0;
+            qtyInput.value = 1;
+            qtyInput.style.display = 'none';
+            document.getElementById('glove-buttons').style.display = 'none';
+
+            const encodedBody = encodeURIComponent(bodyText);
+
+            if (method === 'text') {
+                window.location.href = `sms:7579405171?body=${encodedBody}`;
+            } else if (method === 'email') {
+                const subject = encodeURIComponent(`Glove Order: ${productName} - ${size} × ${qty}`);
+                window.location.href = `mailto:sales@yorktowntools.com?subject=${subject}&body=${encodedBody}`;
+            }
+        }
     </script>
 
 </body>
