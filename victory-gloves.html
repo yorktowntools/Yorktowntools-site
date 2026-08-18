@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Victory Series Drivers Gloves - Premium white goat leather work gloves dropping soon. Join the waitlist.">
+    <meta name="description" content="Victory Series Drivers Gloves - Premium white goat leather work gloves. Buy now with free shipping options.">
     <title>Victory Series | Yorktown Tools</title>
 
     <!-- Open Graph / Facebook Share Image -->
-    <meta property="og:title" content="Victory Series Drivers Gloves - Coming Soon">
+    <meta property="og:title" content="Victory Series Drivers Gloves - Available Now">
     <meta property="og:description" content="Tools Worth Fighting For">
-    <meta property="og:image" content="https://yorktowntools.com/Victoryglovevisual.PNG">
+    <meta property="og:image" content="https://yorktowntools.com/VictoryRetailStand.jpg">
     <meta property="og:url" content="https://yorktowntools.com/victory-gloves">
     <meta property="og:type" content="website">
 
@@ -24,7 +24,12 @@
             --white: #ffffff;
         }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', system-ui, sans-serif;
             line-height: 1.6;
@@ -33,16 +38,19 @@
         }
 
         .hero {
-            background: linear-gradient(rgba(11,30,63,0.93), rgba(11,30,63,0.9)), url('/george-mascot.PNG') center/cover no-repeat;
+            background: linear-gradient(rgba(11, 30, 63, 0.93), rgba(11, 30, 63, 0.9)),
+                        url('/george-mascot.PNG') center/cover no-repeat;
             color: white;
             text-align: center;
             padding: 5rem 1rem 4rem;
         }
+
         .hero h1 {
             font-size: clamp(2.8rem, 9vw, 4.8rem);
             font-weight: 800;
             margin-bottom: 0.5rem;
         }
+
         .hero .slogan {
             font-size: 1.6rem;
             color: var(--gold);
@@ -62,14 +70,123 @@
             gap: 2.5rem;
             align-items: center;
         }
+
         .glove-showcase img {
             width: 100%;
-            max-width: 480px;
+            max-width: 520px;
             border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
 
-        /* New Progress Section */
+        .closeup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .closeup-grid img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Buy Now Section */
+        .buy-now-section {
+            background: linear-gradient(135deg, var(--navy), #1a2f5c);
+            color: white;
+            padding: 3.5rem 1.5rem;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 700px;
+            margin: 3rem auto;
+            box-shadow: 0 20px 50px rgba(11, 30, 63, 0.3);
+        }
+
+        .buy-now-section h2 {
+            font-size: clamp(1.9rem, 5vw, 2.6rem);
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        .buy-now-section p {
+            font-size: 1.15rem;
+            margin-bottom: 2rem;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .buy-button {
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            text-decoration: none;
+            padding: 1.3rem 3.5rem;
+            font-size: 1.35rem;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.4);
+        }
+
+        .buy-button:hover {
+            background: #a00d22;
+            transform: scale(1.05);
+        }
+
+        .shipping-note {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Video Section */
+        .video-section {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin: 2rem auto;
+            max-width: 900px;
+        }
+
+        .video-section h2 {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        .video-section p {
+            font-size: 1.15rem;
+            max-width: 650px;
+            margin: 0 auto 2rem;
+            color: #444;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Progress Section */
         .progress-update {
             background: linear-gradient(135deg, var(--navy), #1a2f5c);
             color: white;
@@ -80,11 +197,13 @@
             max-width: 1100px;
             box-shadow: 0 20px 50px rgba(11, 30, 63, 0.25);
         }
+
         .progress-update h2 {
             font-size: clamp(2.2rem, 6vw, 3.2rem);
             margin-bottom: 1rem;
             color: var(--gold);
         }
+
         .progress-update .badge {
             display: inline-block;
             background: var(--red);
@@ -95,19 +214,22 @@
             font-weight: 700;
             margin-bottom: 1.5rem;
         }
+
         .progress-update img {
             width: 100%;
             max-width: 680px;
             border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             margin: 2rem 0;
         }
+
         .progress-update p {
             font-size: 1.25rem;
             max-width: 700px;
             margin: 0 auto 1.5rem;
             line-height: 1.7;
         }
+
         .progress-update .highlight {
             color: var(--gold);
             font-weight: 700;
@@ -122,6 +244,7 @@
             max-width: 620px;
             margin: 3rem auto;
         }
+
         .waitlist-form input[type="email"] {
             width: 100%;
             max-width: 420px;
@@ -131,6 +254,7 @@
             border-radius: 50px;
             margin-bottom: 1rem;
         }
+
         .waitlist-form button {
             background: var(--red);
             color: white;
@@ -140,7 +264,9 @@
             font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
         }
+
         .waitlist-form button:hover {
             background: #a00d22;
             transform: scale(1.05);
@@ -152,28 +278,36 @@
             text-align: center;
             padding: 3rem 1rem;
         }
+
+        footer img {
+            max-width: 220px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
 
+    <!-- Hero -->
     <section class="hero">
         <h1>VICTORY SERIES</h1>
         <p class="slogan">Gloves Worth Fighting For</p>
-        <h2 style="font-size:2rem; margin-bottom:1.5rem;">Premium White Goat Leather Drivers Gloves</h2>
-        <p style="font-size:1.25rem; max-width:700px; margin:0 auto;">
+        <h2 style="font-size: 2rem; margin-bottom: 1.5rem;">Premium White Goat Leather Drivers Gloves</h2>
+        <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto;">
             Built for people who demand the best in comfort, grip, and protection.<br>
-            <strong>Limited first run arriving in ~75 days.</strong>
+            <strong>Now available — Limited first production run.</strong>
         </p>
     </section>
 
+    <!-- Main Product Showcase -->
     <div class="section">
         <div class="glove-showcase">
             <div>
-                <img src="Victoryglovevisual.PNG" alt="Yorktown Tools Victory Series Drivers Gloves">
+                <!-- Main image -->
+                <img src="VictoryRetailStand.jpg" alt="Yorktown Tools Victory Series Drivers Gloves - Retail Display">
             </div>
             <div>
-                <h2 style="text-align:left; margin-bottom:1.5rem;">Battle-Ready Features</h2>
-                <ul style="font-size:1.15rem; line-height:2.1;">
+                <h2 style="text-align: left; margin-bottom: 1.5rem;">Battle-Ready Features</h2>
+                <ul style="font-size: 1.15rem; line-height: 2.1;">
                     <li><strong>Premium White Goat Leather</strong></li>
                     <li><strong>Double Leather Palm</strong> with reinforced stitching</li>
                     <li><strong>Navy Blue TPR Impact Protection</strong></li>
@@ -183,9 +317,55 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Close-up image -->
+        <div class="closeup-grid">
+            <img src="Victoryglovescloseup.jpg" alt="Victory Series Drivers Gloves Close-up Detail">
+        </div>
     </div>
 
-    <!-- New Exciting Progress Update Section -->
+    <!-- Buy Now Section -->
+    <div class="section">
+        <div class="buy-now-section">
+            <h2>Ready to Gear Up?</h2>
+            <p>
+                Get your pair of Victory Series Drivers Gloves today.<br>
+                Secure checkout powered by Square — shipping address collected at checkout.
+            </p>
+            
+            <a href="https://square.link/u/rJHIUP6A" 
+               class="buy-button" 
+               target="_blank" 
+               rel="noopener noreferrer">
+                BUY NOW →
+            </a>
+            
+            <p class="shipping-note">
+                Shipping address will be requested during checkout.
+            </p>
+        </div>
+    </div>
+
+    <!-- Video Section -->
+    <div class="section">
+        <div class="video-section">
+            <h2>See the Gloves in Detail</h2>
+            <p>
+                Want more information on the gloves? Watch this quick 4-minute video 
+                going over some of the key features of the Victory Series Drivers Gloves.
+            </p>
+            <div class="video-wrapper">
+                <iframe 
+                    src="https://www.youtube.com/embed/FbcCzh40w18" 
+                    title="Victory Series Drivers Gloves - Feature Overview"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Update -->
     <div class="section">
         <div class="progress-update">
             <div class="badge">🚀 HUGE PROGRESS UPDATE — JUNE 18</div>
@@ -195,35 +375,45 @@
             
             <img src="VictoryTPR.JPG" alt="Victory Series TPR Impact Protection Progress - June 18">
             
-            <p class="highlight">The Navy Blue TPR impact protection turned out even better than we expected — sharper details, perfect flex, and that premium battle-ready look we were going for.</p>
+            <p class="highlight">
+                The Navy Blue TPR impact protection turned out even better than we expected — 
+                sharper details, perfect flex, and that premium battle-ready look we were going for.
+            </p>
             
-            <p>Every piece is coming together exactly how we envisioned. These aren't just gloves — they're tools worth fighting for, and they're shaping up to be something truly special.</p>
+            <p>
+                Every piece is coming together exactly how we envisioned. These aren't just gloves — 
+                they're tools worth fighting for, and they're shaping up to be something truly special.
+            </p>
             
-            <p style="font-size:1.4rem; margin-top:2rem; color:var(--gold); font-weight:600;">
+            <p style="font-size: 1.4rem; margin-top: 2rem; color: var(--gold); font-weight: 600;">
                 The finish line is in sight. Thank you for riding with us on this journey!
             </p>
         </div>
     </div>
 
+    <!-- Waitlist (kept for future drops / notifications) -->
     <div class="waitlist-form">
-        <h3 style="font-size:2rem; margin-bottom:1rem;">Join the Waitlist</h3>
-        <p style="margin-bottom:1.8rem;">Be the first to know when they arrive and get special launch pricing.</p>
+        <h3 style="font-size: 2rem; margin-bottom: 1rem;">Stay in the Loop</h3>
+        <p style="margin-bottom: 1.8rem;">
+            Join the list for future drops, restocks, and exclusive updates.
+        </p>
         
         <form action="https://formsubmit.co/sales@yorktowntools.com" method="POST">
             <input type="email" name="email" placeholder="Your email address" required>
             <input type="hidden" name="_subject" value="New Victory Series Waitlist Signup">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_next" value="https://yorktowntools.com/victory-gloves?thankyou=1">
-            <input type="hidden" name="_autoresponse" value="Thank you! You've been added to the Victory Series waitlist. We'll notify you as soon as the gloves arrive.">
-            <button type="submit">JOIN THE WAITLIST →</button>
+            <input type="hidden" name="_autoresponse" value="Thank you! You've been added to the Victory Series list. We'll keep you updated on future releases.">
+            <button type="submit">JOIN THE LIST →</button>
         </form>
     </div>
 
+    <!-- Footer -->
     <footer>
-        <img src="/Yorktown.PNG" alt="Yorktown Tools" style="max-width:220px; margin-bottom:1rem;">
+        <img src="/Yorktown.PNG" alt="Yorktown Tools">
         <p><strong>Yorktown Tools</strong> www.yorktowntools.com Yorktown, Virginia</p>
         <p>Tools Worth Fighting For</p>
-        <p style="margin-top:1.5rem; opacity:0.8;">© 2026 Yorktown Tools. All Rights Reserved.</p>
+        <p style="margin-top: 1.5rem; opacity: 0.8;">© 2026 Yorktown Tools. All Rights Reserved.</p>
     </footer>
 
 </body>
