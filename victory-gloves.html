@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Victory Series Drivers Gloves - Premium white goat leather work gloves. Buy now with free shipping options.">
+    <meta name="description" content="Victory Series Drivers Gloves - Premium white goat leather work gloves. Buy now.">
     <title>Victory Series | Yorktown Tools</title>
 
-    <!-- Open Graph / Facebook Share Image -->
-    <meta property="og:title" content="Victory Series Drivers Gloves - Available Now">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Victory Series Drivers Gloves">
     <meta property="og:description" content="Tools Worth Fighting For">
     <meta property="og:image" content="https://yorktowntools.com/VictoryRetailStand.jpg">
     <meta property="og:url" content="https://yorktowntools.com/victory-gloves">
@@ -64,6 +64,7 @@
             margin: 0 auto;
         }
 
+        /* Image Rotation / Showcase */
         .glove-showcase {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -71,24 +72,50 @@
             align-items: center;
         }
 
-        .glove-showcase img {
+        .image-rotator {
+            position: relative;
             width: 100%;
             max-width: 520px;
+            aspect-ratio: 1 / 1;
             border-radius: 20px;
+            overflow: hidden;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
         }
 
-        .closeup-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .closeup-grid img {
+        .image-rotator img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .image-rotator img.active {
+            opacity: 1;
+        }
+
+        .rotator-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1.2rem;
+        }
+
+        .rotator-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .rotator-dots span.active {
+            background: var(--navy);
         }
 
         /* Buy Now Section */
@@ -186,55 +213,7 @@
             border: none;
         }
 
-        /* Progress Section */
-        .progress-update {
-            background: linear-gradient(135deg, var(--navy), #1a2f5c);
-            color: white;
-            padding: 4rem 1rem;
-            text-align: center;
-            border-radius: 24px;
-            margin: 2rem auto;
-            max-width: 1100px;
-            box-shadow: 0 20px 50px rgba(11, 30, 63, 0.25);
-        }
-
-        .progress-update h2 {
-            font-size: clamp(2.2rem, 6vw, 3.2rem);
-            margin-bottom: 1rem;
-            color: var(--gold);
-        }
-
-        .progress-update .badge {
-            display: inline-block;
-            background: var(--red);
-            color: white;
-            padding: 0.4rem 1.2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-        }
-
-        .progress-update img {
-            width: 100%;
-            max-width: 680px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            margin: 2rem 0;
-        }
-
-        .progress-update p {
-            font-size: 1.25rem;
-            max-width: 700px;
-            margin: 0 auto 1.5rem;
-            line-height: 1.7;
-        }
-
-        .progress-update .highlight {
-            color: var(--gold);
-            font-weight: 700;
-        }
-
+        /* Email List */
         .waitlist-form {
             background: var(--navy);
             color: white;
@@ -293,18 +272,24 @@
         <p class="slogan">Gloves Worth Fighting For</p>
         <h2 style="font-size: 2rem; margin-bottom: 1.5rem;">Premium White Goat Leather Drivers Gloves</h2>
         <p style="font-size: 1.25rem; max-width: 700px; margin: 0 auto;">
-            Built for people who demand the best in comfort, grip, and protection.<br>
-            <strong>Now available — Limited first production run.</strong>
+            Built for people who demand the best in comfort, grip, and protection.
         </p>
     </section>
 
-    <!-- Main Product Showcase -->
+    <!-- Product Showcase with Image Rotation -->
     <div class="section">
         <div class="glove-showcase">
             <div>
-                <!-- Main image -->
-                <img src="VictoryRetailStand.jpg" alt="Yorktown Tools Victory Series Drivers Gloves - Retail Display">
+                <div class="image-rotator" id="rotator">
+                    <img src="VictoryRetailStand.jpg" alt="Victory Series Drivers Gloves - Retail Display" class="active">
+                    <img src="Victoryglovescloseup.jpg" alt="Victory Series Drivers Gloves Close-up">
+                </div>
+                <div class="rotator-dots" id="dots">
+                    <span class="active" data-index="0"></span>
+                    <span data-index="1"></span>
+                </div>
             </div>
+
             <div>
                 <h2 style="text-align: left; margin-bottom: 1.5rem;">Battle-Ready Features</h2>
                 <ul style="font-size: 1.15rem; line-height: 2.1;">
@@ -317,14 +302,9 @@
                 </ul>
             </div>
         </div>
-
-        <!-- Close-up image -->
-        <div class="closeup-grid">
-            <img src="Victoryglovescloseup.jpg" alt="Victory Series Drivers Gloves Close-up Detail">
-        </div>
     </div>
 
-    <!-- Buy Now Section -->
+    <!-- Buy Now -->
     <div class="section">
         <div class="buy-now-section">
             <h2>Ready to Gear Up?</h2>
@@ -346,7 +326,7 @@
         </div>
     </div>
 
-    <!-- Video Section -->
+    <!-- Video -->
     <div class="section">
         <div class="video-section">
             <h2>See the Gloves in Detail</h2>
@@ -365,33 +345,7 @@
         </div>
     </div>
 
-    <!-- Progress Update -->
-    <div class="section">
-        <div class="progress-update">
-            <div class="badge">🚀 HUGE PROGRESS UPDATE — JUNE 18</div>
-            <h2>We're Absolutely Fired Up!</h2>
-            
-            <p>The Victory Series gloves just took a massive leap forward.</p>
-            
-            <img src="VictoryTPR.JPG" alt="Victory Series TPR Impact Protection Progress - June 18">
-            
-            <p class="highlight">
-                The Navy Blue TPR impact protection turned out even better than we expected — 
-                sharper details, perfect flex, and that premium battle-ready look we were going for.
-            </p>
-            
-            <p>
-                Every piece is coming together exactly how we envisioned. These aren't just gloves — 
-                they're tools worth fighting for, and they're shaping up to be something truly special.
-            </p>
-            
-            <p style="font-size: 1.4rem; margin-top: 2rem; color: var(--gold); font-weight: 600;">
-                The finish line is in sight. Thank you for riding with us on this journey!
-            </p>
-        </div>
-    </div>
-
-    <!-- Waitlist (kept for future drops / notifications) -->
+    <!-- Email List -->
     <div class="waitlist-form">
         <h3 style="font-size: 2rem; margin-bottom: 1rem;">Stay in the Loop</h3>
         <p style="margin-bottom: 1.8rem;">
@@ -400,10 +354,10 @@
         
         <form action="https://formsubmit.co/sales@yorktowntools.com" method="POST">
             <input type="email" name="email" placeholder="Your email address" required>
-            <input type="hidden" name="_subject" value="New Victory Series Waitlist Signup">
+            <input type="hidden" name="_subject" value="New Victory Series Signup">
             <input type="hidden" name="_captcha" value="false">
             <input type="hidden" name="_next" value="https://yorktowntools.com/victory-gloves?thankyou=1">
-            <input type="hidden" name="_autoresponse" value="Thank you! You've been added to the Victory Series list. We'll keep you updated on future releases.">
+            <input type="hidden" name="_autoresponse" value="Thank you! You've been added to the Victory Series list. We'll keep you updated.">
             <button type="submit">JOIN THE LIST →</button>
         </form>
     </div>
@@ -415,6 +369,36 @@
         <p>Tools Worth Fighting For</p>
         <p style="margin-top: 1.5rem; opacity: 0.8;">© 2026 Yorktown Tools. All Rights Reserved.</p>
     </footer>
+
+    <!-- Image Rotator Script -->
+    <script>
+        const images = document.querySelectorAll('#rotator img');
+        const dots = document.querySelectorAll('#dots span');
+        let current = 0;
+        const total = images.length;
+
+        function showImage(index) {
+            images.forEach(img => img.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            images[index].classList.add('active');
+            dots[index].classList.add('active');
+            current = index;
+        }
+
+        // Auto-rotate every 4 seconds
+        setInterval(() => {
+            let next = (current + 1) % total;
+            showImage(next);
+        }, 4000);
+
+        // Click dots to switch
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                showImage(parseInt(dot.dataset.index));
+            });
+        });
+    </script>
 
 </body>
 </html>
