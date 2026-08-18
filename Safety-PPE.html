@@ -386,13 +386,14 @@
 
             <!-- Work Gloves -->
             <div class="card" id="gloves">
-                <div style="position:relative;"><img src="Work gloves.PNG" alt="Work Gloves" loading="lazy"></div>
+                <div style="position:relative;"><img src="Victoryglovescloseup.jpg" alt="Victory Series Work Gloves" loading="lazy"></div>
                 <div class="card-content">
                     <h3>Work Gloves</h3>
                     <p>Cut-resistant, impact, high-dexterity, insulated, nitrile-coated, and more.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Work Gloves" onchange="handleSelect(this)">
                         <option value="">— Select Option —</option>
+                        <option value="victory-gloves.html">Yorktown Tools Gloves</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.3m.com/3M/en_US/p/c/ppe/apparel/work-gloves/">3M Gloves</option>
                         <option value="https://www.ergodyne.com/gloves">Ergodyne Gloves</option>
@@ -585,7 +586,8 @@
             const normalized = category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-').replace(/[/]/g, '-');
             const customSection = document.getElementById(`custom-${normalized}`);
 
-            if (select.value.startsWith('http')) {
+            // External catalog links OR internal pages (e.g. victory-gloves.html)
+            if (select.value.startsWith('http') || select.value.endsWith('.html')) {
                 window.location.href = select.value;
             } else if (select.value === 'custom') {
                 customSection.style.display = 'block';
