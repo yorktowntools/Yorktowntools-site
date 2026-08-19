@@ -228,7 +228,7 @@
             background: var(--navy);
         }
 
-        /* Order card (t-shirt style) */
+        /* Order card */
         .order-card {
             background: white;
             border-radius: 24px;
@@ -256,6 +256,29 @@
             font-weight: 800;
             color: var(--red);
             margin: 0.8rem 0 1.2rem;
+        }
+
+        /* Buy Now button */
+        .buy-now-btn {
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto 1.8rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--red);
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.35);
+            transition: var(--transition);
+            text-align: center;
+        }
+        .buy-now-btn:hover {
+            background: #a00d22;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(200, 16, 46, 0.45);
         }
 
         .tool-select {
@@ -545,13 +568,25 @@
         </div>
     </div>
 
-    <!-- Order section (same flow as t-shirts) -->
+    <!-- Order section -->
     <div class="section">
         <div class="order-card">
             <div class="order-card-content">
                 <h3>Victory Series Drivers Gloves</h3>
                 <p class="price">$34.99</p>
-                <p style="color:#555; margin-bottom: 1rem;">Select your size to order. Free local delivery available.</p>
+                <p style="color:#555; margin-bottom: 1.5rem;">Secure checkout via Square. Free local delivery available.</p>
+
+                <!-- Buy Now button -->
+                <a href="https://square.link/u/wqv1UppT" 
+                   class="buy-now-btn" 
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    BUY NOW →
+                </a>
+
+                <p style="color:#666; font-size: 0.95rem; margin-bottom: 1.2rem;">
+                    Or select a size below to text or email your order:
+                </p>
 
                 <select class="tool-select" id="glove-size" onchange="handleSizeSelect(this)">
                     <option value="">— Select Size —</option>
@@ -689,7 +724,7 @@
             modal.showModal();
         }
 
-        // Size selection – show quantity & order buttons (same as t-shirts)
+        // Size selection – show quantity & order buttons
         function handleSizeSelect(select) {
             const qtyInput = document.getElementById('glove-qty');
             const buttons = document.getElementById('glove-buttons');
@@ -703,7 +738,7 @@
             }
         }
 
-        // Send glove order via text or email (same pattern as shirts)
+        // Send glove order via text or email
         function sendGloveOrder(method) {
             const sizeSelect = document.getElementById('glove-size');
             const size = sizeSelect.options[sizeSelect.selectedIndex].text;
