@@ -431,33 +431,6 @@
         }
         .reviews-stars { font-size: 2.8rem; color: #ffc107; margin-bottom: 0.8rem; letter-spacing: 0.2rem; }
 
-        .reviews-rotator {
-            position: relative;
-            max-width: 720px;
-            margin: 3.2rem auto 2.8rem;
-            min-height: 360px;
-        }
-        .review-card {
-            position: absolute;
-            width: 100%;
-            top: 0; left: 0;
-            opacity: 0;
-            transition: opacity 1.5s ease;
-            background: var(--white);
-            padding: 1.9rem 1.6rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            text-align: left;
-        }
-        .review-card.active { opacity: 1; position: relative; }
-
-        .review-header { display: flex; align-items: center; margin-bottom: 1rem; }
-        .reviewer-photo { width: 48px; height: 48px; border-radius: 50%; background: #e0e0e0; margin-right: 1rem; flex-shrink: 0; }
-        .reviewer-info h4 { margin:0; font-size:1.13rem; color:var(--navy); font-weight:600; }
-        .review-date { font-size:0.91rem; color:#777; }
-        .review-stars { color:#ffc107; font-size:1.48rem; margin-bottom:0.9rem; }
-        .review-text { font-size:1.04rem; line-height:1.58; color:#444; }
-
         .contact-form {
             background: var(--light);
             padding: clamp(3.2rem, 8vw, 4.5rem) 1rem;
@@ -783,21 +756,10 @@
             <h2>What Contractors Are Saying</h2>
             <p>Real feedback from jobsites across Hampton Roads.</p>
 
-            <div class="reviews-rotator">
-                <div class="review-card active">
-                    <div class="review-header">
-                        <div class="reviewer-photo"></div>
-                        <div class="reviewer-info">
-                            <h4>Rob M.</h4>
-                            <p class="review-date">December 2025</p>
-                        </div>
-                    </div>
-                    <div class="review-stars">★★★★★</div>
-                    <p class="review-text">When every local supplier said “can’t be sourced,” Zach made it happen like it was nothing. Yorktown Tools kept my site moving, saved days, and earned a customer for life. 10/10.</p>
-                </div>
-            </div>
+            <div id="featurable-8873e4c4-3841-42e6-b4f2-c3e02c88134a" data-featurable-async></div>
+            <script src="https://featurable.com/assets/bundle.js" defer charset="UTF-8"></script>
 
-            <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn">Write a Review on Google</a>
+            <a href="https://g.page/r/CdyaqAOKgsOzEBI/review" target="_blank" class="btn" style="margin-top: 2rem;">Write a Review on Google</a>
         </section>
 
         <section id="contact" class="contact-form">
@@ -912,16 +874,6 @@
             banners[bannerIdx].classList.add('active');
         }, 4000);
 
-        // Reviews Rotator
-        const reviews = document.querySelectorAll('.review-card');
-        let reviewIdx = 0;
-        function rotateReviews() {
-            reviews.forEach(r => r.classList.remove('active'));
-            reviewIdx = (reviewIdx + 1) % reviews.length;
-            reviews[reviewIdx].classList.add('active');
-        }
-        setInterval(rotateReviews, 15000);
-
         function addItem() {
             const list = document.getElementById('item-list');
             const row = document.createElement('div');
@@ -950,10 +902,6 @@
         // Close when clicking outside
         document.getElementById('victory-ad').addEventListener('click', function(e) {
             if (e.target === this) closeAd();
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (reviews.length > 0) reviews[0].classList.add('active');
         });
     </script>
 </body>
