@@ -280,6 +280,55 @@
         }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
 
+        /* ===== NEW STORY SECTION ===== */
+        .story-section {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 3.5rem;
+            align-items: center;
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: clamp(2.5rem, 6vw, 4rem);
+            margin: 4rem 0;
+            box-shadow: var(--shadow);
+        }
+        .story-photo {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+            display: block;
+            margin: 0 auto;
+        }
+        .story-content h2 {
+            text-align: left;
+            font-size: clamp(1.9rem, 5vw, 2.4rem);
+            margin-bottom: 1.4rem;
+            color: var(--navy);
+        }
+        .story-content p {
+            font-size: 1.12rem;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 1.1rem;
+        }
+        .story-content .highlight {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 1.18rem;
+            margin-top: 1.6rem;
+        }
+        @media (max-width: 900px) {
+            .story-section {
+                grid-template-columns: 1fr;
+                gap: 2.2rem;
+                text-align: center;
+            }
+            .story-content h2 { text-align: center; }
+            .story-photo { max-width: 340px; }
+        }
+        /* ===== END STORY SECTION ===== */
+
         #free-resources { 
             background: var(--navy); 
             color: white; 
@@ -607,6 +656,21 @@
             </div>
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
+
+        <!-- ========== NEW STORY SECTION ========== -->
+        <section class="story-section">
+            <div>
+                <img src="/zach-portrait.jpg" alt="Zachary Barber, founder of Yorktown Tools" class="story-photo" loading="lazy">
+            </div>
+            <div class="story-content">
+                <h2>You shouldn’t lose hours just getting the tools you need.</h2>
+                <p>I learned that the hard way as a turbine engine repairer on Army flight lines in Hawaii, Colorado, and Afghanistan. Starting a job only to realize you’re missing a critical tool or part forces you to stop, walk back to the shop, and kill your entire flow. It’s one of the most frustrating wastes of time on any job site.</p>
+                <p>That’s why I built Yorktown Tools.</p>
+                <p>We deliver the tools and accessories contractors, construction companies, and government teams need — right to the job site or your shop. We also offer a consignment mini-store option so your everyday consumables are always stocked where you work, and you only pay for what you use.</p>
+                <p class="highlight">Stay in flow. Save time and money. Never lose hours hunting for tools again.<br>With Yorktown Tools, you never will.</p>
+            </div>
+        </section>
+        <!-- ========== END STORY SECTION ========== -->
 
         <section id="free-resources">
             <h2>Free Resources for Contractors</h2>
