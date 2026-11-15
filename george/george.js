@@ -3,7 +3,9 @@ import { filterCustomerText, renderSafeHtml } from "../shared/customer-text.js";
 import { localReply } from "../shared/local-reply.js";
 import { formatEstimate } from "../shared/pricing.js";
 
-const API = window.GEORGE_API || "https://george.yorktowntools.com";
+// Live Worker for now. window.GEORGE_API overrides this.
+// Later, a custom domain can replace it: https://george.yorktowntools.com
+const API = window.GEORGE_API || "https://yorktown-george.yorktowntools.workers.dev";
 const FORMSPREE = "https://formspree.io/f/xanlvyan";
 const params = new URLSearchParams(location.search);
 const localHost = location.hostname === "localhost" || location.hostname === "127.0.0.1";

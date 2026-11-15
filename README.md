@@ -117,9 +117,13 @@ curl https://yorktown-george.<your-account>.workers.dev/api/health
 
 You want `"ok": true` and `"mode": "live"`. `"mode": "mock"` means the xAI key is missing.
 
-## 4. Point george.yorktowntools.com at the Worker
+## 4. Optional later: point george.yorktowntools.com at the Worker
 
-The chat button calls `https://george.yorktowntools.com`. That is a new name. It does not replace the website, and it does not touch email.
+The chat button currently calls the workers.dev address:
+
+`https://yorktown-george.yorktowntools.workers.dev`
+
+That is set in `george/george.js` (`window.GEORGE_API` overrides it). A custom domain is optional and does not replace the website or touch email. When you want it:
 
 1. In the Cloudflare dashboard, open the Worker **yorktown-george** → **Settings** → **Domains & Routes** → **Add** → **Custom domain**.
 2. Enter `george.yorktowntools.com`.
@@ -137,13 +141,7 @@ The chat button calls `https://george.yorktowntools.com`. That is a new name. It
 
 Wait a few minutes, then open `https://george.yorktowntools.com/api/health`.
 
-If you would rather not add DNS yet, you can temporarily point the button at the workers.dev URL. In `george/george.js` the first line of code is:
-
-```javascript
-const API = window.GEORGE_API || "https://george.yorktowntools.com";
-```
-
-Change the address in quotes, commit, and publish the site. The custom domain is the cleaner long-term choice.
+When that works, change the fallback in `george/george.js` from the workers.dev URL to `https://george.yorktowntools.com` and publish the site. Until then, leave the workers.dev address in place.
 
 ## 5. Send quote email from a subdomain
 
@@ -206,7 +204,7 @@ To change the match, the tax, the fees, or the fuel numbers, edit `worker/config
 
 The chat button, the privacy page, the company field, and the extra manufacturer links are ordinary files in this repository. Publish them the way you already publish yorktowntools.com (GitHub Pages). You do not publish them with Wrangler.
 
-Until `https://george.yorktowntools.com/api/health` returns `"mode": "live"`, George still answers from the on-site price list and the quote form uses Formspree.
+Until `https://yorktown-george.yorktowntools.workers.dev/api/health` returns `"mode": "live"`, George still answers from the on-site price list and the quote form uses Formspree. The same check applies after you switch the button to `george.yorktowntools.com`.
 
 ## Useful files
 
@@ -222,7 +220,7 @@ Until `https://george.yorktowntools.com/api/health` returns `"mode": "live"`, Ge
 ## If something breaks
 
 - **Health says mock.** The xAI secret is empty. Run `npx wrangler secret put XAI_API_KEY` and deploy again.
-- **The button never reaches the Worker.** Open the browser’s site settings and confirm the page is `https://yorktowntools.com`. Then open `https://george.yorktowntools.com/api/health`. If that fails, the GoDaddy CNAME for `george` is wrong or still propagating. The website’s own A records should be unchanged.
+- **The button never reaches the Worker.** Open `https://yorktown-george.yorktowntools.workers.dev/api/health`. You want `"mode": "live"`. If you already switched the button to `george.yorktowntools.com` and that health check fails, the GoDaddy CNAME for `george` is wrong or still propagating. The website’s own A records should be unchanged.
 - **Mail to sales@ stops arriving.** You edited an `@` MX record. Put the Zoho MX records back. George’s mail records belong on `send.quotes` and `resend._domainkey.quotes` only.
 - **Resend will not verify.** Compare every character with the Resend screen, including the region name in the MX or CNAME. Do not proxy those records.
 - **A customer got a retailer name.** That is a bug. Do not keep chatting. Call them. Then check `worker/test/george.test.js` still passes.

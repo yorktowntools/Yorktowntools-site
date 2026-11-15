@@ -7,7 +7,6 @@ import { localReply } from "../../shared/local-reply.js";
 import {
   extractQty,
   hasFirmPrice,
-  instantPrice,
   matchCatalog,
   priceEntry,
   shouldSearch,
@@ -22,7 +21,6 @@ import catalog from "../../data/prices.json" with { type: "json" };
 const env = {
   MOCK_MODE: "true",
   ALLOWED_ORIGINS: "http://localhost:8765",
-  PRICE_DISCOUNT_PERCENT: "1",
 };
 
 function post(path, body) {
@@ -64,6 +62,7 @@ test("catalog match ignores dimensions and finds the saw", () => {
   assert.equal(shouldSearch("What are your hours?", hits), false);
   assert.equal(shouldSearch("price on victory gloves", matchCatalog(catalog, "victory gloves")), false);
   assert.equal(shouldSearch("how much is the Makita 5007FA", hits), true);
+  assert.equal(shouldSearch("I need 6 cases of caulk and 5 circular saws", []), true);
 });
 
 test("customer text never keeps a retailer, a retailer url, or cost", () => {
@@ -256,10 +255,28 @@ test("prompt tells George the rules and the email does not leak them", () => {
   assert.doesNotMatch(visible, /home depot|lowe'?s|\bour cost\b|military discount|supplier discount/i);
 });
 
+test("OPTIONS preflight is an empty 204 with CORS headers", async () => {
+  const res = await handleRequest(new Request("https://george.example/api/chat", {
+    method: "OPTIONS",
+    headers: {
+      Origin: "https://yorktowntools.com",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "Content-Type",
+    },
+  }), { ALLOWED_ORIGINS: "https://yorktowntools.com" });
+  assert.equal(res.status, 204);
+  assert.equal(await res.text(), "");
+  assert.equal(res.headers.get("Access-Control-Allow-Origin"), "https://yorktowntools.com");
+  assert.match(res.headers.get("Access-Control-Allow-Methods"), /POST/);
+  assert.match(res.headers.get("Access-Control-Allow-Headers"), /Content-Type/);
+});
+
 test("mock chat and quote endpoints", async () => {
   resetLimits();
   const health = await handleRequest(new Request("https://george.example/api/health"), env);
-  assert.equal((await health.json()).mode, "mock");
+  const healthBody = await health.json();
+  assert.equal(healthBody.mode, "mock");
+  assert.equal(healthBody.matchPercentBelow, 0);
 
   const chat = await post("/api/chat", {
     messages: [
@@ -272,6 +289,17 @@ test("mock chat and quote endpoints", async () => {
   assert.match(body.reply, /5007FA/);
   assert.equal(body.quote.bulk, false);
   assert.equal(body.quote.items[0].qty, 2);
+  assert.equal(body.quote.items[0].estimate, 149);
+  assert.equal(body.quote.items[0].estimateHigh, 179);
+
+  const bulkChat = await post("/api/chat", {
+    messages: [{ role: "user", content: "I need 6 cases of caulk and 5 Makita 5007FA circular saws" }],
+  });
+  const bulkBody = await bulkChat.json();
+  assert.equal(bulkBody.quote.bulk, true);
+  assert.equal(bulkBody.quote.items[0].ballpark, true);
+  assert.ok(bulkBody.quote.items[0].estimate > 0);
+  assert.match(bulkBody.reply, /bulk pricing usually comes in better/i);
   assert.doesNotMatch(body.reply, /home depot|lowe|margin|our cost/i);
   assert.equal(body.mode, "mock");
 

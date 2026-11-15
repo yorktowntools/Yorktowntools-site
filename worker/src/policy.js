@@ -116,10 +116,26 @@ function channelOf(source) {
   return "unknown";
 }
 
-export function priceFromShelf({ shelf, source, fixedPrice, listPrice }) {
+function priceBound(shelf, channel) {
+  if (channel === "other") {
+    return {
+      estimate: roundMoney(shelf * (1 + rules.otherLocalMarkupPercent / 100)),
+      cost: null,
+      confirm: false,
+    };
+  }
+  const estimate = roundMoney(shelf * (1 - rules.matchPercentBelow / 100));
+  const cost = roundMoney(shelf * (1 - rules.assumedCostBelowShelfPercent / 100));
+  const margin = estimate > 0 ? (estimate - cost) / estimate : 0;
+  if (margin + 1e-9 < rules.minGrossMargin) return { estimate: null, cost, confirm: true };
+  return { estimate, cost, confirm: false };
+}
+
+export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice }) {
   if (fixedPrice && listPrice != null) {
     return {
       estimate: roundMoney(listPrice),
+      estimateHigh: null,
       cost: null,
       firm: true,
       confirm: false,
@@ -128,27 +144,37 @@ export function priceFromShelf({ shelf, source, fixedPrice, listPrice }) {
   }
   const shelfPrice = Number(shelf);
   if (!Number.isFinite(shelfPrice) || shelfPrice <= 0) {
-    return { estimate: null, cost: null, firm: false, confirm: true, ballpark: false };
+    return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false };
   }
   const channel = channelOf(source);
   if (channel === "unknown") {
-    return { estimate: null, cost: null, firm: false, confirm: true, ballpark: false };
+    return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false };
   }
-  if (channel === "other") {
-    const estimate = roundMoney(shelfPrice * (1 + rules.otherLocalMarkupPercent / 100));
-    return { estimate, cost: null, firm: true, confirm: false, ballpark: false };
+  const low = priceBound(shelfPrice, channel);
+  if (low.confirm || low.estimate == null) {
+    return { estimate: null, estimateHigh: null, cost: low.cost, firm: false, confirm: true, ballpark: false };
   }
-  const estimate = roundMoney(shelfPrice * (1 - rules.matchPercentBelow / 100));
-  const cost = roundMoney(shelfPrice * (1 - rules.assumedCostBelowShelfPercent / 100));
-  const margin = estimate > 0 ? (estimate - cost) / estimate : 0;
-  if (margin + 1e-9 < rules.minGrossMargin) {
-    return { estimate: null, cost, firm: false, confirm: true, ballpark: false };
+  const highShelf = Number(shelfHigh);
+  let estimateHigh = null;
+  if (Number.isFinite(highShelf) && highShelf > shelfPrice) {
+    const high = priceBound(highShelf, channel);
+    if (high.confirm || high.estimate == null) {
+      return { estimate: null, estimateHigh: null, cost: low.cost, firm: false, confirm: true, ballpark: false };
+    }
+    estimateHigh = high.estimate;
   }
-  return { estimate, cost, firm: true, confirm: false, ballpark: false };
+  return {
+    estimate: low.estimate,
+    estimateHigh,
+    cost: low.cost,
+    firm: estimateHigh == null,
+    confirm: false,
+    ballpark: estimateHigh != null,
+  };
 }
 
 export function applyFuel(lines, miles) {
-  const priced = lines.filter((line) => line.estimate != null && line.firm && !line.confirm && !line.fixedListed);
+  const priced = lines.filter((line) => line.estimate != null && !line.confirm && !line.fixedListed);
   const marginDollars = priced.reduce((sum, line) => {
     if (line.cost == null) return sum;
     return sum + (line.estimate - line.cost) * (line.qty || 1);
@@ -167,7 +193,9 @@ export function applyFuel(lines, miles) {
       ? remaining
       : roundMoney(fuel * ((line.estimate * qty) / base)) || 0;
     remaining = roundMoney(remaining - share) || 0;
-    line.estimate = roundMoney(line.estimate + share / qty);
+    const each = share / qty;
+    line.estimate = roundMoney(line.estimate + each);
+    if (line.estimateHigh != null) line.estimateHigh = roundMoney(line.estimateHigh + each);
   });
   return { lines, fuelAdded: fuel, miles: trip };
 }
@@ -227,7 +255,7 @@ function publicLine(line, bulk) {
     sku: line.sku || "",
     qty: line.qty,
     estimate: confirm && bulk ? line.estimate : (line.confirm ? null : line.estimate),
-    estimateHigh: null,
+    estimateHigh: confirm && !bulk ? null : (line.estimateHigh ?? null),
     firm: !confirm && line.firm,
     ballpark: bulk && line.estimate != null && !line.fixedListed,
     confirm: line.confirm && !bulk,

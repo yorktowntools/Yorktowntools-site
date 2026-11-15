@@ -41,6 +41,6 @@ That checks the 1% price math, the retailer filter, the bulk-order line, and a m
 5. Turn off the network and send again, or stop the Worker. The form should still land in the existing Formspree inbox.
 6. Send more than 20 chats in an hour from one connection. George should stop answering and point to the phone.
 
-## Price list
+## Match percent
 
-Change `PRICE_DISCOUNT_PERCENT` from `1` to `0` in `worker/wrangler.toml`, deploy again, and confirm a known shelf price is quoted as a match instead of 1% under. Put it back to `1` unless Zachary wants a match.
+The instant quote matches the shelf price. That setting is `matchPercentBelow` in `worker/config/rules.js` (0 means a match). Change it there and deploy the Worker again. Do not put a discount percent in `wrangler.toml`.

@@ -174,11 +174,15 @@ export function formatEstimate(priced) {
   return formatMoney(priced.estimate);
 }
 
+const PRODUCT_WORD = /\b(caulk|saws?|circular|drills?|drivers?|impacts?|tools?|ladders?|gloves?|blades?|bits?|batter(?:y|ies)|wrenches?|pliers|screws?|fasteners?|levels?|lasers?|packout|generators?|stations?|cases?|kits?|grinders?|nailers?|tapes?)\b/i;
+
 export function shouldSearch(userText, matches) {
   const text = String(userText || "");
-  const priceAsk = /(\bprice\b|\bpricing\b|how much|\$|\bquote\b|\bestimate\b)/i.test(text);
+  const priceAsk = /(\bprice\b|\bpricing\b|how much|\$|\bquote\b|\bestimate\b|\bcost\b)/i.test(text);
   const modelish = /\b[a-z]{0,6}-?\d{2,}[a-z0-9-]*\b/i.test(text);
-  if (!priceAsk && !modelish) return false;
+  const qty = extractQty(text);
+  const namedProduct = PRODUCT_WORD.test(text) && (qty != null || priceAsk);
+  if (!priceAsk && !modelish && !namedProduct) return false;
   if (matches.length && matches.every(hasFirmPrice)) return false;
   return true;
 }

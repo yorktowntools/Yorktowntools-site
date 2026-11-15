@@ -3,15 +3,13 @@ import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
 import {
-  discountPercent,
   hasFirmPrice,
   matchCatalog,
-  priceEntry,
   shouldSearch,
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
-import { presentQuote, priceFromShelf } from "./policy.js";
+import { presentQuote, priceFromShelf, rules } from "./policy.js";
 
 const buckets = new Map();
 
@@ -60,17 +58,24 @@ function allowedOrigin(request, env) {
   return "";
 }
 
-function json(body, status, request, env, extra = {}) {
-  const headers = {
-    "Content-Type": "application/json; charset=utf-8",
-    ...extra,
-  };
+function corsHeaders(request, env, extra = {}) {
+  const headers = { ...extra };
   const origin = allowedOrigin(request, env);
   if (origin) {
     headers["Access-Control-Allow-Origin"] = origin;
     headers.Vary = "Origin";
   }
-  return new Response(JSON.stringify(body), { status, headers });
+  return headers;
+}
+
+function json(body, status, request, env, extra = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: corsHeaders(request, env, {
+      "Content-Type": "application/json; charset=utf-8",
+      ...extra,
+    }),
+  });
 }
 
 function num(value, fallback) {
@@ -146,50 +151,6 @@ function countSearches(data) {
   return (data?.output || []).filter((item) => String(item?.type || "").includes("web_search")).length;
 }
 
-function applyCatalog(quote, percent) {
-  const items = Array.isArray(quote?.items) ? quote.items.slice(0, 8) : [];
-  return items.map((raw) => {
-    const name = String(raw?.name || raw?.sku || "").slice(0, 160);
-    const hits = matchCatalog(catalog, `${raw?.sku || ""} ${name}`);
-    const firm = hits.find(hasFirmPrice);
-    let priced;
-    if (firm) {
-      priced = priceEntry({ ...firm, qty: raw?.qty }, percent);
-    } else if (raw?.shelfLow != null || raw?.shelfHigh != null) {
-      const lows = [Number(raw.shelfLow), Number(raw.shelfHigh)].filter((n) => Number.isFinite(n) && n > 0);
-      priced = priceEntry({
-        name,
-        sku: raw?.sku || "",
-        manufacturerUrl: raw?.manufacturerUrl || "",
-        categoryPage: raw?.categoryPage || "",
-        shelfPrice: lows.length ? Math.min(...lows) : null,
-        qty: raw?.qty,
-        date: new Date().toISOString().slice(0, 10),
-      }, percent);
-      if (raw?.confidence === "unsure" || lows.length < 2) {
-        priced.confidence = lows.length ? "range" : "unsure";
-        priced.kind = lows.length ? "instant" : "unsure";
-      } else {
-        priced.confidence = "list";
-        priced.kind = "instant";
-      }
-    } else if (hits[0]) {
-      priced = priceEntry({ ...hits[0], qty: raw?.qty }, percent);
-    } else {
-      priced = priceEntry({
-        name: name || "Item",
-        sku: raw?.sku || "",
-        manufacturerUrl: raw?.manufacturerUrl || "",
-        categoryPage: raw?.categoryPage || "",
-        qty: raw?.qty,
-      }, percent);
-    }
-    const qty = Number(raw?.qty);
-    priced.qty = Number.isFinite(qty) && qty > 0 ? qty : null;
-    return publicQuoteItem(priced);
-  }).filter(Boolean);
-}
-
 async function callXai(env, instructions, input, useSearch) {
   const model = env.XAI_MODEL || "grok-4.3";
   const full = {
@@ -248,14 +209,21 @@ function linesFromQuote(rawQuote) {
     const known = hits.find(hasFirmPrice) || hits[0];
     const fixed = Boolean(known?.fixedPrice);
     let shelf = null;
-    if (!fixed && known?.shelfPrice != null && known.shelfPrice !== "") shelf = Number(known.shelfPrice);
-    else if (!fixed && raw?.shelf != null) shelf = Number(raw.shelf);
-    else if (!fixed && (raw?.shelfLow != null || raw?.shelfHigh != null)) {
-      const nums = [raw.shelfLow, raw.shelfHigh].map(Number).filter((n) => Number.isFinite(n) && n > 0);
-      shelf = nums.length ? Math.min(...nums) : null;
-    }
+    let shelfHigh = null;
+    const takeRange = (low, high) => {
+      const nums = [low, high].map(Number).filter((n) => Number.isFinite(n) && n > 0);
+      if (!nums.length) return;
+      shelf = Math.min(...nums);
+      const top = Math.max(...nums);
+      shelfHigh = top > shelf ? top : null;
+    };
+    if (!fixed && raw?.shelf != null && Number(raw.shelf) > 0) shelf = Number(raw.shelf);
+    else if (!fixed && (raw?.shelfLow != null || raw?.shelfHigh != null)) takeRange(raw.shelfLow, raw.shelfHigh);
+    else if (!fixed && known?.shelfPrice != null && known.shelfPrice !== "") shelf = Number(known.shelfPrice);
+    else if (!fixed && known && (known.shelfLow != null || known.shelfHigh != null)) takeRange(known.shelfLow, known.shelfHigh);
     const priced = priceFromShelf({
       shelf,
+      shelfHigh,
       source: fixed ? "A" : (raw?.source || (shelf ? "A" : "U")),
       fixedPrice: fixed,
       listPrice: fixed ? known.price : null,
@@ -332,9 +300,13 @@ function validPhone(value) {
 export async function handleRequest(request, env = {}) {
   const url = new URL(request.url);
   if (request.method === "OPTIONS") {
-    return json({ ok: true }, 204, request, env, {
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders(request, env, {
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Max-Age": "86400",
+      }),
     });
   }
 
@@ -344,7 +316,7 @@ export async function handleRequest(request, env = {}) {
       ok: true,
       service: "george",
       mode: mock ? "mock" : "live",
-      discountPercent: discountPercent(env.PRICE_DISCOUNT_PERCENT, catalog.discountPercent ?? 1),
+      matchPercentBelow: rules.matchPercentBelow,
     }, 200, request, env);
   }
 
@@ -372,7 +344,7 @@ async function chat(request, env) {
   const body = await readJson(request);
   if (body.error) return json({ error: body.error }, 400, request, env);
   const page = safePage(body.data?.page);
-  const percent = discountPercent(env.PRICE_DISCOUNT_PERCENT, catalog.discountPercent ?? 1);
+  const percent = rules.matchPercentBelow;
   const messages = trimMessages(body.data?.messages, num(env.MAX_HISTORY_MESSAGES, 8));
   const userTurns = messages.filter((message) => message.role === "user");
   if (!userTurns.length) return json({ error: "empty" }, 400, request, env);
@@ -589,4 +561,4 @@ async function quote(request, env) {
   }, 200, request, env);
 }
 
-export { splitModelOutput, applyCatalog, finalizeReply, catalog };
+export { splitModelOutput, finalizeReply, catalog };
