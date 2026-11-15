@@ -1,15 +1,19 @@
 import {
+  AFTER_HOURS_LINE,
   BULK_LINE,
   CATEGORIES,
   CONSIGNMENT_URL,
   CREDIT_APP_URL,
   ESTIMATE_NOTE,
+  GREETING,
   HOURS,
   PHONE_DISPLAY,
+  QUOTE_OFFER,
   SAFE_COST_REPLY,
   SERVICE_AREA,
 } from "./copy.js";
 import { filterCustomerText } from "./customer-text.js";
+import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn } from "./talk.js";
 import {
   discountPercent,
   extractQty,
@@ -45,6 +49,8 @@ function toQuoteItem(priced, qty) {
   return {
     name: priced.name,
     sku: priced.sku,
+    model: priced.model,
+    manufacturer: priced.manufacturer,
     qty,
     estimate: priced.estimate,
     estimateHigh: priced.estimateHigh,
@@ -56,7 +62,39 @@ function toQuoteItem(priced, qty) {
   };
 }
 
-export function localReply({ message, catalog, discount, page }) {
+function recommendCordedHammers(catalog, percent) {
+  const wanted = ["DWE5010", "5378-20"];
+  const picks = wanted
+    .map((sku) => (catalog?.items || []).find((item) => item.sku === sku))
+    .filter(Boolean)
+    .map((item) => priceEntry(item, percent));
+  const why = {
+    DWE5010: "Corded, so it keeps going on a long day of anchors.",
+    "5378-20": "A tougher housing when the bit stays in the hole.",
+  };
+  const lines = picks.map((priced) => {
+    const amount = formatEstimate(priced);
+    const link = itemLink(priced);
+    return `${priced.model}. ${why[priced.sku] || "A solid corded hammer drill for concrete."} Starting estimate ${amount}. ${link}.`;
+  });
+  const reply = [
+    "Okay, here are a couple of good options for concrete.",
+    lines.join("\n\n"),
+    QUOTE_OFFER,
+  ].filter(Boolean).join("\n\n");
+  return {
+    reply,
+    quote: {
+      items: picks.map((priced) => toQuoteItem(priced, 1)),
+      offerForm: false,
+      hold: true,
+      stage: "recommend",
+      bulk: false,
+    },
+  };
+}
+
+export function localReply({ message, history = [], catalog, discount, page }) {
   const text = String(message || "").trim();
   const percent = discountPercent(discount, catalog?.discountPercent ?? 1);
   const filteredUser = filterCustomerText(text);
@@ -93,21 +131,52 @@ export function localReply({ message, catalog, discount, page }) {
     const shaped = bulk
       ? items.map((item) => (item.kind === "listed" ? item : { ...item, kind: "ballpark", firm: false }))
       : items;
-    const withBulk = bulk ? `${reply}\n\n${BULK_LINE}` : reply;
-    const safe = filterCustomerText(withBulk);
+    const withBulk = bulk && items.length ? `${reply}\n\n${BULK_LINE}` : reply;
+    const withOffer = items.length && !/quote together/i.test(withBulk) ? `${withBulk}\n\n${QUOTE_OFFER}` : withBulk;
+    const safe = filterCustomerText(withOffer);
     const body = safe.costHit ? SAFE_COST_REPLY : safe.text;
     return {
       reply: body,
-      quote: { items: shaped, offerForm: Boolean(offerForm || shaped.length), bulk },
+      quote: {
+        items: shaped,
+        offerForm: false,
+        hold: shaped.length > 0,
+        stage: shaped.length ? "quote" : "script",
+        bulk,
+      },
     };
   };
 
   if (!text) {
-    return finish(
-      "Hey, I'm George with Yorktown Tools. You build the project. We deliver the tools. What do you need on the job?",
-      [],
-      false,
-    );
+    return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script" } };
+  }
+
+  if (acceptingQuote(text, history)) {
+    const earlier = [...history].reverse().find((entry) => entry.role === "user");
+    const again = earlier
+      ? localReply({ message: earlier.content, history: history.filter((entry) => entry !== earlier), catalog, discount, page })
+      : { quote: { items: [] } };
+    return {
+      reply: "Okay. Add your name and the job site and we'll send it.",
+      quote: {
+        items: again.quote?.items || [],
+        offerForm: true,
+        hold: false,
+        stage: "form",
+        bulk: Boolean(again.quote?.bulk),
+      },
+    };
+  }
+
+  const drill = drillTurn(text, history);
+  if (drill?.stage === "clarify") {
+    return { reply: drill.reply, quote: { items: [], offerForm: false, stage: "clarify" } };
+  }
+  if (drill?.stage === "recommend") return recommendCordedHammers(catalog, percent);
+
+  const stage = chatStage(text, history, catalog);
+  if (stage === "clarify") {
+    return { reply: clarifyingQuestion(text, history), quote: { items: [], offerForm: false, stage: "clarify" } };
   }
 
   if (/ignore (all |any |the )?(previous|above|prior) instructions|system prompt|you are now|jailbreak|developer mode/i.test(text)) {
@@ -119,12 +188,12 @@ export function localReply({ message, catalog, discount, page }) {
   }
 
   if (filteredUser.costHit || /\b(your cost|the margin|markup|military discount|supplier discount)\b/i.test(text)) {
-    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: true } };
+    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script" } };
   }
 
   if (/^(hi|hey|hello|yo|good morning|good afternoon)\b/i.test(text) && text.length < 40) {
     return finish(
-      "Hey, I'm George with Yorktown Tools. You build the project. We deliver the tools. What do you need on the job?",
+      GREETING,
       [],
       false,
     );
@@ -132,7 +201,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(hour|open|close|when are you)\b/i.test(text)) {
     return finish(
-      `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. After hours, Zachary will reply by 9 a.m. the next business day.`,
+      `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. ${AFTER_HOURS_LINE}`,
       [],
       false,
     );
@@ -164,7 +233,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(who are you|who is zach|about you|veteran|army|truck|cobalt|silverado)\b/i.test(text)) {
     let reply =
-      "Yorktown Tools is Zachary Barber's company in Yorktown, Virginia. He's a veteran. Army aviation maintenance and leadership. The whole point is to keep your crew on the job site. Veteran-owned, and the money stays local. SAM.gov registered.";
+      "Yorktown Tools is a veteran-owned company in Yorktown, Virginia. The founder spent 19-plus years in Army aviation. The whole point is to keep your crew on the job site, and the money stays local. SAM.gov registered.";
     if (/\b(cobalt|silverado|truck)\b/i.test(text)) {
       reply += " He started deliveries in a Chevy Cobalt. The work truck now is a Silverado.";
     }
@@ -173,7 +242,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(gsa|government|sam\.gov|cage|uei)\b/i.test(text)) {
     return finish(
-      "We're SAM.gov registered. UEI SMYXDLJDJMZ4. CAGE 16LD9. I can't promise a GSA schedule or special terms. Zachary handles government pricing and purchase orders directly. Call or text (757) 940-5171.",
+      "We're SAM.gov registered. UEI SMYXDLJDJMZ4. CAGE 16LD9. I can't promise a GSA schedule or special terms. We handle government pricing and purchase orders directly. Call or text (757) 940-5171.",
       [],
       true,
     );
@@ -184,7 +253,7 @@ export function localReply({ message, catalog, discount, page }) {
       const lineQty = priced.qty || qty;
       const amount = formatEstimate(priced);
       const qtyBit = lineQty ? `${lineQty} × ` : "";
-      if (priced.estimate == null) return `- ${qtyBit}${priced.name}: Zachary will confirm the price.`;
+      if (priced.estimate == null) return `- ${qtyBit}${priced.name}.`;
       if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
         const fees = paymentOnTop(priced.estimate);
         return `- ${qtyBit}${priced.name}: ${amount} a pair. Card about ${formatMoney(fees.card)}. ACH about ${formatMoney(fees.ach)}. No fee by check.`;
@@ -207,7 +276,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(price|pricing|how much|quote|cost)\b/i.test(text)) {
     return finish(
-      `Tell me the brand and model, and how many you need. I'll write the estimate. If I'm not sure of the number, I'll say so and Zachary will confirm it quickly. Free delivery from ${SERVICE_AREA}.`,
+      `Tell me the brand and model, and how many you need. I'll write the estimate. ${ESTIMATE_NOTE} Free delivery from ${SERVICE_AREA}.`,
       [],
       true,
     );

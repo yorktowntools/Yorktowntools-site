@@ -24,7 +24,7 @@ export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
   const rows = items.map((item) => {
     const label = clean(item.name, "Item");
     const price = bulk || item.confirm || item.estimate == null
-      ? (bulk ? "Zachary will price this" : "Zachary will confirm the price")
+      ? (bulk ? "We'll price this" : "We'll confirm the price")
       : `${formatMoney(item.estimate)} estimate`;
     const own = /yorktowntools\.com/i.test(item.manufacturerUrl || "");
     const links = (own
@@ -49,12 +49,12 @@ export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
       : "");
 
   const subject = bulk
-    ? "Yorktown Tools got your list — Zachary will send your bulk pricing"
+    ? "Yorktown Tools got your list — we'll send your bulk pricing"
     : `Your Yorktown Tools estimate${company ? ` — ${company}` : ""}`;
 
   const intro = bulk
-    ? `${BULK_EMAIL} I have the items, quantities, and job site. Zachary will price it and write you back.`
-    : `Here is the estimate from George at Yorktown Tools. ${ESTIMATE_NOTE} Free delivery is included. Zachary confirms timing.`;
+    ? `${BULK_EMAIL} We have the items, quantities, and job site.`
+    : `Here is the estimate from George at Yorktown Tools. ${ESTIMATE_NOTE} Free delivery is included.`;
 
   const html = `<!DOCTYPE html>
 <html>
@@ -81,7 +81,7 @@ export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
               <th align="left" style="padding:8px;">Estimate</th>
               <th align="left" style="padding:8px;">Links</th>
             </tr>
-            ${rows || `<tr><td colspan="4" style="padding:10px 8px;">Zachary will price the list you sent.</td></tr>`}
+            ${rows || `<tr><td colspan="4" style="padding:10px 8px;">We'll price the list you sent.</td></tr>`}
           </table>
           ${taxBlock}
           <p style="margin:0 0 12px;"><strong>Delivery:</strong> Free to the job site, shop, or trailer across ${escapeHtml(SERVICE_AREA)}. No minimum. No promise of a clock time.</p>
@@ -108,7 +108,7 @@ export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
     "",
     ...items.map((item) => {
       const price = bulk || item.confirm || item.estimate == null
-        ? (bulk ? "Zachary will price this" : "Zachary will confirm the price")
+        ? (bulk ? "We'll price this" : "We'll confirm the price")
         : `${formatMoney(item.estimate)} estimate`;
       return `- ${clean(item.name, "Item")} × ${item.qty || "?"} — ${price}`;
     }),
@@ -136,6 +136,7 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
     : (bulk
       ? "Bulk order. Do not treat George's note as a locked price. Price it through your own sources and send the number."
       : "Small or one-off order. George already sent an instant estimate. Little follow-up unless something needs confirming.");
+  const zacharyLine = "Zachary, this note is for you. The customer was not given your name.";
   const lines = items.map((item) => {
     const price = item.estimate == null ? "confirm" : formatMoney(item.estimate);
     return `- ${clean(item.name, "Item")} × ${item.qty || "?"} — ${bulk ? "not locked" : price}`;
@@ -143,6 +144,7 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
   const text = [
     flag,
     tierLabel(tier),
+    zacharyLine,
     callLine,
     "",
     `Name: ${clean(lead.name)}`,
@@ -161,6 +163,7 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
 
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;">
     <p style="font-size:18px;font-weight:700;color:#0b1e3f;">${escapeHtml(flag)}</p>
+    <p>${escapeHtml(zacharyLine)}</p>
     <p>${escapeHtml(tierLabel(tier))}. ${escapeHtml(callLine)}</p>
     <p><strong>Name:</strong> ${escapeHtml(clean(lead.name))}<br>
     <strong>Company:</strong> ${escapeHtml(company)}<br>

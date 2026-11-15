@@ -42,8 +42,8 @@ The Worker also caps abuse: 20 chats an hour and 60 a day per network address, 8
 Homeowners and one-off orders should be able to finish on their own. Contractors and government buyers are the accounts to grow.
 
 - A small order matches the shelf price. `matchPercentBelow` in `worker/config/rules.js` is **0**. Fuel is folded into the item price when the drive is long enough. The quote still says delivery is free.
-- If a price would sit under the margin floor, George does not show it. He says Zachary will confirm the price.
-- A bulk order is not a locked price. George gives a starting estimate, says bulk pricing usually comes in better, and the customer email says Zachary will send the bulk pricing.
+- If a price would sit under the margin floor, George does not show it. He says we'll confirm the price.
+- A bulk order is not a locked price. George gives a starting estimate, says bulk pricing usually comes in better, and the customer email says we'll send the bulk pricing. The customer never hears the founder's name.
 - Gloves and shirts marked `fixedPrice` stay at the price printed on the site. Virginia sales tax is 7% unless the buyer is government or tax-exempt, and a tax-exempt order needs a certificate.
 - Card and a government purchase card, ACH, and check are shown on the quote with their fees. Net terms stay approval-only.
 - He never tells a customer your cost, your margin, a supplier, or where an item was picked up. He never names other retailers. Change the numbers only in `worker/config/rules.js`.

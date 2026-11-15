@@ -2,14 +2,14 @@ import { rules } from "../config/rules.js";
 import { isAllowedCustomerUrl } from "../../shared/customer-text.js";
 import { formatEstimate, formatMoney, paymentOnTop, roundMoney } from "../../shared/pricing.js";
 
-const CONFIRM = "Zachary will confirm the price";
+const CONFIRM = "We'll confirm the price";
 const BALLPARK = "Starting estimate, bulk pricing usually comes in better.";
-const BULK_EMAIL = "Zachary will send your bulk pricing.";
-const SAME_DAY = "This looks available for same-day delivery. Zachary will confirm before you count on a clock time.";
-const SOURCED = "I can't get this one locally today, so it has to be sourced. I won't guess the lead time. Zachary will confirm it.";
-const GLOVES = "We keep the Victory Series on hand. Same-day delivery is often possible if your size is here. Zachary will confirm before you count on it.";
-const BULK_TIME = "For a bulk order, figure the next business day or one to two business days. That is a plan, not a promise. Zachary will confirm it.";
-const AFTER_HOURS = "It's outside business hours. Zachary will reply by 9 a.m. the next business day.";
+const BULK_EMAIL = "We'll send your bulk pricing.";
+const SAME_DAY = "This looks available for same-day delivery. We'll confirm before you count on a clock time.";
+const SOURCED = "I can't get this one locally today, so it has to be sourced. I won't guess the lead time. We'll confirm it.";
+const GLOVES = "We keep the Victory Series on hand. Same-day delivery is often possible if your size is here. We'll confirm before you count on it.";
+const BULK_TIME = "For a bulk order, figure the next business day or one to two business days. That is a plan, not a promise.";
+const AFTER_HOURS = "It's outside business hours. We'll get back to you by 9 a.m. the next business day.";
 
 const PLACES = [
   ["virginia beach", 36.8529, -75.978],
@@ -260,7 +260,7 @@ export function leadTimeNote({ bulk, owned, localPickup }) {
   if (owned) return GLOVES;
   if (localPickup === true) return SAME_DAY;
   if (localPickup === false) return SOURCED;
-  return "I won't promise it's on hand. Zachary will confirm timing.";
+  return "I won't promise it's on hand.";
 }
 
 function publicLine(line, bulk) {
@@ -309,9 +309,8 @@ export function presentQuote({
   const notes = [
     lead.bulk ? `${BALLPARK} ${BULK_EMAIL}` : "",
     leadTimeNote({ bulk: lead.bulk, owned, localPickup }),
-    afterHoursNote(now),
     lead.askVolume ? "About how often do you order, and is this a typical size for you?" : "",
-    taxExempt ? "Tax-exempt orders need a certificate. Zachary will follow up for that." : "",
+    taxExempt ? "Tax-exempt orders need a certificate. We'll follow up for that." : "",
   ].filter(Boolean);
   return {
     items,
@@ -413,7 +412,7 @@ export function itemPriceLine(item) {
   if (item.ballpark && amount) {
     return `${qty}${name}: Starting estimate ${amount}.`;
   }
-  if (!amount || item.confirm) return `${qty}${name}: Zachary will confirm the price.`;
+  if (!amount || item.confirm) return `${qty}${name}.`;
   return `${qty}${name}: ${amount}.`;
 }
 
@@ -445,7 +444,7 @@ export function replyWithFinalPrices(modelReply, items) {
     const amounts = dollarTokens(trimmed);
     if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
     if (restatesServerPrice(trimmed, list)) continue;
-    if (list.some((item) => item.ballpark) && /bulk pricing usually comes in better|zachary will send (your |the )?bulk pricing/i.test(trimmed)) continue;
+    if (list.some((item) => item.ballpark) && /bulk pricing usually comes in better|we['’]?ll send (your |the )?bulk pricing|zachary will send (your |the )?bulk pricing/i.test(trimmed)) continue;
     seen.add(key);
     if (/\?\s*$/.test(trimmed)) questions.push(trimmed);
     else explanation.push(trimmed);
@@ -460,6 +459,7 @@ export function replyWithFinalPrices(modelReply, items) {
   if (links.length) blocks.push(links.join("\n"));
   if (explanation.length) blocks.push(explanation.join(" "));
   if (questions.length) blocks.push(questions.join(" "));
+  if (list.some((item) => !formatEstimate(item) || item.confirm)) blocks.push("We'll confirm the price.");
   return blocks.join("\n\n").trim();
 }
 

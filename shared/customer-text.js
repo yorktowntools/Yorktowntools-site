@@ -200,7 +200,42 @@ function scrubUrls(text) {
   return { text: withoutBare, retailerHit };
 }
 
-export function filterCustomerText(input) {
+export function rewriteOwnerName(input) {
+  let text = String(input || "");
+  text = text.replace(/\bZachary Barber(?:['’]s)?\b/gi, "our team");
+  text = text.replace(/\bZachary\s+will\s+reply\s+by\b/gi, "We'll get back to you by");
+  text = text.replace(/\bZachary\s+will\s+send\s+(?:your\s+|the\s+)?bulk\s+pricing\b/gi, "We'll send your bulk pricing");
+  text = text.replace(/\bZachary\s+will\s+confirm\s+the\s+price\b/gi, "We'll confirm the price");
+  text = text.replace(/\bZachary\s+will\s+confirm\b/gi, "We'll confirm");
+  text = text.replace(/\bZachary\s+confirms\b/gi, "We'll confirm");
+  text = text.replace(/\bZachary\s+will\s+price\b/gi, "We'll price");
+  text = text.replace(/\bZachary\s+will\s+take\b/gi, "we'll take");
+  text = text.replace(/\bZachary\s+will\s+follow\s+up\b/gi, "We'll follow up");
+  text = text.replace(/\bZachary\s+will\s+look\b/gi, "we'll look");
+  text = text.replace(/\bZachary\s+handles\b/gi, "we handle");
+  text = text.replace(/\bZachary\b/gi, "our team");
+  text = text.replace(/\bZach\b/gi, "our team");
+  text = text.replace(/\bour team will\b/gi, "we'll");
+  text = text.replace(/\bWe'll will\b/g, "We'll");
+  return text;
+}
+
+export function sayConfirmOnce(input) {
+  let seen = false;
+  return String(input || "")
+    .split("\n")
+    .filter((line) => {
+      if (!/we['’]?ll confirm/i.test(line)) return true;
+      if (seen) return false;
+      seen = true;
+      return true;
+    })
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+export function filterCustomerText(input, options = {}) {
   const original = stripInvisible(input);
   if (!original.trim()) {
     return { text: "", retailerHit: false, costHit: false, replaced: false };
@@ -242,6 +277,7 @@ export function filterCustomerText(input) {
   if (matchesAny(text, RETAILER_PATTERNS) || matchesAny(text, COST_PATTERNS)) {
     return { text: SAFE_RETAILER_REPLY, retailerHit: true, costHit: false, replaced: true };
   }
+  if (!options.keepName) text = sayConfirmOnce(rewriteOwnerName(text));
   return { text, retailerHit, costHit: false, replaced: false };
 }
 

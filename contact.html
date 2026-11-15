@@ -423,30 +423,8 @@
         footer a:hover { opacity: 0.85; }
         footer p { margin: 0.6rem 0; font-size: clamp(0.9rem, 3vw, 1rem); }
 
-        .call-button {
-            position: fixed;
-            right: clamp(14px, 4vw, 24px);
-            bottom: clamp(14px, 4vw, 24px);
-            width: clamp(64px, 16vw, 88px);
-            height: clamp(64px, 16vw, 88px);
-            background: var(--red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
-            z-index: 999;
-            animation: pulse 2.6s infinite;
-            cursor: pointer;
-        }
-        .call-button img { width: 64%; height: auto; border-radius: 50%; border: 3px solid var(--white); }
-
-        @keyframes pulse {
-            0%   { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); }
-            70%  { box-shadow: 0 0 0 25px rgba(200,16,46,0); }
-            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); }
-        }
-
+                
+        
         @media (max-width: 480px) {
             main { padding: 0 0.8rem; }
             .hero { margin: 1.5rem 0; padding: 3rem 0.8rem 2.5rem; }
@@ -456,11 +434,7 @@
 </head>
 <body>
 
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call or text Yorktown Tools">
-        <img src="Yorktown.PNG" alt="George mascot">
-    </a>
-
-    <div class="top-red-banner">
+<div class="top-red-banner">
         <div class="banner-text active">Free Delivery</div>
         <div class="banner-text">Fast Quotes</div>
         <div class="banner-text">Veteran-Owned</div>

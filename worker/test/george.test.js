@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { BULK_LINE } from "../../shared/copy.js";
-import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl } from "../../shared/customer-text.js";
+import { BULK_LINE, CONFIRM_PRICE, GREETING, SAFE_COST_REPLY } from "../../shared/copy.js";
+import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl, rewriteOwnerName, sayConfirmOnce } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
 import {
   extractQty,
@@ -18,7 +18,7 @@ import {
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
-import { presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
+import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
 import { renderSafeHtml } from "../../shared/customer-text.js";
 import { formatEstimate } from "../../shared/pricing.js";
 import { rules } from "../config/rules.js";
@@ -211,7 +211,8 @@ test("tiers, tax, fuel, and the sales email stay private", () => {
     leadInfo: bulk.lead,
     notes: [],
   });
-  assert.match(customer.text, /Zachary will send your bulk pricing/);
+  assert.match(customer.text, /We'll send your bulk pricing/);
+  assert.doesNotMatch(`${customer.text} ${customer.html}`, /\bZach/i);
   assert.doesNotMatch(customer.text, /\$\d/);
   assert.doesNotMatch(customer.text, /tier 1|priority/i);
 
@@ -237,7 +238,8 @@ test("tiers, tax, fuel, and the sales email stay private", () => {
     text: "tonight",
     now: fridayNight,
   });
-  assert.match(after.notes.join(" "), /9 a\.m\. the next business day/);
+  assert.doesNotMatch(after.notes.join(" "), /9 a\.m\./);
+  assert.match(afterHoursNote(fridayNight), /We'll get back to you by 9 a\.m\. the next business day/);
   const tuesday = presentQuote({
     lines: [{
       name: "DeWalt drill",
@@ -299,8 +301,8 @@ test("links render as labeled anchors and hours are not repeated", () => {
   assert.equal((prose.match(/<p>/g) || []).length, 1);
   assert.match(prose, /First sentence here\. Second sentence here\./);
   const once = withoutRepeatedAfterHours(
-    "Still here.\nZachary will reply by 9 a.m. the next business day.",
-    [{ role: "assistant", content: "Zachary will reply by 9 a.m. the next business day." }],
+    "Still here.\nWe'll get back to you by 9 a.m. the next business day.",
+    [{ role: "assistant", content: "We'll get back to you by 9 a.m. the next business day." }],
   );
   assert.doesNotMatch(once, /9 a\.m\./);
   assert.match(once, /Still here/);
@@ -412,7 +414,8 @@ test("mock chat and quote endpoints", async () => {
   assert.match(bulkBody.reply, /Makita 5007FA 7-1\/4 in\. circular saw/);
   assert.match(bulkBody.reply, /\[Makita 5007FA\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
   assert.equal((bulkBody.reply.match(/bulk pricing usually comes in better/gi) || []).length, 1);
-  assert.equal((bulkBody.reply.match(/Zachary will send your bulk pricing/gi) || []).length, 1);
+  assert.equal((bulkBody.reply.match(/We'll send your bulk pricing/gi) || []).length, 1);
+  assert.doesNotMatch(bulkBody.reply, /\bZach/i);
 
   const saws = await post("/api/chat", {
     messages: [{ role: "user", content: "I need 5 circular saws for a job in Newport News" }],
@@ -424,7 +427,7 @@ test("mock chat and quote endpoints", async () => {
   assert.doesNotMatch(sawBody.reply, /home depot|lowe|our cost|margin/i);
   assert.match(sawBody.reply, /5 × Makita 5007FA 7-1\/4 in\. circular saw: Starting estimate/);
   assert.equal((sawBody.reply.match(/bulk pricing usually comes in better/gi) || []).length, 1);
-  assert.equal((sawBody.reply.match(/Zachary will send your bulk pricing/gi) || []).length, 1);
+  assert.equal((sawBody.reply.match(/We'll send your bulk pricing/gi) || []).length, 1);
 
   const caulk = fillMissingShelf(
     { name: "cases of caulk", qty: 6 },
@@ -465,4 +468,50 @@ test("widget carries the same bulk line and the retailer filter", () => {
   const handler = readFileSync(new URL("../../worker/src/handler.js", import.meta.url), "utf8");
   assert.match(handler, /reasoning: \{ effort: useSearch \? "low" : "none" \}/);
   assert.match(readFileSync(new URL("../../shared/copy.js", import.meta.url), "utf8"), /bulk pricing usually comes in better/);
+  assert.doesNotMatch(widget, /\bZach/i);
+});
+
+test("customer-facing text never names Zachary", () => {
+  const samples = [
+    GREETING,
+    BULK_LINE,
+    CONFIRM_PRICE,
+    SAFE_COST_REPLY,
+    localReply({ message: "How much are the Victory gloves? Need 10 pairs.", catalog, discount: 0 }).reply,
+    localReply({ message: "What are your hours?", catalog, discount: 0 }).reply,
+    localReply({ message: "I need a drill", catalog, discount: 0 }).reply,
+    filterCustomerText("Zachary will confirm the price. Zach will send the bulk pricing.").text,
+  ];
+  for (const sample of samples) assert.doesNotMatch(sample, /\bZach(?:ary)?\b/i, sample);
+  assert.match(rewriteOwnerName("Zachary will reply by 9 a.m. the next business day."), /We'll get back to you by 9 a\.m\./);
+  const once = sayConfirmOnce("We'll confirm the price.\nWe'll confirm before you count on it.");
+  assert.equal((once.match(/we'll confirm/gi) || []).length, 1);
+  const sales = buildSalesEmail({
+    lead: { name: "Ada", company: "Ada Concrete", phone: "757-555-0100", email: "a@b.com", jobsite: "Richmond", neededBy: "2026-11-20", notes: "" },
+    items: [{ name: "Saw", qty: 5 }],
+    leadInfo: { tier: 1, bulk: true },
+    totals: null,
+  });
+  assert.match(sales.text, /\bZachary\b/);
+});
+
+test("a vague drill ask stays a question, and an exact model still quotes", async () => {
+  resetLimits();
+  const vague = await post("/api/chat", { messages: [{ role: "user", content: "I need a drill" }] });
+  const vagueBody = await vague.json();
+  assert.match(vagueBody.reply, /what are you using the drill for/i);
+  assert.equal(vagueBody.quote.offerForm, false);
+  assert.equal((vagueBody.quote.items || []).length, 0);
+  assert.doesNotMatch(vagueBody.reply, /\$\d/);
+  assert.doesNotMatch(vagueBody.reply, /\bZach/i);
+
+  const exact = await post("/api/chat", {
+    messages: [{ role: "user", content: "How much is a Makita 5007FA? Need 2." }],
+  });
+  const exactBody = await exact.json();
+  assert.match(exactBody.reply, /5007FA/);
+  assert.match(exactBody.reply, /\$/);
+  assert.equal(exactBody.quote.hold, true);
+  assert.equal(exactBody.quote.offerForm, false);
+  assert.equal(exactBody.quote.items[0].qty, 2);
 });

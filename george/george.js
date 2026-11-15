@@ -109,7 +109,7 @@ const messages = [];
 function addMessage(role, text) {
   const safe = role === "user"
     ? String(text || "")
-    : (filterCustomerText(text).text || "Call or text (757) 940-5171 and Zachary will take it from here.");
+    : (filterCustomerText(text).text || "Call or text (757) 940-5171 and we'll take it from here.");
   messages.push({ role, content: safe });
   const bubble = document.createElement("div");
   bubble.className = `george-msg george-msg-${role === "user" ? "user" : "bot"}`;
@@ -209,13 +209,16 @@ function renderItems() {
       const fees = paymentOnTop(item.estimate);
       price.textContent = `${amount} a pair. Card ${formatMoney(fees.card)}. ACH ${formatMoney(fees.ach)}. No fee by check.`;
     } else if (ballpark && amount) price.textContent = `Starting estimate ${amount}.`;
-    else if (confirm || !amount) price.textContent = "Zachary will confirm the price.";
+    else if ((confirm || !amount) && !draft.saidConfirm) {
+      draft.saidConfirm = true;
+      price.textContent = "We'll confirm the price.";
+    } else if (confirm || !amount) price.textContent = "";
     else price.textContent = `${amount} estimate. Free delivery is included. Not a promise of stock.`;
     row.append(name, qty, price);
     itemsEl.appendChild(row);
   });
   bulkNote.textContent = draft.bulk ? BULK_LINE : "Free job-site delivery. Virginia sales tax is added unless the order is tax-exempt.";
-  quoteForm.querySelector(".george-submit").textContent = draft.bulk ? "Send details to Zachary" : "Send quote";
+  quoteForm.querySelector(".george-submit").textContent = draft.bulk ? "Send details to Yorktown Tools" : "Send quote";
   const hasItems = draft.items.some((item) => item.name);
   reviewButton.hidden = !hasItems;
   reviewButton.textContent = draft.open ? "Hide quote form" : "Review & send quote";
@@ -243,7 +246,13 @@ function openQuote() {
 
 function absorbQuote(quote) {
   if (!quote) return;
-  for (const item of quote.items || []) {
+  if (quote.hold && !quote.offerForm) {
+    draft.pending = quote.items || [];
+    draft.pendingBulk = Boolean(quote.bulk);
+    return;
+  }
+  const incoming = quote.items?.length ? quote.items : (draft.pending || []);
+  for (const item of incoming) {
     const key = (item.sku || item.name || "").toLowerCase();
     if (!key) continue;
     const existing = draft.items.find((row) => (row.sku || row.name || "").toLowerCase() === key);
@@ -259,7 +268,9 @@ function absorbQuote(quote) {
       draft.items.push({ ...item, touched: false });
     }
   }
-  if (quote.bulk) draft.bulk = true;
+  if (quote.bulk || draft.pendingBulk) draft.bulk = true;
+  if (quote.offerForm) draft.open = true;
+  draft.saidConfirm = false;
   renderItems();
 }
 
@@ -289,6 +300,7 @@ async function ask(text) {
   if (mode !== "live") {
     return localReply({
       message: text,
+      history: messages.slice(0, -1),
       catalog,
       discount: catalog.discountPercent,
       page: location.pathname,
@@ -421,7 +433,7 @@ function openPanel() {
   launcher.setAttribute("aria-expanded", "true");
   if (!log.childElementCount) {
     if (preview) showBanner("Preview on this computer. Quotes are not emailed from here.");
-    addMessage("assistant", "Hey, I'm George with Yorktown Tools. You build the project. We deliver the tools. What do you need on the job?");
+    addMessage("assistant", "Hey, I'm George with Yorktown Tools. How can I help you today?");
     chips();
     detect();
   }

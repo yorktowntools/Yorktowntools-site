@@ -2,6 +2,7 @@ import catalog from "../../data/prices.json" with { type: "json" };
 import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
+import { chatStage } from "../../shared/talk.js";
 import {
   fillMissingShelf,
   hasFirmPrice,
@@ -291,6 +292,12 @@ function pickupOf(lines) {
   return null;
 }
 
+function withQuoteOffer(reply) {
+  const text = String(reply || "").trim();
+  if (/quote together/i.test(text)) return text;
+  return text ? `${text}\n\nWant me to put a quote together?` : "Want me to put a quote together?";
+}
+
 function mergeNotes(reply, notes) {
   let text = String(reply || "").trim();
   for (const note of notes) {
@@ -391,7 +398,7 @@ async function chat(request, env) {
   if (!userTurns.length) return json({ error: "empty" }, 400, request, env);
   if (userTurns.length > num(env.MAX_USER_TURNS, 12)) {
     return json({
-      reply: `This chat is as long as I should keep it. Call or text (757) 940-5171 and Zachary will take it from here, or send the quote form.`,
+      reply: `This chat is as long as I should keep it. Call or text (757) 940-5171 and we'll take it from here, or use the quote form on the site.`,
       quote: { items: [], offerForm: true },
       searchesUsed: 0,
       mode: "capped",
@@ -399,16 +406,31 @@ async function chat(request, env) {
   }
 
   const latest = userTurns[userTurns.length - 1].content;
+  const prior = messages.slice(0, -1);
   const matches = matchCatalog(catalog, latest);
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
+  const local = localReply({ message: latest, history: prior, catalog, discount: percent, page });
+  const stage = local.quote?.stage || chatStage(latest, prior, catalog);
+  if (stage !== "quote") {
+    return json({
+      reply: finalizeReply(local.reply, messages),
+      quote: {
+        items: stage === "form" || stage === "recommend" ? (local.quote?.items || []) : [],
+        offerForm: Boolean(local.quote?.offerForm),
+        hold: Boolean(local.quote?.hold),
+        bulk: Boolean(local.quote?.bulk),
+      },
+      searchesUsed: 0,
+      mode: mock ? "mock" : "live",
+    }, 200, request, env);
+  }
   if (mock) {
-    const local = localReply({ message: latest, catalog, discount: percent, page });
     const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest);
     const view = viewFor(lines, { text: latest });
-    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages);
+    const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));
     return json({
       reply,
-      quote: { items: view.items.length ? view.items : local.quote.items, offerForm: local.quote.offerForm, bulk: view.lead.bulk },
+      quote: { items: view.items.length ? view.items : local.quote.items, offerForm: false, hold: true, bulk: view.lead.bulk },
       searchesUsed: 0,
       mode: "mock",
     }, 200, request, env);
@@ -417,7 +439,7 @@ async function chat(request, env) {
   const sid = sessionId(body.data?.sessionId) || ip;
   const searchCap = num(env.MAX_SEARCHES_PER_CHAT, 2);
   const dayCap = num(env.MAX_SEARCHES_PER_IP_DAY, 15);
-  const canSearch = shouldSearch(latest, catalog)
+  const canSearch = stage === "quote" && shouldSearch(latest, catalog)
     && underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
     && underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
   if (canSearch) {
@@ -436,7 +458,7 @@ async function chat(request, env) {
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose);
     const view = viewFor(lines, { text: latest });
-    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages);
+    const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
@@ -446,7 +468,8 @@ async function chat(request, env) {
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {
         items: view.items,
-        offerForm: Boolean(parsed.quote?.offerForm) || view.items.length > 0,
+        offerForm: false,
+        hold: true,
         bulk: view.lead.bulk,
       },
       searchesUsed,
@@ -526,7 +549,7 @@ async function quote(request, env) {
   }
 
   const done = view.lead.bulk
-    ? "Zachary will send your bulk pricing. Yorktown Tools has the details."
+    ? "We'll send your bulk pricing. Yorktown Tools has the details."
     : "A copy is on the way to your email, and Yorktown Tools has it too.";
   if (env.MOCK_MODE === "true") {
     return json({ ok: true, via: "mock", customerEmailed: false, message: "Preview only. Nothing was sent." }, 200, request, env);
@@ -587,7 +610,7 @@ async function quote(request, env) {
         via: "formspree",
         customerEmailed: false,
         message: view.lead.bulk
-          ? "Zachary will send your bulk pricing. Yorktown Tools has the details."
+          ? "We'll send your bulk pricing. Yorktown Tools has the details."
           : "Yorktown Tools has the quote. If a branded email is not set up yet, call or text (757) 940-5171. We still have your request.",
       }, 200, request, env);
     } catch {
