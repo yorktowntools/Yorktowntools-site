@@ -2,8 +2,10 @@ name = "yorktown-george"
 main = "src/index.js"
 compatibility_date = "2026-11-01"
 
-# Plain settings. Secrets (XAI_API_KEY, RESEND_API_KEY) are NOT put here.
+# Plain settings. Secrets (XAI_API_KEY, RESEND_API_KEY, PRIVATE_COSTS_JSON) are NOT put here.
 # Set those with: npx wrangler secret put XAI_API_KEY
+# PRIVATE_COSTS_JSON is a JSON object keyed by catalog sku: {"SKU":{"privateCost":1.23,"costSource":"example"}}
+# 1.23 is a fake example. Put the real numbers only in the secret.
 
 [vars]
 XAI_MODEL = "grok-4.3"

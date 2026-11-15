@@ -19,7 +19,8 @@ import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
-import { privateCostFor, privateCosts } from "../config/private-costs.js";
+import { loadPrivateCosts, privateCostFor } from "../config/private-costs.js";
+import { accessoryOffer } from "../config/accessories.js";
 import { renderSafeHtml } from "../../shared/customer-text.js";
 import { formatEstimate } from "../../shared/pricing.js";
 import { rules } from "../config/rules.js";
@@ -461,31 +462,27 @@ test("mock chat and quote endpoints", async () => {
   assert.equal(sentBody.customerEmailed, false);
 });
 
-test("private cost stays under the shelf and off the customer reply", async () => {
-  assert.equal(privateCostFor("DAP-ALEX-PLUS-12"), 58.37);
-  assert.equal(privateCosts["DAP-ALEX-PLUS-12"].costSource, "ors");
-  assert.equal(privateCosts["DAP-ALEX-PLUS-12"].sourceSku, "802-18152");
-  assert.equal(privateCostFor("5007FA"), 212.31);
-  assert.equal(privateCosts["5007FA"].sourceSku, "5007F");
-  assert.equal(privateCosts.JACKERY.costSource, "dealer");
-  assert.equal(privateCostFor("JACKERY"), null);
-
-  const caulk = priceFromShelf({ shelf: 80, source: "A", privateCost: 58.37 });
-  assert.equal(caulk.estimate, 70.04);
-  assert.equal(caulk.confirm, false);
-  const underShelf = priceFromShelf({ shelf: 60, source: "A", privateCost: 58.37 });
-  assert.equal(underShelf.estimate, 60);
-  const saw = priceFromShelf({
-    shelf: 149,
-    shelfHigh: 179,
-    source: "A",
-    privateCost: privateCostFor("5007FA"),
+test("private cost comes from the environment and stays off the customer reply", async () => {
+  const secret = JSON.stringify({
+    "EXAMPLE-SAW": { privateCost: 40, costSource: "example" },
+    "5007FA": { privateCost: 400, costSource: "example" },
   });
-  assert.equal(saw.estimate, 149);
-  assert.equal(saw.estimateHigh, 179);
+  assert.deepEqual(loadPrivateCosts(""), {});
+  assert.deepEqual(loadPrivateCosts("not json"), {});
+  assert.equal(privateCostFor("5007FA", {}), null);
+  assert.equal(privateCostFor("5007FA", loadPrivateCosts(secret)), 400);
+  const source = readFileSync(new URL("../config/private-costs.js", import.meta.url), "utf8");
+  assert.match(source, /EXAMPLE-SKU/);
+  assert.match(source, /1\.23/);
+  assert.doesNotMatch(source, /58\.|212\./);
+
+  const marked = priceFromShelf({ shelf: 80, source: "A", privateCost: 40 });
+  assert.equal(marked.estimate, 48);
+  const aboveShelf = priceFromShelf({ shelf: 149, shelfHigh: 179, source: "A", privateCost: 400 });
+  assert.equal(aboveShelf.estimate, 149);
+  assert.equal(aboveShelf.estimateHigh, 179);
   const dealer = priceFromShelf({ shelf: 400, source: "A", privateCost: 250 });
   assert.equal(dealer.estimate, 300);
-
   rules.privateMarkup = 1.05;
   try {
     const thin = priceFromShelf({ shelf: 100, source: "A", privateCost: 90 });
@@ -495,24 +492,63 @@ test("private cost stays under the shelf and off the customer reply", async () =
   }
 
   const publicCatalog = readFileSync(new URL("../../data/prices.json", import.meta.url), "utf8");
-  assert.doesNotMatch(publicCatalog, /privateCost|orsCost|costSource|58\.37|212\.31|nasco|\bORS\b/i);
+  assert.doesNotMatch(publicCatalog, /privateCost|orsCost|costSource|58\.|212\.|nasco|\bORS\b/i);
   const widget = readFileSync(new URL("../../george/george.js", import.meta.url), "utf8");
   const shared = readFileSync(new URL("../../shared/pricing.js", import.meta.url), "utf8");
-  assert.doesNotMatch(`${widget}\n${shared}`, /private-costs|privateCost|costSource/);
+  assert.doesNotMatch(`${widget}\n${shared}`, /private-costs/);
 
   resetLimits();
-  const chat = await post("/api/chat", {
-    messages: [{ role: "user", content: "How much is a Makita 5007FA? Need 2." }],
-  });
+  const chat = await handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages: [{ role: "user", content: "How much is a Makita 5007FA? Need 2." }] }),
+  }), { ...env, PRIVATE_COSTS_JSON: secret });
   const body = await chat.json();
   const packed = JSON.stringify(body.quote.items);
   assert.equal(body.quote.items[0].estimate, 149);
   assert.equal(body.quote.items[0].estimateHigh, 179);
-  assert.doesNotMatch(`${body.reply}\n${packed}`, /212\.31|254\.|privateCost|costSource|nasco|\bORS\b|dealer cost/i);
+  assert.doesNotMatch(`${body.reply}\n${packed}`, /400|privateCost|costSource|nasco|\bORS\b|dealer cost/i);
   assert.equal(body.quote.items[0].cost, undefined);
 
-  const hidden = filterCustomerText("Our ORS Nasco cost is $58.37.").text;
-  assert.doesNotMatch(hidden, /ors|nasco|58\.37/i);
+  const hidden = filterCustomerText("Our supplier file lists a private cost.").text;
+  assert.doesNotMatch(hidden, /private cost/i);
+});
+
+test("a settled tool gets one accessory offer, and yes adds it", async () => {
+  const saw = accessoryOffer("Makita 5007FA circular saw");
+  assert.match(saw.line, /blade/i);
+  assert.match(saw.line, /I can add them if you want/);
+  assert.equal(saw.suggestions.length, 1);
+  const hammer = accessoryOffer("corded hammer drill for concrete");
+  assert.match(hammer.line, /SDS|masonry|anchor/i);
+  assert.ok(hammer.suggestions.length >= 1 && hammer.suggestions.length <= 3);
+  assert.match(accessoryOffer("cordless drill driver").line, /bit|battery|charger/i);
+  assert.match(accessoryOffer("angle grinder").line, /disc|wheel/i);
+  assert.match(accessoryOffer("framing nailer").line, /nail/i);
+  assert.match(accessoryOffer("case of caulk").line, /caulk gun/i);
+  assert.match(accessoryOffer("extension ladder").line, /stabilizer/i);
+  assert.match(accessoryOffer("hard hat and safety glasses").line, /Victory Series gloves/i);
+  assert.match(accessoryOffer("hard hat and safety glasses").line, /\$19\.99/);
+
+  resetLimits();
+  const first = await post("/api/chat", {
+    messages: [{ role: "user", content: "How much is a Makita 5007FA? Need 2." }],
+  });
+  const firstBody = await first.json();
+  assert.match(firstBody.reply, /I can add them if you want/);
+  assert.equal(firstBody.quote.items.some((item) => /blade/i.test(item.name)), false);
+
+  const second = await post("/api/chat", {
+    messages: [
+      { role: "user", content: "How much is a Makita 5007FA? Need 2." },
+      { role: "assistant", content: firstBody.reply },
+      { role: "user", content: "Yes" },
+    ],
+  });
+  const secondBody = await second.json();
+  assert.equal(secondBody.quote.items.some((item) => /blade/i.test(item.name)), true);
+  assert.match(secondBody.reply, /quote together/i);
+  assert.equal(secondBody.quote.offerForm, false);
 });
 
 test("widget carries the same bulk line and the retailer filter", () => {

@@ -33,13 +33,13 @@ function userBlob(message, history) {
   return [...prior, message].filter(Boolean).join("\n");
 }
 
-function assistantBlob(history) {
-  return (history || []).filter((entry) => entry.role === "assistant").map((entry) => entry.content || "").join("\n");
+function lastAssistant(history) {
+  return [...(history || [])].reverse().find((entry) => entry.role === "assistant");
 }
 
 export function acceptingQuote(message, history) {
   return /^(yes|yeah|yep|sure|please|ok|okay|do it|sounds good)\b/i.test(String(message || "").trim())
-    && /quote together/i.test(assistantBlob(history));
+    && /quote together/i.test(lastAssistant(history)?.content || "");
 }
 
 export function drillTurn(message, history) {
@@ -50,6 +50,9 @@ export function drillTurn(message, history) {
   const use = /\b(concrete|masonry|wood|steel|metal|anchor|tapcon|drywall|deck|brick)\b/i.test(blob);
   const power = /\b(corded|cordless|plug-?in|battery)\b/i.test(blob);
   const brand = /\b(dewalt|milwaukee|makita|bosch|ridgid|don't care|dont care|do not care|no preference|any brand)\b/i.test(blob);
+  const voltage = /\b(12v|18v|20v|36v|40v|m12|m18|flexvolt)\b/i.test(blob);
+  const cordless = /\b(cordless|battery)\b/i.test(blob) && !/\bcorded\b/i.test(blob);
+  const quantity = /\b(\d+|one|two|a couple|few)\b/i.test(blob);
   if (!use) return { stage: "clarify", reply: "Okay, what are you using the drill for?" };
   if (!power || !brand) {
     return {
@@ -57,6 +60,10 @@ export function drillTurn(message, history) {
       reply: "Okay, are you looking for corded or cordless? And do you have a specific brand or model in mind, or should I suggest a few?",
     };
   }
+  if (cordless && !voltage) {
+    return { stage: "clarify", reply: "Okay, what voltage or battery platform are you on?" };
+  }
+  if (!quantity) return { stage: "clarify", reply: "Okay, how many do you need?" };
   return { stage: "recommend" };
 }
 
@@ -70,7 +77,12 @@ export function clarifyingQuestion(message, history) {
   if (/\bsaws?\b/i.test(text) && !/\bcircular\b/i.test(text)) {
     return "Okay, what are you cutting, and do you have a brand or model in mind?";
   }
-  if (/\bladders?\b/i.test(text)) return "Okay, what height and duty rating do you need?";
+  if (/\bladders?\b/i.test(text) && !/\b(foot|ft|type ia|type i)\b/i.test(text)) {
+    return "Okay, what height and duty rating do you need?";
+  }
+  if (/\b(jackery|power station)\b/i.test(text) && !/\d/.test(text)) {
+    return "Okay, what capacity do you need, and is this for tools on the job or just charging batteries?";
+  }
   return "Okay, what are you using it for, and do you have a brand or model in mind?";
 }
 

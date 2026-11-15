@@ -12,7 +12,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
-import { privateCostFor } from "../config/private-costs.js";
+import { loadPrivateCosts, privateCostFor } from "../config/private-costs.js";
 import { presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
 const buckets = new Map();
@@ -240,12 +240,38 @@ function alignRequested(rawItems, userText) {
   });
 }
 
-function linesFromQuote(rawQuote, prose = "") {
+function costsFromEnv(env) {
+  return loadPrivateCosts(env?.PRIVATE_COSTS_JSON);
+}
+
+function linesFromQuote(rawQuote, prose = "", costs = {}) {
   const rawItems = Array.isArray(rawQuote?.items) ? rawQuote.items.slice(0, 8) : [];
   return rawItems.map((raw) => {
+    if (raw?.lockName && !raw?.sku) {
+      const qty = Number(raw.qty);
+      return {
+        name: String(raw.name || "Item").slice(0, 160),
+        sku: "",
+        model: "",
+        manufacturer: "",
+        qty: Number.isFinite(qty) && qty > 0 ? qty : null,
+        estimate: null,
+        estimateHigh: null,
+        cost: null,
+        firm: false,
+        confirm: true,
+        ballpark: false,
+        fixedListed: false,
+        manufacturerUrl: "",
+        categoryPage: "",
+        warrantyUrl: "",
+        localPickup: null,
+        asOf: null,
+      };
+    }
     const filled = fillMissingShelf(raw, catalog, prose);
     const name = String(filled?.name || filled?.sku || "Item").slice(0, 160);
-    const hits = matchCatalog(catalog, `${filled?.sku || ""} ${name}`);
+    const hits = filled?.lockName && !filled?.sku ? [] : matchCatalog(catalog, `${filled?.sku || ""} ${name}`);
     const known = hits.find(hasFirmPrice) || hits[0];
     const fixed = Boolean(known?.fixedPrice);
     let shelf = null;
@@ -268,7 +294,7 @@ function linesFromQuote(rawQuote, prose = "") {
       source: fixed ? "A" : (["A", "B", "C"].includes(String(filled?.source || "").toUpperCase()) ? String(filled.source).toUpperCase() : (shelf ? "A" : "U")),
       fixedPrice: fixed || Boolean(filled?.fixedPrice),
       listPrice: fixed ? known.price : (filled?.listPrice ?? null),
-      privateCost: privateCostFor(sku),
+      privateCost: privateCostFor(sku, costs),
     });
     const qty = Number(filled?.qty);
     const displayName = known?.name || (name && name !== "Item" ? name : "Item");
@@ -297,7 +323,7 @@ function pickupOf(lines) {
 
 function withQuoteOffer(reply) {
   const text = String(reply || "").trim();
-  if (/quote together/i.test(text)) return text;
+  if (/quote together|I can add them if you want/i.test(text)) return text;
   return text ? `${text}\n\nWant me to put a quote together?` : "Want me to put a quote together?";
 }
 
@@ -428,7 +454,7 @@ async function chat(request, env) {
     }, 200, request, env);
   }
   if (mock) {
-    const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest);
+    const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest, costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
     const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));
     return json({
@@ -459,7 +485,7 @@ async function chat(request, env) {
     );
     const parsed = splitModelOutput(outputText(data));
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
-    const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose);
+    const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
     const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
@@ -532,7 +558,7 @@ async function quote(request, env) {
   if (!lead.items.length || lead.items.some((item) => !item.qty || !item.name)) missing.push("quantity");
   if (missing.length) return json({ error: "missing", missing }, 400, request, env);
 
-  const view = viewFor(linesFromQuote({ items: lead.items }), {
+  const view = viewFor(linesFromQuote({ items: lead.items }, "", costsFromEnv(env)), {
     text: `${lead.notes} ${lead.company}`,
     company: lead.company,
     jobsite: lead.jobsite,

@@ -14,6 +14,7 @@ import {
 } from "./copy.js";
 import { filterCustomerText } from "./customer-text.js";
 import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn } from "./talk.js";
+import { accessoryAsked, accessoryOffer } from "../worker/config/accessories.js";
 import {
   discountPercent,
   extractQty,
@@ -80,7 +81,7 @@ function recommendCordedHammers(catalog, percent) {
   const reply = [
     "Okay, here are a couple of good options for concrete.",
     lines.join("\n\n"),
-    QUOTE_OFFER,
+    accessoryOffer("corded hammer drill concrete").line,
   ].filter(Boolean).join("\n\n");
   return {
     reply,
@@ -132,7 +133,11 @@ export function localReply({ message, history = [], catalog, discount, page }) {
       ? items.map((item) => (item.kind === "listed" ? item : { ...item, kind: "ballpark", firm: false }))
       : items;
     const withBulk = bulk && items.length ? `${reply}\n\n${BULK_LINE}` : reply;
-    const withOffer = items.length && !/quote together/i.test(withBulk) ? `${withBulk}\n\n${QUOTE_OFFER}` : withBulk;
+    const offer = accessoryOffer(`${text}\n${items.map((item) => item.name).join(" ")}`);
+    const askAccessories = items.length && offer && !accessoryAsked(history);
+    const withOffer = askAccessories
+      ? `${withBulk}\n\n${offer.line}`
+      : (items.length && !/quote together/i.test(withBulk) ? `${withBulk}\n\n${QUOTE_OFFER}` : withBulk);
     const safe = filterCustomerText(withOffer);
     const body = safe.costHit ? SAFE_COST_REPLY : safe.text;
     return {
@@ -149,6 +154,41 @@ export function localReply({ message, history = [], catalog, discount, page }) {
 
   if (!text) {
     return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script" } };
+  }
+
+  const yes = /^(yes|yeah|yep|sure|please|ok|okay|add them|do it)\b/i.test(text);
+  const no = /^(no|nope|nah|i'm set|im set|all set|we're set)\b/i.test(text);
+  const lastAssistant = [...history].reverse().find((entry) => entry.role === "assistant");
+  const askedAccessories = /I can add them if you want/i.test(lastAssistant?.content || "");
+  if ((yes || no) && askedAccessories && !/quote together/i.test(lastAssistant?.content || "")) {
+    const earlierUsers = history.filter((entry) => entry.role === "user" && !/^(yes|yeah|yep|sure|no|nope|nah|ok|okay|add them|do it|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim()));
+    const base = earlierUsers.length
+      ? localReply({ message: earlierUsers.at(-1).content, history, catalog, discount, page })
+      : { quote: { items: [] } };
+    const toolText = [...earlierUsers.map((entry) => entry.content), ...(base.quote?.items || []).map((item) => item.name)].join("\n");
+    const offer = accessoryOffer(toolText);
+    const extra = yes && offer
+      ? offer.suggestions.map((item) => {
+        const known = item.sku ? (catalog?.items || []).find((entry) => entry.sku === item.sku) : null;
+        const priced = known ? priceEntry({ ...known, qty: item.qty }, percent) : null;
+        return priced
+          ? toQuoteItem(priced, item.qty)
+          : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+      })
+      : [];
+    const items = [...(base.quote?.items || []), ...extra];
+    return {
+      reply: yes
+        ? `Okay, I'll add those.\n\n${QUOTE_OFFER}`
+        : `No problem.\n\n${QUOTE_OFFER}`,
+      quote: {
+        items,
+        offerForm: false,
+        hold: items.length > 0,
+        stage: items.length ? "quote" : "script",
+        bulk: Boolean(base.quote?.bulk),
+      },
+    };
   }
 
   if (acceptingQuote(text, history)) {
