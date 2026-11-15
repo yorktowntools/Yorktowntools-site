@@ -18,7 +18,8 @@ import {
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
-import { presentQuote, priceFromShelf } from "../src/policy.js";
+import { presentQuote, priceFromShelf, replyWithFinalPrices } from "../src/policy.js";
+import { formatEstimate } from "../../shared/pricing.js";
 import { rules } from "../config/rules.js";
 import catalog from "../../data/prices.json" with { type: "json" };
 
@@ -280,6 +281,20 @@ test("prompt tells George the rules and the email does not leak them", () => {
   assert.doesNotMatch(visible, /home depot|lowe'?s|\bour cost\b|military discount|supplier discount/i);
 });
 
+test("chat prices match the computed quote, not the raw shelf", () => {
+  const items = [
+    { name: "circular saws", qty: 5, estimate: 160.24, estimateHigh: 190.24, ballpark: true },
+    { name: "cases of caulk", qty: 6, estimate: 32.26, ballpark: true },
+  ];
+  const reply = replyWithFinalPrices("5 saws at $149 each. Caulk is around $30 each.", items);
+  assert.match(reply, /\$160\.24 to \$190\.24/);
+  assert.match(reply, /\$32\.26/);
+  assert.doesNotMatch(reply, /\$149/);
+  assert.doesNotMatch(reply, /\$30/);
+  assert.match(reply, /5 × circular saws/);
+  assert.match(reply, /6 × cases of caulk/);
+});
+
 test("OPTIONS preflight is an empty 204 with CORS headers", async () => {
   const res = await handleRequest(new Request("https://george.example/api/chat", {
     method: "OPTIONS",
@@ -329,7 +344,8 @@ test("mock chat and quote endpoints", async () => {
   assert.equal(sawLine.ballpark, true);
   assert.equal(caulkLine.qty, 6);
   assert.equal(caulkLine.estimate, null);
-  assert.match(bulkBody.reply, /\$149/);
+  assert.match(bulkBody.reply, new RegExp(formatEstimate(sawLine).replace(/[$.]/g, "\\$&")));
+  assert.doesNotMatch(bulkBody.reply, /\$149(?:\.00)?(?!\d)/);
   assert.match(bulkBody.reply, /caulk/i);
   assert.match(bulkBody.reply, /confirm the price/i);
 

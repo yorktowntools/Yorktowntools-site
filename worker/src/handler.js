@@ -11,7 +11,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
-import { presentQuote, priceFromShelf, rules } from "./policy.js";
+import { presentQuote, priceFromShelf, replyWithFinalPrices, rules } from "./policy.js";
 
 const buckets = new Map();
 
@@ -400,7 +400,7 @@ async function chat(request, env) {
     const local = localReply({ message: latest, catalog, discount: percent, page });
     const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest);
     const view = viewFor(lines, { text: latest });
-    const reply = finalizeReply(mergeNotes(local.reply, view.notes));
+    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes));
     return json({
       reply,
       quote: { items: view.items.length ? view.items : local.quote.items, offerForm: local.quote.offerForm, bulk: view.lead.bulk },
@@ -431,7 +431,7 @@ async function chat(request, env) {
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose);
     const view = viewFor(lines, { text: latest });
-    const reply = finalizeReply(mergeNotes(parsed.reply, view.notes));
+    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);

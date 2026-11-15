@@ -1,5 +1,5 @@
 import { rules } from "../config/rules.js";
-import { formatMoney, paymentOnTop, roundMoney } from "../../shared/pricing.js";
+import { formatEstimate, formatMoney, paymentOnTop, roundMoney } from "../../shared/pricing.js";
 
 const CONFIRM = "Zachary will confirm the price";
 const BALLPARK = "Starting estimate, bulk pricing usually comes in better.";
@@ -313,6 +313,45 @@ export function presentQuote({
     ballparkLabel: BALLPARK,
     bulkEmailLine: BULK_EMAIL,
   };
+}
+
+function dollarTokens(text) {
+  return [...String(text || "").matchAll(/\$\s?\d{1,3}(?:,\d{3})*(?:\.\d{2})?/g)]
+    .map((match) => match[0].replace(/\s/g, ""));
+}
+
+export function itemPriceLine(item) {
+  const name = String(item?.name || "").trim();
+  if (!name) return "";
+  const qty = item.qty ? `${item.qty} × ` : "";
+  const amount = formatEstimate(item);
+  if (item.ballpark && amount) {
+    return `${qty}${name}: Starting estimate ${amount}. Bulk pricing usually comes in better.`;
+  }
+  if (!amount || item.confirm) return `${qty}${name}: Zachary will confirm the price.`;
+  return `${qty}${name}: ${amount} estimate.`;
+}
+
+/** Chat text uses the same rounded figures as the quote form. Shelf dollars that differ are dropped. */
+export function replyWithFinalPrices(modelReply, items) {
+  const list = Array.isArray(items) ? items : [];
+  const allowed = new Set();
+  const lines = [];
+  for (const item of list) {
+    const line = itemPriceLine(item);
+    if (line) lines.push(line);
+    if (item.estimate != null) allowed.add(formatMoney(item.estimate));
+    if (item.estimateHigh != null) allowed.add(formatMoney(item.estimateHigh));
+  }
+  const kept = [];
+  for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+/)) {
+    const trimmed = sentence.trim();
+    if (!trimmed) continue;
+    const amounts = dollarTokens(trimmed);
+    if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
+    kept.push(trimmed);
+  }
+  return [...lines, ...kept].join("\n").trim();
 }
 
 export function feeSentence(totals) {
