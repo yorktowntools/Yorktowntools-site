@@ -1,0 +1,118 @@
+import { BULK_LINE, CREDIT_APP_URL, ESTIMATE_NOTE, HOURS, PHONE_DISPLAY, PHONE_TEL, SERVICE_AREA } from "../../shared/copy.js";
+import { escapeHtml, filterCustomerText, isAllowedCustomerUrl } from "../../shared/customer-text.js";
+import { formatEstimate } from "../../shared/pricing.js";
+
+function clean(value, fallback = "") {
+  const text = filterCustomerText(value).text;
+  return text || fallback;
+}
+
+function moneyCell(item) {
+  const priced = {
+    estimate: item.estimate,
+    estimateHigh: item.estimateHigh,
+    kind: item.kind,
+  };
+  const amount = formatEstimate(priced);
+  if (!amount) return "Yorktown Tools will confirm";
+  return `${amount} estimate`;
+}
+
+export function buildQuoteEmail({ lead, items }) {
+  const name = clean(lead.name, "there");
+  const company = clean(lead.company);
+  const rows = items.map((item) => {
+    const label = clean(item.name, "Item");
+    const mfr = isAllowedCustomerUrl(item.manufacturerUrl)
+      ? `<a href="${escapeHtml(item.manufacturerUrl)}">Maker page</a>`
+      : "";
+    const site = isAllowedCustomerUrl(item.categoryPage)
+      ? `<a href="${escapeHtml(item.categoryPage)}">Yorktown Tools page</a>`
+      : "";
+    const links = [mfr, site].filter(Boolean).join(" · ");
+    return `<tr>
+      <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${escapeHtml(label)}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;text-align:center;">${escapeHtml(String(item.qty || ""))}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${escapeHtml(moneyCell(item))}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${links}</td>
+    </tr>`;
+  }).join("");
+
+  const subject = `Your Yorktown Tools estimate${company ? ` — ${company}` : ""}`;
+  const html = `<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5f7;padding:24px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" style="max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
+        <tr><td style="background:#0b1e3f;color:#ffffff;padding:22px 24px;">
+          <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#f0d48a;">Yorktown Tools</div>
+          <div style="font-size:22px;font-weight:700;margin-top:6px;">Tools Worth Fighting For</div>
+          <div style="margin-top:8px;font-size:15px;">You build the project. We deliver the tools.</div>
+        </td></tr>
+        <tr><td style="padding:22px 24px;font-size:16px;line-height:1.5;">
+          <p style="margin:0 0 12px;">Hi ${escapeHtml(name)},</p>
+          <p style="margin:0 0 12px;">Here is the estimate from George at Yorktown Tools. ${escapeHtml(ESTIMATE_NOTE)} Zachary will confirm the number, the quantity, and availability.</p>
+          <p style="margin:0 0 12px;"><strong>Company:</strong> ${escapeHtml(company)}<br>
+          <strong>Phone:</strong> ${escapeHtml(clean(lead.phone))}<br>
+          <strong>Job site:</strong> ${escapeHtml(clean(lead.jobsite))}<br>
+          <strong>Needed by:</strong> ${escapeHtml(clean(lead.neededBy))}</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:14px;">
+            <tr style="background:#f8f9fa;">
+              <th align="left" style="padding:8px;">Item</th>
+              <th align="center" style="padding:8px;">Qty</th>
+              <th align="left" style="padding:8px;">Estimate</th>
+              <th align="left" style="padding:8px;">Links</th>
+            </tr>
+            ${rows || `<tr><td colspan="4" style="padding:10px 8px;">Details are in the note below. Zachary will price them.</td></tr>`}
+          </table>
+          <p style="margin:16px 0 12px;">${escapeHtml(BULK_LINE)}</p>
+          <p style="margin:0 0 12px;"><strong>Delivery:</strong> Free to the job site, shop, or trailer across ${escapeHtml(SERVICE_AREA)}. No minimum.</p>
+          <p style="margin:0 0 12px;"><strong>How to pay:</strong> Card is the easiest. ACH and other methods are fine. Do not reply with card or bank numbers. Net terms are only for approved customers. <a href="${CREDIT_APP_URL}">Credit application</a>. Sending it does not promise terms.</p>
+          ${lead.notes ? `<p style="margin:0 0 12px;"><strong>Notes:</strong> ${escapeHtml(clean(lead.notes))}</p>` : ""}
+          <p style="margin:0 0 12px;">Questions: call or text <a href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a> or email <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a>. ${escapeHtml(HOURS)}.</p>
+          <p style="margin:0;">— Yorktown Tools<br>Yorktown, Virginia · Veteran-owned</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  const text = [
+    `Hi ${name},`,
+    "",
+    "Here is your Yorktown Tools estimate. It is an estimate, not a promise of stock. Zachary will confirm it.",
+    `Company: ${company}`,
+    `Phone: ${clean(lead.phone)}`,
+    `Job site: ${clean(lead.jobsite)}`,
+    `Needed by: ${clean(lead.neededBy)}`,
+    "",
+    ...items.map((item) => `- ${clean(item.name, "Item")} × ${item.qty || "?"} — ${moneyCell(item)}`),
+    "",
+    BULK_LINE,
+    `Free delivery: ${SERVICE_AREA}.`,
+    "Card is easiest. ACH and other methods are fine. Do not send payment numbers. Net terms only if approved.",
+    `Credit application: ${CREDIT_APP_URL}`,
+    `Call or text ${PHONE_DISPLAY}. sales@yorktowntools.com. ${HOURS}.`,
+  ].join("\n");
+
+  return { subject: clean(subject, "Your Yorktown Tools estimate"), html, text };
+}
+
+export function formspreeBody(lead, items) {
+  const summary = items.map((item) => {
+    const amount = formatEstimate(item) || "confirm";
+    return `${item.qty || "?"} × ${clean(item.name, "Item")} (${amount} estimate)`;
+  }).join("\n");
+  return {
+    name: clean(lead.name),
+    company: clean(lead.company),
+    email: lead.email,
+    phone: clean(lead.phone),
+    delivery: clean(lead.jobsite),
+    needed_by: clean(lead.neededBy),
+    message: `George chat quote\n${summary}\n${clean(lead.notes || "")}`.trim(),
+    _subject: "George chat quote",
+  };
+}
