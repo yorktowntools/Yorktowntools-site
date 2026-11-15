@@ -31,12 +31,11 @@ function ownProduct(priced) {
 
 function itemLinks(priced) {
   if (ownProduct(priced)) {
-    return priced.categoryPage ? ` Our page: [${priced.name}](${priced.categoryPage}).` : "";
+    return priced.categoryPage ? ` [Our page](${priced.categoryPage}).` : "";
   }
-  const maker = priced.manufacturerUrl
-    ? ` Maker page: [${priced.manufacturer || "manufacturer"}](${priced.manufacturerUrl}).`
-    : "";
-  const ours = priced.categoryPage ? ` Our page: [${priced.name}](${priced.categoryPage}).` : "";
+  const brand = priced.manufacturer && !/yorktown tools/i.test(priced.manufacturer) ? priced.manufacturer : "Maker page";
+  const maker = priced.manufacturerUrl ? ` Maker page: [${brand}](${priced.manufacturerUrl}).` : "";
+  const ours = priced.categoryPage ? ` [Our page](${priced.categoryPage}).` : "";
   return `${maker}${ours}`;
 }
 

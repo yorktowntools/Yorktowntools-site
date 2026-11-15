@@ -18,7 +18,8 @@ import {
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
-import { presentQuote, priceFromShelf, replyWithFinalPrices } from "../src/policy.js";
+import { presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
+import { renderSafeHtml } from "../../shared/customer-text.js";
 import { formatEstimate } from "../../shared/pricing.js";
 import { rules } from "../config/rules.js";
 import catalog from "../../data/prices.json" with { type: "json" };
@@ -76,8 +77,9 @@ test("catalog match ignores dimensions and finds the saw", () => {
   assert.equal(extractQty("7-1/4 inch saw"), null);
   assert.equal(shouldSearch("What are your hours?", hits), false);
   assert.equal(shouldSearch("price on victory gloves", matchCatalog(catalog, "victory gloves")), false);
-  assert.equal(shouldSearch("how much is the Makita 5007FA", hits), true);
-  assert.equal(shouldSearch("I need 6 cases of caulk and 5 circular saws", []), true);
+  assert.equal(shouldSearch("how much is the Makita 5007FA", catalog), false);
+  assert.equal(shouldSearch("I need 6 cases of caulk and 5 circular saws", catalog), false);
+  assert.equal(shouldSearch("how much is a Festool OF 1400", catalog), true);
   assert.equal(matchCatalog(catalog, "I need 5 circular saws")[0].sku, "5007FA");
   assert.equal(matchCatalog(catalog, "circular saws")[0].sku, "5007FA");
   const parts = splitRequestedItems("I need 6 cases of caulk and 5 circular saws for a job in Newport News");
@@ -279,6 +281,26 @@ test("prompt tells George the rules and the email does not leak them", () => {
   assert.doesNotMatch(mail.text, /Zachary will send your bulk pricing/);
   const visible = `${mail.html.replace(/style="[^"]*"/g, "")} ${mail.text}`;
   assert.doesNotMatch(visible, /home depot|lowe'?s|\bour cost\b|military discount|supplier discount/i);
+});
+
+test("catalog range still prices a saw when the model leaves the shelf empty", () => {
+  const filled = fillMissingShelf({ name: "circular saws", qty: 5, source: "U" }, catalog, "");
+  assert.equal(filled.shelfLow, 149);
+  assert.equal(filled.shelfHigh, 179);
+  assert.equal(filled.source, "A");
+});
+
+test("links render as labeled anchors and hours are not repeated", () => {
+  const html = renderSafeHtml("Our page: https://yorktowntools.com/victory-gloves.html\n\n- Card\n- Check");
+  assert.match(html, /<a href="https:\/\/yorktowntools.com\/victory-gloves.html" target="_blank" rel="noopener noreferrer">Our page<\/a>/);
+  assert.match(html, /<ul><li>Card<\/li><li>Check<\/li><\/ul>/);
+  assert.doesNotMatch(html, />https:\/\//);
+  const once = withoutRepeatedAfterHours(
+    "Still here.\nZachary will reply by 9 a.m. the next business day.",
+    [{ role: "assistant", content: "Zachary will reply by 9 a.m. the next business day." }],
+  );
+  assert.doesNotMatch(once, /9 a\.m\./);
+  assert.match(once, /Still here/);
 });
 
 test("chat prices match the computed quote, not the raw shelf", () => {

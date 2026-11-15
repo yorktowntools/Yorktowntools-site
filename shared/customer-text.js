@@ -214,7 +214,11 @@ export function filterCustomerText(input) {
   const urlPass = scrubUrls(original);
   const keptLines = [];
   let retailerHit = urlPass.retailerHit || matchesAny(original, RETAILER_PATTERNS);
-  for (const line of urlPass.text.split(/\n+/)) {
+  for (const line of urlPass.text.split("\n")) {
+    if (!line.trim()) {
+      keptLines.push("");
+      continue;
+    }
     const kept = [];
     for (const chunk of splitChunks(line)) {
       if (matchesAny(chunk, RETAILER_PATTERNS) || matchesAny(chunk, COST_PATTERNS)) {
@@ -231,7 +235,7 @@ export function filterCustomerText(input) {
     if (joined) keptLines.push(joined);
   }
 
-  let text = keptLines.join("\n").trim();
+  let text = keptLines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
   if (retailerHit && !text) {
     return { text: SAFE_RETAILER_REPLY, retailerHit: true, costHit: false, replaced: true };
   }
@@ -261,16 +265,58 @@ export function escapeHtml(value) {
     .replace(/"/g, "&quot;");
 }
 
+function linkLabel(url) {
+  if (/yorktowntools\.com/i.test(url)) return "Our page";
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (/dewalt\.com$/i.test(host)) return "DeWalt";
+    if (/milwaukeetool\.com$/i.test(host)) return "Milwaukee";
+    if (/makitatools\.com$/i.test(host) || /makita\.com$/i.test(host)) return "Makita";
+    return "Maker page";
+  } catch {
+    return "Link";
+  }
+}
+
+function anchor(url, label) {
+  const href = escapeHtml(url);
+  return `<a href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+}
+
 export function renderSafeHtml(input) {
   const filtered = filterCustomerText(input).text;
-  const escaped = escapeHtml(filtered);
-  const linked = escaped.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (full, label, url) => {
-    const decoded = url.replace(/&amp;/g, "&");
-    if (!isAllowedCustomerUrl(decoded)) return label;
-    const href = escapeHtml(decoded);
-    return `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  const tokens = [];
+  const stash = (html) => {
+    const key = `@@LINK${tokens.length}@@`;
+    tokens.push(html);
+    return key;
+  };
+  let marked = filtered.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (full, label, url) => {
+    if (!isAllowedCustomerUrl(url)) return label;
+    return stash(anchor(url, label));
   });
-  return linked.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
+  marked = marked.replace(/https?:\/\/[^\s<]+/g, (raw) => {
+    const url = raw.replace(/[),.;]+$/, "");
+    const tail = raw.slice(url.length);
+    if (!isAllowedCustomerUrl(url)) return raw;
+    return `${stash(anchor(url, linkLabel(url)))}${tail}`;
+  });
+  const escaped = escapeHtml(marked)
+    .replace(/@@LINK(\d+)@@/g, (full, id) => tokens[Number(id)] || "")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  const blocks = escaped.split(/\n{2,}/).map((block) => {
+    const lines = block.split(/\n/).map((line) => line.trim()).filter(Boolean);
+    if (lines.length && lines.every((line) => /^[-*]\s+/.test(line))) {
+      const items = lines.map((line) => `<li>${line.replace(/^[-*]\s+/, "")}</li>`).join("");
+      return `<ul>${items}</ul>`;
+    }
+    if (lines.length === 1) {
+      const sentences = lines[0].split(/(?<=[.!?])\s+(?=[A-Z])/).map((sentence) => sentence.trim()).filter(Boolean);
+      if (sentences.length > 1) return sentences.map((sentence) => `<p>${sentence}</p>`).join("");
+    }
+    return `<p>${lines.join("<br>")}</p>`;
+  });
+  return blocks.join("");
 }
 
 export function publicQuoteItem(item) {

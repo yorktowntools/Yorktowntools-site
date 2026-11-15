@@ -11,7 +11,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
-import { presentQuote, priceFromShelf, replyWithFinalPrices, rules } from "./policy.js";
+import { presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
 const buckets = new Map();
 
@@ -160,7 +160,7 @@ async function callXai(env, instructions, input, useSearch) {
     instructions,
     input,
     temperature: 0.3,
-    max_output_tokens: num(env.MAX_OUTPUT_TOKENS, 650),
+    max_output_tokens: num(env.MAX_OUTPUT_TOKENS, 320),
   };
   if (useSearch) {
     full.tools = [{
@@ -259,7 +259,7 @@ function linesFromQuote(rawQuote, prose = "") {
     const priced = priceFromShelf({
       shelf,
       shelfHigh,
-      source: fixed ? "A" : (filled?.source || (shelf ? "A" : "U")),
+      source: fixed ? "A" : (["A", "B", "C"].includes(String(filled?.source || "").toUpperCase()) ? String(filled.source).toUpperCase() : (shelf ? "A" : "U")),
       fixedPrice: fixed || Boolean(filled?.fixedPrice),
       listPrice: fixed ? known.price : (filled?.listPrice ?? null),
     });
@@ -308,8 +308,8 @@ function viewFor(lines, extra) {
   });
 }
 
-function finalizeReply(reply) {
-  return filterCustomerText(reply).text;
+function finalizeReply(reply, priorMessages = []) {
+  return withoutRepeatedAfterHours(filterCustomerText(reply).text, priorMessages);
 }
 
 async function readJson(request) {
@@ -400,7 +400,7 @@ async function chat(request, env) {
     const local = localReply({ message: latest, catalog, discount: percent, page });
     const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest);
     const view = viewFor(lines, { text: latest });
-    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes));
+    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages);
     return json({
       reply,
       quote: { items: view.items.length ? view.items : local.quote.items, offerForm: local.quote.offerForm, bulk: view.lead.bulk },
@@ -412,7 +412,7 @@ async function chat(request, env) {
   const sid = sessionId(body.data?.sessionId) || ip;
   const searchCap = num(env.MAX_SEARCHES_PER_CHAT, 2);
   const dayCap = num(env.MAX_SEARCHES_PER_IP_DAY, 15);
-  const canSearch = shouldSearch(latest, matches)
+  const canSearch = shouldSearch(latest, catalog)
     && underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
     && underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
   if (canSearch) {
@@ -431,7 +431,7 @@ async function chat(request, env) {
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose);
     const view = viewFor(lines, { text: latest });
-    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes));
+    const reply = finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);

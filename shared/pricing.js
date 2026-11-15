@@ -271,12 +271,12 @@ export function fillMissingShelf(raw, catalog, prose = "") {
       next.sku = next.sku || known.sku;
     } else if (known?.shelfPrice != null && known.shelfPrice !== "") {
       next.shelf = Number(known.shelfPrice);
-      next.source = next.source || "A";
+      if (!next.source || String(next.source).toUpperCase() === "U") next.source = "A";
       next.sku = next.sku || known.sku;
     } else if (known && (known.shelfLow != null || known.shelfHigh != null)) {
       next.shelfLow = Number(known.shelfLow);
       next.shelfHigh = known.shelfHigh != null ? Number(known.shelfHigh) : null;
-      next.source = next.source || "A";
+      if (!next.source || String(next.source).toUpperCase() === "U") next.source = "A";
       next.sku = next.sku || known.sku;
     }
   }
@@ -305,13 +305,26 @@ export function formatEstimate(priced) {
 
 const PRODUCT_WORD = /\b(caulk|saws?|circular|drills?|drivers?|impacts?|tools?|ladders?|gloves?|blades?|bits?|batter(?:y|ies)|wrenches?|pliers|screws?|fasteners?|levels?|lasers?|packout|generators?|stations?|cases?|kits?|grinders?|nailers?|tapes?)\b/i;
 
-export function shouldSearch(userText, matches) {
+function coveredByCatalog(catalog, query) {
+  return matchCatalog(catalog, query).some((item) => hasUsablePrice(item) || item.fixedPrice);
+}
+
+export function shouldSearch(userText, catalogOrMatches) {
   const text = String(userText || "");
   const priceAsk = /(\bprice\b|\bpricing\b|how much|\$|\bquote\b|\bestimate\b|\bcost\b)/i.test(text);
   const modelish = /\b[a-z]{0,6}-?\d{2,}[a-z0-9-]*\b/i.test(text);
   const qty = extractQty(text);
   const namedProduct = PRODUCT_WORD.test(text) && (qty != null || priceAsk);
   if (!priceAsk && !modelish && !namedProduct) return false;
-  if (matches.length && matches.every(hasFirmPrice)) return false;
-  return true;
+  if (Array.isArray(catalogOrMatches)) {
+    if (catalogOrMatches.length && catalogOrMatches.every((item) => hasUsablePrice(item) || item.fixedPrice)) return false;
+    return true;
+  }
+  const catalog = catalogOrMatches || { items: [] };
+  const queries = splitRequestedItems(text).map((part) => part.query);
+  const subjects = queries.length ? queries : [text];
+  return subjects.some((subject) => {
+    if (coveredByCatalog(catalog, subject)) return false;
+    return priceAsk || /\b[a-z]{0,6}-?\d{2,}[a-z0-9-]*\b/i.test(subject);
+  });
 }

@@ -1,7 +1,7 @@
 import { BULK_LINE, PHONE_DISPLAY, PHONE_TEL } from "../shared/copy.js";
 import { filterCustomerText, renderSafeHtml } from "../shared/customer-text.js";
 import { localReply } from "../shared/local-reply.js";
-import { formatEstimate } from "../shared/pricing.js";
+import { formatEstimate, formatMoney, paymentOnTop } from "../shared/pricing.js";
 
 // Live Worker for now. window.GEORGE_API overrides this.
 // Later, a custom domain can replace it: https://george.yorktowntools.com
@@ -61,7 +61,10 @@ root.innerHTML = `
     <div class="george-log" role="log" aria-live="polite"></div>
     <button type="button" class="george-review" hidden>Review &amp; send quote</button>
     <form class="george-quote" hidden>
-      <h3>Quote for Yorktown Tools</h3>
+      <div class="george-quote-bar">
+        <h3>Quote for Yorktown Tools</h3>
+        <button type="button" class="george-quote-close">Close</button>
+      </div>
       <p class="george-bulk"></p>
       <div class="george-items"></div>
       <button type="button" class="george-add">Add an item</button>
@@ -113,6 +116,11 @@ function addMessage(role, text) {
   if (role === "user") bubble.textContent = safe;
   else bubble.innerHTML = renderSafeHtml(safe);
   log.appendChild(bubble);
+  pinLog();
+}
+
+function pinLog() {
+  log.scrollTop = log.scrollHeight;
   requestAnimationFrame(() => {
     log.scrollTop = log.scrollHeight;
   });
@@ -194,8 +202,14 @@ function renderItems() {
     const price = document.createElement("p");
     price.className = "george-price";
     const amount = formatEstimate(item);
-    if (item.ballpark && amount) price.textContent = `Starting estimate ${amount}. Bulk pricing usually comes in better.`;
-    else if (item.confirm || !amount) price.textContent = "Zachary will confirm the price.";
+    const gloves = item.sku === "VICTORY-GLOVE" || (/victory/i.test(item.name || "") && /glove/i.test(item.name || ""));
+    const ballpark = item.ballpark || item.kind === "ballpark";
+    const confirm = item.confirm || item.kind === "unsure" || (!amount && item.confidence === "unsure");
+    if (gloves && item.estimate != null && item.estimateHigh == null) {
+      const fees = paymentOnTop(item.estimate);
+      price.textContent = `${amount} a pair. Card ${formatMoney(fees.card)}. ACH ${formatMoney(fees.ach)}. Check ${amount}.`;
+    } else if (ballpark && amount) price.textContent = `Starting estimate ${amount}. Bulk pricing usually comes in better.`;
+    else if (confirm || !amount) price.textContent = "Zachary will confirm the price.";
     else price.textContent = `${amount} estimate. Free delivery is included. Not a promise of stock.`;
     row.append(name, qty, price);
     itemsEl.appendChild(row);
@@ -206,8 +220,18 @@ function renderItems() {
   reviewButton.hidden = !hasItems;
   reviewButton.textContent = draft.open ? "Hide quote form" : "Review & send quote";
   quoteForm.hidden = !draft.open;
+  pinLog();
   requestAnimationFrame(() => {
-    log.scrollTop = log.scrollHeight;
+    if (quoteForm.hidden) return;
+    const last = itemsEl.lastElementChild;
+    if (!last) {
+      quoteForm.scrollTop = 0;
+      return;
+    }
+    const formRect = quoteForm.getBoundingClientRect();
+    const lastRect = last.getBoundingClientRect();
+    const overflow = lastRect.bottom - (formRect.top + quoteForm.clientHeight);
+    if (overflow > 0) quoteForm.scrollTop += overflow + 8;
   });
 }
 
@@ -215,7 +239,6 @@ function openQuote() {
   draft.open = !draft.open;
   if (draft.open && !draft.items.length) addBlankItem();
   renderItems();
-  if (draft.open) quoteForm.querySelector("input[name=name]")?.focus();
 }
 
 function absorbQuote(quote) {
@@ -290,8 +313,9 @@ async function onSend(event) {
   textarea.value = "";
   addMessage("user", text);
   const pending = document.createElement("div");
-  pending.className = "george-msg george-msg-bot";
-  pending.textContent = "One second.";
+  pending.className = "george-msg george-msg-bot george-typing";
+  pending.setAttribute("aria-label", "George is typing");
+  pending.innerHTML = "<span></span><span></span><span></span>";
   log.appendChild(pending);
   try {
     const result = await ask(text);
@@ -420,6 +444,9 @@ root.querySelector(".george-add").addEventListener("click", () => {
   renderItems();
 });
 reviewButton.addEventListener("click", openQuote);
+root.querySelector(".george-quote-close").addEventListener("click", () => {
+  if (draft.open) openQuote();
+});
 
 document.addEventListener("keydown", (event) => {
   if (panel.hidden) return;

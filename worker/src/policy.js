@@ -233,6 +233,12 @@ export function zonedParts(date) {
   return { weekday: grab("weekday"), hour: Number(grab("hour")) };
 }
 
+export function withoutRepeatedAfterHours(reply, priorMessages = []) {
+  const said = priorMessages.some((message) => message.role === "assistant" && /9 a\.m\./i.test(message.content || ""));
+  if (!said) return String(reply || "");
+  return String(reply || "").split(/\n+/).filter((line) => !/9 a\.m\./i.test(line)).join("\n").trim();
+}
+
 export function afterHoursNote(date = new Date()) {
   const { weekday, hour } = zonedParts(date);
   const openDay = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(weekday);
@@ -351,7 +357,15 @@ export function replyWithFinalPrices(modelReply, items) {
     if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
     kept.push(trimmed);
   }
-  return [...lines, ...kept].join("\n").trim();
+  const seen = new Set();
+  const unique = [];
+  for (const sentence of [...lines, ...kept]) {
+    const key = sentence.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(sentence);
+  }
+  return unique.join("\n").trim();
 }
 
 export function feeSentence(totals) {
