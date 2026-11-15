@@ -267,10 +267,12 @@ function linesFromQuote(rawQuote, prose = "") {
       listPrice: fixed ? known.price : (filled?.listPrice ?? null),
     });
     const qty = Number(filled?.qty);
-    const displayName = name && name !== "Item" ? name : (known?.name || name);
+    const displayName = known?.name || (name && name !== "Item" ? name : "Item");
     return {
       name: displayName,
       sku: known?.sku || filled?.sku || "",
+      model: known?.model || "",
+      manufacturer: known?.manufacturer || "",
       qty: Number.isFinite(qty) && qty > 0 ? qty : null,
       ...priced,
       fixedListed: fixed || Boolean(filled?.fixedPrice),

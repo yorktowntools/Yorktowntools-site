@@ -336,7 +336,8 @@ test("chat prices match the computed quote, not the raw shelf", () => {
   assert.match(gloves, /\[Our page\]\(https:\/\/yorktowntools\.com\/victory-gloves\.html\)/);
   assert.doesNotMatch(gloves, /listed for a pair/i);
   assert.doesNotMatch(gloves, /prepare a quote for you/i);
-  assert.equal((gloves.match(/\$19\.99/g) || []).length, 2);
+  assert.equal((gloves.match(/\$19\.99/g) || []).length, 1);
+  assert.match(gloves, /No fee by check/);
   assert.match(gloves, /We keep them on hand/);
 
   const saw = replyWithFinalPrices("The saw has to be sourced.", [{
@@ -345,10 +346,12 @@ test("chat prices match the computed quote, not the raw shelf", () => {
     estimate: 160.24,
     estimateHigh: 190.24,
     ballpark: true,
+    model: "Makita 5007FA",
     manufacturerUrl: "https://www.makitatools.com/products/details/5007FA",
     categoryPage: "https://yorktowntools.com/Power-tools.html",
   }]);
-  assert.match(saw, /\[Makita\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
+  assert.match(saw, /\[Makita 5007FA\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
+  assert.equal((saw.match(/bulk pricing usually comes in better/gi) || []).length, 0);
   assert.match(saw, /The saw has to be sourced\./);
   assert.doesNotMatch(saw, /\[Our page\]/);
 });
@@ -406,6 +409,10 @@ test("mock chat and quote endpoints", async () => {
   assert.doesNotMatch(bulkBody.reply, /\$149(?:\.00)?(?!\d)/);
   assert.match(bulkBody.reply, /caulk/i);
   assert.match(bulkBody.reply, /confirm the price/i);
+  assert.match(bulkBody.reply, /Makita 5007FA 7-1\/4 in\. circular saw/);
+  assert.match(bulkBody.reply, /\[Makita 5007FA\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
+  assert.equal((bulkBody.reply.match(/bulk pricing usually comes in better/gi) || []).length, 1);
+  assert.equal((bulkBody.reply.match(/Zachary will send your bulk pricing/gi) || []).length, 1);
 
   const saws = await post("/api/chat", {
     messages: [{ role: "user", content: "I need 5 circular saws for a job in Newport News" }],
@@ -415,6 +422,9 @@ test("mock chat and quote endpoints", async () => {
   assert.equal(sawBody.quote.items[0].ballpark, true);
   assert.ok(sawBody.quote.items[0].estimate > 0);
   assert.doesNotMatch(sawBody.reply, /home depot|lowe|our cost|margin/i);
+  assert.match(sawBody.reply, /5 × Makita 5007FA 7-1\/4 in\. circular saw: Starting estimate/);
+  assert.equal((sawBody.reply.match(/bulk pricing usually comes in better/gi) || []).length, 1);
+  assert.equal((sawBody.reply.match(/Zachary will send your bulk pricing/gi) || []).length, 1);
 
   const caulk = fillMissingShelf(
     { name: "cases of caulk", qty: 6 },
