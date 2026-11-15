@@ -34,6 +34,50 @@ export function normalizeText(value) {
     .trim();
 }
 
+function singularize(token) {
+  if (token.length > 4 && token.endsWith("ies")) return `${token.slice(0, -3)}y`;
+  if (token.length > 4 && /(ses|xes|zes|ches|shes)$/.test(token)) return token.slice(0, -2);
+  if (token.length > 3 && token.endsWith("s") && !token.endsWith("ss")) return token.slice(0, -1);
+  return token;
+}
+
+const MATCH_STOP = new Set([
+  "the", "a", "an", "of", "for", "and", "in", "with", "to", "on", "my", "our",
+  "job", "jobs", "need", "needs", "pair", "pairs", "inch",
+]);
+
+function contentTokens(value) {
+  return normalizeText(value)
+    .split(" ")
+    .map(singularize)
+    .filter((token) => token && token.length > 1 && !MATCH_STOP.has(token));
+}
+
+function scoreKey(queryTokens, keyTokens) {
+  if (!queryTokens.length || !keyTokens.length) return 0;
+  const query = queryTokens.join(" ");
+  const key = keyTokens.join(" ");
+  if (query === key) return 120;
+  if (query.includes(key) && (keyTokens.length >= 2 || keyTokens[0].length >= 5)) {
+    return 40 + Math.min(key.length, 50);
+  }
+  const overlap = keyTokens.filter((token) => queryTokens.includes(token));
+  const distinctive = overlap.filter((token) => token.length >= 4);
+  if (overlap.length >= 2 && distinctive.length >= 1) return 30 + overlap.length * 15;
+  if (overlap.length === 1 && overlap[0].length >= 5 && (keyTokens.length === 1 || queryTokens.length === 1)) {
+    return 70;
+  }
+  return 0;
+}
+
+function asMoney(value) {
+  if (typeof value === "number" && Number.isFinite(value) && value > 0 && value < 100000) return value;
+  const match = String(value ?? "").replace(/,/g, "").match(/(\d+(?:\.\d{1,2})?)/);
+  if (!match) return null;
+  const number = Number(match[1]);
+  return number > 0 && number < 100000 ? number : null;
+}
+
 export function hasFirmPrice(entry) {
   if (!entry) return false;
   if (entry.fixedPrice && entry.price != null) return true;
@@ -109,17 +153,14 @@ export function priceEntry(entry, percent) {
 }
 
 export function matchCatalog(catalog, query) {
-  const q = normalizeText(query);
-  if (!q) return [];
+  const queryTokens = contentTokens(query);
+  if (!queryTokens.length) return [];
   const hits = [];
   for (const item of catalog?.items || []) {
     const keys = [item.sku, item.model, item.name, ...(item.aliases || [])].filter(Boolean);
     let score = 0;
     for (const key of keys) {
-      const k = normalizeText(key);
-      if (!k || k.length < 4) continue;
-      if (q === k) score = Math.max(score, 120);
-      else if (q.includes(k)) score = Math.max(score, 40 + Math.min(k.length, 50));
+      score = Math.max(score, scoreKey(queryTokens, contentTokens(key)));
     }
     if (score >= 50) hits.push({ item, score });
   }
@@ -164,6 +205,75 @@ export function extractQty(text) {
     return words[word[1].toLowerCase()] || null;
   }
   return null;
+}
+
+/** Pull a shelf price for one item out of prose. Numbers only; store names are ignored. */
+export function shelvesFromText(prose, name) {
+  const nameTokens = contentTokens(name);
+  if (!nameTokens.length) return null;
+  const sentences = String(prose || "").split(/\n+|(?<=[.!?])\s+/);
+  let best = "";
+  let bestScore = 0;
+  for (const sentence of sentences) {
+    if (!/\$\s?\d/.test(sentence)) continue;
+    const overlap = nameTokens.filter((token) => contentTokens(sentence).includes(token)).length;
+    if (overlap > bestScore) {
+      bestScore = overlap;
+      best = sentence;
+    }
+  }
+  if (!best || bestScore < 1) return null;
+  const range = best.match(/\$\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:to|through|-|–|—)\s*\$?\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)/i);
+  if (range) {
+    const low = asMoney(range[1]);
+    const high = asMoney(range[2]);
+    if (low && high) return { shelfLow: Math.min(low, high), shelfHigh: Math.max(low, high), source: "A" };
+  }
+  const amounts = [...best.matchAll(/\$\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)/g)]
+    .map((match) => asMoney(match[1]))
+    .filter(Boolean);
+  if (!amounts.length) return null;
+  if (amounts.length === 1) return { shelf: amounts[0], source: "A" };
+  return { shelf: amounts[amounts.length - 1], source: "A" };
+}
+
+export function fillMissingShelf(raw, catalog, prose = "") {
+  const next = { ...raw };
+  next.shelf = asMoney(next.shelf);
+  next.shelfLow = asMoney(next.shelfLow);
+  next.shelfHigh = asMoney(next.shelfHigh);
+  const hasShelf = (next.shelf && next.shelf > 0) || (next.shelfLow && next.shelfLow > 0);
+  if (!hasShelf && !next.fixedPrice) {
+    const hits = matchCatalog(catalog, `${next.sku || ""} ${next.name || ""}`);
+    const known = hits.find(hasFirmPrice) || hits[0];
+    if (known?.fixedPrice && known.price != null) {
+      next.fixedPrice = true;
+      next.listPrice = known.price;
+      next.sku = next.sku || known.sku;
+    } else if (known?.shelfPrice != null && known.shelfPrice !== "") {
+      next.shelf = Number(known.shelfPrice);
+      next.source = next.source || "A";
+      next.sku = next.sku || known.sku;
+    } else if (known && (known.shelfLow != null || known.shelfHigh != null)) {
+      next.shelfLow = Number(known.shelfLow);
+      next.shelfHigh = known.shelfHigh != null ? Number(known.shelfHigh) : null;
+      next.source = next.source || "A";
+      next.sku = next.sku || known.sku;
+    }
+  }
+  const stillMissing = !(next.shelf > 0) && !(next.shelfLow > 0) && !next.fixedPrice;
+  if (stillMissing) {
+    const found = shelvesFromText(prose, `${next.name || ""} ${next.sku || ""}`);
+    if (found) Object.assign(next, found);
+  }
+  return next;
+}
+
+export function paymentOnTop(price, cardRate = 0.03, achRate = 0.01) {
+  return {
+    card: roundMoney(Number(price) * (1 + cardRate)),
+    ach: roundMoney(Number(price) * (1 + achRate)),
+  };
 }
 
 export function formatEstimate(priced) {

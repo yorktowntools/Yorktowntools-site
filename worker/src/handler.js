@@ -3,6 +3,7 @@ import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
 import {
+  fillMissingShelf,
   hasFirmPrice,
   matchCatalog,
   shouldSearch,
@@ -201,11 +202,23 @@ function warrantyFor(name) {
   return hit ? hit[1] : "";
 }
 
-function linesFromQuote(rawQuote) {
+function collectDollarText(value, out = [], depth = 0) {
+  if (depth > 8 || value == null) return out;
+  if (typeof value === "string") {
+    if (/\$\s?\d/.test(value) && value.length < 8000) out.push(value);
+    return out;
+  }
+  if (Array.isArray(value)) value.forEach((item) => collectDollarText(item, out, depth + 1));
+  else if (typeof value === "object") Object.values(value).forEach((item) => collectDollarText(item, out, depth + 1));
+  return out;
+}
+
+function linesFromQuote(rawQuote, prose = "") {
   const rawItems = Array.isArray(rawQuote?.items) ? rawQuote.items.slice(0, 8) : [];
   return rawItems.map((raw) => {
-    const name = String(raw?.name || raw?.sku || "Item").slice(0, 160);
-    const hits = matchCatalog(catalog, `${raw?.sku || ""} ${name}`);
+    const filled = fillMissingShelf(raw, catalog, prose);
+    const name = String(filled?.name || filled?.sku || "Item").slice(0, 160);
+    const hits = matchCatalog(catalog, `${filled?.sku || ""} ${name}`);
     const known = hits.find(hasFirmPrice) || hits[0];
     const fixed = Boolean(known?.fixedPrice);
     let shelf = null;
@@ -217,28 +230,29 @@ function linesFromQuote(rawQuote) {
       const top = Math.max(...nums);
       shelfHigh = top > shelf ? top : null;
     };
-    if (!fixed && raw?.shelf != null && Number(raw.shelf) > 0) shelf = Number(raw.shelf);
-    else if (!fixed && (raw?.shelfLow != null || raw?.shelfHigh != null)) takeRange(raw.shelfLow, raw.shelfHigh);
+    if (!fixed && filled?.shelf != null && Number(filled.shelf) > 0) shelf = Number(filled.shelf);
+    else if (!fixed && (filled?.shelfLow != null || filled?.shelfHigh != null)) takeRange(filled.shelfLow, filled.shelfHigh);
     else if (!fixed && known?.shelfPrice != null && known.shelfPrice !== "") shelf = Number(known.shelfPrice);
     else if (!fixed && known && (known.shelfLow != null || known.shelfHigh != null)) takeRange(known.shelfLow, known.shelfHigh);
     const priced = priceFromShelf({
       shelf,
       shelfHigh,
-      source: fixed ? "A" : (raw?.source || (shelf ? "A" : "U")),
-      fixedPrice: fixed,
-      listPrice: fixed ? known.price : null,
+      source: fixed ? "A" : (filled?.source || (shelf ? "A" : "U")),
+      fixedPrice: fixed || Boolean(filled?.fixedPrice),
+      listPrice: fixed ? known.price : (filled?.listPrice ?? null),
     });
-    const qty = Number(raw?.qty);
+    const qty = Number(filled?.qty);
+    const displayName = name && name !== "Item" ? name : (known?.name || name);
     return {
-      name: known?.name || name,
-      sku: known?.sku || raw?.sku || "",
+      name: displayName,
+      sku: known?.sku || filled?.sku || "",
       qty: Number.isFinite(qty) && qty > 0 ? qty : null,
       ...priced,
-      fixedListed: fixed,
-      manufacturerUrl: known?.manufacturerUrl || raw?.manufacturerUrl || "",
-      categoryPage: known?.categoryPage || raw?.categoryPage || "",
-      warrantyUrl: raw?.warrantyUrl || warrantyFor(known?.name || name),
-      localPickup: raw?.localPickup === true ? true : (raw?.localPickup === false ? false : null),
+      fixedListed: fixed || Boolean(filled?.fixedPrice),
+      manufacturerUrl: known?.manufacturerUrl || filled?.manufacturerUrl || "",
+      categoryPage: known?.categoryPage || filled?.categoryPage || "",
+      warrantyUrl: filled?.warrantyUrl || warrantyFor(known?.name || name),
+      localPickup: filled?.localPickup === true ? true : (filled?.localPickup === false ? false : null),
       asOf: known?.date || null,
     };
   }).filter((line) => line.name);
@@ -362,7 +376,7 @@ async function chat(request, env) {
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
   if (mock) {
     const local = localReply({ message: latest, catalog, discount: percent, page });
-    const lines = linesFromQuote(local.quote || { items: [] });
+    const lines = linesFromQuote(local.quote || { items: [] }, latest);
     const view = viewFor(lines, { text: latest });
     const reply = finalizeReply(mergeNotes(local.reply, view.notes));
     return json({
@@ -392,7 +406,8 @@ async function chat(request, env) {
       canSearch,
     );
     const parsed = splitModelOutput(outputText(data));
-    const lines = linesFromQuote(parsed.quote || { items: [] });
+    const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
+    const lines = linesFromQuote(parsed.quote || { items: [] }, prose);
     const view = viewFor(lines, { text: latest });
     const reply = finalizeReply(mergeNotes(parsed.reply, view.notes));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;

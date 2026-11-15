@@ -1,5 +1,5 @@
 import { rules } from "../config/rules.js";
-import { formatMoney, roundMoney } from "../../shared/pricing.js";
+import { formatMoney, paymentOnTop, roundMoney } from "../../shared/pricing.js";
 
 const CONFIRM = "Zachary will confirm the price";
 const BALLPARK = "Starting estimate, bulk pricing usually comes in better.";
@@ -240,6 +240,13 @@ export function afterHoursNote(date = new Date()) {
   return AFTER_HOURS;
 }
 
+function gloveCardNote(lines) {
+  const glove = lines.find((line) => line.fixedListed && /victory/i.test(line.name || "") && line.estimate != null);
+  if (!glove) return "";
+  const fees = paymentOnTop(glove.estimate, rules.cardFeeRate, rules.achFeeRate);
+  return `Victory Series gloves are ${formatMoney(glove.estimate)} a pair. Pay by card or government purchase card and the fee makes it about ${formatMoney(fees.card)} a pair. ACH is about ${formatMoney(fees.ach)}. A check stays ${formatMoney(glove.estimate)}.`;
+}
+
 export function leadTimeNote({ bulk, owned, localPickup }) {
   if (bulk) return BULK_TIME;
   if (owned) return GLOVES;
@@ -290,6 +297,7 @@ export function presentQuote({
   const items = working.map((line) => publicLine(line, lead.bulk));
   const totals = lead.bulk ? null : moneyTotals(working.filter((line) => !line.confirm), { taxExempt });
   const notes = [
+    gloveCardNote(working),
     lead.bulk ? `${BALLPARK} ${BULK_EMAIL}` : "",
     leadTimeNote({ bulk: lead.bulk, owned, localPickup }),
     afterHoursNote(now),

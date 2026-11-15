@@ -14,7 +14,9 @@ import {
   discountPercent,
   extractQty,
   formatEstimate,
+  formatMoney,
   matchCatalog,
+  paymentOnTop,
   priceEntry,
 } from "./pricing.js";
 
@@ -25,6 +27,10 @@ function pageLink(path, label) {
 function priceSentence(priced, qty) {
   const qtyBit = qty ? ` Quantity noted: ${qty}.` : " How many do you need?";
   const amount = formatEstimate(priced);
+  if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
+    const fees = paymentOnTop(priced.estimate);
+    return `Victory Series gloves are ${amount} a pair.${qtyBit} Pay by card and the fee makes it about ${formatMoney(fees.card)} a pair. ACH is about ${formatMoney(fees.ach)}. A check stays ${amount}. ${ESTIMATE_NOTE}`;
+  }
   if (priced.kind === "listed") {
     return `${priced.name} is listed at ${amount} on our site.${qtyBit} ${ESTIMATE_NOTE}`;
   }

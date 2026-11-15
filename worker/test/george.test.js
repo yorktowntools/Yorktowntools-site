@@ -6,9 +6,12 @@ import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl } from "../../
 import { localReply } from "../../shared/local-reply.js";
 import {
   extractQty,
+  fillMissingShelf,
   hasFirmPrice,
   matchCatalog,
+  paymentOnTop,
   priceEntry,
+  shelvesFromText,
   shouldSearch,
 } from "../../shared/pricing.js";
 import { buildInstructions } from "../src/prompt.js";
@@ -50,7 +53,17 @@ test("instant price matches the shelf, and the margin floor blocks a deeper cut"
     rules.matchPercentBelow = 0;
   }
   const firm = priceEntry(catalog.items.find((item) => item.sku === "VICTORY-GLOVE"), 0);
-  assert.equal(firm.estimate, 34.99);
+  assert.equal(paymentOnTop(19.99, rules.cardFeeRate, rules.achFeeRate).card, 20.59);
+  assert.equal(paymentOnTop(19.99, rules.cardFeeRate, rules.achFeeRate).ach, 20.19);
+  assert.equal(firm.estimate, 19.99);
+  rules.matchPercentBelow = 5;
+  try {
+    const gloves = priceFromShelf({ fixedPrice: true, listPrice: 19.99, source: "A" });
+    assert.equal(gloves.estimate, 19.99);
+    assert.equal(gloves.confirm, false);
+  } finally {
+    rules.matchPercentBelow = 0;
+  }
   assert.equal(hasFirmPrice(catalog.items.find((item) => item.sku === "5007FA")), false);
 });
 
@@ -63,6 +76,8 @@ test("catalog match ignores dimensions and finds the saw", () => {
   assert.equal(shouldSearch("price on victory gloves", matchCatalog(catalog, "victory gloves")), false);
   assert.equal(shouldSearch("how much is the Makita 5007FA", hits), true);
   assert.equal(shouldSearch("I need 6 cases of caulk and 5 circular saws", []), true);
+  assert.equal(matchCatalog(catalog, "I need 5 circular saws")[0].sku, "5007FA");
+  assert.equal(matchCatalog(catalog, "circular saws")[0].sku, "5007FA");
 });
 
 test("customer text never keeps a retailer, a retailer url, or cost", () => {
@@ -101,7 +116,9 @@ test("small orders stay instant and bulk orders stay a ballpark", () => {
     catalog,
     discount: 0,
   });
-  assert.match(gloves.reply, /\$34\.99/);
+  assert.match(gloves.reply, /\$19\.99/);
+  assert.match(gloves.reply, /\$20\.59/);
+  assert.match(gloves.reply, /card/i);
   assert.equal(gloves.quote.bulk, false);
   assert.equal(gloves.quote.items[0].qty, 10);
   assert.doesNotMatch(gloves.reply, /home depot|lowe|margin|our cost|military discount/i);
@@ -242,13 +259,13 @@ test("prompt tells George the rules and the email does not leak them", () => {
     items: [{
       name: "Victory Series drivers gloves",
       qty: 10,
-      estimate: 34.99,
+      estimate: 19.99,
       kind: "listed",
       manufacturerUrl: "https://yorktowntools.com/victory-gloves.html",
       categoryPage: "https://yorktowntools.com/Safety-PPE.html",
     }],
   });
-  assert.match(mail.html, /\$34\.99/);
+  assert.match(mail.html, /\$19\.99/);
   assert.match(mail.text, /Free delivery/);
   assert.doesNotMatch(mail.text, /Zachary will send your bulk pricing/);
   const visible = `${mail.html.replace(/style="[^"]*"/g, "")} ${mail.text}`;
@@ -300,6 +317,23 @@ test("mock chat and quote endpoints", async () => {
   assert.equal(bulkBody.quote.items[0].ballpark, true);
   assert.ok(bulkBody.quote.items[0].estimate > 0);
   assert.match(bulkBody.reply, /bulk pricing usually comes in better/i);
+
+  const saws = await post("/api/chat", {
+    messages: [{ role: "user", content: "I need 5 circular saws for a job in Newport News" }],
+  });
+  const sawBody = await saws.json();
+  assert.equal(sawBody.quote.bulk, true);
+  assert.equal(sawBody.quote.items[0].ballpark, true);
+  assert.ok(sawBody.quote.items[0].estimate > 0);
+  assert.doesNotMatch(sawBody.reply, /home depot|lowe|our cost|margin/i);
+
+  const caulk = fillMissingShelf(
+    { name: "cases of caulk", qty: 6 },
+    catalog,
+    "Cases of caulk are about $48 a case.",
+  );
+  assert.equal(caulk.shelf, 48);
+  assert.equal(shelvesFromText("The store price is not copied.", "cases of caulk"), null);
   assert.doesNotMatch(body.reply, /home depot|lowe|margin|our cost/i);
   assert.equal(body.mode, "mock");
 

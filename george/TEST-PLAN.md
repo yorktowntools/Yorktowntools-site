@@ -8,7 +8,7 @@ Run these before the widget is trusted with real customers. Nothing here should 
 2. Open `http://127.0.0.1:8765/?george=mock`.
 3. Click **Ask George**. The panel opens. The mascot is George. Call and Text use (757) 940-5171.
 4. Ask `How much are the Victory gloves? Need 10 pairs.`
-   - The reply includes **$34.99**.
+   - The reply includes **$19.99**, and about **$20.59** if they pay by card.
    - It does not promise the gloves are on the truck.
 5. Ask `I need 5 circular saws for the crew.`
    - George does not lock a final price.
