@@ -276,6 +276,8 @@ function publicLine(line, bulk) {
     confirm: line.confirm && !bulk,
     confidence: line.confirm ? "unsure" : (bulk ? "ballpark" : "list"),
     kind: line.fixedListed ? "listed" : (bulk ? "ballpark" : "instant"),
+    model: line.model || "",
+    manufacturer: line.manufacturer || "",
     manufacturerUrl: line.manufacturerUrl || "",
     categoryPage: line.categoryPage || "",
     warrantyUrl: line.warrantyUrl || "",
@@ -342,6 +344,15 @@ function brandLabel(url) {
   }
 }
 
+function productLinkLabel(item, url) {
+  const model = String(item?.model || "").trim();
+  if (model) return model;
+  const brand = item?.manufacturer && !/yorktown tools/i.test(item.manufacturer) ? item.manufacturer : brandLabel(url);
+  const sku = String(item?.sku || "").trim();
+  if (brand && sku && !brand.toLowerCase().includes(sku.toLowerCase())) return `${brand} ${sku}`;
+  return brand || "Maker page";
+}
+
 function ownProduct(item) {
   return /yorktowntools\.com/i.test(item?.manufacturerUrl || "")
     || item?.sku === "VICTORY-GLOVE"
@@ -355,7 +366,7 @@ export function itemLinkLine(item) {
     const url = page || maker;
     return url ? `[Our page](${url})` : "";
   }
-  if (maker && !/yorktowntools\.com/i.test(maker)) return `[${brandLabel(maker)}](${maker})`;
+  if (maker && !/yorktowntools\.com/i.test(maker)) return `[${productLinkLabel(item, maker)}](${maker})`;
   return page ? `[Our page](${page})` : "";
 }
 
@@ -396,11 +407,11 @@ export function itemPriceLine(item) {
   const qty = item.qty ? `${item.qty} × ` : "";
   const fees = gloveFees(item);
   if (fees) {
-    return `${qty}${name}: ${fees.price} a pair. Card about ${fees.card}. ACH about ${fees.ach}. A check stays ${fees.price}.`;
+    return `${qty}${name}: ${fees.price} a pair. Card about ${fees.card}. ACH about ${fees.ach}. No fee by check.`;
   }
   const amount = formatEstimate(item);
   if (item.ballpark && amount) {
-    return `${qty}${name}: Starting estimate ${amount}. Bulk pricing usually comes in better.`;
+    return `${qty}${name}: Starting estimate ${amount}.`;
   }
   if (!amount || item.confirm) return `${qty}${name}: Zachary will confirm the price.`;
   return `${qty}${name}: ${amount}.`;
@@ -434,7 +445,7 @@ export function replyWithFinalPrices(modelReply, items) {
     const amounts = dollarTokens(trimmed);
     if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
     if (restatesServerPrice(trimmed, list)) continue;
-    if (/^starting estimate[,.]?\s*bulk pricing usually comes in better\.?$/i.test(trimmed) && itemLines.some((line) => /bulk pricing usually comes in better/i.test(line))) continue;
+    if (list.some((item) => item.ballpark) && /bulk pricing usually comes in better|zachary will send (your |the )?bulk pricing/i.test(trimmed)) continue;
     seen.add(key);
     if (/\?\s*$/.test(trimmed)) questions.push(trimmed);
     else explanation.push(trimmed);

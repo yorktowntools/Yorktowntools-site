@@ -207,8 +207,8 @@ function renderItems() {
     const confirm = item.confirm || item.kind === "unsure" || (!amount && item.confidence === "unsure");
     if (gloves && item.estimate != null && item.estimateHigh == null) {
       const fees = paymentOnTop(item.estimate);
-      price.textContent = `${amount} a pair. Card ${formatMoney(fees.card)}. ACH ${formatMoney(fees.ach)}. Check ${amount}.`;
-    } else if (ballpark && amount) price.textContent = `Starting estimate ${amount}. Bulk pricing usually comes in better.`;
+      price.textContent = `${amount} a pair. Card ${formatMoney(fees.card)}. ACH ${formatMoney(fees.ach)}. No fee by check.`;
+    } else if (ballpark && amount) price.textContent = `Starting estimate ${amount}.`;
     else if (confirm || !amount) price.textContent = "Zachary will confirm the price.";
     else price.textContent = `${amount} estimate. Free delivery is included. Not a promise of stock.`;
     row.append(name, qty, price);

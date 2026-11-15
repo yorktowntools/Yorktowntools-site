@@ -34,8 +34,9 @@ function itemLink(priced) {
     return priced.categoryPage ? `[Our page](${priced.categoryPage})` : "";
   }
   if (priced.manufacturerUrl && !/yorktowntools\.com/i.test(priced.manufacturerUrl)) {
-    const brand = priced.manufacturer && !/yorktown tools/i.test(priced.manufacturer) ? priced.manufacturer : "Maker page";
-    return `[${brand}](${priced.manufacturerUrl})`;
+    const label = priced.model
+      || (priced.manufacturer && priced.sku ? `${priced.manufacturer} ${priced.sku}` : (priced.manufacturer || "Maker page"));
+    return `[${label}](${priced.manufacturerUrl})`;
   }
   return priced.categoryPage ? `[Our page](${priced.categoryPage})` : "";
 }
@@ -186,10 +187,10 @@ export function localReply({ message, catalog, discount, page }) {
       if (priced.estimate == null) return `- ${qtyBit}${priced.name}: Zachary will confirm the price.`;
       if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
         const fees = paymentOnTop(priced.estimate);
-        return `- ${qtyBit}${priced.name}: ${amount} a pair. Card about ${formatMoney(fees.card)}. ACH about ${formatMoney(fees.ach)}. A check stays ${amount}.`;
+        return `- ${qtyBit}${priced.name}: ${amount} a pair. Card about ${formatMoney(fees.card)}. ACH about ${formatMoney(fees.ach)}. No fee by check.`;
       }
       if ((lineQty >= 5 && priced.kind !== "listed") || (lineQty >= 2 && /\bcase/i.test(priced.name || ""))) {
-        return `- ${qtyBit}${priced.name}: Starting estimate ${amount}. Bulk pricing usually comes in better.`;
+        return `- ${qtyBit}${priced.name}: Starting estimate ${amount}.`;
       }
       return `- ${qtyBit}${priced.name}: ${amount}.`;
     });

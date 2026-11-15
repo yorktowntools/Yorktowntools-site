@@ -101,6 +101,7 @@ export function priceEntry(entry, percent) {
   const base = {
     sku: entry.sku || "",
     name: entry.name || entry.model || "Item",
+    model: entry.model || "",
     manufacturer: entry.manufacturer || "",
     manufacturerUrl: entry.manufacturerUrl || "",
     categoryPage: entry.categoryPage || "",
