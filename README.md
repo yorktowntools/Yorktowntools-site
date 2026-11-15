@@ -33,7 +33,7 @@ Checked against xAI’s public prices in November 2026. Confirm them on [docs.x.
 
 **A busier month (about 1,000 messages and 400 searches):** roughly **$10 to $15**.
 
-If you change `XAI_MODEL` to `grok-4.7`, token prices are higher ($2 input / $6 output per million). Leave the default unless you have a reason.
+If you change `XAI_MODEL` to `grok-4.7`, token prices are higher ($2 input / $6 output per million). Leave the default unless you have a reason. No-search replies use `grok-4.3` with reasoning turned off (`reasoning.effort` `none`). Search replies stay on the same model with reasoning `low`.
 
 The Worker also caps abuse: 20 chats an hour and 60 a day per network address, 8 quote emails a day, 2 web searches per chat, 15 searches a day per address, and only the last 8 messages are sent. Set a monthly spending limit in the xAI console if you see that setting, and glance at usage the first few weeks. The caps live in memory on the Worker, so they reset if Cloudflare moves the program. The xAI spending limit is the real ceiling.
 

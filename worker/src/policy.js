@@ -1,4 +1,5 @@
 import { rules } from "../config/rules.js";
+import { isAllowedCustomerUrl } from "../../shared/customer-text.js";
 import { formatEstimate, formatMoney, paymentOnTop, roundMoney } from "../../shared/pricing.js";
 
 const CONFIRM = "Zachary will confirm the price";
@@ -246,11 +247,12 @@ export function afterHoursNote(date = new Date()) {
   return AFTER_HOURS;
 }
 
-function gloveCardNote(lines) {
-  const glove = lines.find((line) => line.fixedListed && /victory/i.test(line.name || "") && line.estimate != null);
-  if (!glove) return "";
-  const fees = paymentOnTop(glove.estimate, rules.cardFeeRate, rules.achFeeRate);
-  return `Victory Series gloves are ${formatMoney(glove.estimate)} a pair. Pay by card or government purchase card and the fee makes it about ${formatMoney(fees.card)} a pair. ACH is about ${formatMoney(fees.ach)}. A check stays ${formatMoney(glove.estimate)}.`;
+function gloveFees(item) {
+  if (!item || item.estimate == null || item.estimateHigh != null) return null;
+  const gloves = item.sku === "VICTORY-GLOVE" || (/victory/i.test(item.name || "") && /glove/i.test(item.name || ""));
+  if (!gloves) return null;
+  const fees = paymentOnTop(item.estimate, rules.cardFeeRate, rules.achFeeRate);
+  return { price: formatMoney(item.estimate), card: formatMoney(fees.card), ach: formatMoney(fees.ach) };
 }
 
 export function leadTimeNote({ bulk, owned, localPickup }) {
@@ -303,7 +305,6 @@ export function presentQuote({
   const items = working.map((line) => publicLine(line, lead.bulk));
   const totals = lead.bulk ? null : moneyTotals(working.filter((line) => !line.confirm), { taxExempt });
   const notes = [
-    gloveCardNote(working),
     lead.bulk ? `${BALLPARK} ${BULK_EMAIL}` : "",
     leadTimeNote({ bulk: lead.bulk, owned, localPickup }),
     afterHoursNote(now),
@@ -326,46 +327,129 @@ function dollarTokens(text) {
     .map((match) => match[0].replace(/\s/g, ""));
 }
 
+function brandLabel(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (/dewalt\.com$/i.test(host)) return "DeWalt";
+    if (/milwaukeetool\.com$/i.test(host)) return "Milwaukee";
+    if (/makitatools\.com$/i.test(host) || /makita\.com$/i.test(host)) return "Makita";
+    if (/bosch/i.test(host)) return "Bosch";
+    if (/wernerco\.com$/i.test(host)) return "Werner";
+    if (/jackery\.com$/i.test(host)) return "Jackery";
+    return "Maker page";
+  } catch {
+    return "Maker page";
+  }
+}
+
+function ownProduct(item) {
+  return /yorktowntools\.com/i.test(item?.manufacturerUrl || "")
+    || item?.sku === "VICTORY-GLOVE"
+    || (/victory/i.test(item?.name || "") && /glove/i.test(item?.name || ""));
+}
+
+export function itemLinkLine(item) {
+  const page = isAllowedCustomerUrl(item?.categoryPage) ? item.categoryPage : "";
+  const maker = isAllowedCustomerUrl(item?.manufacturerUrl) ? item.manufacturerUrl : "";
+  if (ownProduct(item)) {
+    const url = page || maker;
+    return url ? `[Our page](${url})` : "";
+  }
+  if (maker && !/yorktowntools\.com/i.test(maker)) return `[${brandLabel(maker)}](${maker})`;
+  return page ? `[Our page](${page})` : "";
+}
+
+function nameTokens(name) {
+  return String(name || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/)
+    .filter((token) => token.length >= 4 && !["series", "drivers", "cases", "case", "inch"].includes(token));
+}
+
+function restatesServerPrice(sentence, items) {
+  if (/listed for a pair/i.test(sentence)) return true;
+  if (/prepare a quote for you/i.test(sentence)) return true;
+  const lower = sentence.toLowerCase();
+  const glove = items.some((item) => gloveFees(item));
+  if (glove && /a pair|\bcard\b|\bach\b|a check/.test(lower) && /\$|\d/.test(lower)) return true;
+  const talksPrice = /\$|\bestimate\b|\blisted\b|\bprice\b|\bpricing\b/.test(lower);
+  if (!talksPrice) return false;
+  return items.some((item) => {
+    const tokens = nameTokens(item.name);
+    if (!tokens.length) return false;
+    const hits = tokens.filter((token) => lower.includes(token));
+    return hits.length >= Math.min(2, tokens.length);
+  });
+}
+
+function withoutModelLinks(sentence) {
+  const cleaned = sentence
+    .replace(/\[[^\]]+\]\((https?:\/\/[^)\s]+)\)/g, "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  if (/^(our page|maker page)\s*[:.]?\s*$/i.test(cleaned)) return "";
+  return cleaned;
+}
+
 export function itemPriceLine(item) {
   const name = String(item?.name || "").trim();
   if (!name) return "";
   const qty = item.qty ? `${item.qty} × ` : "";
+  const fees = gloveFees(item);
+  if (fees) {
+    return `${qty}${name}: ${fees.price} a pair. Card about ${fees.card}. ACH about ${fees.ach}. A check stays ${fees.price}.`;
+  }
   const amount = formatEstimate(item);
   if (item.ballpark && amount) {
     return `${qty}${name}: Starting estimate ${amount}. Bulk pricing usually comes in better.`;
   }
   if (!amount || item.confirm) return `${qty}${name}: Zachary will confirm the price.`;
-  return `${qty}${name}: ${amount} estimate.`;
+  return `${qty}${name}: ${amount}.`;
 }
 
 /** Chat text uses the same rounded figures as the quote form. Shelf dollars that differ are dropped. */
 export function replyWithFinalPrices(modelReply, items) {
   const list = Array.isArray(items) ? items : [];
   const allowed = new Set();
-  const lines = [];
+  const itemLines = [];
   for (const item of list) {
     const line = itemPriceLine(item);
-    if (line) lines.push(line);
+    if (line) itemLines.push(`- ${line}`);
+    const fees = gloveFees(item);
+    if (fees) {
+      allowed.add(fees.price);
+      allowed.add(fees.card);
+      allowed.add(fees.ach);
+    }
     if (item.estimate != null) allowed.add(formatMoney(item.estimate));
     if (item.estimateHigh != null) allowed.add(formatMoney(item.estimateHigh));
   }
-  const kept = [];
+  const seen = new Set(itemLines.map((line) => line.toLowerCase()));
+  const explanation = [];
+  const questions = [];
   for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+/)) {
-    const trimmed = sentence.trim();
-    if (!trimmed) continue;
+    const trimmed = withoutModelLinks(sentence.trim());
+    if (!trimmed || /^(our page|maker page|makita|dewalt|milwaukee)$/i.test(trimmed)) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
     const amounts = dollarTokens(trimmed);
     if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
-    kept.push(trimmed);
-  }
-  const seen = new Set();
-  const unique = [];
-  for (const sentence of [...lines, ...kept]) {
-    const key = sentence.toLowerCase();
-    if (seen.has(key)) continue;
+    if (restatesServerPrice(trimmed, list)) continue;
+    if (/^starting estimate[,.]?\s*bulk pricing usually comes in better\.?$/i.test(trimmed) && itemLines.some((line) => /bulk pricing usually comes in better/i.test(line))) continue;
     seen.add(key);
-    unique.push(sentence);
+    if (/\?\s*$/.test(trimmed)) questions.push(trimmed);
+    else explanation.push(trimmed);
   }
-  return unique.join("\n").trim();
+  const links = [];
+  for (const item of list) {
+    const link = itemLinkLine(item);
+    if (link && !links.includes(link)) links.push(link);
+  }
+  const blocks = [];
+  if (itemLines.length) blocks.push(itemLines.join("\n"));
+  if (links.length) blocks.push(links.join("\n"));
+  if (explanation.length) blocks.push(explanation.join(" "));
+  if (questions.length) blocks.push(questions.join(" "));
+  return blocks.join("\n\n").trim();
 }
 
 export function feeSentence(totals) {

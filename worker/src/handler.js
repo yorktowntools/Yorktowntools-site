@@ -161,6 +161,9 @@ async function callXai(env, instructions, input, useSearch) {
     input,
     temperature: 0.3,
     max_output_tokens: num(env.MAX_OUTPUT_TOKENS, 320),
+    // grok-4.3 defaults to low reasoning, which is most of a no-search wait.
+    // none skips that. Search turns stay on low so tool use still works.
+    reasoning: { effort: useSearch ? "low" : "none" },
   };
   if (useSearch) {
     full.tools = [{

@@ -29,33 +29,15 @@ function ownProduct(priced) {
   return /yorktowntools\.com/i.test(priced.manufacturerUrl || "") || /yorktown tools/i.test(priced.manufacturer || "");
 }
 
-function itemLinks(priced) {
+function itemLink(priced) {
   if (ownProduct(priced)) {
-    return priced.categoryPage ? ` [Our page](${priced.categoryPage}).` : "";
+    return priced.categoryPage ? `[Our page](${priced.categoryPage})` : "";
   }
-  const brand = priced.manufacturer && !/yorktown tools/i.test(priced.manufacturer) ? priced.manufacturer : "Maker page";
-  const maker = priced.manufacturerUrl ? ` Maker page: [${brand}](${priced.manufacturerUrl}).` : "";
-  const ours = priced.categoryPage ? ` [Our page](${priced.categoryPage}).` : "";
-  return `${maker}${ours}`;
-}
-
-function priceSentence(priced, qty) {
-  const qtyBit = qty ? ` Quantity noted: ${qty}.` : " How many do you need?";
-  const amount = formatEstimate(priced);
-  if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
-    const fees = paymentOnTop(priced.estimate);
-    return `Victory Series gloves are ${amount} a pair.${qtyBit} Pay by card and the fee makes it about ${formatMoney(fees.card)} a pair. ACH is about ${formatMoney(fees.ach)}. A check stays ${amount}. ${ESTIMATE_NOTE}`;
+  if (priced.manufacturerUrl && !/yorktowntools\.com/i.test(priced.manufacturerUrl)) {
+    const brand = priced.manufacturer && !/yorktown tools/i.test(priced.manufacturer) ? priced.manufacturer : "Maker page";
+    return `[${brand}](${priced.manufacturerUrl})`;
   }
-  if (priced.kind === "listed") {
-    return `${priced.name} is listed at ${amount} on our site.${qtyBit} ${ESTIMATE_NOTE}`;
-  }
-  if (priced.kind === "range") {
-    return `For ${priced.name} I would figure about ${amount}.${qtyBit} ${ESTIMATE_NOTE} Yorktown Tools will confirm it quickly.`;
-  }
-  if (priced.estimate != null) {
-    return `For ${priced.name} my estimate is ${amount}.${qtyBit} ${ESTIMATE_NOTE}`;
-  }
-  return `I don't have a firm number on ${priced.name} yet. Tell me the model if you have it.${qtyBit} Zachary will confirm the price quickly. ${ESTIMATE_NOTE}`;
+  return priced.categoryPage ? `[Our page](${priced.categoryPage})` : "";
 }
 
 function toQuoteItem(priced, qty) {
@@ -200,15 +182,26 @@ export function localReply({ message, catalog, discount, page }) {
     const lines = matches.map((priced) => {
       const lineQty = priced.qty || qty;
       const amount = formatEstimate(priced);
-      if (priced.estimate == null) {
-        return `${lineQty ? `${lineQty} × ` : ""}${priced.name}: Zachary will confirm the price.`;
+      const qtyBit = lineQty ? `${lineQty} × ` : "";
+      if (priced.estimate == null) return `- ${qtyBit}${priced.name}: Zachary will confirm the price.`;
+      if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
+        const fees = paymentOnTop(priced.estimate);
+        return `- ${qtyBit}${priced.name}: ${amount} a pair. Card about ${formatMoney(fees.card)}. ACH about ${formatMoney(fees.ach)}. A check stays ${amount}.`;
       }
       if ((lineQty >= 5 && priced.kind !== "listed") || (lineQty >= 2 && /\bcase/i.test(priced.name || ""))) {
-        return `${lineQty} × ${priced.name}: starting estimate ${amount}. Bulk pricing usually comes in better. ${ESTIMATE_NOTE}${itemLinks(priced)}`;
+        return `- ${qtyBit}${priced.name}: Starting estimate ${amount}. Bulk pricing usually comes in better.`;
       }
-      return `${priceSentence(priced, lineQty)}${itemLinks(priced)}`;
+      return `- ${qtyBit}${priced.name}: ${amount}.`;
     });
-    return finish(lines.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
+    const links = [];
+    for (const priced of matches) {
+      const link = itemLink(priced);
+      if (link && !links.includes(link)) links.push(link);
+    }
+    const blocks = [lines.join("\n")];
+    if (links.length) blocks.push(links.join("\n"));
+    blocks.push(ESTIMATE_NOTE);
+    return finish(blocks.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
   }
 
   if (/\b(price|pricing|how much|quote|cost)\b/i.test(text)) {

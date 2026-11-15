@@ -310,11 +310,7 @@ export function renderSafeHtml(input) {
       const items = lines.map((line) => `<li>${line.replace(/^[-*]\s+/, "")}</li>`).join("");
       return `<ul>${items}</ul>`;
     }
-    if (lines.length === 1) {
-      const sentences = lines[0].split(/(?<=[.!?])\s+(?=[A-Z])/).map((sentence) => sentence.trim()).filter(Boolean);
-      if (sentences.length > 1) return sentences.map((sentence) => `<p>${sentence}</p>`).join("");
-    }
-    return `<p>${lines.join("<br>")}</p>`;
+    return `<p>${lines.join(" ")}</p>`;
   });
   return blocks.join("");
 }

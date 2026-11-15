@@ -295,6 +295,9 @@ test("links render as labeled anchors and hours are not repeated", () => {
   assert.match(html, /<a href="https:\/\/yorktowntools.com\/victory-gloves.html" target="_blank" rel="noopener noreferrer">Our page<\/a>/);
   assert.match(html, /<ul><li>Card<\/li><li>Check<\/li><\/ul>/);
   assert.doesNotMatch(html, />https:\/\//);
+  const prose = renderSafeHtml("First sentence here. Second sentence here.");
+  assert.equal((prose.match(/<p>/g) || []).length, 1);
+  assert.match(prose, /First sentence here\. Second sentence here\./);
   const once = withoutRepeatedAfterHours(
     "Still here.\nZachary will reply by 9 a.m. the next business day.",
     [{ role: "assistant", content: "Zachary will reply by 9 a.m. the next business day." }],
@@ -315,6 +318,39 @@ test("chat prices match the computed quote, not the raw shelf", () => {
   assert.doesNotMatch(reply, /\$30/);
   assert.match(reply, /5 × circular saws/);
   assert.match(reply, /6 × cases of caulk/);
+  assert.match(reply, /^- /m);
+
+  const gloves = replyWithFinalPrices(
+    "1 × Victory Series drivers gloves: $19.99 estimate. Victory Series gloves are listed for a pair. I can prepare a quote for you. Victory Series gloves are $19.99 a pair. We keep them on hand.",
+    [{
+      name: "Victory Series drivers gloves",
+      sku: "VICTORY-GLOVE",
+      qty: 1,
+      estimate: 19.99,
+      manufacturerUrl: "https://yorktowntools.com/victory-gloves.html",
+      categoryPage: "https://yorktowntools.com/victory-gloves.html",
+    }],
+  );
+  assert.match(gloves, /\$19\.99 a pair/);
+  assert.match(gloves, /\$20\.59/);
+  assert.match(gloves, /\[Our page\]\(https:\/\/yorktowntools\.com\/victory-gloves\.html\)/);
+  assert.doesNotMatch(gloves, /listed for a pair/i);
+  assert.doesNotMatch(gloves, /prepare a quote for you/i);
+  assert.equal((gloves.match(/\$19\.99/g) || []).length, 2);
+  assert.match(gloves, /We keep them on hand/);
+
+  const saw = replyWithFinalPrices("The saw has to be sourced.", [{
+    name: "Makita 5007FA 7-1/4 in. circular saw",
+    qty: 5,
+    estimate: 160.24,
+    estimateHigh: 190.24,
+    ballpark: true,
+    manufacturerUrl: "https://www.makitatools.com/products/details/5007FA",
+    categoryPage: "https://yorktowntools.com/Power-tools.html",
+  }]);
+  assert.match(saw, /\[Makita\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
+  assert.match(saw, /The saw has to be sourced\./);
+  assert.doesNotMatch(saw, /\[Our page\]/);
 });
 
 test("OPTIONS preflight is an empty 204 with CORS headers", async () => {
@@ -416,5 +452,7 @@ test("widget carries the same bulk line and the retailer filter", () => {
   assert.match(widget, /BULK_LINE/);
   assert.match(widget, /company/);
   assert.match(widget, /qty/);
+  const handler = readFileSync(new URL("../../worker/src/handler.js", import.meta.url), "utf8");
+  assert.match(handler, /reasoning: \{ effort: useSearch \? "low" : "none" \}/);
   assert.match(readFileSync(new URL("../../shared/copy.js", import.meta.url), "utf8"), /bulk pricing usually comes in better/);
 });
