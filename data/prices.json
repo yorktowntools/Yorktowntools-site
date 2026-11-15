@@ -1,8 +1,8 @@
 {
-  "discountPercent": 1,
+  "discountPercent": 0,
   "currency": "USD",
   "updated": "2026-11-15",
-  "readme": "Instant estimate = the lower national shelf price, then match it or take discountPercent off (1 means 1% under, 0 means a match). The Worker setting PRICE_DISCOUNT_PERCENT overrides discountPercent. fixedPrice items are the price already printed on yorktowntools.com and are not discounted. Put the lower shelf price in shelfPrice when you have verified it. Use shelfLow and shelfHigh only when you are not ready to publish one number; George will give a range and say he will confirm. Do not put retailer names, your cost, or supplier names in this file. After you edit it, deploy the Worker again.",
+  "readme": "Customer-facing starter list. discountPercent 0 means a listed shelfPrice is matched, not discounted. The real rules (margin, fuel, tax, fees) live in worker/config/rules.js and are applied only on the server. fixedPrice items are the price already printed on the site. Do not put retailer names, cost, or supplier names in this file.",
   "items": [
     {
       "sku": "VICTORY-GLOVE",

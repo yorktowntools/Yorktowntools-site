@@ -39,16 +39,15 @@ The Worker also caps abuse: 20 chats an hour and 60 a day per network address, 8
 
 ## How a price is built
 
-George is for contractors and companies, not a walk-in counter.
+Homeowners and one-off orders should be able to finish on their own. Contractors and government buyers are the accounts to grow.
 
-- He looks at `data/prices.json` first.
-- If that row has a single `shelfPrice`, the estimate is that price, or up to 1% under it.
-- `PRICE_DISCOUNT_PERCENT` controls the gap. `1` means 1% under the lower shelf price. `0` means he matches it. Keep it at 0 or 1.
-- If the list only has a range, or the item is missing, he can search and then apply the same rule to the **lower** shelf price he finds.
-- If he is not confident, he gives a range and says Yorktown Tools will confirm it.
-- Gloves and shirts marked `fixedPrice` stay at the price already printed on the site.
-- After every price he adds one line: companies and bulk orders can often get better pricing, so send the quantity and company or call or text **(757) 940-5171** and Zachary will sharpen it.
-- He never tells a customer your cost, your margin, a supplier name, or a military or supplier discount. He never names Home Depot, Lowe’s, or any other retailer. Those names are blocked again on the server before the customer sees the reply.
+- A small order matches the shelf price. `matchPercentBelow` in `worker/config/rules.js` is **0**. Fuel is folded into the item price when the drive is long enough. The quote still says delivery is free.
+- If a price would sit under the margin floor, George does not show it. He says Zachary will confirm the price.
+- A bulk order is not a locked price. George gives a starting estimate, says bulk pricing usually comes in better, and the customer email says Zachary will send the bulk pricing.
+- Gloves and shirts marked `fixedPrice` stay at the price printed on the site. Virginia sales tax is 7% unless the buyer is government or tax-exempt, and a tax-exempt order needs a certificate.
+- Card and a government purchase card, ACH, and check are shown on the quote with their fees. Net terms stay approval-only.
+- He never tells a customer your cost, your margin, a supplier, or where an item was picked up. He never names other retailers. Change the numbers only in `worker/config/rules.js`.
+- Every email to sales@ includes the tier. A company that looks like a bulk or ongoing account is **TIER 1 / PRIORITY**. A small order is still an instant quote, even from a big company. Homeowners are tier 3.
 
 ## 1. Preview George on your computer
 
@@ -187,7 +186,7 @@ If Resend fails, the Worker posts the same lead to the existing Formspree form (
 
 Edit `data/prices.json`.
 
-- `shelfPrice` is the lower current national shelf price for that exact model. George quotes it, or 1% under it, based on `PRICE_DISCOUNT_PERCENT`.
+- `shelfPrice` is the shelf price George matches for a small order. The knobs (match percent, tax, fees, fuel) are in `worker/config/rules.js`.
 - `fixedPrice: true` means “use `price` as printed on our site” (the gloves and the shirts).
 - A `shelfLow` / `shelfHigh` pair with no `shelfPrice` is only a range. George will say he needs to confirm it. Replace it with one `shelfPrice` when you have checked the number.
 - Do not type a retailer name, your cost, or a supplier name in this file.
@@ -201,11 +200,7 @@ npx wrangler deploy
 
 Publish the website too, so the no-key fallback in the browser sees the same file.
 
-To change the 1%:
-
-1. Open `worker/wrangler.toml`.
-2. Set `PRICE_DISCOUNT_PERCENT = "0"` to match the lower shelf price, or `"1"` to sit 1% under it.
-3. Deploy the Worker again.
+To change the match, the tax, the fees, or the fuel numbers, edit `worker/config/rules.js` and deploy the Worker again. Do not put those notes in a customer reply.
 
 ## 7. Publish the website
 

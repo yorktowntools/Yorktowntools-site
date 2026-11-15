@@ -227,9 +227,7 @@
   gap: 8px;
 }
 
-.george-fields label:nth-child(1),
-.george-fields label:nth-child(2),
-.george-fields label:nth-child(5) {
+.george-fields .george-wide {
   grid-column: 1 / -1;
 }
 

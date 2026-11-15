@@ -9,7 +9,7 @@ import {
   SAFE_COST_REPLY,
   SERVICE_AREA,
 } from "./copy.js";
-import { ensureBulkLine, filterCustomerText } from "./customer-text.js";
+import { filterCustomerText } from "./customer-text.js";
 import {
   discountPercent,
   extractQty,
@@ -60,12 +60,20 @@ export function localReply({ message, catalog, discount, page }) {
   const matches = matchCatalog(catalog, text).map((item) => priceEntry({ ...item, qty }, percent));
 
   const finish = (reply, items, offerForm) => {
-    const hasPrice = items.some((item) => item.estimate != null);
-    const safe = filterCustomerText(reply);
+    const bulk = /\b(bulk|pallet|truckload)\b/i.test(text)
+      || (qty >= 5 && /\b(saw|saws|drill|drills|tool|tools|ladder|ladders|impact|impacts)\b/i.test(text))
+      || (qty >= 2 && /\b(case|cases|caulk)\b/i.test(text))
+      || items.some((item) => item.kind !== "listed" && Number(item.qty) >= 5)
+      || items.some((item) => /\b(case|cases|caulk)\b/i.test(item.name || "") && Number(item.qty) >= 2);
+    const shaped = bulk
+      ? items.map((item) => (item.kind === "listed" ? item : { ...item, kind: "ballpark", firm: false }))
+      : items;
+    const withBulk = bulk ? `${reply}\n\n${BULK_LINE}` : reply;
+    const safe = filterCustomerText(withBulk);
     const body = safe.costHit ? SAFE_COST_REPLY : safe.text;
     return {
-      reply: ensureBulkLine(body, hasPrice || /\$\s?\d/.test(body)),
-      quote: { items, offerForm: Boolean(offerForm || items.length) },
+      reply: body,
+      quote: { items: shaped, offerForm: Boolean(offerForm || shaped.length), bulk },
     };
   };
 
@@ -99,7 +107,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(hour|open|close|when are you)\b/i.test(text)) {
     return finish(
-      `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. If you write after hours, Zachary picks it up the next business morning.`,
+      `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. After hours, Zachary will reply by 9 a.m. the next business day.`,
       [],
       false,
     );
@@ -115,7 +123,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(pay|payment|card|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
     return finish(
-      `Card is the easiest. ACH and other methods are fine too. Don't send card or bank numbers in this chat. I can't take payment here. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms.`,
+      `Card, a government purchase card, ACH, and check are all fine. Card costs more to process than ACH, and a check has no fee. Don't send card or bank numbers in this chat. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms. Virginia sales tax is on the quote unless the order is tax-exempt, and a tax-exempt order needs a certificate.`,
       [],
       false,
     );
@@ -168,7 +176,7 @@ export function localReply({ message, catalog, discount, page }) {
     );
   }
 
-  if (/\b(drill|saw|ladder|glove|battery|blade|bit|wrench|storage|packout|ppe|hard hat|laser|level|jackery|power)\b/i.test(text)) {
+  if (/\b(drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|storage|packout|ppe|hard hats?|lasers?|levels?|jackery|power)\b/i.test(text)) {
     const hint = CATEGORIES.slice(0, 4)
       .map((cat) => pageLink(cat.path, cat.name))
       .join(", ");

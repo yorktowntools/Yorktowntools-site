@@ -1,44 +1,61 @@
-import { BULK_LINE, CREDIT_APP_URL, ESTIMATE_NOTE, HOURS, PHONE_DISPLAY, PHONE_TEL, SERVICE_AREA } from "../../shared/copy.js";
+import { CREDIT_APP_URL, ESTIMATE_NOTE, HOURS, PHONE_DISPLAY, PHONE_TEL, SERVICE_AREA } from "../../shared/copy.js";
 import { escapeHtml, filterCustomerText, isAllowedCustomerUrl } from "../../shared/customer-text.js";
-import { formatEstimate } from "../../shared/pricing.js";
+import { formatMoney } from "../../shared/pricing.js";
+import { BULK_EMAIL, feeSentence } from "./policy.js";
 
 function clean(value, fallback = "") {
   const text = filterCustomerText(value).text;
   return text || fallback;
 }
 
-function moneyCell(item) {
-  const priced = {
-    estimate: item.estimate,
-    estimateHigh: item.estimateHigh,
-    kind: item.kind,
-  };
-  const amount = formatEstimate(priced);
-  if (!amount) return "Yorktown Tools will confirm";
-  return `${amount} estimate`;
+function link(url, label) {
+  if (!isAllowedCustomerUrl(url)) return "";
+  return `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`;
 }
 
-export function buildQuoteEmail({ lead, items }) {
+function tierLabel(tier) {
+  return `Tier ${tier}`;
+}
+
+export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
   const name = clean(lead.name, "there");
   const company = clean(lead.company);
+  const bulk = Boolean(leadInfo?.bulk);
   const rows = items.map((item) => {
     const label = clean(item.name, "Item");
-    const mfr = isAllowedCustomerUrl(item.manufacturerUrl)
-      ? `<a href="${escapeHtml(item.manufacturerUrl)}">Maker page</a>`
-      : "";
-    const site = isAllowedCustomerUrl(item.categoryPage)
-      ? `<a href="${escapeHtml(item.categoryPage)}">Yorktown Tools page</a>`
-      : "";
-    const links = [mfr, site].filter(Boolean).join(" · ");
+    const price = bulk || item.confirm || item.estimate == null
+      ? (bulk ? "Zachary will price this" : "Zachary will confirm the price")
+      : `${formatMoney(item.estimate)} estimate`;
+    const links = [
+      link(item.manufacturerUrl, "Maker page"),
+      link(item.warrantyUrl, "Warranty"),
+      link(item.categoryPage, "Yorktown Tools page"),
+    ].filter(Boolean).join(" · ");
     return `<tr>
       <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${escapeHtml(label)}</td>
       <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;text-align:center;">${escapeHtml(String(item.qty || ""))}</td>
-      <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${escapeHtml(moneyCell(item))}</td>
+      <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${escapeHtml(price)}</td>
       <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${links}</td>
     </tr>`;
   }).join("");
 
-  const subject = `Your Yorktown Tools estimate${company ? ` — ${company}` : ""}`;
+  const taxBlock = bulk
+    ? `<p style="margin:12px 0;">${escapeHtml(BULK_EMAIL)} This is not a final quote.</p>`
+    : (totals
+      ? `<p style="margin:12px 0;"><strong>Subtotal:</strong> ${formatMoney(totals.subtotal)}<br>
+       <strong>${escapeHtml(totals.taxLabel)}:</strong> ${formatMoney(totals.tax)}<br>
+       <strong>Total before payment fee:</strong> ${formatMoney(totals.total)}</p>
+       <p style="margin:0 0 12px;">${escapeHtml(feeSentence(totals))}</p>`
+      : "");
+
+  const subject = bulk
+    ? "Yorktown Tools got your list — Zachary will send your bulk pricing"
+    : `Your Yorktown Tools estimate${company ? ` — ${company}` : ""}`;
+
+  const intro = bulk
+    ? `${BULK_EMAIL} I have the items, quantities, and job site. Zachary will price it and write you back.`
+    : `Here is the estimate from George at Yorktown Tools. ${ESTIMATE_NOTE} Free delivery is included. Zachary confirms timing.`;
+
   const html = `<!DOCTYPE html>
 <html>
 <body style="margin:0;padding:0;background:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;">
@@ -52,8 +69,8 @@ export function buildQuoteEmail({ lead, items }) {
         </td></tr>
         <tr><td style="padding:22px 24px;font-size:16px;line-height:1.5;">
           <p style="margin:0 0 12px;">Hi ${escapeHtml(name)},</p>
-          <p style="margin:0 0 12px;">Here is the estimate from George at Yorktown Tools. ${escapeHtml(ESTIMATE_NOTE)} Zachary will confirm the number, the quantity, and availability.</p>
-          <p style="margin:0 0 12px;"><strong>Company:</strong> ${escapeHtml(company)}<br>
+          <p style="margin:0 0 12px;">${escapeHtml(intro)}</p>
+          <p style="margin:0 0 12px;"><strong>Company:</strong> ${escapeHtml(company || "—")}<br>
           <strong>Phone:</strong> ${escapeHtml(clean(lead.phone))}<br>
           <strong>Job site:</strong> ${escapeHtml(clean(lead.jobsite))}<br>
           <strong>Needed by:</strong> ${escapeHtml(clean(lead.neededBy))}</p>
@@ -64,11 +81,12 @@ export function buildQuoteEmail({ lead, items }) {
               <th align="left" style="padding:8px;">Estimate</th>
               <th align="left" style="padding:8px;">Links</th>
             </tr>
-            ${rows || `<tr><td colspan="4" style="padding:10px 8px;">Details are in the note below. Zachary will price them.</td></tr>`}
+            ${rows || `<tr><td colspan="4" style="padding:10px 8px;">Zachary will price the list you sent.</td></tr>`}
           </table>
-          <p style="margin:16px 0 12px;">${escapeHtml(BULK_LINE)}</p>
-          <p style="margin:0 0 12px;"><strong>Delivery:</strong> Free to the job site, shop, or trailer across ${escapeHtml(SERVICE_AREA)}. No minimum.</p>
-          <p style="margin:0 0 12px;"><strong>How to pay:</strong> Card is the easiest. ACH and other methods are fine. Do not reply with card or bank numbers. Net terms are only for approved customers. <a href="${CREDIT_APP_URL}">Credit application</a>. Sending it does not promise terms.</p>
+          ${taxBlock}
+          <p style="margin:0 0 12px;"><strong>Delivery:</strong> Free to the job site, shop, or trailer across ${escapeHtml(SERVICE_AREA)}. No minimum. No promise of a clock time.</p>
+          <p style="margin:0 0 12px;">Returns and warranty go through the manufacturer. Net terms are only for approved customers. <a href="${CREDIT_APP_URL}">Credit application</a>. Sending it does not promise terms.</p>
+          ${notes.map((note) => `<p style="margin:0 0 12px;">${escapeHtml(clean(note))}</p>`).join("")}
           ${lead.notes ? `<p style="margin:0 0 12px;"><strong>Notes:</strong> ${escapeHtml(clean(lead.notes))}</p>` : ""}
           <p style="margin:0 0 12px;">Questions: call or text <a href="tel:${PHONE_TEL}">${PHONE_DISPLAY}</a> or email <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a>. ${escapeHtml(HOURS)}.</p>
           <p style="margin:0;">— Yorktown Tools<br>Yorktown, Virginia · Veteran-owned</p>
@@ -82,29 +100,87 @@ export function buildQuoteEmail({ lead, items }) {
   const text = [
     `Hi ${name},`,
     "",
-    "Here is your Yorktown Tools estimate. It is an estimate, not a promise of stock. Zachary will confirm it.",
-    `Company: ${company}`,
+    intro,
+    `Company: ${company || "—"}`,
     `Phone: ${clean(lead.phone)}`,
     `Job site: ${clean(lead.jobsite)}`,
     `Needed by: ${clean(lead.neededBy)}`,
     "",
-    ...items.map((item) => `- ${clean(item.name, "Item")} × ${item.qty || "?"} — ${moneyCell(item)}`),
+    ...items.map((item) => {
+      const price = bulk || item.confirm || item.estimate == null
+        ? (bulk ? "Zachary will price this" : "Zachary will confirm the price")
+        : `${formatMoney(item.estimate)} estimate`;
+      return `- ${clean(item.name, "Item")} × ${item.qty || "?"} — ${price}`;
+    }),
     "",
-    BULK_LINE,
+    bulk ? BULK_EMAIL : `Subtotal ${formatMoney(totals?.subtotal)} · ${totals?.taxLabel} ${formatMoney(totals?.tax)} · Total before payment fee ${formatMoney(totals?.total)}`,
+    bulk ? "This is not a final quote." : feeSentence(totals),
     `Free delivery: ${SERVICE_AREA}.`,
-    "Card is easiest. ACH and other methods are fine. Do not send payment numbers. Net terms only if approved.",
+    "Warranty is through the manufacturer. Net terms only if approved.",
     `Credit application: ${CREDIT_APP_URL}`,
+    ...notes.map((note) => clean(note)),
     `Call or text ${PHONE_DISPLAY}. sales@yorktowntools.com. ${HOURS}.`,
   ].join("\n");
 
   return { subject: clean(subject, "Your Yorktown Tools estimate"), html, text };
 }
 
-export function formspreeBody(lead, items) {
-  const summary = items.map((item) => {
-    const amount = formatEstimate(item) || "confirm";
-    return `${item.qty || "?"} × ${clean(item.name, "Item")} (${amount} estimate)`;
-  }).join("\n");
+export function buildSalesEmail({ lead, items, leadInfo, totals }) {
+  const tier = leadInfo?.tier || 3;
+  const bulk = Boolean(leadInfo?.bulk);
+  const company = clean(lead.company) || "no company given";
+  const flag = tier === 1 ? "TIER 1 / PRIORITY" : (bulk ? `TIER ${tier} / BULK` : `TIER ${tier}`);
+  const subject = `${flag} — George lead — ${company}`;
+  const callLine = tier === 1
+    ? "PRIORITY. Call this lead. They look like a bulk, ongoing, or multi-site account. Ask about typical order volume and how often they buy if that is not in the notes."
+    : (bulk
+      ? "Bulk order. Do not treat George's note as a locked price. Price it through your own sources and send the number."
+      : "Small or one-off order. George already sent an instant estimate. Little follow-up unless something needs confirming.");
+  const lines = items.map((item) => {
+    const price = item.estimate == null ? "confirm" : formatMoney(item.estimate);
+    return `- ${clean(item.name, "Item")} × ${item.qty || "?"} — ${bulk ? "not locked" : price}`;
+  });
+  const text = [
+    flag,
+    tierLabel(tier),
+    callLine,
+    "",
+    `Name: ${clean(lead.name)}`,
+    `Company: ${company}`,
+    `Phone: ${clean(lead.phone)}`,
+    `Email: ${lead.email}`,
+    `Job site: ${clean(lead.jobsite)}`,
+    `Needed by: ${clean(lead.neededBy)}`,
+    `Tax exempt: ${lead.taxExempt ? "yes — certificate required" : "no"}`,
+    "",
+    ...lines,
+    "",
+    bulk ? BULK_EMAIL : `Customer total before payment fee: ${formatMoney(totals?.total)} (${totals?.taxLabel})`,
+    lead.notes ? `Notes: ${clean(lead.notes)}` : "",
+  ].filter(Boolean).join("\n");
+
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;color:#1c1c1c;">
+    <p style="font-size:18px;font-weight:700;color:#0b1e3f;">${escapeHtml(flag)}</p>
+    <p>${escapeHtml(tierLabel(tier))}. ${escapeHtml(callLine)}</p>
+    <p><strong>Name:</strong> ${escapeHtml(clean(lead.name))}<br>
+    <strong>Company:</strong> ${escapeHtml(company)}<br>
+    <strong>Phone:</strong> ${escapeHtml(clean(lead.phone))}<br>
+    <strong>Email:</strong> ${escapeHtml(lead.email)}<br>
+    <strong>Job site:</strong> ${escapeHtml(clean(lead.jobsite))}<br>
+    <strong>Needed by:</strong> ${escapeHtml(clean(lead.neededBy))}<br>
+    <strong>Tax exempt:</strong> ${lead.taxExempt ? "yes — certificate required" : "no"}</p>
+    <pre style="font-family:Arial,Helvetica,sans-serif;">${escapeHtml(lines.join("\n"))}</pre>
+    <p>${escapeHtml(bulk ? BULK_EMAIL : `Customer total before payment fee: ${formatMoney(totals?.total)}`)}</p>
+  </div>`;
+
+  return { subject, html, text };
+}
+
+export function formspreeBody(lead, items, leadInfo) {
+  const tier = leadInfo?.tier || 3;
+  const bulk = Boolean(leadInfo?.bulk);
+  const flag = tier === 1 ? "TIER 1 / PRIORITY" : `TIER ${tier}${bulk ? " / BULK" : ""}`;
+  const summary = items.map((item) => `${item.qty || "?"} × ${clean(item.name, "Item")}`).join("\n");
   return {
     name: clean(lead.name),
     company: clean(lead.company),
@@ -112,7 +188,7 @@ export function formspreeBody(lead, items) {
     phone: clean(lead.phone),
     delivery: clean(lead.jobsite),
     needed_by: clean(lead.neededBy),
-    message: `George chat quote\n${summary}\n${clean(lead.notes || "")}`.trim(),
-    _subject: "George chat quote",
+    message: `${flag}\n${bulk ? BULK_EMAIL : "Instant estimate sent if email is connected."}\n${summary}\n${clean(lead.notes || "")}`.trim(),
+    _subject: `${flag} — George lead`,
   };
 }

@@ -7,15 +7,15 @@ export const HOURS = "Monday–Friday, 8:00 AM – 5:00 PM Eastern";
 export const SERVICE_AREA = "Richmond to Virginia Beach, including Hampton Roads and the military bases";
 
 export const BULK_LINE =
-  "Companies and bulk orders can often get better pricing. Send your quantity and company, or call or text (757) 940-5171, and Zachary will sharpen it.";
+  "Starting estimate, bulk pricing usually comes in better. Zachary will send your bulk pricing.";
+
+export const CONFIRM_PRICE = "Zachary will confirm the price.";
 
 export const SAFE_COST_REPLY =
-  "I don't get into what we pay or how a price is built. What I can share is an estimate. " +
-  BULK_LINE;
+  "I don't get into what we pay or how a price is built. " + CONFIRM_PRICE;
 
 export const SAFE_RETAILER_REPLY =
-  "I only quote Yorktown Tools. Tell me the brand, model, and quantity and I'll put an estimate together. Delivery to the job site is free. " +
-  BULK_LINE;
+  "I only quote Yorktown Tools. Tell me the brand, model, and quantity and I'll put an estimate together. Delivery to the job site is free.";
 
 export const ESTIMATE_NOTE =
   "That's an estimate, not a promise that it's on the truck.";

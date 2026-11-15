@@ -1,11 +1,6 @@
 import catalog from "../../data/prices.json" with { type: "json" };
 import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
-import {
-  ensureBulkLine,
-  filterCustomerText,
-  hasDollarAmount,
-  publicQuoteItem,
-} from "../../shared/customer-text.js";
+import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
 import {
   discountPercent,
@@ -14,8 +9,9 @@ import {
   priceEntry,
   shouldSearch,
 } from "../../shared/pricing.js";
-import { buildQuoteEmail, formspreeBody } from "./email.js";
+import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
+import { presentQuote, priceFromShelf } from "./policy.js";
 
 const buckets = new Map();
 
@@ -232,10 +228,84 @@ async function callXai(env, instructions, input, useSearch) {
   return data;
 }
 
-function finalizeReply(reply, items) {
-  const filtered = filterCustomerText(reply);
-  const hasPrice = items.some((item) => item.estimate != null) || hasDollarAmount(filtered.text);
-  return ensureBulkLine(filtered.text, hasPrice);
+const WARRANTIES = [
+  [/dewalt/i, "https://www.dewalt.com/support/warranty"],
+  [/milwaukee/i, "https://www.milwaukeetool.com/support/warranty"],
+  [/makita/i, "https://www.makitatools.com/support/warranty"],
+  [/klein/i, "https://www.kleintools.com/support/warranty"],
+];
+
+function warrantyFor(name) {
+  const hit = WARRANTIES.find(([pattern]) => pattern.test(String(name || "")));
+  return hit ? hit[1] : "";
+}
+
+function linesFromQuote(rawQuote) {
+  const rawItems = Array.isArray(rawQuote?.items) ? rawQuote.items.slice(0, 8) : [];
+  return rawItems.map((raw) => {
+    const name = String(raw?.name || raw?.sku || "Item").slice(0, 160);
+    const hits = matchCatalog(catalog, `${raw?.sku || ""} ${name}`);
+    const known = hits.find(hasFirmPrice) || hits[0];
+    const fixed = Boolean(known?.fixedPrice);
+    let shelf = null;
+    if (!fixed && known?.shelfPrice != null && known.shelfPrice !== "") shelf = Number(known.shelfPrice);
+    else if (!fixed && raw?.shelf != null) shelf = Number(raw.shelf);
+    else if (!fixed && (raw?.shelfLow != null || raw?.shelfHigh != null)) {
+      const nums = [raw.shelfLow, raw.shelfHigh].map(Number).filter((n) => Number.isFinite(n) && n > 0);
+      shelf = nums.length ? Math.min(...nums) : null;
+    }
+    const priced = priceFromShelf({
+      shelf,
+      source: fixed ? "A" : (raw?.source || (shelf ? "A" : "U")),
+      fixedPrice: fixed,
+      listPrice: fixed ? known.price : null,
+    });
+    const qty = Number(raw?.qty);
+    return {
+      name: known?.name || name,
+      sku: known?.sku || raw?.sku || "",
+      qty: Number.isFinite(qty) && qty > 0 ? qty : null,
+      ...priced,
+      fixedListed: fixed,
+      manufacturerUrl: known?.manufacturerUrl || raw?.manufacturerUrl || "",
+      categoryPage: known?.categoryPage || raw?.categoryPage || "",
+      warrantyUrl: raw?.warrantyUrl || warrantyFor(known?.name || name),
+      localPickup: raw?.localPickup === true ? true : (raw?.localPickup === false ? false : null),
+      asOf: known?.date || null,
+    };
+  }).filter((line) => line.name);
+}
+
+function pickupOf(lines) {
+  if (lines.some((line) => line.localPickup === false)) return false;
+  if (lines.some((line) => line.localPickup === true)) return true;
+  return null;
+}
+
+function mergeNotes(reply, notes) {
+  let text = String(reply || "").trim();
+  for (const note of notes) {
+    const key = note.slice(0, 28).toLowerCase();
+    if (!text.toLowerCase().includes(key)) text = text ? `${text}\n\n${note}` : note;
+  }
+  return text;
+}
+
+function viewFor(lines, extra) {
+  return presentQuote({
+    lines,
+    jobsite: extra.jobsite || "",
+    text: extra.text || "",
+    company: extra.company || "",
+    taxExempt: Boolean(extra.taxExempt),
+    owned: lines.length > 0 && lines.every((line) => line.fixedListed),
+    localPickup: pickupOf(lines),
+    now: extra.now || new Date(),
+  });
+}
+
+function finalizeReply(reply) {
+  return filterCustomerText(reply).text;
 }
 
 async function readJson(request) {
@@ -320,7 +390,15 @@ async function chat(request, env) {
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
   if (mock) {
     const local = localReply({ message: latest, catalog, discount: percent, page });
-    return json({ ...local, searchesUsed: 0, mode: "mock" }, 200, request, env);
+    const lines = linesFromQuote(local.quote || { items: [] });
+    const view = viewFor(lines, { text: latest });
+    const reply = finalizeReply(mergeNotes(local.reply, view.notes));
+    return json({
+      reply,
+      quote: { items: view.items.length ? view.items : local.quote.items, offerForm: local.quote.offerForm, bulk: view.lead.bulk },
+      searchesUsed: 0,
+      mode: "mock",
+    }, 200, request, env);
   }
 
   const sid = sessionId(body.data?.sessionId) || ip;
@@ -342,8 +420,9 @@ async function chat(request, env) {
       canSearch,
     );
     const parsed = splitModelOutput(outputText(data));
-    const items = applyCatalog(parsed.quote || { items: [] }, percent);
-    const reply = finalizeReply(parsed.reply, items);
+    const lines = linesFromQuote(parsed.quote || { items: [] });
+    const view = viewFor(lines, { text: latest });
+    const reply = finalizeReply(mergeNotes(parsed.reply, view.notes));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
@@ -352,8 +431,9 @@ async function chat(request, env) {
     return json({
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {
-        items,
-        offerForm: Boolean(parsed.quote?.offerForm) || items.length > 0,
+        items: view.items,
+        offerForm: Boolean(parsed.quote?.offerForm) || view.items.length > 0,
+        bulk: view.lead.bulk,
       },
       searchesUsed,
       mode: "live",
@@ -365,18 +445,19 @@ async function chat(request, env) {
 }
 
 function cleanLead(data) {
-  const items = (Array.isArray(data.items) ? data.items : []).slice(0, 8).map((item) => publicQuoteItem({
-    name: item?.name,
-    sku: item?.sku,
+  const items = (Array.isArray(data.items) ? data.items : []).slice(0, 8).map((item) => ({
+    name: String(item?.name || "").slice(0, 160),
+    sku: String(item?.sku || "").slice(0, 80),
     qty: item?.qty,
-    estimate: item?.estimate,
-    estimateHigh: item?.estimateHigh,
-    confidence: item?.confidence,
-    kind: item?.kind,
+    shelf: item?.shelf,
+    shelfLow: item?.shelfLow,
+    shelfHigh: item?.shelfHigh,
+    source: item?.source,
+    localPickup: item?.localPickup,
     manufacturerUrl: item?.manufacturerUrl,
+    warrantyUrl: item?.warrantyUrl,
     categoryPage: item?.categoryPage,
-    asOf: item?.asOf,
-  })).filter(Boolean);
+  })).filter((item) => item.name);
   return {
     name: String(data.name || "").trim().slice(0, 120),
     company: String(data.company || "").trim().slice(0, 160),
@@ -385,6 +466,7 @@ function cleanLead(data) {
     jobsite: String(data.jobsite || "").trim().slice(0, 240),
     neededBy: String(data.neededBy || "").trim().slice(0, 80),
     notes: String(data.notes || "").trim().slice(0, 800),
+    taxExempt: data.taxExempt === true || data.taxExempt === "true" || data.taxExempt === "on",
     items,
   };
 }
@@ -403,7 +485,6 @@ async function quote(request, env) {
   const lead = cleanLead(body.data || {});
   const missing = [];
   if (!lead.name) missing.push("name");
-  if (!lead.company) missing.push("company");
   if (!validEmail(lead.email)) missing.push("email");
   if (!validPhone(lead.phone)) missing.push("phone");
   if (!lead.jobsite) missing.push("jobsite");
@@ -411,12 +492,28 @@ async function quote(request, env) {
   if (!lead.items.length || lead.items.some((item) => !item.qty || !item.name)) missing.push("quantity");
   if (missing.length) return json({ error: "missing", missing }, 400, request, env);
 
-  const mail = buildQuoteEmail({ lead, items: lead.items });
-  const leaked = filterCustomerText(`${mail.subject}\n${mail.text}`);
+  const view = viewFor(linesFromQuote({ items: lead.items }), {
+    text: `${lead.notes} ${lead.company}`,
+    company: lead.company,
+    jobsite: lead.jobsite,
+    taxExempt: lead.taxExempt,
+  });
+  const customerMail = buildQuoteEmail({
+    lead,
+    items: view.items,
+    totals: view.totals,
+    leadInfo: view.lead,
+    notes: view.notes.filter((note) => !note.startsWith("About how often")),
+  });
+  const salesMail = buildSalesEmail({ lead, items: view.items, leadInfo: view.lead, totals: view.totals });
+  const leaked = filterCustomerText(`${customerMail.subject}\n${customerMail.text}\n${salesMail.text}`);
   if (leaked.costHit || leaked.retailerHit) {
     return json({ error: "blocked" }, 422, request, env);
   }
 
+  const done = view.lead.bulk
+    ? "Zachary will send your bulk pricing. Yorktown Tools has the details."
+    : "A copy is on the way to your email, and Yorktown Tools has it too.";
   if (env.MOCK_MODE === "true") {
     return json({ ok: true, via: "mock", customerEmailed: false, message: "Preview only. Nothing was sent." }, 200, request, env);
   }
@@ -435,14 +532,28 @@ async function quote(request, env) {
         body: JSON.stringify({
           from,
           to: [lead.email],
-          bcc: [sales],
           reply_to: sales,
-          subject: mail.subject,
-          html: mail.html,
-          text: mail.text,
+          subject: customerMail.subject,
+          html: customerMail.html,
+          text: customerMail.text,
         }),
       });
       customerEmailed = response.ok;
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.RESEND_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from,
+          to: [sales],
+          reply_to: lead.email,
+          subject: salesMail.subject,
+          html: salesMail.html,
+          text: salesMail.text,
+        }),
+      });
     } catch {
       customerEmailed = false;
     }
@@ -454,14 +565,16 @@ async function quote(request, env) {
       const response = await fetch(formspree, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(formspreeBody(lead, lead.items)),
+        body: JSON.stringify(formspreeBody(lead, view.items, view.lead)),
       });
       if (!response.ok) return json({ error: "delivery_failed" }, 502, request, env);
       return json({
         ok: true,
         via: "formspree",
         customerEmailed: false,
-        message: "Yorktown Tools has the quote. If a branded email is not set up yet, call or text (757) 940-5171. We still have your request.",
+        message: view.lead.bulk
+          ? "Zachary will send your bulk pricing. Yorktown Tools has the details."
+          : "Yorktown Tools has the quote. If a branded email is not set up yet, call or text (757) 940-5171. We still have your request.",
       }, 200, request, env);
     } catch {
       return json({ error: "delivery_failed" }, 502, request, env);
@@ -472,7 +585,7 @@ async function quote(request, env) {
     ok: true,
     via: "resend",
     customerEmailed: true,
-    message: "A copy is on the way to your email, and Yorktown Tools has it too.",
+    message: done,
   }, 200, request, env);
 }
 

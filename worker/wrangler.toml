@@ -7,7 +7,8 @@ compatibility_date = "2026-11-01"
 
 [vars]
 XAI_MODEL = "grok-4.3"
-PRICE_DISCOUNT_PERCENT = "1"
+# Match percent, tax, fees, and the margin floor live in worker/config/rules.js.
+# This var is not used for pricing.
 MAX_OUTPUT_TOKENS = "650"
 MAX_HISTORY_MESSAGES = "8"
 MAX_USER_TURNS = "12"

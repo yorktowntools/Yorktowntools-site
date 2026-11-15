@@ -63,12 +63,14 @@ root.innerHTML = `
       <div class="george-items"></div>
       <button type="button" class="george-add">Add an item</button>
       <div class="george-fields">
-        <label>Name <input name="name" autocomplete="name" required></label>
-        <label>Company <input name="company" autocomplete="organization" required></label>
+        <label class="george-wide">Name <input name="name" autocomplete="name" required></label>
+        <label class="george-wide">Company, if this is for a business <input name="company" autocomplete="organization"></label>
         <label>Phone <input name="phone" type="tel" autocomplete="tel" required></label>
         <label>Email <input name="email" type="email" autocomplete="email" required></label>
-        <label>Job-site address <input name="jobsite" autocomplete="street-address" required></label>
+        <label class="george-wide">Job-site address <input name="jobsite" autocomplete="street-address" required></label>
         <label>Needed by <input name="neededBy" type="date" required></label>
+        <label class="george-wide"><input name="taxExempt" type="checkbox"> Government or tax-exempt. A certificate is required.</label>
+        <label class="george-wide">Notes <textarea name="notes" rows="2" placeholder="For a company account: how often you order"></textarea></label>
       </div>
       <p class="george-error" role="alert"></p>
       <button type="submit" class="george-submit">Send quote</button>
@@ -93,7 +95,7 @@ const itemsEl = root.querySelector(".george-items");
 const compose = root.querySelector(".george-compose");
 const textarea = compose.querySelector("textarea");
 const errorEl = root.querySelector(".george-error");
-root.querySelector(".george-bulk").textContent = BULK_LINE;
+const bulkNote = root.querySelector(".george-bulk");
 
 const messages = [];
 
@@ -190,12 +192,14 @@ function renderItems() {
     const price = document.createElement("p");
     price.className = "george-price";
     const amount = formatEstimate(item);
-    price.textContent = amount
-      ? `${amount} estimate. Not a promise of stock.`
-      : "Yorktown Tools will confirm this price.";
+    if (item.ballpark && amount) price.textContent = `Starting estimate ${amount}. Bulk pricing usually comes in better.`;
+    else if (item.confirm || !amount) price.textContent = "Zachary will confirm the price.";
+    else price.textContent = `${amount} estimate. Free delivery is included. Not a promise of stock.`;
     row.append(name, qty, price);
     itemsEl.appendChild(row);
   });
+  bulkNote.textContent = draft.bulk ? BULK_LINE : "Free job-site delivery. Virginia sales tax is added unless the order is tax-exempt.";
+  quoteForm.querySelector(".george-submit").textContent = draft.bulk ? "Send details to Zachary" : "Send quote";
   quoteForm.hidden = !draft.open;
   if (draft.open) {
     const companyInput = quoteForm.querySelector("input[name=company]");
@@ -221,6 +225,7 @@ function absorbQuote(quote) {
       draft.items.push({ ...item, touched: false });
     }
   }
+  if (quote.bulk) draft.bulk = true;
   if (quote.offerForm || (quote.items || []).length) draft.open = true;
   renderItems();
 }
@@ -309,6 +314,8 @@ function formData() {
     email: String(data.get("email") || "").trim(),
     jobsite: String(data.get("jobsite") || "").trim(),
     neededBy: String(data.get("neededBy") || "").trim(),
+    notes: String(data.get("notes") || "").trim(),
+    taxExempt: data.get("taxExempt") === "on",
     items: draft.items.map((item) => ({
       name: item.name,
       sku: item.sku,
