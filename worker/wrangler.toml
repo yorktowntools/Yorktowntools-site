@@ -1,0 +1,25 @@
+name = "yorktown-george"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+# Plain settings. Secrets (XAI_API_KEY, RESEND_API_KEY) are NOT put here.
+# Set those with: npx wrangler secret put XAI_API_KEY
+
+[vars]
+XAI_MODEL = "grok-4.3"
+# No-search turns send reasoning.effort "none" so this model does not think first.
+# Search turns stay on "low". Both are set in worker/src/handler.js.
+# Match percent, tax, fees, fuel, and the margin floor are in worker/config/rules.js.
+MAX_OUTPUT_TOKENS = "320"
+MAX_HISTORY_MESSAGES = "8"
+MAX_USER_TURNS = "12"
+MAX_SEARCHES_PER_CHAT = "2"
+MAX_SEARCHES_PER_IP_DAY = "15"
+RATE_LIMIT_CHAT_PER_HOUR = "20"
+RATE_LIMIT_CHAT_PER_DAY = "60"
+RATE_LIMIT_QUOTE_PER_DAY = "8"
+ALLOWED_ORIGINS = "https://yorktowntools.com,https://www.yorktowntools.com,http://localhost:8080,http://127.0.0.1:8080,http://localhost:8765,http://127.0.0.1:8765"
+FROM_EMAIL = "Yorktown Tools <quotes@quotes.yorktowntools.com>"
+SALES_EMAIL = "sales@yorktowntools.com"
+FORMSPREE_URL = "https://formspree.io/f/xanlvyan"
+MOCK_MODE = "false"

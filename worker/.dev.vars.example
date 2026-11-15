@@ -1,0 +1,6 @@
+# Copy this file to worker/.dev.vars for local wrangler dev.
+# .dev.vars is not committed. Never put these values in the website files.
+
+XAI_API_KEY=
+RESEND_API_KEY=
+MOCK_MODE=true

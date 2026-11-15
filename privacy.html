@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy | Yorktown Tools</title>
+    <meta name="description" content="How Yorktown Tools handles quote requests and chats with George. We don't sell your information, and we don't take payment card numbers in chat.">
+    <link rel="canonical" href="https://yorktowntools.com/privacy.html">
+    <link rel="icon" href="/Yorktown.PNG" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --navy: #0b1e3f; --red: #c8102e; --white: #fff; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #212529; line-height: 1.6; background: #fff; }
+        .banner { background: var(--red); color: #fff; text-align: center; padding: 0.85rem 1rem; font-weight: 700; }
+        .logo-header { text-align: center; padding: 1.2rem 1rem 0.4rem; }
+        .logo-header img { max-width: 220px; width: 70%; height: auto; }
+        nav { background: var(--navy); }
+        .mobile-nav { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.9rem; }
+        .mobile-nav a { color: #fff; text-decoration: none; font-weight: 600; padding: 0.6rem 0.9rem; border-radius: 999px; white-space: nowrap; }
+        .mobile-nav a:hover, .mobile-nav a.active { background: #fff; color: var(--navy); }
+        main { max-width: 820px; margin: 0 auto; padding: 2rem 1.1rem 4rem; }
+        h1 { color: var(--navy); font-size: clamp(2rem, 6vw, 2.7rem); line-height: 1.15; margin-bottom: 0.6rem; }
+        h2 { color: var(--navy); font-size: 1.35rem; margin: 1.8rem 0 0.4rem; }
+        a { color: var(--navy); }
+        footer { background: var(--navy); color: #fff; text-align: center; padding: 2.5rem 1rem; }
+        footer a { color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="banner">Free quote. Free delivery. No hassle.</div>
+    <div class="logo-header">
+        <a href="/"><img src="/Yorktown.PNG" alt="Yorktown Tools"></a>
+    </div>
+    <nav>
+        <div class="mobile-nav">
+            <a href="/">Home</a>
+            <a href="/contact.html">Contact</a>
+            <a href="/privacy.html" class="active">Privacy</a>
+        </div>
+    </nav>
+    <main>
+        <h1>Privacy</h1>
+        <p>Yorktown Tools is a veteran-owned supplier in Yorktown, Virginia. This page says what we collect when you request a quote or chat with George, and what we do with it. We do not sell your information.</p>
+
+        <h2>What we collect</h2>
+        <p>If you use a quote form or George, you may give us your name, company, phone, email, job-site address, needed-by date, quantities, and the tools you want. George also sees the messages you type in the chat and which page of this site you opened him from.</p>
+        <p>Do not put payment card numbers, bank account numbers, or routing numbers in the chat or in a form. We do not take payment there. Card, ACH, and other payment methods are handled separately, after you and Zachary agree on the order.</p>
+
+        <h2>How we use it</h2>
+        <p>We use it to answer you, price the tools, and deliver to the job. A quote email goes to you and to <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a>. If that branded email is unavailable, the same request is sent through our existing quote form so the lead is not lost.</p>
+        <p>Prices George gives are estimates. He may check a short price list we keep, and he may look up a current public shelf price so the estimate is not a guess. He will say when a number needs to be confirmed. An estimate is not a promise that the item is in stock.</p>
+
+        <h2>Who handles it</h2>
+        <p>This website is a plain set of pages hosted on GitHub Pages. George’s chat is handled by a Cloudflare Worker. The Worker sends the conversation to xAI (Grok) to draft a reply. xAI may use web search to look up a public price. The Worker can send the quote email through Resend. The older quote forms on the site post to Formspree, which we keep as a backup.</p>
+        <p>Those companies process the information only so we can answer and follow up. We do not run ads from your quote, and we do not build a sold mailing list from it.</p>
+
+        <h2>How long we keep it</h2>
+        <p>The chat itself is not stored in a database. The quote you submit is kept in the sales inbox, the same way a phone call or an email quote is kept, so Zachary can fill the order and follow up. You can ask us to delete a quote by calling or emailing.</p>
+
+        <h2>Talk to a person</h2>
+        <p>George is an assistant. Zachary confirms quotes. Call or text <a href="tel:+17579405171">(757) 940-5171</a>, or email <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a>. Hours are Monday through Friday, 8:00 AM to 5:00 PM Eastern.</p>
+        <p>Questions about this page can go to the same phone and email.</p>
+    </main>
+    <footer>
+        <p><strong>Phone:</strong> <a href="tel:+17579405171">(757) 940-5171</a> |
+           <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
+        <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
+        <p><a href="/privacy.html">Privacy</a></p>
+        <p>© Yorktown Tools. All rights reserved.</p>
+    </footer>
+    <script type="module" src="/george/george.js"></script>
+</body>
+</html>
