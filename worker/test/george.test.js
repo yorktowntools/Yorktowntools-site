@@ -13,6 +13,7 @@ import {
   priceEntry,
   shelvesFromText,
   shouldSearch,
+  splitRequestedItems,
 } from "../../shared/pricing.js";
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
@@ -78,6 +79,12 @@ test("catalog match ignores dimensions and finds the saw", () => {
   assert.equal(shouldSearch("I need 6 cases of caulk and 5 circular saws", []), true);
   assert.equal(matchCatalog(catalog, "I need 5 circular saws")[0].sku, "5007FA");
   assert.equal(matchCatalog(catalog, "circular saws")[0].sku, "5007FA");
+  const parts = splitRequestedItems("I need 6 cases of caulk and 5 circular saws for a job in Newport News");
+  assert.equal(parts.length, 2);
+  assert.equal(parts[0].qty, 6);
+  assert.match(parts[0].name, /caulk/i);
+  assert.equal(parts[1].qty, 5);
+  assert.match(parts[1].query, /circular saw/i);
 });
 
 test("customer text never keeps a retailer, a retailer url, or cost", () => {
@@ -119,6 +126,7 @@ test("small orders stay instant and bulk orders stay a ballpark", () => {
   assert.match(gloves.reply, /\$19\.99/);
   assert.match(gloves.reply, /\$20\.59/);
   assert.match(gloves.reply, /card/i);
+  assert.doesNotMatch(gloves.reply, /Maker page/i);
   assert.equal(gloves.quote.bulk, false);
   assert.equal(gloves.quote.items[0].qty, 10);
   assert.doesNotMatch(gloves.reply, /home depot|lowe|margin|our cost|military discount/i);
@@ -313,10 +321,17 @@ test("mock chat and quote endpoints", async () => {
     messages: [{ role: "user", content: "I need 6 cases of caulk and 5 Makita 5007FA circular saws" }],
   });
   const bulkBody = await bulkChat.json();
+  const sawLine = bulkBody.quote.items.find((item) => /saw|5007/i.test(item.name));
+  const caulkLine = bulkBody.quote.items.find((item) => /caulk/i.test(item.name));
   assert.equal(bulkBody.quote.bulk, true);
-  assert.equal(bulkBody.quote.items[0].ballpark, true);
-  assert.ok(bulkBody.quote.items[0].estimate > 0);
-  assert.match(bulkBody.reply, /bulk pricing usually comes in better/i);
+  assert.equal(sawLine.qty, 5);
+  assert.ok(sawLine.estimate > 0);
+  assert.equal(sawLine.ballpark, true);
+  assert.equal(caulkLine.qty, 6);
+  assert.equal(caulkLine.estimate, null);
+  assert.match(bulkBody.reply, /\$149/);
+  assert.match(bulkBody.reply, /caulk/i);
+  assert.match(bulkBody.reply, /confirm the price/i);
 
   const saws = await post("/api/chat", {
     messages: [{ role: "user", content: "I need 5 circular saws for a job in Newport News" }],

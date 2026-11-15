@@ -171,7 +171,7 @@ function stripInvisible(text) {
 
 function splitChunks(text) {
   return String(text || "")
-    .split(/\n+|(?<=[.!?])\s+/)
+    .split(/(?<=[.!?])\s+/)
     .map((part) => part.trim())
     .filter(Boolean);
 }
@@ -212,21 +212,26 @@ export function filterCustomerText(input) {
   }
 
   const urlPass = scrubUrls(original);
-  const kept = [];
+  const keptLines = [];
   let retailerHit = urlPass.retailerHit || matchesAny(original, RETAILER_PATTERNS);
-  for (const chunk of splitChunks(urlPass.text)) {
-    if (matchesAny(chunk, RETAILER_PATTERNS) || matchesAny(chunk, COST_PATTERNS)) {
-      retailerHit = true;
-      continue;
+  for (const line of urlPass.text.split(/\n+/)) {
+    const kept = [];
+    for (const chunk of splitChunks(line)) {
+      if (matchesAny(chunk, RETAILER_PATTERNS) || matchesAny(chunk, COST_PATTERNS)) {
+        retailerHit = true;
+        continue;
+      }
+      if (isBlockedHost(hostnameOf(chunk))) {
+        retailerHit = true;
+        continue;
+      }
+      kept.push(chunk);
     }
-    if (isBlockedHost(hostnameOf(chunk))) {
-      retailerHit = true;
-      continue;
-    }
-    kept.push(chunk);
+    const joined = kept.join(" ").replace(/[ \t]{2,}/g, " ").replace(/\s+([,.!?])/g, "$1").trim();
+    if (joined) keptLines.push(joined);
   }
 
-  let text = kept.join(" ").replace(/\s{2,}/g, " ").replace(/\s+([,.!?])/g, "$1").trim();
+  let text = keptLines.join("\n").trim();
   if (retailerHit && !text) {
     return { text: SAFE_RETAILER_REPLY, retailerHit: true, costHit: false, replaced: true };
   }

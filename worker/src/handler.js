@@ -7,6 +7,7 @@ import {
   hasFirmPrice,
   matchCatalog,
   shouldSearch,
+  splitRequestedItems,
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
@@ -213,6 +214,27 @@ function collectDollarText(value, out = [], depth = 0) {
   return out;
 }
 
+function alignRequested(rawItems, userText) {
+  const requested = splitRequestedItems(userText);
+  if (requested.length < 2) return rawItems;
+  const used = new Set();
+  return requested.map((ask) => {
+    const catalogHits = matchCatalog(catalog, ask.query);
+    const index = rawItems.findIndex((item, i) => {
+      if (used.has(i)) return false;
+      const lineHits = matchCatalog(catalog, `${item?.name || ""} ${item?.sku || ""}`);
+      if (catalogHits[0] && lineHits[0] && catalogHits[0].sku === lineHits[0].sku) return true;
+      return `${item?.name || ""} ${item?.sku || ""}`.toLowerCase().includes(ask.query.toLowerCase());
+    });
+    if (index >= 0) {
+      used.add(index);
+      return { ...rawItems[index], qty: ask.qty, name: rawItems[index].name || ask.name };
+    }
+    if (catalogHits[0]) return { name: catalogHits[0].name, sku: catalogHits[0].sku, qty: ask.qty };
+    return { name: ask.name, qty: ask.qty, source: "U" };
+  });
+}
+
 function linesFromQuote(rawQuote, prose = "") {
   const rawItems = Array.isArray(rawQuote?.items) ? rawQuote.items.slice(0, 8) : [];
   return rawItems.map((raw) => {
@@ -376,7 +398,7 @@ async function chat(request, env) {
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
   if (mock) {
     const local = localReply({ message: latest, catalog, discount: percent, page });
-    const lines = linesFromQuote(local.quote || { items: [] }, latest);
+    const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest);
     const view = viewFor(lines, { text: latest });
     const reply = finalizeReply(mergeNotes(local.reply, view.notes));
     return json({
@@ -407,7 +429,7 @@ async function chat(request, env) {
     );
     const parsed = splitModelOutput(outputText(data));
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
-    const lines = linesFromQuote(parsed.quote || { items: [] }, prose);
+    const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose);
     const view = viewFor(lines, { text: latest });
     const reply = finalizeReply(mergeNotes(parsed.reply, view.notes));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;

@@ -59,6 +59,7 @@ root.innerHTML = `
       </div>
     </header>
     <div class="george-log" role="log" aria-live="polite"></div>
+    <button type="button" class="george-review" hidden>Review &amp; send quote</button>
     <form class="george-quote" hidden>
       <h3>Quote for Yorktown Tools</h3>
       <p class="george-bulk"></p>
@@ -93,6 +94,7 @@ const launcher = root.querySelector(".george-launcher");
 const panel = root.querySelector(".george-panel");
 const log = root.querySelector(".george-log");
 const quoteForm = root.querySelector(".george-quote");
+const reviewButton = root.querySelector(".george-review");
 const itemsEl = root.querySelector(".george-items");
 const compose = root.querySelector(".george-compose");
 const textarea = compose.querySelector("textarea");
@@ -111,7 +113,9 @@ function addMessage(role, text) {
   if (role === "user") bubble.textContent = safe;
   else bubble.innerHTML = renderSafeHtml(safe);
   log.appendChild(bubble);
-  log.scrollTop = log.scrollHeight;
+  requestAnimationFrame(() => {
+    log.scrollTop = log.scrollHeight;
+  });
 }
 
 function showBanner(text) {
@@ -135,11 +139,7 @@ function chips() {
     button.textContent = label;
     button.addEventListener("click", () => {
       if (!prompt) {
-        draft.open = true;
-        if (!draft.items.length) addBlankItem();
-        renderItems();
-        quoteForm.hidden = false;
-        quoteForm.querySelector("input[name=name]").focus();
+        openQuote();
         return;
       }
       textarea.value = prompt;
@@ -202,11 +202,20 @@ function renderItems() {
   });
   bulkNote.textContent = draft.bulk ? BULK_LINE : "Free job-site delivery. Virginia sales tax is added unless the order is tax-exempt.";
   quoteForm.querySelector(".george-submit").textContent = draft.bulk ? "Send details to Zachary" : "Send quote";
+  const hasItems = draft.items.some((item) => item.name);
+  reviewButton.hidden = !hasItems;
+  reviewButton.textContent = draft.open ? "Hide quote form" : "Review & send quote";
   quoteForm.hidden = !draft.open;
-  if (draft.open) {
-    const companyInput = quoteForm.querySelector("input[name=company]");
-    if (companyInput) companyInput.scrollIntoView({ block: "nearest", inline: "nearest" });
-  }
+  requestAnimationFrame(() => {
+    log.scrollTop = log.scrollHeight;
+  });
+}
+
+function openQuote() {
+  draft.open = !draft.open;
+  if (draft.open && !draft.items.length) addBlankItem();
+  renderItems();
+  if (draft.open) quoteForm.querySelector("input[name=name]")?.focus();
 }
 
 function absorbQuote(quote) {
@@ -228,7 +237,6 @@ function absorbQuote(quote) {
     }
   }
   if (quote.bulk) draft.bulk = true;
-  if (quote.offerForm || (quote.items || []).length) draft.open = true;
   renderItems();
 }
 
@@ -408,8 +416,10 @@ compose.addEventListener("submit", onSend);
 quoteForm.addEventListener("submit", onQuote);
 root.querySelector(".george-add").addEventListener("click", () => {
   addBlankItem();
+  draft.open = true;
   renderItems();
 });
+reviewButton.addEventListener("click", openQuote);
 
 document.addEventListener("keydown", (event) => {
   if (panel.hidden) return;

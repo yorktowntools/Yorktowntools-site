@@ -18,10 +18,26 @@ import {
   matchCatalog,
   paymentOnTop,
   priceEntry,
+  splitRequestedItems,
 } from "./pricing.js";
 
 function pageLink(path, label) {
   return `[${label}](https://yorktowntools.com${path})`;
+}
+
+function ownProduct(priced) {
+  return /yorktowntools\.com/i.test(priced.manufacturerUrl || "") || /yorktown tools/i.test(priced.manufacturer || "");
+}
+
+function itemLinks(priced) {
+  if (ownProduct(priced)) {
+    return priced.categoryPage ? ` Our page: [${priced.name}](${priced.categoryPage}).` : "";
+  }
+  const maker = priced.manufacturerUrl
+    ? ` Maker page: [${priced.manufacturer || "manufacturer"}](${priced.manufacturerUrl}).`
+    : "";
+  const ours = priced.categoryPage ? ` Our page: [${priced.name}](${priced.categoryPage}).` : "";
+  return `${maker}${ours}`;
 }
 
 function priceSentence(priced, qty) {
@@ -62,8 +78,29 @@ export function localReply({ message, catalog, discount, page }) {
   const text = String(message || "").trim();
   const percent = discountPercent(discount, catalog?.discountPercent ?? 1);
   const filteredUser = filterCustomerText(text);
-  const qty = extractQty(text);
-  const matches = matchCatalog(catalog, text).map((item) => priceEntry({ ...item, qty }, percent));
+  const requested = splitRequestedItems(text);
+  const qty = requested.length === 1 ? requested[0].qty : extractQty(text);
+  const matches = (requested.length
+    ? requested.map((ask) => {
+      const hit = matchCatalog(catalog, ask.query)[0];
+      if (!hit) {
+        return {
+          name: ask.name,
+          sku: "",
+          qty: ask.qty,
+          estimate: null,
+          estimateHigh: null,
+          confidence: "unsure",
+          kind: "unsure",
+          manufacturer: "",
+          manufacturerUrl: "",
+          categoryPage: "",
+        };
+      }
+      return priceEntry({ ...hit, qty: ask.qty }, percent);
+    })
+    : matchCatalog(catalog, text).map((item) => priceEntry({ ...item, qty }, percent))
+  );
 
   const finish = (reply, items, offerForm) => {
     const bulk = /\b(bulk|pallet|truckload)\b/i.test(text)
@@ -162,16 +199,17 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (matches.length) {
     const lines = matches.map((priced) => {
-      const link = priced.manufacturerUrl
-        ? ` Maker page: [${priced.manufacturer || "manufacturer"}](${priced.manufacturerUrl}).`
-        : "";
-      const cat = priced.categoryPage
-        ? ` Our page: [${priced.name}](${priced.categoryPage}).`
-        : "";
-      return `${priceSentence(priced, qty)}${link}${cat}`;
+      const lineQty = priced.qty || qty;
+      const amount = formatEstimate(priced);
+      if (priced.estimate == null) {
+        return `${lineQty ? `${lineQty} × ` : ""}${priced.name}: Zachary will confirm the price.`;
+      }
+      if ((lineQty >= 5 && priced.kind !== "listed") || (lineQty >= 2 && /\bcase/i.test(priced.name || ""))) {
+        return `${lineQty} × ${priced.name}: starting estimate ${amount}. Bulk pricing usually comes in better. ${ESTIMATE_NOTE}${itemLinks(priced)}`;
+      }
+      return `${priceSentence(priced, lineQty)}${itemLinks(priced)}`;
     });
-    const offer = true;
-    return finish(lines.join("\n\n"), matches.map((priced) => toQuoteItem(priced, qty)), offer);
+    return finish(lines.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
   }
 
   if (/\b(price|pricing|how much|quote|cost)\b/i.test(text)) {

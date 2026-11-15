@@ -26,11 +26,11 @@ export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
     const price = bulk || item.confirm || item.estimate == null
       ? (bulk ? "Zachary will price this" : "Zachary will confirm the price")
       : `${formatMoney(item.estimate)} estimate`;
-    const links = [
-      link(item.manufacturerUrl, "Maker page"),
-      link(item.warrantyUrl, "Warranty"),
-      link(item.categoryPage, "Yorktown Tools page"),
-    ].filter(Boolean).join(" · ");
+    const own = /yorktowntools\.com/i.test(item.manufacturerUrl || "");
+    const links = (own
+      ? [link(item.categoryPage || item.manufacturerUrl, "Our page"), link(item.warrantyUrl, "Warranty")]
+      : [link(item.manufacturerUrl, "Maker page"), link(item.warrantyUrl, "Warranty"), link(item.categoryPage, "Our page")]
+    ).filter(Boolean).join(" · ");
     return `<tr>
       <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;">${escapeHtml(label)}</td>
       <td style="padding:10px 8px;border-bottom:1px solid #e6e6e6;text-align:center;">${escapeHtml(String(item.qty || ""))}</td>

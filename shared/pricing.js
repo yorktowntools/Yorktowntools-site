@@ -181,6 +181,25 @@ export function matchCatalog(catalog, query) {
 }
 
 /** Pull a quantity only when the customer actually gave one. Dimensions like 7-1/4 do not count. */
+/**
+ * "6 cases of caulk and 5 circular saws" -> two lines, each with its own quantity.
+ * A bare "need 2" with no product words returns nothing so the single-item path can handle it.
+ */
+export function splitRequestedItems(text) {
+  const source = String(text || "");
+  const re = /(\d{1,4})\s+(?:(cases?|boxes|pairs?|packs?)\s+of\s+)?([a-z0-9][^.\n;]{1,80}?)(?=\s*(?:,|\band\b|\bfor\b|\bin\b)|$)/gi;
+  const found = [];
+  let match;
+  while ((match = re.exec(source))) {
+    let product = match[3].replace(/\s+/g, " ").trim().replace(/^(a|an|the)\s+/i, "");
+    if (product.length < 2) continue;
+    const unit = (match[2] || "").toLowerCase();
+    const name = unit.startsWith("case") ? `cases of ${product}` : product;
+    found.push({ qty: Number(match[1]), name, query: product });
+  }
+  return found;
+}
+
 export function extractQty(text) {
   const raw = String(text || "");
   const patterns = [
