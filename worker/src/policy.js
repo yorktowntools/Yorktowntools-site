@@ -132,7 +132,24 @@ function priceBound(shelf, channel) {
   return { estimate, cost, confirm: false };
 }
 
-export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice }) {
+function privateMarked(shelf, privateCost) {
+  const cost = Number(privateCost);
+  const shelfPrice = Number(shelf);
+  if (!(cost > 0) || !(shelfPrice > 0) || cost > shelfPrice) return null;
+  const marked = roundMoney(cost * rules.privateMarkup);
+  if (marked == null || marked > shelfPrice) return null;
+  const margin = (marked - cost) / marked;
+  if (margin + 1e-9 < rules.minGrossMargin) return null;
+  return marked;
+}
+
+function boundFor(shelf, channel, privateCost) {
+  const marked = privateMarked(shelf, privateCost);
+  if (marked != null) return { estimate: marked, cost: roundMoney(privateCost), confirm: false };
+  return priceBound(shelf, channel);
+}
+
+export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice, privateCost }) {
   if (fixedPrice && listPrice != null) {
     return {
       estimate: roundMoney(listPrice),
@@ -151,18 +168,18 @@ export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice
   if (channel === "unknown") {
     return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false };
   }
-  const low = priceBound(shelfPrice, channel);
+  const low = boundFor(shelfPrice, channel, privateCost);
   if (low.confirm || low.estimate == null) {
     return { estimate: null, estimateHigh: null, cost: low.cost, firm: false, confirm: true, ballpark: false };
   }
   const highShelf = Number(shelfHigh);
   let estimateHigh = null;
   if (Number.isFinite(highShelf) && highShelf > shelfPrice) {
-    const high = priceBound(highShelf, channel);
+    const high = boundFor(highShelf, channel, privateCost);
     if (high.confirm || high.estimate == null) {
       return { estimate: null, estimateHigh: null, cost: low.cost, firm: false, confirm: true, ballpark: false };
     }
-    estimateHigh = high.estimate;
+    if (high.estimate > low.estimate) estimateHigh = high.estimate;
   }
   return {
     estimate: low.estimate,

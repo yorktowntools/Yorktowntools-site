@@ -40,6 +40,7 @@ const BLOCKED_HOSTS = [
 const ALLOWED_HOSTS = [
   "yorktowntools.com",
   "yorktowntools.beehiiv.com",
+  "dap.com",
   "dewalt.com",
   "milwaukeetool.com",
   "makitatools.com",
@@ -125,6 +126,10 @@ const COST_PATTERNS = [
   /\bsupplier discount\b/i,
   /\b(?:our|my) supplier\b/i,
   /\b(?:our|my) distributor\b/i,
+  /\bors\b/i,
+  /\bnasco\b/i,
+  /\bprivate cost\b/i,
+  /\bcost source\b/i,
   /\bstart at cost\b/i,
   /\bwork our way up\b/i,
 ];

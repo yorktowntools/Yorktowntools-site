@@ -12,6 +12,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
+import { privateCostFor } from "../config/private-costs.js";
 import { presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
 const buckets = new Map();
@@ -260,18 +261,20 @@ function linesFromQuote(rawQuote, prose = "") {
     else if (!fixed && (filled?.shelfLow != null || filled?.shelfHigh != null)) takeRange(filled.shelfLow, filled.shelfHigh);
     else if (!fixed && known?.shelfPrice != null && known.shelfPrice !== "") shelf = Number(known.shelfPrice);
     else if (!fixed && known && (known.shelfLow != null || known.shelfHigh != null)) takeRange(known.shelfLow, known.shelfHigh);
+    const sku = known?.sku || filled?.sku || "";
     const priced = priceFromShelf({
       shelf,
       shelfHigh,
       source: fixed ? "A" : (["A", "B", "C"].includes(String(filled?.source || "").toUpperCase()) ? String(filled.source).toUpperCase() : (shelf ? "A" : "U")),
       fixedPrice: fixed || Boolean(filled?.fixedPrice),
       listPrice: fixed ? known.price : (filled?.listPrice ?? null),
+      privateCost: privateCostFor(sku),
     });
     const qty = Number(filled?.qty);
     const displayName = known?.name || (name && name !== "Item" ? name : "Item");
     return {
       name: displayName,
-      sku: known?.sku || filled?.sku || "",
+      sku,
       model: known?.model || "",
       manufacturer: known?.manufacturer || "",
       qty: Number.isFinite(qty) && qty > 0 ? qty : null,

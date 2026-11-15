@@ -95,6 +95,19 @@
       "notes": "Starter range for a common corded hammer drill. Replace with shelfPrice when verified."
     },
     {
+      "sku": "DAP-ALEX-PLUS-12",
+      "model": "DAP Alex Plus",
+      "name": "DAP Alex Plus 10.1 oz white caulk, case of 12",
+      "aliases": ["alex plus", "dap alex plus", "dap caulk", "caulk", "case of caulk", "cases of caulk"],
+      "manufacturer": "DAP",
+      "manufacturerUrl": "https://www.dap.com/",
+      "categoryPage": "",
+      "source": "needs-shelf",
+      "date": "2026-11-15",
+      "confidence": "unsure",
+      "notes": "Case of 12. A shelf price is still required before a number is shown."
+    },
+    {
       "sku": "2853-20",
       "model": "Milwaukee 2853-20",
       "name": "Milwaukee M18 FUEL 1/4 in. hex impact driver (tool only)",

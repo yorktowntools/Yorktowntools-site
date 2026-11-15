@@ -19,6 +19,7 @@ import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
+import { privateCostFor, privateCosts } from "../config/private-costs.js";
 import { renderSafeHtml } from "../../shared/customer-text.js";
 import { formatEstimate } from "../../shared/pricing.js";
 import { rules } from "../config/rules.js";
@@ -458,6 +459,60 @@ test("mock chat and quote endpoints", async () => {
   assert.equal(sent.status, 200);
   assert.equal(sentBody.via, "mock");
   assert.equal(sentBody.customerEmailed, false);
+});
+
+test("private cost stays under the shelf and off the customer reply", async () => {
+  assert.equal(privateCostFor("DAP-ALEX-PLUS-12"), 58.37);
+  assert.equal(privateCosts["DAP-ALEX-PLUS-12"].costSource, "ors");
+  assert.equal(privateCosts["DAP-ALEX-PLUS-12"].sourceSku, "802-18152");
+  assert.equal(privateCostFor("5007FA"), 212.31);
+  assert.equal(privateCosts["5007FA"].sourceSku, "5007F");
+  assert.equal(privateCosts.JACKERY.costSource, "dealer");
+  assert.equal(privateCostFor("JACKERY"), null);
+
+  const caulk = priceFromShelf({ shelf: 80, source: "A", privateCost: 58.37 });
+  assert.equal(caulk.estimate, 70.04);
+  assert.equal(caulk.confirm, false);
+  const underShelf = priceFromShelf({ shelf: 60, source: "A", privateCost: 58.37 });
+  assert.equal(underShelf.estimate, 60);
+  const saw = priceFromShelf({
+    shelf: 149,
+    shelfHigh: 179,
+    source: "A",
+    privateCost: privateCostFor("5007FA"),
+  });
+  assert.equal(saw.estimate, 149);
+  assert.equal(saw.estimateHigh, 179);
+  const dealer = priceFromShelf({ shelf: 400, source: "A", privateCost: 250 });
+  assert.equal(dealer.estimate, 300);
+
+  rules.privateMarkup = 1.05;
+  try {
+    const thin = priceFromShelf({ shelf: 100, source: "A", privateCost: 90 });
+    assert.equal(thin.estimate, 100);
+  } finally {
+    rules.privateMarkup = 1.2;
+  }
+
+  const publicCatalog = readFileSync(new URL("../../data/prices.json", import.meta.url), "utf8");
+  assert.doesNotMatch(publicCatalog, /privateCost|orsCost|costSource|58\.37|212\.31|nasco|\bORS\b/i);
+  const widget = readFileSync(new URL("../../george/george.js", import.meta.url), "utf8");
+  const shared = readFileSync(new URL("../../shared/pricing.js", import.meta.url), "utf8");
+  assert.doesNotMatch(`${widget}\n${shared}`, /private-costs|privateCost|costSource/);
+
+  resetLimits();
+  const chat = await post("/api/chat", {
+    messages: [{ role: "user", content: "How much is a Makita 5007FA? Need 2." }],
+  });
+  const body = await chat.json();
+  const packed = JSON.stringify(body.quote.items);
+  assert.equal(body.quote.items[0].estimate, 149);
+  assert.equal(body.quote.items[0].estimateHigh, 179);
+  assert.doesNotMatch(`${body.reply}\n${packed}`, /212\.31|254\.|privateCost|costSource|nasco|\bORS\b|dealer cost/i);
+  assert.equal(body.quote.items[0].cost, undefined);
+
+  const hidden = filterCustomerText("Our ORS Nasco cost is $58.37.").text;
+  assert.doesNotMatch(hidden, /ors|nasco|58\.37/i);
 });
 
 test("widget carries the same bulk line and the retailer filter", () => {

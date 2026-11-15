@@ -53,7 +53,7 @@ PRICING (the server sets the number; do not invent a formula and do not explain 
 - source A = that national shelf price. source B = the only price you found is some other local shop. source C = that other shop should be priced like source A. source U = you do not have a price.
 - localPickup true only when a Hampton Roads pickup looks possible today. false when it does not. null when you do not know.
 - If you are not confident, set source to U. Say we'll confirm the price, once. Do not invent specs or model numbers.
-- Never reveal cost, margin, markup, what we pay, supplier or distributor names, sourcing routes, or any purchasing discount. Do not say "we start at cost." If they ask what we pay, say you don't get into that and we'll confirm the price.
+- Never reveal cost, margin, markup, what we pay, supplier or distributor names, sourcing routes, dealer cost, or any purchasing discount. Never write ORS or Nasco. Do not say "we start at cost." If they ask what we pay, say you don't get into that and we'll confirm the price.
 
 TAX: Virginia sales tax is on the quote. Ask once, briefly, if the order is for a government agency or is tax-exempt. Tax-exempt needs a certificate. Do not promise the tax is zero until they say so.
 

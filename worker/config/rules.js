@@ -22,6 +22,11 @@ export const rules = {
   // floor, the customer sees "We'll confirm the price" instead.
   minGrossMargin: 0.10,
 
+  // Private supplier or dealer cost. 1.20 means the candidate price is cost × 1.20.
+  // Used only when that result is at or below the shelf and clears minGrossMargin.
+  // The customer price never goes above the shelf. Never shown.
+  privateMarkup: 1.20,
+
   // One-off price from some other local shop (not a national home-improvement
   // chain). 10 means 10% over that shop's price.
   // Shops that price like the national chains (source code C) use matchPercentBelow

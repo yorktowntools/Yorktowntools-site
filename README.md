@@ -47,6 +47,7 @@ Homeowners and one-off orders should be able to finish on their own. Contractors
 - Gloves and shirts marked `fixedPrice` stay at the price printed on the site. Virginia sales tax is 7% unless the buyer is government or tax-exempt, and a tax-exempt order needs a certificate.
 - Card and a government purchase card, ACH, and check are shown on the quote with their fees. Net terms stay approval-only.
 - He never tells a customer your cost, your margin, a supplier, or where an item was picked up. He never names other retailers. Change the numbers only in `worker/config/rules.js`.
+- Private product costs live in `worker/config/private-costs.js` (`privateCost` and `costSource`). That file is not on the website. A quote uses cost × 1.20 only when that result is at or below the shelf and the margin is at least 10%. Otherwise it uses the shelf, or says we'll confirm the price. The customer never sees the cost or who it came from.
 - Every email to sales@ includes the tier. A company that looks like a bulk or ongoing account is **TIER 1 / PRIORITY**. A small order is still an instant quote, even from a big company. Homeowners are tier 3.
 
 ## 1. Preview George on your computer
