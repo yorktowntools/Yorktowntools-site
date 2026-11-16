@@ -32,6 +32,11 @@ try {
   sessionId = `web${Date.now()}`;
 }
 
+const mascotPng = new URL("./george-mascot.png", import.meta.url).href;
+function mascotPicture(className, width, height) {
+  return `<img class="${className}" src="${mascotPng}" alt="" width="${width}" height="${height}">`;
+}
+
 const catalogReady = fetch(new URL("../data/prices.json", import.meta.url))
   .then((response) => response.json())
   .then((data) => {
@@ -41,13 +46,16 @@ const catalogReady = fetch(new URL("../data/prices.json", import.meta.url))
 
 const root = document.createElement("div");
 root.innerHTML = `
-  <button type="button" class="george-launcher" aria-expanded="false" aria-controls="george-panel">
-    <img src="/george-mascot.PNG" alt="" width="44" height="44">
-    <span>Ask George</span>
+  <button type="button" class="george-launcher" aria-label="Chat with George for quotes and pricing" aria-expanded="false" aria-controls="george-panel">
+    ${mascotPicture("george-launcher-mascot", 72, 68)}
+    <span class="george-launcher-copy">
+      <strong>Chat with George</strong>
+      <small>Quotes &amp; pricing in seconds</small>
+    </span>
   </button>
   <section id="george-panel" class="george-panel" role="dialog" aria-modal="true" aria-labelledby="george-title" hidden>
     <header class="george-head">
-      <img src="/george-mascot.PNG" alt="" width="44" height="44">
+      ${mascotPicture("george-head-avatar", 44, 42)}
       <div class="george-head-text">
         <h2 id="george-title">George</h2>
         <p>Yorktown Tools</p>
@@ -430,6 +438,7 @@ async function onQuote(event) {
 
 function openPanel() {
   panel.hidden = false;
+  launcher.hidden = true;
   launcher.setAttribute("aria-expanded", "true");
   if (!log.childElementCount) {
     if (preview) showBanner("Preview on this computer. Quotes are not emailed from here.");
@@ -442,8 +451,22 @@ function openPanel() {
 
 function closePanel() {
   panel.hidden = true;
+  launcher.hidden = false;
   launcher.setAttribute("aria-expanded", "false");
   launcher.focus();
+}
+
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  try {
+    if (!sessionStorage.getItem("george-launcher-nudge")) {
+      window.setTimeout(() => {
+        if (launcher.hidden || launcher.getAttribute("aria-expanded") === "true") return;
+        launcher.classList.add("george-launcher-nudge");
+        sessionStorage.setItem("george-launcher-nudge", "1");
+      }, 3000);
+    }
+  } catch {}
+  launcher.addEventListener("animationend", () => launcher.classList.remove("george-launcher-nudge"));
 }
 
 launcher.addEventListener("click", openPanel);
