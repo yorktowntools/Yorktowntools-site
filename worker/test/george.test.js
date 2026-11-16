@@ -1465,3 +1465,70 @@ test("a search snippet price with no shelf becomes one out-the-door total", asyn
   const totalAt = body.reply.indexOf("Out the door that's");
   assert.ok(upsellAt >= 0 && upsellAt < totalAt);
 });
+
+test("a generic jack hammer stays a clarifying question, and What does not repeat the contact ask", async () => {
+  resetLimits();
+  const live = {
+    MOCK_MODE: "false",
+    XAI_API_KEY: "test-key",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+  };
+  const ask = (messages, callXai) => handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages }),
+  }), { ...live, callXai });
+  const unpriced = (name) => ({
+    output_text: `QUOTE_JSON: ${JSON.stringify({ items: [{ name, qty: 1, source: "U" }] })}`,
+  });
+
+  let calls = 0;
+  const hammer = await ask(
+    [{ role: "user", content: "I need a jack hammer do you sell them?" }],
+    async () => {
+      calls += 1;
+      return unpriced("jack hammer");
+    },
+  );
+  const hammerBody = await hammer.json();
+  assert.equal(calls, 1);
+  assert.match(hammerBody.reply, /We can source a jack hammer for you\. What are you breaking up, and do you want electric corded, cordless, or pneumatic\?/);
+  assert.doesNotMatch(hammerBody.reply, /That one's for our team to price/i);
+  assert.doesNotMatch(hammerBody.reply, /name, company, and cell or email/i);
+
+  const what = await ask([
+    { role: "user", content: "I need a jack hammer do you sell them?" },
+    { role: "assistant", content: "I have 1 × jack hammer. That one's for our team to price. What's your name, company, and cell or email?" },
+    { role: "user", content: "What" },
+  ], async () => {
+    throw new Error("a bare What stays local");
+  });
+  const whatBody = await what.json();
+  assert.match(whatBody.reply, /breaking concrete, tile, or something else/i);
+  assert.doesNotMatch(whatBody.reply, /name, company, and cell or email/i);
+  assert.doesNotMatch(whatBody.reply, /That one's for our team to price/i);
+
+  const drill = await ask(
+    [{ role: "user", content: "I need a drill" }],
+    async () => unpriced("drill"),
+  );
+  const drillBody = await drill.json();
+  assert.match(drillBody.reply, /what are you using the drill for/i);
+  assert.doesNotMatch(drillBody.reply, /name, company, and cell or email/i);
+
+  const saw = await ask(
+    [{ role: "user", content: "I need a saw" }],
+    async () => unpriced("saw"),
+  );
+  const sawBody = await saw.json();
+  assert.match(sawBody.reply, /what are you cutting/i);
+  assert.doesNotMatch(sawBody.reply, /name, company, and cell or email/i);
+
+  const named = await ask(
+    [{ role: "user", content: "Jack hammer for concrete, corded." }],
+    async () => unpriced("jack hammer"),
+  );
+  const namedBody = await named.json();
+  assert.match(namedBody.reply, /That one's for our team to price/);
+  assert.match(namedBody.reply, /name, company, and cell or email/i);
+});

@@ -429,6 +429,13 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     };
   }
 
+  if (/^what\??$/i.test(text)) {
+    return {
+      reply: confusedWhatReply(history),
+      quote: { items: [], offerForm: false, hold: false, stage: "clarify" },
+    };
+  }
+
   if (/that one's for our team to price|we'll confirm the price/i.test(lastText) && /name, company, and cell or email/i.test(lastText)) {
     const carried = carryQuote(text, history, catalog, discount, page);
     const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text)

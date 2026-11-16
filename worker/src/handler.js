@@ -4,7 +4,7 @@ import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/
 import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
-import { chatStage, isShortReply } from "../../shared/talk.js";
+import { chatStage, clarifyingQuestion, isShortReply } from "../../shared/talk.js";
 import {
   fillMissingShelf,
   formatMoney,
@@ -464,7 +464,47 @@ function itemAmount(item) {
   return formatMoney(item.estimate);
 }
 
-function scriptOrderReply(baseReply, items, { government = false, bulk = false } = {}) {
+const BRAND = /\b(dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt|stanley|klein|werner|stabila|jackery|porter|dap)\b/i;
+const MODEL = /\b[a-z]{0,6}\d{3,}[a-z0-9-]*\b/i;
+const GENERIC = new Set([
+  "jack", "hammer", "drill", "saw", "grinder", "nailer", "tool", "ladder", "glove",
+  "battery", "blade", "bit", "wrench", "caulk", "case", "box", "pair", "demolition",
+  "rotary", "sds", "corded", "cordless", "electric", "pneumatic", "power", "impact",
+  "driver", "circular", "angle", "heat", "gun", "kit", "plus", "inch", "amp",
+]);
+
+function nameTokens(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(" ")
+    .map((word) => (word.length > 3 && word.endsWith("s") ? word.slice(0, -1) : word))
+    .filter((word) => word.length > 2);
+}
+
+function specificItem(item) {
+  const blob = `${item?.name || ""} ${item?.sku || ""} ${item?.model || ""} ${item?.manufacturer || ""}`;
+  if (BRAND.test(blob) || MODEL.test(blob)) return true;
+  return nameTokens(blob).some((token) => !GENERIC.has(token));
+}
+
+function customerConfirmed(text) {
+  const value = String(text || "");
+  if (BRAND.test(value) || MODEL.test(value)) return true;
+  const use = /\b(concrete|tile|asphalt|brick|masonry|wood|steel|metal|drywall)\b/i.test(value);
+  const power = /\b(corded|cordless|pneumatic|electric)\b/i.test(value);
+  return use && power;
+}
+
+function genericCategoryReply(items, text) {
+  const blob = `${text || ""}\n${(items || []).map((item) => item?.name || "").join("\n")}`;
+  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(blob)) {
+    return "We can source a jack hammer for you. What are you breaking up, and do you want electric corded, cordless, or pneumatic?";
+  }
+  return clarifyingQuestion(blob);
+}
+
+function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "" } = {}) {
   const lines = (items || []).filter((item) => item?.name);
   if (!lines.length) return String(baseReply || "");
   const read = lines.map((item) => {
@@ -491,6 +531,9 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false }
   const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
   const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
   const head = upsell ? `${upsell}\n\n` : "";
+  if (missingPrice && !bulk && !(lines.some(specificItem) || customerConfirmed(text))) {
+    return genericCategoryReply(lines, text);
+  }
   if (missingPrice && !bulk) {
     return `${head}I have ${read}. That one's for our team to price. What's your name, company, and cell or email?${linkBlock}`;
   }
@@ -672,7 +715,7 @@ async function chat(request, env) {
     const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
     const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
     const reply = kept.length
-      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk) }), messages)
+      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk), text: convo }), messages)
       : finalizeReply(local.reply, messages);
     return json({
       reply,
@@ -707,7 +750,7 @@ async function chat(request, env) {
     const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
     const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes);
     const ordered = view.items.length
-      ? scriptOrderReply(pricedReply, view.items, { government, bulk: view.lead.bulk })
+      ? scriptOrderReply(pricedReply, view.items, { government, bulk: view.lead.bulk, text: convo })
       : pricedReply;
     const reply = replaceRepeatedReply(parsed.reply, finalizeReply(ordered, messages), messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
