@@ -49,8 +49,27 @@ export function acceptingQuote(message, history) {
   return agrees && /quote together/i.test(lastAssistant(history)?.content || "");
 }
 
+export function concreteDrillingAdvice(text) {
+  const raw = String(text || "");
+  const drilling = /\b(drill|drilling|bore|boring|core)\b/i.test(raw);
+  const concrete = /\bconcrete\b/i.test(raw);
+  const sized = /\brebar\b/i.test(raw)
+    || /1\s*[- ]\s*1\/2|1\.5/i.test(raw)
+    || /\b\d+\s*(?:["”]|in(?:ch(?:es)?)?)\b/i.test(raw);
+  if (!drilling || !concrete || !sized) return "";
+  return "For a 1-1/2 inch hole through 9 inches of concrete with rebar, use an SDS-Max rotary hammer (a DeWalt D25614K-class tool) or a core drill. Use a 1-1/2 inch SDS-Max bit at least 13 inches long, and a rebar cutter bit if you hit rebar. Do you already have an SDS-Max hammer?";
+}
+
+export function genericSawQuestion(text) {
+  const raw = String(text || "");
+  if (/\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/i.test(raw)) return "";
+  if (!/\b(sawzalls?|sawzaws?|reciprocating(?:\s+saws?)?)\b/i.test(raw)) return "";
+  return "Which model do you want, or do you want it cordless or corded?";
+}
+
 export function drillTurn(message, history) {
   const latest = String(message || "");
+  if (concreteDrillingAdvice(latest)) return null;
   const blob = userBlob(latest, history);
   if (!/\bdrills?\b|\bhammer drill\b/i.test(blob)) return null;
   if (/\b[a-z]{0,6}\d{3,}[a-z0-9-]*/i.test(latest)) return null;
@@ -97,6 +116,7 @@ const NAMED_POWER = /\b(dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgi
 export function chatStage(message, history, catalog) {
   const latest = String(message || "").trim();
   if (acceptingQuote(latest, history)) return "form";
+  if (concreteDrillingAdvice(latest)) return "quote";
   const drill = drillTurn(latest, history);
   if (drill?.stage === "clarify") return "clarify";
   if (drill?.stage === "recommend") return "recommend";

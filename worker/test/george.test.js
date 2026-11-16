@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { BULK_LINE, CONFIRM_PRICE, GREETING, SAFE_COST_REPLY } from "../../shared/copy.js";
-import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl, rewriteOwnerName, sayConfirmOnce } from "../../shared/customer-text.js";
+import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl, isCustomerPriceAsk, isPrivateCostAsk, rewriteOwnerName, sayConfirmOnce } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
 import {
   extractQty,
@@ -18,6 +18,7 @@ import {
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
+import { extractShelfPrice } from "../src/shelf-fetch.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
 import { loadPrivateCosts, privateCostFor, readPrivateCosts } from "../config/private-costs.js";
 import jackeryCatalog from "../config/jackery-catalog.json" with { type: "json" };
@@ -1559,4 +1560,256 @@ test("a generic jack hammer stays a clarifying question, and What does not repea
   assert.match(fromUserBody.reply, /breaking concrete, tile, or something else/i);
   assert.doesNotMatch(fromUserBody.reply, /Which part should I answer/i);
   assert.doesNotMatch(fromUserBody.reply, /name, company, and cell or email/i);
+});
+
+function liveChat(messages, env) {
+  return handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages }),
+  }), {
+    MOCK_MODE: "false",
+    XAI_API_KEY: "test-key",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+    ...env,
+  });
+}
+
+test("my cost, my price, and what would I pay are quote requests", async () => {
+  for (const text of [
+    "what do you pay for a DCD996B",
+    "your cost on that drill",
+    "what's your margin",
+    "wholesale price on the drill",
+    "Our cost is $40",
+  ]) {
+    assert.equal(isPrivateCostAsk(text), true, text);
+    assert.equal(isCustomerPriceAsk(text), false, text);
+    assert.equal(localReply({ message: text, catalog, discount: 0 }).reply, SAFE_COST_REPLY, text);
+  }
+  for (const text of [
+    "WHAT IS MY COST ON A DCD996B",
+    "what about my cost on a dewalt sawzaw",
+    "what would I pay for a DCD996B",
+    "what's it cost",
+    "my price on the saw",
+    "how much is the drill",
+  ]) {
+    assert.equal(isPrivateCostAsk(text), false, text);
+    assert.equal(isCustomerPriceAsk(text), true, text);
+    assert.notEqual(localReply({ message: text, catalog, discount: 0 }).reply, SAFE_COST_REPLY, text);
+  }
+  const kept = filterCustomerText("WHAT IS MY COST ON A DCD996B");
+  assert.equal(kept.costHit, false);
+  assert.match(kept.text, /DCD996B/);
+  assert.equal(filterCustomerText("what do you pay for a DCD996B").costHit, true);
+  assert.equal(filterCustomerText("Can I get the wholesale price?").costHit, true);
+
+  const pay = localReply({ message: "what would I pay for a DCD996B", catalog, discount: 0 });
+  assert.doesNotMatch(pay.reply, /\bACH\b/);
+  assert.match(pay.reply, /DCD996B/);
+  const saw = localReply({ message: "what about my cost on a dewalt sawzaw", catalog, discount: 0 });
+  assert.match(saw.reply, /Which model do you want, or do you want it cordless or corded\?/);
+  assert.doesNotMatch(saw.reply, /don't get into what we pay/i);
+  assert.doesNotMatch(saw.reply, /name, company, and cell or email/i);
+
+  resetLimits();
+  const mock = await post("/api/chat", { messages: [{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }] });
+  const mockBody = await mock.json();
+  assert.doesNotMatch(mockBody.reply, /don't get into what we pay/i);
+  assert.match(mockBody.reply, /DCD996B/);
+});
+
+test("the prompt stores a seen retail price and answers a how-to before contact", () => {
+  const prompt = buildInstructions({ catalog, page: "/" });
+  assert.match(prompt, /current typical retail price/);
+  assert.match(prompt, /QUOTE_JSON shelf/);
+  assert.match(prompt, /Never put a store name/);
+  assert.match(prompt, /cordless or corded/);
+  assert.match(prompt, /SDS-Max/);
+  assert.match(prompt, /D25614K/);
+  assert.match(prompt, /13 inches/);
+  assert.match(prompt, /rebar cutter/);
+  assert.match(prompt, /My cost/);
+  assert.match(prompt, /what do you pay/);
+  assert.match(prompt, /Do not repeat the same contact ask/);
+  assert.match(prompt, /Would you like to place an order\?/);
+  const html = `<p>Home Depot</p><span>$12.98</span><script type="application/ld+json">{"@type":"Product","name":"DEWALT DCD996B","offers":{"price":"199.00"}}</script>`;
+  assert.equal(extractShelfPrice(html), 199);
+  assert.equal(extractShelfPrice(`"currentPrice":179.00`), 179);
+});
+
+test("a search URL with no snippet is priced from the product page and cached", async () => {
+  resetLimits();
+  const url = "https://www.homedepot.com/p/DEWALT-20V-MAX-XR-DCD996B/207274253";
+  const html = `<html><title>Home Depot DEWALT DCD996B</title><p>$12.98 accessory</p>
+    <script type="application/ld+json">{"@type":"Product","name":"DEWALT DCD996B","offers":{"@type":"Offer","price":"199.00"}}</script></html>`;
+  let fetches = 0;
+  const env = {
+    callXai: async () => ({
+      output_text: `The shelf is on the page.\nQUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: null, source: "U" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [{ url, title: "DEWALT 20V MAX Drill DCD996B", snippet: "" }],
+      }],
+    }),
+    fetchProductPage: async (asked) => {
+      fetches += 1;
+      assert.equal(asked, url);
+      return { text: async () => html };
+    },
+  };
+  const first = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], env)).json();
+  assert.equal(fetches, 1);
+  assert.equal(first.quote.items[0].sku, "DCD996B");
+  assert.equal(first.quote.items[0].estimate, 199);
+  assert.match(first.reply, /1 × DeWalt DCD996B/);
+  assert.match(first.reply, /Out the door that's \$219\.32/);
+  assert.match(first.reply, /Would you like to place an order\?/);
+  assert.doesNotMatch(first.reply, /don't get into what we pay/i);
+  assert.doesNotMatch(first.reply, /home depot|lowe|\$12\.98/i);
+  const second = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], env)).json();
+  assert.equal(fetches, 1);
+  assert.equal(second.quote.items[0].estimate, 199);
+
+  resetLimits();
+  let modelFetches = 0;
+  const fromModel = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: 189, source: "A" }],
+      })}`,
+    }),
+    fetchProductPage: async () => {
+      modelFetches += 1;
+      return { text: async () => html };
+    },
+  })).json();
+  assert.equal(modelFetches, 0);
+  assert.equal(fromModel.quote.items[0].estimate, 189);
+  assert.match(fromModel.reply, /Out the door that's \$208\.30/);
+  assert.match(fromModel.reply, /Would you like to place an order\?/);
+  assert.doesNotMatch(fromModel.reply, /home depot|lowe/i);
+});
+
+test("a product page that does not answer still prices the question before the handoff", async () => {
+  resetLimits();
+  const response = await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    SHELF_FETCH_TIMEOUT_MS: "120",
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, source: "U" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [{ url: "https://www.dewalt.com/product/dcd996b", title: "DCD996B", snippet: "" }],
+      }],
+    }),
+    fetchProductPage: () => new Promise(() => {}),
+  });
+  const body = await response.json();
+  assert.match(body.reply, /Yes, we can price that/);
+  assert.match(body.reply, /DCD996B/);
+  assert.match(body.reply, /That one's for our team to price/);
+  assert.match(body.reply, /What's your name, company, and cell or email\?/);
+  assert.ok(body.reply.indexOf("Yes, we can price that") < body.reply.indexOf("What's your name"));
+  assert.doesNotMatch(body.reply, /Out the door/);
+  assert.doesNotMatch(body.reply, /don't get into what we pay/i);
+});
+
+test("a generic DeWalt Sawzall is a model question, not a handoff", async () => {
+  resetLimits();
+  let calls = 0;
+  const saw = await (await liveChat([{ role: "user", content: "what about my cost on a dewalt sawzaw" }], {
+    callXai: async () => {
+      calls += 1;
+      return {
+        output_text: `What's your name, company, and cell or email?\nQUOTE_JSON: ${JSON.stringify({
+          items: [{ name: "DeWalt DCS367 reciprocating saw", sku: "DCS367", qty: 1, shelf: 159, source: "A" }],
+        })}`,
+      };
+    },
+  })).json();
+  assert.equal(calls, 1);
+  assert.match(saw.reply, /Which model do you want, or do you want it cordless or corded\?/);
+  assert.doesNotMatch(saw.reply, /for our team to price/i);
+  assert.doesNotMatch(saw.reply, /name, company, and cell or email/i);
+  assert.doesNotMatch(saw.reply, /don't get into what we pay|Out the door/i);
+
+  const mixed = await (await liveChat([{ role: "user", content: "do you have any pricing ?" }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [
+          { name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, source: "U" },
+          { name: "DeWalt reciprocating saw", qty: 1, source: "U" },
+        ],
+      })}`,
+    }),
+  })).json();
+  assert.match(mixed.reply, /Which model do you want, or do you want it cordless or corded\?/);
+  assert.match(mixed.reply, /Yes, we can price that/);
+  assert.match(mixed.reply, /DeWalt DCD996B/);
+  assert.match(mixed.reply, /That one's for our team to price/);
+  assert.doesNotMatch(mixed.reply, /reciprocating saw/i);
+  assert.ok(mixed.reply.indexOf("Yes, we can price that") < mixed.reply.indexOf("What's your name"));
+});
+
+test("a concrete how-to is answered, and the contact ask is not repeated", async () => {
+  resetLimits();
+  const hole = 'what can i use to drill through 9" concrete with rebar, needs to be a 1-1/2" hole';
+  const prior = "I have 1 × DeWalt DCD996B. That one's for our team to price. What's your name, company, and cell or email?";
+  let calls = 0;
+  const blocked = await (await liveChat([
+    { role: "user", content: "WHAT IS MY COST ON A DCD996B" },
+    { role: "assistant", content: prior },
+    { role: "user", content: hole },
+  ], {
+    callXai: async () => {
+      calls += 1;
+      return { output_text: "What's your name, company, and cell or email?" };
+    },
+  })).json();
+  assert.equal(calls, 1);
+  assert.match(blocked.reply, /SDS-Max rotary hammer/);
+  assert.match(blocked.reply, /D25614K-class/);
+  assert.match(blocked.reply, /core drill/);
+  assert.match(blocked.reply, /1-1\/2 inch SDS-Max bit at least 13 inches long/);
+  assert.match(blocked.reply, /rebar cutter bit/);
+  assert.match(blocked.reply, /Do you already have an SDS-Max hammer\?/);
+  assert.doesNotMatch(blocked.reply, /name, company, and cell or email/i);
+  assert.ok(blocked.reply.indexOf("SDS-Max") < blocked.reply.indexOf("?"));
+
+  const modelText = "I would start with an SDS-Max rotary hammer or a core drill for the rebar. Do you already have an SDS-Max hammer?";
+  const answered = await (await liveChat([
+    { role: "user", content: "WHAT IS MY COST ON A DCD996B" },
+    { role: "assistant", content: prior },
+    { role: "user", content: hole },
+  ], {
+    callXai: async () => {
+      calls += 1;
+      return { output_text: modelText };
+    },
+  })).json();
+  assert.match(answered.reply, /I would start with an SDS-Max/);
+  assert.match(answered.reply, /rebar/);
+  assert.doesNotMatch(answered.reply, /name, company, and cell or email/i);
+
+  const again = await (await liveChat([
+    { role: "user", content: "One DeWalt D25133K SDS-Plus rotary hammer, just the tool." },
+    { role: "assistant", content: "I have 1 × DeWalt D25133K SDS-Plus rotary hammer. That one's for our team to price. What's your name, company, and cell or email?" },
+    { role: "user", content: "do you have any pricing ?" },
+  ], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt D25133K SDS-Plus rotary hammer", sku: "D25133K", qty: 1, source: "U" }],
+      })}`,
+    }),
+  })).json();
+  assert.match(again.reply, /Yes, we can price that/);
+  assert.match(again.reply, /D25133K/);
+  assert.match(again.reply, /for our team to price/i);
+  assert.doesNotMatch(again.reply, /name, company, and cell or email/i);
+  assert.ok(again.reply.indexOf("Yes, we can price that") < again.reply.toLowerCase().indexOf("team to price"));
 });

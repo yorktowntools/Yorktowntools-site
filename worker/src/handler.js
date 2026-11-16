@@ -2,9 +2,10 @@ import catalog from "../../data/prices.json" with { type: "json" };
 import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
 import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared/copy.js";
-import { filterCustomerText } from "../../shared/customer-text.js";
+import { filterCustomerText, isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
-import { chatStage, clarifyingQuestion, isShortReply } from "../../shared/talk.js";
+import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
+import { collectSearchUrls, fetchShelfPrices, resetShelfCache } from "./shelf-fetch.js";
 import {
   fillMissingShelf,
   formatMoney,
@@ -23,6 +24,7 @@ const buckets = new Map();
 
 export function resetLimits() {
   buckets.clear();
+  resetShelfCache();
 }
 
 function limit(key, max, windowMs, now) {
@@ -472,7 +474,7 @@ const GENERIC = new Set([
   "battery", "blade", "bit", "wrench", "caulk", "case", "box", "pair", "demolition",
   "rotary", "sds", "corded", "cordless", "electric", "pneumatic", "power", "impact",
   "driver", "circular", "angle", "heat", "gun", "kit", "plus", "inch", "amp",
-  "item", "product",
+  "item", "product", "reciprocating", "sawzall", "sawzaw",
 ]);
 
 function nameTokens(value) {
@@ -494,6 +496,10 @@ function specificItem(item) {
   return nameTokens(blob).some((token) => !GENERIC.has(token) && !BRAND_WORDS.has(token));
 }
 
+function accessoryLine(item) {
+  return /\b(blades?|bits?|anchors?|discs?|wheels?|nails?|batter(?:y|ies)|chargers?|stabilizers?|gloves?|caulk guns?)\b/i.test(item?.name || "");
+}
+
 function customerConfirmed(text) {
   const value = String(text || "");
   if (MODEL.test(value)) return true;
@@ -507,18 +513,74 @@ function genericCategoryReply(items, text) {
   if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text || "")) {
     return "We can source a jack hammer for you. What are you breaking up, and do you want electric corded, cordless, or pneumatic?";
   }
+  const saw = genericSawQuestion(blob);
+  if (saw) return saw;
   if (BRAND.test(blob) && !MODEL.test(blob)) return "Which model or size do you want?";
   return clarifyingQuestion(text || blob);
 }
 
-function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "" } = {}) {
+function priceAnswer(text) {
+  if (/\b(my cost|my price|how much|what would i pay|what(?:'s| is| does) it cost|pricing|do you have any pric)\b/i.test(String(text || ""))) {
+    return "Yes, we can price that. ";
+  }
+  return "";
+}
+
+function modelCodeOf(item) {
+  const match = `${item?.sku || ""} ${item?.name || ""} ${item?.model || ""}`.match(/\b[a-z]{0,6}\d{3,}[a-z0-9-]*\b/i);
+  return match ? match[0] : "";
+}
+
+function shelfNotes(lines, pages) {
+  const waiting = (lines || []).filter((line) => line.estimate == null);
+  const notes = [];
+  const used = new Set();
+  for (const page of pages || []) {
+    if (!(Number(page?.shelf) > 0)) continue;
+    const blob = `${page.url || ""} ${page.title || ""}`.toLowerCase();
+    let match = waiting.find((line) => {
+      if (used.has(line)) return false;
+      const code = modelCodeOf(line);
+      return code && blob.includes(code.toLowerCase());
+    });
+    if (!match && waiting.length === 1 && !used.has(waiting[0])) match = waiting[0];
+    if (!match) continue;
+    used.add(match);
+    notes.push(`${match.name} ${match.sku || ""} $${Number(page.shelf)}`);
+  }
+  return notes.join("\n");
+}
+
+function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "", latest = "" } = {}) {
+  const asked = String(latest || text || "");
   const lines = (items || []).filter((item) => item?.name && !isPlaceholderName(item.name));
+  const sawAsk = genericSawQuestion(asked);
   if (!lines.length) {
-    if (/\b(jack\s*hammers?|demolition hammers?|drills?|saws?|grinders?|hammers?)\b/i.test(text || "") || (BRAND.test(text || "") && !MODEL.test(text || ""))) {
-      return genericCategoryReply([], text);
+    if (sawAsk) return sawAsk;
+    const advice = concreteDrillingAdvice(asked);
+    if (advice) return advice;
+    if (/\b(jack\s*hammers?|demolition hammers?|drills?|saws?|grinders?|hammers?)\b/i.test(asked) || (BRAND.test(asked) && !MODEL.test(asked))) {
+      return genericCategoryReply([], asked);
     }
     return String(baseReply || "");
   }
+  const named = lines.filter((item) => specificItem(item));
+  const vague = lines.filter((item) => !specificItem(item) && !accessoryLine(item));
+  const confirmed = customerConfirmed(asked);
+  const sawLine = (item) => /\b(sawzall|sawzaw|reciprocat)/i.test(`${item?.name || ""} ${item?.sku || ""}`);
+  const onlySaws = lines.some(sawLine) && !lines.some((item) => specificItem(item) && !sawLine(item));
+  if ((sawAsk || onlySaws) && !MODEL.test(asked) && !lines.some((item) => specificItem(item) && !sawLine(item))) {
+    return "Which model do you want, or do you want it cordless or corded?";
+  }
+  if (!named.length && !confirmed && lines.every((item) => item.estimate == null)) return genericCategoryReply(lines, asked);
+  const quoteLines = named.length ? lines.filter((item) => specificItem(item) || accessoryLine(item)) : lines;
+  const vagueAsk = named.length && vague.length ? genericCategoryReply(vague, `${asked}\n${vague.map((item) => item.name).join("\n")}`) : "";
+  const core = composeQuote(baseReply, quoteLines, { government, bulk, asked });
+  if (!vagueAsk || vagueAsk === core) return core;
+  return `${vagueAsk}\n\n${core}`;
+}
+
+function composeQuote(baseReply, lines, { government = false, bulk = false, asked = "" } = {}) {
   const read = lines.map((item) => {
     const amount = itemAmount(item);
     const label = amount && item.ballpark ? `Starting estimate ${amount}` : amount;
@@ -543,11 +605,11 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false, 
   const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
   const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
   const head = upsell ? `${upsell}\n\n` : "";
-  if (missingPrice && !bulk && !(lines.some(specificItem) || customerConfirmed(text))) {
-    return genericCategoryReply(lines, text);
+  if (missingPrice && !bulk && !(lines.some(specificItem) || customerConfirmed(asked))) {
+    return genericCategoryReply(lines, asked);
   }
   if (missingPrice && !bulk) {
-    return `${head}I have ${read}. That one's for our team to price. What's your name, company, and cell or email?${linkBlock}`;
+    return `${head}${priceAnswer(asked)}I have ${read}. That one's for our team to price. What's your name, company, and cell or email?${linkBlock}`;
   }
   if (uncertain || over || bulk) {
     const bulkNote = bulk ? ` ${BULK_LINE}` : "";
@@ -593,8 +655,44 @@ function withoutRepeatedGreeting(reply, priorMessages) {
   return stripped || "What do you need for the job?";
 }
 
-function finalizeReply(reply, priorMessages = []) {
-  return withoutRepeatedAfterHours(filterCustomerText(withoutRepeatedGreeting(reply, priorMessages)).text, priorMessages);
+const CONTACT_ASK = /what'?s your name, company, and cell or email\??/i;
+
+function withoutRepeatedContactAsk(reply, priorMessages) {
+  const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
+  if (!CONTACT_ASK.test(previous) || !CONTACT_ASK.test(String(reply || ""))) return String(reply || "");
+  return String(reply || "")
+    .replace(/what'?s your name, company, and cell or email\??/gi, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function fallbackAnswer(latest) {
+  const advice = concreteDrillingAdvice(latest);
+  if (advice) return advice;
+  const saw = genericSawQuestion(latest);
+  if (saw) return saw;
+  if (isCustomerPriceAsk(latest) || /\b(price|pricing|cost|how much)\b/i.test(String(latest || ""))) {
+    return "Yes, we can price that. Tell me the brand and model if I don't have it yet.";
+  }
+  if (/\b(what|how|which|can i|do you)\b/i.test(String(latest || ""))) {
+    return "Yes, we can help with that. What tool or job is this for?";
+  }
+  return "What do you need for the job?";
+}
+
+function needsAnAnswer(text) {
+  const raw = String(text || "");
+  if (concreteDrillingAdvice(raw) || genericSawQuestion(raw) || isCustomerPriceAsk(raw)) return true;
+  return /\?/.test(raw) || /\b(what|how|which|do you|can i|price|pricing|quote)\b/i.test(raw);
+}
+
+function finalizeReply(reply, priorMessages = [], latest = "") {
+  const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
+  let body = withoutRepeatedContactAsk(withoutRepeatedGreeting(reply, priorMessages), priorMessages);
+  const onlyContact = !String(body || "").trim() || (CONTACT_ASK.test(body) && !String(body).replace(CONTACT_ASK, "").trim());
+  if (onlyContact && (CONTACT_ASK.test(previous) || needsAnAnswer(latest))) body = fallbackAnswer(latest);
+  return withoutRepeatedAfterHours(filterCustomerText(body).text, priorMessages);
 }
 
 async function readJson(request) {
@@ -706,7 +804,7 @@ async function chat(request, env) {
     || ((stage !== "quote" && stage !== "script") && !(followUp && pricedLocally));
   if (keepLocal) {
     return json({
-      reply: finalizeReply(local.reply, messages),
+      reply: finalizeReply(local.reply, messages, latest),
       quote: {
         items: stage === "form" || stage === "recommend" || (stage === "script" && (local.quote?.items || []).length) ? (local.quote?.items || []) : [],
         offerForm: Boolean(local.quote?.offerForm),
@@ -727,8 +825,8 @@ async function chat(request, env) {
     const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
     const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
     const reply = kept.length
-      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk), text: convo }), messages)
-      : finalizeReply(local.reply, messages);
+      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk), text: convo, latest }), messages, latest)
+      : finalizeReply(local.reply, messages, latest);
     return json({
       reply,
       quote: { items: kept, offerForm: false, hold: true, bulk: view.lead.bulk || Boolean(local.quote?.bulk) },
@@ -756,16 +854,54 @@ async function chat(request, env) {
       canSearch,
     );
     const parsed = splitModelOutput(outputText(data));
-    const prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
-    const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
+    let prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
+    const rawItems = alignRequested(parsed.quote?.items || [], latest);
+    const costs = await costsFromEnv(env);
+    let lines = linesFromQuote({ items: rawItems }, prose, costs);
+    if (lines.some((line) => line.estimate == null && (specificItem(line) || customerConfirmed(latest)))) {
+      try {
+        const pages = collectSearchUrls(data);
+        if (pages.length) {
+          const fetched = await fetchShelfPrices(pages, {
+            fetchImpl: typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch,
+            timeoutMs: num(env.SHELF_FETCH_TIMEOUT_MS, 1800),
+          });
+          const note = shelfNotes(lines, fetched);
+          if (note) {
+            prose = `${prose}\n${note}`;
+            lines = linesFromQuote({ items: rawItems }, prose, costs);
+          }
+        }
+      } catch {
+        // A page that does not load still ends in the team handoff.
+      }
+    }
     const view = viewFor(lines, { text: latest });
     const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
     const quotable = view.items.filter((item) => item?.name && !isPlaceholderName(item.name));
     const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, quotable), view.notes);
-    const ordered = view.items.length
-      ? scriptOrderReply(pricedReply, quotable, { government, bulk: view.lead.bulk, text: convo })
+    let ordered = view.items.length
+      ? scriptOrderReply(pricedReply, quotable, { government, bulk: view.lead.bulk, text: convo, latest })
       : pricedReply;
-    const reply = replaceRepeatedReply(parsed.reply, finalizeReply(ordered, messages), messages);
+    let quoteItems = quotable;
+    const sawAsk = genericSawQuestion(latest);
+    if (sawAsk && !/cordless or corded|which model/i.test(ordered)) {
+      ordered = sawAsk;
+      quoteItems = quoteItems.filter((item) => specificItem(item) && !/\b(sawzall|sawzaw|reciprocat)/i.test(`${item.name} ${item.sku}`));
+    }
+    const advice = concreteDrillingAdvice(latest);
+    if (advice) {
+      const modelText = String(parsed.reply || "");
+      if (/sds-max/i.test(modelText) && /\brebar\b/i.test(modelText)) {
+        ordered = modelText.replace(/\s*What'?s your name, company, and cell or email\??/gi, "").trim();
+        if (!/\?/.test(ordered)) ordered = `${ordered} Do you already have an SDS-Max hammer?`;
+      } else {
+        ordered = advice;
+      }
+      quoteItems = [];
+    }
+    const finalized = finalizeReply(ordered, messages, latest);
+    const reply = advice ? finalized : replaceRepeatedReply(parsed.reply, finalized, messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
@@ -774,9 +910,9 @@ async function chat(request, env) {
     return json({
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {
-        items: quotable,
+        items: quoteItems,
         offerForm: false,
-        hold: quotable.length > 0,
+        hold: quoteItems.length > 0,
         bulk: view.lead.bulk,
       },
       searchesUsed,

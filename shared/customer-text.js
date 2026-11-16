@@ -113,19 +113,20 @@ const RETAILER_PATTERNS = [
 
 const COST_PATTERNS = [
   /\bour cost\b/i,
-  /\bmy cost\b/i,
+  /\byour cost\b/i,
+  /\bmy cost is\b/i,
   /\bat cost\b/i,
   /\bcost price\b/i,
-  /\bwhat we pay\b/i,
-  /\bwhat i pay\b/i,
+  /\bwhat (?:do )?(?:we|you) pay\b/i,
+  /\byour margin\b/i,
   /\bmargin\b/i,
   /\bmarkup\b/i,
   /\bmark[\s\-]*up\b/i,
   /\bmilitary discount\b/i,
   /\bveteran discount\b/i,
   /\bsupplier discount\b/i,
-  /\b(?:our|my) supplier\b/i,
-  /\b(?:our|my) distributor\b/i,
+  /\b(?:our|my|your) supplier\b/i,
+  /\b(?:our|my|your) distributor\b/i,
   /\bors\b/i,
   /\bnasco\b/i,
   /\bpower\s*77\b/i,
@@ -133,6 +134,19 @@ const COST_PATTERNS = [
   /\bcost source\b/i,
   /\bstart at cost\b/i,
   /\bwork our way up\b/i,
+  /\bwholesale\b/i,
+  /\bdealer cost\b/i,
+];
+
+// The customer's own price. These are quote requests, not a look at what we pay.
+const CUSTOMER_PRICE_PATTERNS = [
+  /\bmy cost\b/i,
+  /\bmy price\b/i,
+  /\bhow much\b/i,
+  /\bwhat would i pay\b/i,
+  /\bwhat(?:'s| is| does) it cost\b/i,
+  /\bwhat(?:'s| is) the cost\b/i,
+  /\bwhat(?:'s| is) (?:the |my )?(?:price|pricing)\b/i,
 ];
 
 function hostMatches(host, suffix) {
@@ -187,6 +201,16 @@ function matchesAny(text, patterns) {
     re.lastIndex = 0;
     return re.test(text);
   });
+}
+
+export function isPrivateCostAsk(text) {
+  return matchesAny(String(text || ""), COST_PATTERNS);
+}
+
+export function isCustomerPriceAsk(text) {
+  const raw = String(text || "");
+  if (isPrivateCostAsk(raw)) return false;
+  return matchesAny(raw, CUSTOMER_PRICE_PATTERNS);
 }
 
 function scrubUrls(text) {

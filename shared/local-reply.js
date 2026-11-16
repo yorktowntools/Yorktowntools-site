@@ -15,8 +15,8 @@ import {
   SAFE_COST_REPLY,
   SERVICE_AREA,
 } from "./copy.js";
-import { filterCustomerText } from "./customer-text.js";
-import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn, isShortReply } from "./talk.js";
+import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
+import { acceptingQuote, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
   discountPercent,
@@ -173,7 +173,6 @@ function addedAccessory(text) {
 export function localReply({ message, history = [], catalog, discount, page, rebuilding = false }) {
   const text = String(message || "").trim();
   const percent = discountPercent(discount, catalog?.discountPercent ?? 1);
-  const filteredUser = filterCustomerText(text);
   const requested = splitRequestedItems(text);
   const qty = requested.length === 1 ? requested[0].qty : extractQty(text);
   const matches = (requested.length
@@ -437,29 +436,40 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   }
 
   if (/that one's for our team to price|we'll confirm the price/i.test(lastText) && /name, company, and cell or email/i.test(lastText)) {
-    const carried = carryQuote(text, history, catalog, discount, page);
-    const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text)
-      || /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(text)
-      || /\b(my name|i'm|i am|this is)\b/i.test(text);
-    return {
-      reply: contact
-        ? `${HANDOFF_LINE} ${CLOSING_LINE}`
-        : "What's your name, company, and cell or email?",
-      quote: {
-        items: carried?.quote?.items || [],
-        offerForm: false,
-        hold: !contact,
-        stage: "script",
-        scripted: true,
-        bulk: Boolean(carried?.quote?.bulk),
-      },
-    };
+    if (gaveContact(text)) {
+      const carried = carryQuote(text, history, catalog, discount, page);
+      return {
+        reply: `${HANDOFF_LINE} ${CLOSING_LINE}`,
+        quote: {
+          items: carried?.quote?.items || [],
+          offerForm: false,
+          hold: false,
+          stage: "script",
+          scripted: true,
+          bulk: Boolean(carried?.quote?.bulk),
+        },
+      };
+    }
   }
 
   if (isShortReply(text) && history.some((entry) => entry.role === "user" && !isShortReply(entry.content))) {
     const carried = carryQuote(text, history, catalog, discount, page);
     if (carried?.quote?.items?.length) return carried;
   }
+  }
+
+  if (isPrivateCostAsk(text)) {
+    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
+  }
+
+  const holeAdvice = concreteDrillingAdvice(text);
+  if (holeAdvice) {
+    return { reply: holeAdvice, quote: { items: [], offerForm: false, hold: false, stage: "quote" } };
+  }
+
+  const sawQuestion = genericSawQuestion(text);
+  if (sawQuestion) {
+    return { reply: sawQuestion, quote: { items: [], offerForm: false, hold: false, stage: "quote" } };
   }
 
   const drill = drillTurn(text, history);
@@ -505,7 +515,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (filteredUser.costHit || /\b(your cost|the margin|markup|military discount|supplier discount)\b/i.test(text)) {
+  if (isPrivateCostAsk(text)) {
     return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
   }
 
@@ -571,7 +581,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   const government = governmentTurn(text, history);
   if (government) return finish(government, [], false);
 
-  if (/\b(pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
+  if (!isCustomerPriceAsk(text) && /\b(pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
     return finish(
       `Card, a government purchase card, ACH, and check are all fine. Card costs more to process than ACH, and a check has no fee. Don't send card or bank numbers in this chat. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms. Virginia sales tax is on the quote unless the order is tax-exempt, and a tax-exempt order needs a certificate.`,
       [],
@@ -621,7 +631,18 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return finish(blocks.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
   }
 
-  if (/\b(price|pricing|how much|quote|cost)\b/i.test(text)) {
+  if (isCustomerPriceAsk(text) || /\b(price|pricing|how much|quote|cost)\b/i.test(text)) {
+    const saw = genericSawQuestion(text);
+    if (saw) {
+      return { reply: saw, quote: { items: [], offerForm: false, hold: false, stage: "quote" } };
+    }
+    const model = text.match(/\b([a-z]{1,6}\d{3,}[a-z0-9-]*)\b/i);
+    if (model) {
+      return {
+        reply: `I can price the ${model[1].toUpperCase()} for you.`,
+        quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+      };
+    }
     return finish(
       `Tell me the brand and model, and how many you need. I'll write the estimate. Free delivery from ${SERVICE_AREA}.`,
       [],
@@ -664,6 +685,24 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 const SHIP_WORD = /\b(ships?|shipped|shipping|delivers?|delivered|delivery|sends?|sending)\b/i;
 const OUT_OF_AREA = /\b(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|washington|west virginia|wisconsin|wyoming|atlanta|chicago|dallas|denver|los angeles|miami|phoenix|portland|seattle)\b/i;
 const CREDS = "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. Tax is 0% for government.";
+
+function gaveContact(text) {
+  const raw = String(text || "");
+  if (/\b[\w.+-]+@[\w.-]+\.\w+\b/.test(raw)) return true;
+  if (/\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(raw)) return true;
+  if (isFreshQuestion(raw)) return false;
+  return /\b(my name|i'm|i am|this is)\b/i.test(raw);
+}
+
+function isFreshQuestion(text) {
+  const raw = String(text || "");
+  if (/\b[\w.+-]+@[\w.-]+\.\w+\b/.test(raw) || /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(raw)) return false;
+  if (concreteDrillingAdvice(raw) || genericSawQuestion(raw)) return true;
+  if (/\?/.test(raw)) return true;
+  if (/\b(what|how|which|why|can you|do you|price|pricing|cost|quote|drill|saw|model|need)\b/i.test(raw)) return true;
+  if (/\b[a-z]{0,6}\d{3,}[a-z0-9-]*\b/i.test(raw)) return true;
+  return false;
+}
 
 function alreadyGreeted(history) {
   return (history || []).some((entry) => entry.role === "assistant" && /hey, i'm george|welcome to yorktown tools/i.test(entry.content || ""));
