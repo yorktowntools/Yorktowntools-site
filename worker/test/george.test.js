@@ -410,9 +410,10 @@ test("mock chat and quote endpoints", async () => {
   assert.equal(caulkLine.qty, 6);
   assert.equal(caulkLine.estimate, null);
   assert.match(bulkBody.reply, new RegExp(formatEstimate(sawLine).replace(/[$.]/g, "\\$&")));
-  assert.doesNotMatch(bulkBody.reply, /\$149(?:\.00)?(?!\d)/);
+  assert.ok(sawLine.estimate <= 149);
+  assert.ok(sawLine.estimateHigh == null || sawLine.estimateHigh <= 179);
   assert.match(bulkBody.reply, /caulk/i);
-  assert.match(bulkBody.reply, /confirm the price/i);
+  assert.doesNotMatch(bulkBody.reply, /we'll confirm the price/i);
   assert.match(bulkBody.reply, /Makita 5007FA 7-1\/4 in\. circular saw/);
   assert.match(bulkBody.reply, /\[Makita 5007FA\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
   assert.equal((bulkBody.reply.match(/bulk pricing usually comes in better/gi) || []).length, 1);
@@ -702,6 +703,102 @@ test("multi-turn quote flows keep the selected items", async () => {
   await drillTurn("Concrete.");
   const picks = await drillTurn("Corded hammer drill, I don't care about the brand.");
   assert.match(picks.reply, /DeWalt|Milwaukee/i);
+  assert.match(picks.reply, /which one do you want/i);
   assert.doesNotMatch(picks.reply, /how many do you need/i);
-  assert.equal(picks.quote.items[0]?.qty, 1);
+  assert.equal((picks.quote.items || []).length, 0);
+  const chosen = await drillTurn("The DeWalt");
+  assert.equal(chosen.quote.items.length, 1);
+  assert.match(chosen.quote.items[0].name, /DWE5010/);
+  assert.equal(chosen.quote.items[0].estimate, 99);
+  assert.equal(chosen.quote.items[0].estimateHigh, 129);
+  assert.equal(chosen.quote.items.filter((item) => /milwaukee/i.test(item.name)).length, 0);
+  const bits = await drillTurn("Yes");
+  assert.equal(bits.quote.items.filter((item) => /DWE5010/.test(item.name)).length, 1);
+  assert.equal(bits.quote.items.filter((item) => /milwaukee/i.test(item.name)).length, 0);
+  assert.equal(bits.quote.items.some((item) => /bit|anchor/i.test(item.name)), true);
+});
+
+test("add-accessory phrasing keeps the cart and the shelf cap holds", async () => {
+  resetLimits();
+  const thread = [];
+  const turn = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: thread });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  await turn("I need a Makita circular saw");
+  for (const phrase of ["Add the blades please", "add blades", "throw in a couple blades", "yes add 2 blades"]) {
+    const fresh = [
+      { role: "user", content: "I need a Makita circular saw" },
+      { role: "assistant", content: thread[1].content },
+      { role: "user", content: phrase },
+    ];
+    const response = await post("/api/chat", { messages: fresh });
+    const body = await response.json();
+    const blades = body.quote.items.find((item) => /blade/i.test(item.name));
+    assert.equal(body.quote.items.some((item) => item.sku === "5007FA"), true, phrase);
+    assert.ok(blades, phrase);
+    assert.doesNotMatch(body.reply, /Brand and model help/i, phrase);
+    if (/couple|two|2/.test(phrase)) assert.equal(blades.qty, 2, phrase);
+  }
+  const messy = [];
+  const step = async (text) => {
+    messy.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: messy });
+    const body = await response.json();
+    messy.push({ role: "assistant", content: body.reply || "" });
+    return body;
+  };
+  await step("I need a Makita circular saw");
+  await step("Just one");
+  await step("Add the blades please");
+  await step("Please add two circular saw blades, then put the quote together");
+  const finalYes = await step("Yes");
+  assert.equal(finalYes.mode === "error", false);
+  assert.doesNotMatch(finalYes.reply, /something went wrong/i);
+  assert.doesNotMatch(finalYes.reply, /not a promise that it's on the truck/i);
+  assert.doesNotMatch(finalYes.reply, /that(?:'s| is) an estimate/i);
+  assert.doesNotMatch(finalYes.reply, /we'll confirm the price/i);
+  assert.ok((finalYes.reply.match(/\$149(?:\.00)? to \$179(?:\.00)?/g) || []).length <= 1);
+  const saw = finalYes.quote.items.find((item) => item.sku === "5007FA");
+  const blades = finalYes.quote.items.find((item) => /blade/i.test(item.name));
+  assert.equal(saw?.qty, 1);
+  assert.equal(blades?.qty, 2);
+  assert.equal(finalYes.quote.offerForm, true);
+
+  const bulk = await post("/api/chat", {
+    messages: [{ role: "user", content: "I need 10 cases of caulk and 5 saws" }],
+  });
+  const bulkBody = await bulk.json();
+  const followed = await post("/api/chat", {
+    messages: [
+      { role: "user", content: "I need 10 cases of caulk and 5 saws" },
+      { role: "assistant", content: bulkBody.reply },
+      { role: "user", content: "The 5 saws are Makita 5007FA" },
+    ],
+  });
+  const followedBody = await followed.json();
+  const names = followedBody.quote.items.map((item) => item.name);
+  assert.equal(names.filter((name) => /5007FA/.test(name)).length, 1);
+  assert.equal(names.filter((name) => /^saws?$/i.test(name) || /\b5 × saws\b/i.test(name)).length, 0);
+  assert.equal(followedBody.quote.items.filter((item) => /caulk/i.test(item.name) && /makita/i.test(item.name)).length, 0);
+  const priced = followedBody.quote.items.find((item) => item.sku === "5007FA");
+  assert.ok(priced.estimate <= 149);
+  assert.ok(priced.estimateHigh <= 179);
+  assert.equal((followedBody.reply.match(/5 × Makita 5007FA/g) || []).length, 1);
+});
+
+test("a handler exception comes back as a friendly reply", async () => {
+  const response = await handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages: [{ role: "user", content: "I need a saw" }] }),
+  }), { ...env, FORCE_HANDLER_ERROR: "1" });
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.mode, "error");
+  assert.match(body.reply, /Something went wrong on my side/);
+  assert.equal(body.quote.offerForm, false);
 });

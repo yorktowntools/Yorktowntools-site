@@ -1,4 +1,4 @@
-import { CREDIT_APP_URL, ESTIMATE_NOTE, HOURS, PHONE_DISPLAY, PHONE_TEL, SERVICE_AREA } from "../../shared/copy.js";
+import { CREDIT_APP_URL, HOURS, PHONE_DISPLAY, PHONE_TEL, SERVICE_AREA } from "../../shared/copy.js";
 import { escapeHtml, filterCustomerText, isAllowedCustomerUrl } from "../../shared/customer-text.js";
 import { formatMoney } from "../../shared/pricing.js";
 import { BULK_EMAIL, feeSentence } from "./policy.js";
@@ -54,7 +54,7 @@ export function buildQuoteEmail({ lead, items, totals, leadInfo, notes = [] }) {
 
   const intro = bulk
     ? `${BULK_EMAIL} We have the items, quantities, and job site.`
-    : `Here is the estimate from George at Yorktown Tools. ${ESTIMATE_NOTE} Free delivery is included.`;
+    : "Here is the estimate from George at Yorktown Tools. Free delivery is included.";
 
   const html = `<!DOCTYPE html>
 <html>

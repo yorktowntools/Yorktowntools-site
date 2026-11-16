@@ -44,8 +44,9 @@ export function isShortReply(text) {
 }
 
 export function acceptingQuote(message, history) {
-  return /^(yes|yeah|yep|sure|please|ok|okay|do it|sounds good)\b/i.test(String(message || "").trim())
-    && /quote together/i.test(lastAssistant(history)?.content || "");
+  const value = String(message || "").trim();
+  const agrees = /^(yes|yeah|yep|sure|ok|okay|do it|sounds good)\b/i.test(value) || /^please[.!]?$/i.test(value);
+  return agrees && /quote together/i.test(lastAssistant(history)?.content || "");
 }
 
 export function drillTurn(message, history) {

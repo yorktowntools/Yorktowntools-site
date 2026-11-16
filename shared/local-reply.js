@@ -4,7 +4,6 @@ import {
   CATEGORIES,
   CONSIGNMENT_URL,
   CREDIT_APP_URL,
-  ESTIMATE_NOTE,
   GREETING,
   HOURS,
   PHONE_DISPLAY,
@@ -81,15 +80,15 @@ function recommendCordedHammers(catalog, percent) {
   const reply = [
     "Okay, here are a couple of good options for concrete.",
     lines.join("\n\n"),
-    accessoryOffer("corded hammer drill concrete").line,
+    "Which one do you want, the DeWalt DWE5010 or the Milwaukee 5378-20?",
   ].filter(Boolean).join("\n\n");
   return {
     reply,
     quote: {
-      items: picks.map((priced) => toQuoteItem(priced, 1)),
+      items: [],
       offerForm: false,
-      hold: true,
-      stage: "recommend",
+      hold: false,
+      stage: "choose",
       bulk: false,
     },
   };
@@ -99,38 +98,75 @@ function substantiveUsers(history) {
   return (history || []).filter((entry) => entry.role === "user" && !isShortReply(entry.content));
 }
 
+function accessoryLine(addition, catalog, discount) {
+  const known = addition.sku ? (catalog?.items || []).find((entry) => entry.sku === addition.sku) : null;
+  const priced = known ? priceEntry({ ...known, qty: addition.qty }, discountPercent(discount, catalog?.discountPercent ?? 0)) : null;
+  return priced
+    ? toQuoteItem(priced, addition.qty)
+    : { name: addition.name, sku: addition.sku || "", qty: addition.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+}
+
 function carryQuote(text, history, catalog, discount, page) {
-  const users = substantiveUsers(history);
-  const subject = users.at(-1)?.content || "";
+  const users = (history || []).filter((entry) => entry.role === "user");
+  const subject = [...users].reverse().find((entry) => !isShortReply(entry.content) && !addedAccessory(entry.content))?.content || "";
   if (!subject) return null;
-  const base = localReply({ message: subject, history, catalog, discount, page });
+  const base = localReply({ message: subject, history, catalog, discount, page, rebuilding: true });
   if (!base.quote?.items?.length) return null;
-  const qty = extractQty(text) || extractQty(subject);
+  const qty = addedAccessory(text) ? null : (extractQty(text) || extractQty(subject));
   const tools = base.quote.items.filter((item) => !item.lockName);
   let items = qty && tools.length === 1
     ? base.quote.items.map((item) => (item.lockName ? item : { ...item, qty }))
-    : base.quote.items;
+    : base.quote.items.slice();
+  for (const entry of users) {
+    const addition = addedAccessory(entry.content);
+    if (!addition) continue;
+    items = items.filter((item) => item.name !== addition.name);
+    items.push(accessoryLine(addition, catalog, discount));
+  }
   let asked = false;
   let accepted = false;
   for (const entry of history || []) {
     if (entry.role === "assistant" && /I can add them if you want/i.test(entry.content || "")) asked = true;
-    if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|ok|okay)\b/i.test(String(entry.content || "").trim())) accepted = true;
+    if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|ok|okay)\b/i.test(String(entry.content || "").trim()) && !addedAccessory(entry.content)) accepted = true;
   }
   if (accepted) {
     const offer = accessoryOffer(`${subject}\n${items.map((item) => item.name).join(" ")}`);
     for (const suggestion of offer?.suggestions || []) {
       if (items.some((item) => item.name === suggestion.name)) continue;
-      const known = suggestion.sku ? (catalog?.items || []).find((entry) => entry.sku === suggestion.sku) : null;
-      const priced = known ? priceEntry({ ...known, qty: suggestion.qty }, discountPercent(discount, catalog?.discountPercent ?? 0)) : null;
-      items.push(priced
-        ? toQuoteItem(priced, suggestion.qty)
-        : { name: suggestion.name, sku: suggestion.sku || "", qty: suggestion.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true });
+      items.push(accessoryLine(suggestion, catalog, discount));
     }
   }
   return { ...base, quote: { ...base.quote, items, stage: base.quote.stage || "quote" } };
 }
 
-export function localReply({ message, history = [], catalog, discount, page }) {
+function pickedModel(text, history) {
+  const asked = (history || []).some((entry) => entry.role === "assistant" && /which one do you want/i.test(entry.content || ""));
+  if (!asked) return null;
+  if (/dewalt|dwe5010/i.test(text)) return "DWE5010";
+  if (/milwaukee|5378/i.test(text)) return "5378-20";
+  return null;
+}
+
+function addedAccessory(text) {
+  const raw = String(text || "");
+  if (!/\b(add|throw in|include)\b/i.test(raw)) return null;
+  let name = "";
+  if (/\bblades?\b/i.test(raw)) name = "Circular saw blades";
+  else if (/\banchors?\b/i.test(raw)) name = "Concrete anchors";
+  else if (/\bbits?\b/i.test(raw)) name = "Driver bits";
+  else if (/\b(discs?|wheels?)\b/i.test(raw)) name = "Grinding discs";
+  else if (/\bnails?\b/i.test(raw)) name = "Nails";
+  else if (/\bcaulk gun\b/i.test(raw)) name = "Caulk gun";
+  else if (/\bbatter/i.test(raw)) name = "Extra battery";
+  else if (/\bcharg/i.test(raw)) name = "Charger";
+  else if (/\bstabilizer\b/i.test(raw)) name = "Ladder stabilizer";
+  else if (/\bgloves?\b/i.test(raw)) name = "Victory Series drivers gloves";
+  else return null;
+  const qty = /\b(a couple|couple of|two|2)\b/i.test(raw) ? 2 : (extractQty(raw) || 1);
+  return { name, qty, sku: /victory/i.test(name) ? "VICTORY-GLOVE" : "" };
+}
+
+export function localReply({ message, history = [], catalog, discount, page, rebuilding = false }) {
   const text = String(message || "").trim();
   const percent = discountPercent(discount, catalog?.discountPercent ?? 1);
   const filteredUser = filterCustomerText(text);
@@ -191,21 +227,58 @@ export function localReply({ message, history = [], catalog, discount, page }) {
     return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script" } };
   }
 
-  const yes = /^(yes|yeah|yep|sure|please|ok|okay|add them|do it)\b/i.test(text);
+  const picked = pickedModel(text, history);
+  if (picked) {
+    const item = (catalog?.items || []).find((entry) => entry.sku === picked);
+    if (item) {
+      const priced = priceEntry({ ...item, qty: 1 }, percent);
+      return finish(`Okay, the ${priced.model}.`, [priced], true);
+    }
+  }
+
+  if (!rebuilding) {
+    const addition = addedAccessory(text);
+    if (addition) {
+      const carried = carryQuote(text, history, catalog, discount, page);
+      const kept = (carried?.quote?.items || []).filter((item) => item.name !== addition.name);
+      const known = addition.sku ? (catalog?.items || []).find((entry) => entry.sku === addition.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: addition.qty }, percent) : null;
+      const extra = priced
+        ? toQuoteItem(priced, addition.qty)
+        : { name: addition.name, sku: addition.sku || "", qty: addition.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+      const items = [...kept, extra];
+      return {
+        reply: `Okay, I'll add ${addition.qty} × ${addition.name}.\n\n${QUOTE_OFFER}`,
+        quote: {
+          items,
+          offerForm: false,
+          hold: true,
+          stage: "quote",
+          bulk: Boolean(carried?.quote?.bulk),
+        },
+      };
+    }
+  }
+
+  if (!rebuilding) {
+  const yes = /^(yes|yeah|yep|sure|ok|okay|add them|do it)\b/i.test(text);
   const no = /^(no|nope|nah|i'm set|im set|all set|we're set)\b/i.test(text);
   const accessoryPending = (() => {
     let asked = false;
     let answered = false;
     for (const entry of history) {
       if (entry.role === "assistant" && /I can add them if you want/i.test(entry.content || "")) asked = true;
-      if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|no|nope|nah|ok|okay|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim())) answered = true;
+      if (asked && entry.role === "user" && (
+        addedAccessory(entry.content)
+        || /^(yes|yeah|yep|sure|no|nope|nah|ok|okay|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim())
+      )) answered = true;
     }
     return asked && !answered;
   })();
   if ((yes || no) && accessoryPending) {
-    const earlierUsers = history.filter((entry) => entry.role === "user" && !/^(yes|yeah|yep|sure|no|nope|nah|ok|okay|add them|do it|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim()));
+    const earlierUsers = history.filter((entry) => entry.role === "user" && !isShortReply(entry.content));
     const base = earlierUsers.length
-      ? localReply({ message: earlierUsers.at(-1).content, history, catalog, discount, page })
+      ? localReply({ message: earlierUsers[earlierUsers.length - 1].content, history, catalog, discount, page, rebuilding: true })
       : { quote: { items: [] } };
     const toolText = [...earlierUsers.map((entry) => entry.content), ...(base.quote?.items || []).map((item) => item.name)].join("\n");
     const offer = accessoryOffer(toolText);
@@ -250,6 +323,7 @@ export function localReply({ message, history = [], catalog, discount, page }) {
   if (isShortReply(text) && history.some((entry) => entry.role === "user" && !isShortReply(entry.content))) {
     const carried = carryQuote(text, history, catalog, discount, page);
     if (carried?.quote?.items?.length) return carried;
+  }
   }
 
   const drill = drillTurn(text, history);
@@ -354,13 +428,12 @@ export function localReply({ message, history = [], catalog, discount, page }) {
     }
     const blocks = [lines.join("\n")];
     if (links.length) blocks.push(links.join("\n"));
-    blocks.push(ESTIMATE_NOTE);
     return finish(blocks.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
   }
 
   if (/\b(price|pricing|how much|quote|cost)\b/i.test(text)) {
     return finish(
-      `Tell me the brand and model, and how many you need. I'll write the estimate. ${ESTIMATE_NOTE} Free delivery from ${SERVICE_AREA}.`,
+      `Tell me the brand and model, and how many you need. I'll write the estimate. Free delivery from ${SERVICE_AREA}.`,
       [],
       true,
     );

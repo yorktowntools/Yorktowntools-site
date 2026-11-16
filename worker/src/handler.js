@@ -112,7 +112,11 @@ function trimMessages(messages, max) {
     if (!content.trim()) continue;
     clean.push({ role: message.role, content });
   }
-  return clean.slice(-max);
+  if (clean.length <= max) return clean;
+  const recent = clean.slice(-(max - 1));
+  const anchor = clean.find((message) => message.role === "user" && !isShortReply(message.content));
+  if (!anchor || recent.includes(anchor)) return clean.slice(-max);
+  return [anchor, ...recent];
 }
 
 function splitModelOutput(raw) {
@@ -240,6 +244,37 @@ function alignRequested(rawItems, userText) {
   });
 }
 
+function familyOf(name) {
+  const value = String(name || "").toLowerCase();
+  if (/caulk gun/.test(value)) return "caulk-gun";
+  if (/caulk/.test(value)) return "caulk";
+  if (/blade/.test(value)) return "blade";
+  if (/circular saw|5007|\bsaws?\b/.test(value)) return "saw";
+  return "";
+}
+
+function rankItem(item) {
+  return (item?.sku ? 10 : 0) + (/\d{3,}/.test(`${item?.sku || ""} ${item?.name || ""}`) ? 5 : 0);
+}
+
+function preferSpecific(items) {
+  const out = [];
+  for (const item of items || []) {
+    if (!item?.name || /^item$/i.test(item.name)) continue;
+    const family = familyOf(item.name);
+    const index = family ? out.findIndex((existing) => familyOf(existing.name) === family) : -1;
+    if (index >= 0) {
+      if (rankItem(item) > rankItem(out[index])) {
+        out[index] = { ...item, qty: item.qty || out[index].qty };
+      }
+      continue;
+    }
+    if (item.sku && out.some((existing) => existing.sku === item.sku)) continue;
+    out.push(item);
+  }
+  return out;
+}
+
 function costsFromEnv(env) {
   return loadPrivateCosts(env?.PRIVATE_COSTS_JSON);
 }
@@ -271,7 +306,8 @@ function linesFromQuote(rawQuote, prose = "", costs = {}) {
     }
     const filled = fillMissingShelf(raw, catalog, prose);
     const name = String(filled?.name || filled?.sku || "Item").slice(0, 160);
-    const hits = filled?.lockName && !filled?.sku ? [] : matchCatalog(catalog, `${filled?.sku || ""} ${name}`);
+    const exact = (catalog.items || []).find((item) => item.sku && filled?.sku && String(item.sku).toLowerCase() === String(filled.sku).toLowerCase());
+    const hits = exact ? [exact] : (filled?.lockName && !filled?.sku ? [] : matchCatalog(catalog, `${filled?.sku || ""} ${name}`));
     const known = hits.find(hasFirmPrice) || hits[0];
     const fixed = Boolean(known?.fixedPrice);
     let shelf = null;
@@ -375,6 +411,20 @@ function validPhone(value) {
 }
 
 export async function handleRequest(request, env = {}) {
+  try {
+    return await routeRequest(request, env);
+  } catch {
+    return json({
+      reply: "Something went wrong on my side. Tell me the tool again, or call or text (757) 940-5171.",
+      quote: { items: [], offerForm: false },
+      searchesUsed: 0,
+      mode: "error",
+    }, 200, request, env);
+  }
+}
+
+async function routeRequest(request, env = {}) {
+  if (env?.FORCE_HANDLER_ERROR) throw new Error("forced");
   const url = new URL(request.url);
   if (request.method === "OPTIONS") {
     return new Response(null, {
@@ -457,7 +507,10 @@ async function chat(request, env) {
     }, 200, request, env);
   }
   if (mock || pricedLocally || followUp) {
-    const sourceItems = followUp ? (local.quote?.items || []) : alignRequested(local.quote?.items || [], convo);
+    const alreadyNamed = (local.quote?.items || []).length > 0 && (local.quote.items || []).every((item) => item.sku);
+    const sourceItems = preferSpecific(followUp || alreadyNamed
+      ? (local.quote?.items || [])
+      : alignRequested(local.quote?.items || [], convo));
     const lines = linesFromQuote({ items: sourceItems }, convo, costsFromEnv(env));
     const view = viewFor(lines, { text: convo });
     const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));

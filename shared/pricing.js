@@ -269,7 +269,8 @@ export function fillMissingShelf(raw, catalog, prose = "") {
   next.shelfHigh = asMoney(next.shelfHigh);
   const hasShelf = (next.shelf && next.shelf > 0) || (next.shelfLow && next.shelfLow > 0);
   if (!hasShelf && !next.fixedPrice) {
-    const hits = matchCatalog(catalog, `${next.sku || ""} ${next.name || ""}`);
+    const exact = (catalog?.items || []).find((item) => item.sku && next.sku && String(item.sku).toLowerCase() === String(next.sku).toLowerCase());
+    const hits = exact ? [exact] : matchCatalog(catalog, `${next.sku || ""} ${next.name || ""}`);
     const known = hits.find(hasFirmPrice) || hits[0];
     if (known?.fixedPrice && known.price != null) {
       next.fixedPrice = true;

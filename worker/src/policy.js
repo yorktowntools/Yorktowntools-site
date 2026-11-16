@@ -185,10 +185,22 @@ export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice
     estimate: low.estimate,
     estimateHigh,
     cost: low.cost,
+    shelfCeiling: roundMoney(shelfPrice),
+    shelfHighCeiling: Number.isFinite(highShelf) && highShelf > shelfPrice ? roundMoney(highShelf) : null,
     firm: estimateHigh == null,
     confirm: false,
     ballpark: estimateHigh != null,
   };
+}
+
+function capToShelf(line) {
+  if (!line) return;
+  if (line.shelfCeiling != null && line.estimate != null && line.estimate > line.shelfCeiling) {
+    line.estimate = line.shelfCeiling;
+  }
+  if (line.shelfHighCeiling != null && line.estimateHigh != null && line.estimateHigh > line.shelfHighCeiling) {
+    line.estimateHigh = line.shelfHighCeiling;
+  }
 }
 
 export function applyFuel(lines, miles) {
@@ -200,6 +212,7 @@ export function applyFuel(lines, miles) {
   const fuel = fuelDollars(miles);
   const trip = miles || 0;
   if (!(fuel > 0) || !(marginDollars > 0) || fuel <= rules.fuelShareOfMargin * marginDollars) {
+    lines.forEach(capToShelf);
     return { lines, fuelAdded: 0, miles: trip };
   }
   const base = priced.reduce((sum, line) => sum + line.estimate * (line.qty || 1), 0);
@@ -215,6 +228,7 @@ export function applyFuel(lines, miles) {
     line.estimate = roundMoney(line.estimate + each);
     if (line.estimateHigh != null) line.estimateHigh = roundMoney(line.estimateHigh + each);
   });
+  lines.forEach(capToShelf);
   return { lines, fuelAdded: fuel, miles: trip };
 }
 
@@ -453,13 +467,16 @@ export function replyWithFinalPrices(modelReply, items) {
   const seen = new Set(itemLines.map((line) => line.toLowerCase()));
   const explanation = [];
   const questions = [];
-  for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+/)) {
+  for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+(?=[A-Z])/)) {
     const trimmed = withoutModelLinks(sentence.trim());
     if (!trimmed || /^(our page|maker page|makita|dewalt|milwaukee)$/i.test(trimmed)) continue;
     if (/^-?\s*item\.?$/i.test(trimmed)) continue;
+    if (/not a promise that it(?:'s| is) on the truck/i.test(trimmed)) continue;
+    if (/that(?:'s| is) an estimate/i.test(trimmed)) continue;
     const key = trimmed.toLowerCase();
     if (seen.has(key)) continue;
     const amounts = dollarTokens(trimmed);
+    if (amounts.length && itemLines.length) continue;
     if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
     if (restatesServerPrice(trimmed, list)) continue;
     if (list.some((item) => item.ballpark) && /bulk pricing usually comes in better|we['’]?ll send (your |the )?bulk pricing|zachary will send (your |the )?bulk pricing/i.test(trimmed)) continue;
@@ -477,7 +494,8 @@ export function replyWithFinalPrices(modelReply, items) {
   if (links.length) blocks.push(links.join("\n"));
   if (explanation.length) blocks.push(explanation.join(" "));
   if (questions.length) blocks.push(questions.join(" "));
-  if (list.some((item) => !formatEstimate(item) || item.confirm)) blocks.push("We'll confirm the price.");
+  const anyPrice = list.some((item) => formatEstimate(item));
+  if (!anyPrice && list.some((item) => !formatEstimate(item) || item.confirm)) blocks.push("We'll confirm the price.");
   return blocks.join("\n\n").trim();
 }
 

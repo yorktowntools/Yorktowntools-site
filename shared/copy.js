@@ -24,8 +24,7 @@ export const SAFE_COST_REPLY =
 export const SAFE_RETAILER_REPLY =
   "I only quote Yorktown Tools. Tell me the brand, model, and quantity and I'll put an estimate together. Delivery to the job site is free.";
 
-export const ESTIMATE_NOTE =
-  "That's an estimate, not a promise that it's on the truck.";
+export const ESTIMATE_NOTE = "";
 
 export const CREDIT_APP_URL =
   "https://yorktowntools.com/yorktown%20tools%20credit%20application.pdf";
