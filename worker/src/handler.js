@@ -5,7 +5,18 @@ import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared
 import { filterCustomerText, isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
-import { collectSearchUrls, fetchShelfPrices, resetShelfCache } from "./shelf-fetch.js";
+import {
+  collectSearchShelves,
+  collectSearchUrls,
+  exactModelsIn,
+  fetchShelfPrices,
+  lowestShelf,
+  normalizeModel,
+  pageMatchesModel,
+  readModelShelf,
+  resetShelfCache,
+  writeModelShelf,
+} from "./shelf-fetch.js";
 import {
   fillMissingShelf,
   formatMoney,
@@ -531,24 +542,68 @@ function modelCodeOf(item) {
   return match ? match[0] : "";
 }
 
-function shelfNotes(lines, pages) {
-  const waiting = (lines || []).filter((line) => line.estimate == null);
-  const notes = [];
-  const used = new Set();
-  for (const page of pages || []) {
-    if (!(Number(page?.shelf) > 0)) continue;
-    const blob = `${page.url || ""} ${page.title || ""}`.toLowerCase();
-    let match = waiting.find((line) => {
-      if (used.has(line)) return false;
-      const code = modelCodeOf(line);
-      return code && blob.includes(code.toLowerCase());
-    });
-    if (!match && waiting.length === 1 && !used.has(waiting[0])) match = waiting[0];
-    if (!match) continue;
-    used.add(match);
-    notes.push(`${match.name} ${match.sku || ""} $${Number(page.shelf)}`);
+const BRAND_PRETTY = {
+  dewalt: "DeWalt",
+  milwaukee: "Milwaukee",
+  makita: "Makita",
+  bosch: "Bosch",
+  ridgid: "Ridgid",
+  hilti: "Hilti",
+};
+
+function pagesForLine(line, pages, waiting = []) {
+  const code = modelCodeOf(line);
+  const priced = (pages || []).filter((page) => Number(page?.shelf) > 0);
+  if (code) return priced.filter((page) => pageMatchesModel(page, code));
+  if (waiting.length === 1) return priced;
+  return [];
+}
+
+function alignItemsToCustomerModels(items, latest) {
+  const wanted = exactModelsIn(latest);
+  if (!wanted.length) return items || [];
+  return wanted.map((code) => {
+    const hit = (items || []).find((item) => pageMatchesModel({
+      title: `${item?.name || ""} ${item?.sku || ""}`,
+      model: item?.model || "",
+      sku: item?.sku || "",
+    }, code));
+    if (hit) return { ...hit };
+    const brand = String(latest || "").match(/\b(dewalt|milwaukee|makita|bosch|ridgid|hilti)\b/i);
+    const label = brand ? BRAND_PRETTY[brand[1].toLowerCase()] || brand[1] : "";
+    const pretty = code.toUpperCase();
+    return {
+      name: label ? `${label} ${pretty}` : pretty,
+      sku: pretty,
+      qty: 1,
+      shelf: null,
+      source: "U",
+    };
+  });
+}
+
+function applyLowestFetchedShelves(items, pages, cached = {}) {
+  const list = (items || []).map((item) => ({ ...item }));
+  for (const item of list) {
+    const hits = pagesForLine(item, pages, list);
+    const prices = hits.map((page) => Number(page.shelf)).filter((price) => price > 0);
+    const saved = Number(cached[normalizeModel(modelCodeOf(item))]);
+    if (saved > 0) prices.push(saved);
+    if (!prices.length) continue;
+    const fetched = Math.min(...prices);
+    const current = Number(item.shelf);
+    item.shelf = current > 0 ? Math.min(current, fetched) : fetched;
+    if (item.shelf > 0 && (!item.source || String(item.source).toUpperCase() === "U")) item.source = "A";
   }
-  return notes.join("\n");
+  return list;
+}
+
+function matchingPageCount(items, pages) {
+  const urls = new Set();
+  for (const item of items || []) {
+    for (const page of pagesForLine(item, pages)) urls.add(page.url || `${page.title}:${page.shelf}`);
+  }
+  return urls.size;
 }
 
 function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "", latest = "" } = {}) {
@@ -716,9 +771,9 @@ function validPhone(value) {
   return digits.length >= 10 && digits.length <= 15;
 }
 
-export async function handleRequest(request, env = {}) {
+export async function handleRequest(request, env = {}, ctx) {
   try {
-    return await routeRequest(request, env);
+    return await routeRequest(request, env, ctx || env.ctx);
   } catch {
     return json({
       reply: "Something went wrong on my side. Tell me the tool again, or call or text (757) 940-5171.",
@@ -729,7 +784,7 @@ export async function handleRequest(request, env = {}) {
   }
 }
 
-async function routeRequest(request, env = {}) {
+async function routeRequest(request, env = {}, ctx) {
   if (env?.FORCE_HANDLER_ERROR) throw new Error("forced");
   const url = new URL(request.url);
   if (request.method === "OPTIONS") {
@@ -754,7 +809,7 @@ async function routeRequest(request, env = {}) {
   }
 
   if (url.pathname === "/api/chat" && request.method === "POST") {
-    return chat(request, env);
+    return chat(request, env, ctx);
   }
   if (url.pathname === "/api/quote" && request.method === "POST") {
     return quote(request, env);
@@ -762,7 +817,11 @@ async function routeRequest(request, env = {}) {
   return json({ error: "not_found" }, 404, request, env);
 }
 
-async function chat(request, env) {
+function followUpSearch(code) {
+  return `Search again for the current shelf price of exact model ${code}. Check both Home Depot and Lowe's, and use a different retailer if the first results were only one store. Return product page URLs for ${code} only, and write the visible shelf price next to each URL as $123.45. Do not substitute a different model.`;
+}
+
+async function chat(request, env, ctx) {
   const ip = clientIp(request);
   const now = Date.now();
   const perHour = limit(`chat-h:${ip}`, num(env.RATE_LIMIT_CHAT_PER_HOUR, 20), 60 * 60 * 1000, now);
@@ -846,6 +905,12 @@ async function chat(request, env) {
     take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
   }
 
+  const preload = {};
+  for (const code of exactModelsIn(latest)) {
+    const saved = await readModelShelf(env, code);
+    if (saved > 0) preload[normalizeModel(code)] = saved;
+  }
+
   try {
     const data = await (typeof env.callXai === "function" ? env.callXai : callXai)(
       env,
@@ -855,25 +920,109 @@ async function chat(request, env) {
     );
     const parsed = splitModelOutput(outputText(data));
     let prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
-    const rawItems = alignRequested(parsed.quote?.items || [], latest);
+    let rawItems = alignItemsToCustomerModels(alignRequested(parsed.quote?.items || [], latest), latest);
     const costs = await costsFromEnv(env);
     let lines = linesFromQuote({ items: rawItems }, prose, costs);
-    if (lines.some((line) => line.estimate == null && (specificItem(line) || customerConfirmed(latest)))) {
+    let extraSearches = 0;
+    const namedModel = exactModelsIn(latest).length > 0 || rawItems.some((item) => modelCodeOf(item));
+    if (namedModel && (lines.some((line) => specificItem(line) || customerConfirmed(latest)) || exactModelsIn(latest).length)) {
       try {
-        const pages = collectSearchUrls(data);
-        if (pages.length) {
-          const fetched = await fetchShelfPrices(pages, {
-            fetchImpl: typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch,
-            timeoutMs: num(env.SHELF_FETCH_TIMEOUT_MS, 1800),
+        const fetchImpl = typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch;
+        const budgetMs = num(env.SHELF_FETCH_TIMEOUT_MS, 4000);
+        const deadline = Date.now() + budgetMs;
+        const askModel = typeof env.callXai === "function" ? env.callXai : callXai;
+        const code = exactModelsIn(latest)[0] || "";
+        let pages = collectSearchUrls(data, 4, code);
+        const dollarBits = collectDollarText(data).concat(searchCards(data));
+        console.log(`shelf search: model=${code || "none"} urls=${pages.map((page) => page.url).join(" | ") || "none"} dollarTexts=${dollarBits.length} sample=${(dollarBits[0] || outputText(data) || "").replace(/\s+/g, " ").slice(0, 220)}`);
+        const matchedUrls = code ? pages.filter((page) => pageMatchesModel(page, code)) : pages;
+        const already = canSearch ? Math.max(1, countSearches(data)) : 0;
+        const firstSnippets = code ? collectSearchShelves(data, code) : [];
+        const ipRoom = underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
+        // Home Depot and Lowe's product pages 403 from the Worker, so a named
+        // model with no snippet price gets one follow-up even at the chat cap.
+        const room = ipRoom && (already < searchCap
+          || (firstSnippets.length === 0 && underCap(`search-s:${sid}`, searchCap + 1, 6 * 60 * 60 * 1000, now)));
+        const firstFetch = pages.length
+          ? fetchShelfPrices(pages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 })
+          : Promise.resolve([]);
+        let secondSearch = Promise.resolve(null);
+        if (code && (matchedUrls.length < 2 || firstSnippets.length < 2) && room) {
+          take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
+          take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
+          extraSearches += 1;
+          secondSearch = askModel(
+            env,
+            buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
+            [
+              ...messages.map((message) => ({ role: message.role, content: message.content })),
+              { role: "user", content: followUpSearch(code.toUpperCase()) },
+            ],
+            true,
+          ).catch((error) => {
+            console.error(`shelf search: follow-up failed: ${error instanceof Error ? error.message : "error"}`);
+            return null;
           });
-          const note = shelfNotes(lines, fetched);
-          if (note) {
-            prose = `${prose}\n${note}`;
-            lines = linesFromQuote({ items: rawItems }, prose, costs);
+        }
+        const [firstPages, extra] = await Promise.all([firstFetch, secondSearch]);
+        let fetched = firstPages;
+        if (extra) {
+          const extraBits = collectDollarText(extra).concat(searchCards(extra));
+          console.log(`shelf search follow-up: urls=${collectSearchUrls(extra, 4, code).map((page) => page.url).join(" | ") || "none"} dollarTexts=${extraBits.length} sample=${(extraBits[0] || outputText(extra) || "").replace(/\s+/g, " ").slice(0, 220)}`);
+          const seen = new Set(pages.map((page) => page.url));
+          const morePages = collectSearchUrls(extra, 4, code).filter((page) => page.url && !seen.has(page.url));
+          if (morePages.length && Date.now() + 30 < deadline) {
+            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
+            fetched = fetched.concat(more);
+            pages = pages.concat(morePages);
+          }
+        } else if (code && matchingPageCount(rawItems, fetched) < 2 && extraSearches === 0 && room && Date.now() + 150 < deadline) {
+          take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
+          take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
+          extraSearches += 1;
+          const follow = await askModel(
+            env,
+            buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
+            [
+              ...messages.map((message) => ({ role: message.role, content: message.content })),
+              { role: "user", content: followUpSearch(code.toUpperCase()) },
+            ],
+            true,
+          );
+          const seen = new Set(pages.map((page) => page.url));
+          const morePages = collectSearchUrls(follow, 4, code).filter((page) => page.url && !seen.has(page.url));
+          if (morePages.length && Date.now() + 30 < deadline) {
+            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
+            fetched = fetched.concat(more);
           }
         }
-      } catch {
-        // A page that does not load still ends in the team handoff.
+        const snippets = (code ? firstSnippets.concat(extra ? collectSearchShelves(extra, code) : []) : []);
+        if (snippets.length) fetched = fetched.concat(snippets);
+        rawItems = applyLowestFetchedShelves(rawItems, fetched, preload);
+        const wrote = [];
+        for (const item of rawItems) {
+          const itemCode = modelCodeOf(item);
+          if (!itemCode) continue;
+          const seen = pagesForLine(item, fetched).map((page) => Number(page.shelf)).filter((price) => price > 0);
+          const quoted = Number(item.shelf);
+          const saved = Number(preload[normalizeModel(itemCode)]) || 0;
+          // Persist the lowest shelf we are actually quoting, including a
+          // model- or snippet-supplied price when product-page fetches miss.
+          const durable = lowestShelf(saved, seen.concat(quoted > 0 ? [quoted] : []));
+          if (!(durable > 0) || (saved > 0 && durable > saved)) continue;
+          const stored = await writeModelShelf(env, itemCode, durable, ctx);
+          if (stored > 0) wrote.push(`${normalizeModel(itemCode).toUpperCase()}:${stored}`);
+        }
+        const fetchNotes = fetched.map((page) => {
+          const host = (() => { try { return new URL(page.url).hostname.replace(/^www\./, ""); } catch { return "snippet"; } })();
+          return `${host}${page.status ? ":" + page.status : ""}:${page.shelf || 0}`;
+        });
+        console.log(`shelf lookup: model=${code || "none"} pages=${pages.length} fetched=${fetchNotes.join(",") || "none"} snippets=${snippets.length} wrote=${wrote.join(",") || "none"} ctx=${ctx && typeof ctx.waitUntil === "function" ? "yes" : "no"}`);
+        lines = linesFromQuote({ items: rawItems }, prose, costs);
+      } catch (error) {
+        console.error(`shelf lookup failed: ${error instanceof Error ? error.message : "error"}`);
+        rawItems = applyLowestFetchedShelves(rawItems, [], preload);
+        lines = linesFromQuote({ items: rawItems }, prose, costs);
       }
     }
     const view = viewFor(lines, { text: latest });
@@ -902,11 +1051,12 @@ async function chat(request, env) {
     }
     const finalized = finalizeReply(ordered, messages, latest);
     const reply = advice ? finalized : replaceRepeatedReply(parsed.reply, finalized, messages);
-    const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
-    if (canSearch && searchesUsed > 1) {
-      take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
-      take(`search-ip:${ip}`, searchesUsed - 1, 24 * 60 * 60 * 1000, now);
+    const firstSearches = canSearch ? Math.max(1, countSearches(data)) : 0;
+    if (canSearch && firstSearches > 1) {
+      take(`search-s:${sid}`, firstSearches - 1, 6 * 60 * 60 * 1000, now);
+      take(`search-ip:${ip}`, firstSearches - 1, 24 * 60 * 60 * 1000, now);
     }
+    const searchesUsed = firstSearches + extraSearches;
     return json({
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {
