@@ -17,6 +17,7 @@ import {
 } from "./copy.js";
 import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
 import { acceptingQuote, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
+import { cartFromThread, eachQty, isLastNameAsk, listReadback, sawGuide, washingtonReply } from "./job.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
   discountPercent,
@@ -228,6 +229,26 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (!text) {
     return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
+  }
+
+  if (isLastNameAsk(text, history)) {
+    return { reply: washingtonReply(), quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+
+  const each = eachQty(text);
+  if (each) {
+    const items = cartFromThread(history, text);
+    if (items.length) {
+      return {
+        reply: listReadback(items),
+        quote: { items, offerForm: false, hold: true, stage: "script", scripted: true },
+      };
+    }
+  }
+
+  const guided = sawGuide(history, text);
+  if (guided) {
+    return { reply: guided, quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
   }
 
   const picked = pickedModel(text, history);
@@ -791,6 +812,7 @@ function consignmentTurn(text, history) {
 export function confusedWhatReply(history) {
   const prior = [...(history || [])].reverse().find((entry) => entry.role === "assistant")?.content || "";
   const recentUsers = (history || []).filter((entry) => entry.role === "user").slice(-4).map((entry) => entry.content || "").join("\n");
+  if (isLastNameAsk(recentUsers, history) || /make it washington|last name/i.test(recentUsers)) return washingtonReply();
   if (/jack\s*hammer|demolition hammer/i.test(`${prior}\n${recentUsers}`)) {
     return "Sorry, let me make it simpler. What kind of work is the jack hammer for: breaking concrete, tile, or something else?";
   }

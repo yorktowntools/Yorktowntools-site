@@ -158,11 +158,42 @@ export function priceEntry(entry, percent) {
   };
 }
 
-export function matchCatalog(catalog, query) {
+const TOOL_BRANDS = ["dewalt", "milwaukee", "makita", "bosch", "hilti", "festool", "metabo", "ridgid", "skil", "flex", "hercules", "kobalt"];
+
+export function customerBrand(text) {
+  const hits = [...String(text || "").toLowerCase().matchAll(new RegExp(`\\b(${TOOL_BRANDS.join("|")})\\b`, "g"))];
+  return hits.length ? hits[hits.length - 1][1] : "";
+}
+
+export function customerBladeSize(text) {
+  const hits = [...String(text || "").matchAll(/(\d+)\s*[- ]\s*(\d+)\s*\/\s*(\d+)/g)];
+  if (!hits.length) return "";
+  const last = hits[hits.length - 1];
+  return `${last[1]}-${last[2]}/${last[3]}`;
+}
+
+function itemBrand(item) {
+  const blob = `${item?.manufacturer || ""} ${item?.name || ""} ${item?.model || ""}`.toLowerCase();
+  return TOOL_BRANDS.find((brand) => blob.includes(brand)) || "";
+}
+
+export function catalogConflict(item, context = "") {
+  const brand = customerBrand(context);
+  const size = customerBladeSize(context);
+  const theirs = itemBrand(item);
+  const theirSize = customerBladeSize(`${item?.name || ""} ${item?.model || ""}`);
+  if (brand && theirs && theirs !== brand) return true;
+  if (size && theirSize && theirSize !== size) return true;
+  return false;
+}
+
+export function matchCatalog(catalog, query, context = "") {
   const queryTokens = contentTokens(query);
   if (!queryTokens.length) return [];
+  const guard = `${context || ""} ${query || ""}`;
   const hits = [];
   for (const item of catalog?.items || []) {
+    if (catalogConflict(item, guard)) continue;
     const keys = [item.sku, item.model, item.name, ...(item.aliases || [])].filter(Boolean);
     const covered = new Set(contentTokens(keys.join(" ")));
     if (queryTokens.some((token) => TYPE_WORDS.has(token) && !covered.has(token))) continue;

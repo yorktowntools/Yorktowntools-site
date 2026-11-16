@@ -228,6 +228,32 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
   return { subject, html, text };
 }
 
+export function buildHandoffEmail({ identity, items, why, transcript, update = false }) {
+  const name = identity?.name || "No name yet";
+  const missing = !identity?.phone && !identity?.email;
+  const subject = `${update ? "UPDATE — " : ""}HANDOFF — George — ${name}${missing ? " — missing phone or email" : ""}`;
+  const lines = (items || []).map((item) => `- ${item.qty || 1} × ${item.name || "Item"}${item.sku ? ` (${item.sku})` : ""}`);
+  const text = [
+    update ? "Update on a handoff already sent." : "George handed this chat to the team.",
+    `Why: ${why || "handoff"}`,
+    missing ? "MISSING PHONE OR EMAIL. The note below is enough to start, but we still need a way to reach them." : "",
+    "",
+    `Name: ${name}`,
+    `Company: ${identity?.company || "—"}`,
+    `Phone: ${identity?.phone || "—"}`,
+    `Email: ${identity?.email || "—"}`,
+    identity?.note ? `Note: ${identity.note}` : "",
+    "",
+    "Items:",
+    ...(lines.length ? lines : ["- none listed"]),
+    "",
+    "Transcript:",
+    transcript || "—",
+  ].filter(Boolean).join("\n");
+  const html = `<div style="font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap;">${escapeHtml(text)}</div>`;
+  return { subject, html, text };
+}
+
 export function formspreeBody(lead, items, leadInfo) {
   const tier = leadInfo?.tier || 3;
   const bulk = Boolean(leadInfo?.bulk);
