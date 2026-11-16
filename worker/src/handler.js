@@ -1,6 +1,6 @@
 import catalog from "../../data/prices.json" with { type: "json" };
-import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
-import { jackeryItems, resolveJackery } from "../config/jackery.js";
+import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../config/accessories.js";
+import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
 import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
@@ -287,6 +287,13 @@ async function costsFromEnv(env) {
 }
 
 function withJackery(latest, prior, local) {
+  const follow = resolveJackeryFollowup(latest, prior);
+  if (follow?.action === "choose") {
+    return {
+      reply: follow.reply,
+      quote: { items: [], offerForm: false, hold: false, stage: "choose" },
+    };
+  }
   const hit = resolveJackery(latest);
   if (!hit) return local;
   if (hit.action === "ask") {
@@ -388,9 +395,38 @@ function pickupOf(lines) {
   return null;
 }
 
+function withSiblingLines(latest, prior, local) {
+  const earlier = [...(prior || [])].reverse().find((entry) => entry.role === "user" && splitRequestedItems(entry.content).length >= 2);
+  const current = local?.quote?.items || [];
+  if (!earlier || current.length === 0) return local;
+  const base = localReply({
+    message: earlier.content,
+    history: [],
+    catalog: quoteCatalog,
+    discount: rules.matchPercentBelow,
+    rebuilding: true,
+  });
+  const priorItems = base.quote?.items || [];
+  if (priorItems.length < 2) return local;
+  const overlaps = current.some((item) => priorItems.some((old) => {
+    const family = familyOf(old.name);
+    return family && family === familyOf(item.name);
+  }));
+  if (!overlaps) return local;
+  return {
+    ...local,
+    quote: {
+      ...local.quote,
+      items: preferSpecific([...priorItems, ...current]),
+      bulk: Boolean(base.quote?.bulk || local.quote?.bulk),
+      stage: "quote",
+    },
+  };
+}
+
 function withQuoteOffer(reply) {
   const text = String(reply || "").trim();
-  if (/quote together|I can add them if you want/i.test(text)) return text;
+  if (/quote together/i.test(text) || isAccessoryQuestion(text) || /which ones do you want/i.test(text)) return text;
   return text ? `${text}\n\nWant me to put a quote together?` : "Want me to put a quote together?";
 }
 
@@ -520,7 +556,7 @@ async function chat(request, env) {
   const convo = [...prior.filter((message) => message.role === "user").map((message) => message.content), latest].join("\n");
   const matches = matchCatalog(catalog, latest);
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
-  const local = withJackery(latest, prior, localReply({ message: latest, history: prior, catalog: quoteCatalog, discount: percent, page }));
+  const local = withSiblingLines(latest, prior, withJackery(latest, prior, localReply({ message: latest, history: prior, catalog: quoteCatalog, discount: percent, page })));
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);

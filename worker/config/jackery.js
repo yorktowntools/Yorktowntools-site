@@ -141,6 +141,24 @@ export function resolveJackery(text) {
   return { action: "quote", item: top.item };
 }
 
+export function resolveJackeryFollowup(text, history) {
+  const last = [...(history || [])].reverse().find((entry) => entry.role === "assistant");
+  if (!/what are you powering/i.test(last?.content || "")) return null;
+  const raw = String(text || "");
+  const solar = /\bsolar\b/i.test(raw) && !/\bno solar\b/i.test(raw);
+  const fullDay = /full (work ?)?day|workday|all day|job-?site tools|\btools\b/i.test(raw);
+  if (fullDay && !solar) {
+    return {
+      action: "choose",
+      reply: "For a full day of job-site tools, I'd look at the Explorer 2000 v2 or the HomePower 3600 Plus. Which one do you want?",
+    };
+  }
+  return {
+    action: "choose",
+    reply: "Explorer 1000 v2, Explorer 2000 v2, or HomePower 3600 Plus. Which one do you want?",
+  };
+}
+
 export function customerStockNote(note) {
   const text = String(note || "").trim();
   if (!/pre-order|out of stock/i.test(text)) return "";

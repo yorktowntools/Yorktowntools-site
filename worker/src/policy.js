@@ -8,7 +8,7 @@ const BULK_EMAIL = "We'll send your bulk pricing.";
 const SAME_DAY = "This looks available for same-day delivery. We'll confirm before you count on a clock time.";
 const SOURCED = "I can't get this one locally today, so it has to be sourced. I won't guess the lead time. We'll confirm it.";
 const GLOVES = "We keep the Victory Series on hand. Same-day delivery is often possible if your size is here. We'll confirm before you count on it.";
-const BULK_TIME = "For a bulk order, figure the next business day or one to two business days. That is a plan, not a promise.";
+const BULK_TIME = "For a bulk order, figure the next business day or one to two business days.";
 const AFTER_HOURS = "It's outside business hours. We'll get back to you by 9 a.m. the next business day.";
 
 const PLACES = [
@@ -373,7 +373,7 @@ export function presentQuote({
   const totals = lead.bulk ? null : moneyTotals(working.filter((line) => !line.confirm), { taxExempt });
   const notes = [
     lead.bulk ? `${BALLPARK} ${BULK_EMAIL}` : "",
-    leadTimeNote({ bulk: lead.bulk, owned, localPickup }),
+    lead.bulk ? "" : leadTimeNote({ bulk: false, owned, localPickup }),
     lead.askVolume ? "About how often do you order, and is this a typical size for you?" : "",
     taxExempt ? "Tax-exempt orders need a certificate. We'll follow up for that." : "",
   ].filter(Boolean);
@@ -507,6 +507,7 @@ export function replyWithFinalPrices(modelReply, items) {
     if (!trimmed || /^(our page|maker page|makita|dewalt|milwaukee)$/i.test(trimmed)) continue;
     if (/^-?\s*item\.?$/i.test(trimmed)) continue;
     if (/not a promise that it(?:'s| is) on the truck/i.test(trimmed)) continue;
+    if (/that is a plan, not a promise/i.test(trimmed)) continue;
     if (/that(?:'s| is) an estimate/i.test(trimmed)) continue;
     const key = trimmed.toLowerCase();
     if (seen.has(key)) continue;

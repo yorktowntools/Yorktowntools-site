@@ -91,11 +91,17 @@ export function accessoryOffer(text) {
     ? hits[0].prompt
     : `Need ${suggestions.map((item) => item.name.toLowerCase()).join(", ")} with that?`;
   return {
-    line: `${prompt} I can add them if you want.`,
+    line: prompt,
     suggestions,
   };
 }
 
+export function isAccessoryQuestion(text) {
+  const value = String(text || "");
+  return /need (a blade|sds or masonry|discs or wheels|nails with|a caulk gun|a bit set|an extra battery|a stabilizer|victory series gloves|a solar panel)/i.test(value)
+    || /need .+ with that\?/i.test(value);
+}
+
 export function accessoryAsked(history) {
-  return (history || []).some((entry) => entry.role === "assistant" && /I can add them if you want/i.test(entry.content || ""));
+  return (history || []).some((entry) => entry.role === "assistant" && (isAccessoryQuestion(entry.content) || /which ones do you want/i.test(entry.content || "")));
 }

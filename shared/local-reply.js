@@ -13,7 +13,7 @@ import {
 } from "./copy.js";
 import { filterCustomerText } from "./customer-text.js";
 import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn, isShortReply } from "./talk.js";
-import { accessoryAsked, accessoryOffer } from "../worker/config/accessories.js";
+import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
   discountPercent,
   extractQty,
@@ -126,7 +126,7 @@ function carryQuote(text, history, catalog, discount, page) {
   let asked = false;
   let accepted = false;
   for (const entry of history || []) {
-    if (entry.role === "assistant" && /I can add them if you want/i.test(entry.content || "")) asked = true;
+    if (entry.role === "assistant" && isAccessoryQuestion(entry.content)) asked = true;
     if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|ok|okay)\b/i.test(String(entry.content || "").trim()) && !addedAccessory(entry.content)) accepted = true;
   }
   if (accepted) {
@@ -263,11 +263,63 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   if (!rebuilding) {
   const yes = /^(yes|yeah|yep|sure|ok|okay|add them|do it)\b/i.test(text);
   const no = /^(no|nope|nah|i'm set|im set|all set|we're set)\b/i.test(text);
+  const pickNamed = (suggestions) => {
+    const raw = text.toLowerCase();
+    if (/\b(both|all of them|all)\b/i.test(raw)) return suggestions;
+    return suggestions.filter((item) => {
+      const name = item.name.toLowerCase();
+      if (raw.includes(name)) return true;
+      return name.split(/\s+/).some((word) => {
+        if (word.length <= 3) return false;
+        const stem = word.endsWith("s") ? word.slice(0, -1) : word;
+        return raw.includes(word) || (stem.length > 3 && raw.includes(stem));
+      });
+    });
+  };
+  const whichLine = (suggestions) => {
+    const names = suggestions.map((item) => item.name);
+    const choice = names.length === 2 ? `the ${names[0]} or the ${names[1]}` : names.map((name) => `the ${name}`).join(", ");
+    return `Which ones do you want, ${choice}?`;
+  };
+  const lastAssistant = [...history].reverse().find((entry) => entry.role === "assistant");
+  if (/which ones do you want/i.test(lastAssistant?.content || "")) {
+    const earlierUsers = history.filter((entry) => entry.role === "user" && !isShortReply(entry.content));
+    const base = earlierUsers.length
+      ? localReply({ message: earlierUsers[earlierUsers.length - 1].content, history, catalog, discount, page, rebuilding: true })
+      : { quote: { items: [] } };
+    const toolText = [...earlierUsers.map((entry) => entry.content), ...(base.quote?.items || []).map((item) => item.name)].join("\n");
+    const offer = accessoryOffer(toolText);
+    const picked = offer ? pickNamed(offer.suggestions) : [];
+    if (!picked.length) {
+      return {
+        reply: offer ? whichLine(offer.suggestions) : "Which of those do you want?",
+        quote: { items: base.quote?.items || [], offerForm: false, hold: true, stage: "quote", bulk: Boolean(base.quote?.bulk) },
+      };
+    }
+    const extra = picked.map((item) => {
+      const known = item.sku ? (catalog?.items || []).find((entry) => entry.sku === item.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: item.qty }, percent) : null;
+      return priced
+        ? toQuoteItem(priced, item.qty)
+        : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+    });
+    return {
+      reply: `Okay, I'll add ${picked.map((item) => item.name).join(" and ")}.\n\n${QUOTE_OFFER}`,
+      quote: {
+        items: [...(base.quote?.items || []), ...extra],
+        offerForm: false,
+        hold: true,
+        stage: "quote",
+        bulk: Boolean(base.quote?.bulk),
+      },
+    };
+  }
   const accessoryPending = (() => {
     let asked = false;
     let answered = false;
     for (const entry of history) {
-      if (entry.role === "assistant" && /I can add them if you want/i.test(entry.content || "")) asked = true;
+      if (entry.role === "assistant" && isAccessoryQuestion(entry.content)) asked = true;
+      if (entry.role === "assistant" && /which ones do you want/i.test(entry.content || "")) answered = true;
       if (asked && entry.role === "user" && (
         addedAccessory(entry.content)
         || /^(yes|yeah|yep|sure|no|nope|nah|ok|okay|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim())
@@ -282,15 +334,28 @@ export function localReply({ message, history = [], catalog, discount, page, reb
       : { quote: { items: [] } };
     const toolText = [...earlierUsers.map((entry) => entry.content), ...(base.quote?.items || []).map((item) => item.name)].join("\n");
     const offer = accessoryOffer(toolText);
-    const extra = yes && offer
-      ? offer.suggestions.map((item) => {
-        const known = item.sku ? (catalog?.items || []).find((entry) => entry.sku === item.sku) : null;
-        const priced = known ? priceEntry({ ...known, qty: item.qty }, percent) : null;
-        return priced
-          ? toQuoteItem(priced, item.qty)
-          : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
-      })
+    const chosen = yes && offer
+      ? (offer.suggestions.length > 1 ? pickNamed(offer.suggestions) : offer.suggestions)
       : [];
+    if (yes && offer && offer.suggestions.length > 1 && chosen.length === 0) {
+      return {
+        reply: whichLine(offer.suggestions),
+        quote: {
+          items: base.quote?.items || [],
+          offerForm: false,
+          hold: (base.quote?.items || []).length > 0,
+          stage: (base.quote?.items || []).length ? "quote" : "script",
+          bulk: Boolean(base.quote?.bulk),
+        },
+      };
+    }
+    const extra = chosen.map((item) => {
+      const known = item.sku ? (catalog?.items || []).find((entry) => entry.sku === item.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: item.qty }, percent) : null;
+      return priced
+        ? toQuoteItem(priced, item.qty)
+        : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+    });
     const items = [...(base.quote?.items || []), ...extra];
     return {
       reply: yes
@@ -453,6 +518,13 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   if (page && /what.*(page|sell|categor)/i.test(text)) {
     const list = CATEGORIES.map((cat) => pageLink(cat.path, cat.name)).join(", ");
     return finish(`Here's how the site is split: ${list}.`, [], false);
+  }
+
+  if (!rebuilding && (history || []).some((entry) => entry.role === "assistant")) {
+    return {
+      reply: "Okay, I'm still on that. What else do you need?",
+      quote: { items: [], offerForm: false, stage: "clarify" },
+    };
   }
 
   return finish(

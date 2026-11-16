@@ -419,6 +419,7 @@ test("mock chat and quote endpoints", async () => {
   assert.match(bulkBody.reply, /\[Makita 5007FA\]\(https:\/\/www\.makitatools\.com\/products\/details\/5007FA\)/);
   assert.equal((bulkBody.reply.match(/bulk pricing usually comes in better/gi) || []).length, 1);
   assert.equal((bulkBody.reply.match(/We'll send your bulk pricing/gi) || []).length, 1);
+  assert.doesNotMatch(bulkBody.reply, /that is a plan, not a promise/i);
   assert.doesNotMatch(bulkBody.reply, /\bZach/i);
 
   const saws = await post("/api/chat", {
@@ -519,7 +520,7 @@ test("private cost comes from the environment and stays off the customer reply",
 test("a settled tool gets one accessory offer, and yes adds it", async () => {
   const saw = accessoryOffer("Makita 5007FA circular saw");
   assert.match(saw.line, /blade/i);
-  assert.match(saw.line, /I can add them if you want/);
+  assert.doesNotMatch(saw.line, /I can add them if you want/);
   assert.equal(saw.suggestions.length, 1);
   const hammer = accessoryOffer("corded hammer drill for concrete");
   assert.match(hammer.line, /SDS|masonry|anchor/i);
@@ -537,7 +538,8 @@ test("a settled tool gets one accessory offer, and yes adds it", async () => {
     messages: [{ role: "user", content: "How much is a Makita 5007FA? Need 2." }],
   });
   const firstBody = await first.json();
-  assert.match(firstBody.reply, /I can add them if you want/);
+  assert.match(firstBody.reply, /need a blade/i);
+  assert.doesNotMatch(firstBody.reply, /I can add them if you want/);
   assert.equal(firstBody.quote.items.some((item) => /blade/i.test(item.name)), false);
 
   const second = await post("/api/chat", {
@@ -625,7 +627,8 @@ test("multi-turn quote flows keep the selected items", async () => {
   assert.doesNotMatch(saw.reply, /\bItem\b/);
   assert.match(saw.reply, /5007FA/);
   assert.match(saw.reply, /\$149(?:\.00)? to \$179(?:\.00)?/);
-  assert.match(saw.reply, /I can add them if you want/);
+  assert.match(saw.reply, /need a blade/i);
+  assert.doesNotMatch(saw.reply, /I can add them if you want/);
   assert.equal(saw.quote.items.some((item) => item.sku === "5007FA"), true);
 
   const sized = await post("/api/chat", {
@@ -668,8 +671,14 @@ test("multi-turn quote flows keep the selected items", async () => {
   assert.ok(bulkSaw?.estimate > 0);
   const bulkYes = await bulkTurn("Yes");
   assert.equal(bulkYes.quote.bulk, true);
+  assert.match(bulkYes.reply, /which ones/i);
   assert.equal(bulkYes.quote.items.find((item) => item.sku === "5007FA")?.qty, 5);
-  assert.equal(bulkYes.quote.items.some((item) => /blade/i.test(item.name)), true);
+  assert.equal(bulkYes.quote.items.find((item) => /caulk/i.test(item.name))?.qty, 10);
+  assert.equal(bulkYes.quote.items.some((item) => /blade/i.test(item.name)), false);
+  const bulkBlade = await bulkTurn("the blade");
+  assert.equal(bulkBlade.quote.items.some((item) => /blade/i.test(item.name)), true);
+  assert.equal(bulkBlade.quote.items.find((item) => item.sku === "5007FA")?.qty, 5);
+  assert.equal(bulkBlade.quote.items.find((item) => /caulk/i.test(item.name))?.qty, 10);
 
   const caulk = await post("/api/chat", {
     messages: [{ role: "user", content: "a case of DAP Alex Plus" }],
@@ -714,9 +723,13 @@ test("multi-turn quote flows keep the selected items", async () => {
   assert.equal(chosen.quote.items[0].estimateHigh, 129);
   assert.equal(chosen.quote.items.filter((item) => /milwaukee/i.test(item.name)).length, 0);
   const bits = await drillTurn("Yes");
+  assert.match(bits.reply, /which ones do you want/i);
   assert.equal(bits.quote.items.filter((item) => /DWE5010/.test(item.name)).length, 1);
-  assert.equal(bits.quote.items.filter((item) => /milwaukee/i.test(item.name)).length, 0);
-  assert.equal(bits.quote.items.some((item) => /bit|anchor/i.test(item.name)), true);
+  assert.equal(bits.quote.items.some((item) => /bit|anchor/i.test(item.name)), false);
+  const onlyBits = await drillTurn("the bits");
+  assert.equal(onlyBits.quote.items.filter((item) => /DWE5010/.test(item.name)).length, 1);
+  assert.equal(onlyBits.quote.items.some((item) => /bit/i.test(item.name)), true);
+  assert.equal(onlyBits.quote.items.some((item) => /anchor/i.test(item.name)), false);
 });
 
 test("add-accessory phrasing keeps the cart and the shelf cap holds", async () => {
@@ -880,4 +893,51 @@ test("Jackery quotes the MAP, confirms a thin margin, and shows a pre-order", as
     PRIVATE_COSTS_KV: { get: async () => { throw new Error("down"); } },
   });
   assert.equal(fallback["JACKERY-E1000V2"].privateCost, 400);
+});
+
+test("refining one bulk line keeps the others, and a Jackery answer stays on topic", async () => {
+  resetLimits();
+  const thread = [];
+  const turn = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: thread });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const first = await turn("I need 10 cases of caulk and 5 saws");
+  assert.equal(first.quote.items.some((item) => /caulk/i.test(item.name)), true);
+  assert.doesNotMatch(first.reply, /I can add them if you want/i);
+  assert.doesNotMatch(first.reply, /that is a plan, not a promise/i);
+  assert.equal((first.reply.match(/we'll send your bulk pricing/gi) || []).length, 1);
+  const refined = await turn("The 5 saws are Makita 5007FA");
+  const caulk = refined.quote.items.find((item) => /caulk/i.test(item.name));
+  const saw = refined.quote.items.find((item) => item.sku === "5007FA");
+  assert.equal(caulk?.qty, 10);
+  assert.equal(saw?.qty, 5);
+  assert.equal(refined.quote.items.filter((item) => /caulk/i.test(item.name)).length, 1);
+  assert.equal(refined.quote.items.filter((item) => item.sku === "5007FA").length, 1);
+
+  const power = [];
+  const ask = async (text) => {
+    power.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: power });
+    const body = await response.json();
+    power.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const opening = await ask("I need a portable power station for a job site");
+  assert.match(opening.reply, /what are you powering/i);
+  const answer = await ask("I'm powering job-site tools for a full workday. No solar.");
+  assert.doesNotMatch(answer.reply, /I stick to tools/i);
+  assert.match(answer.reply, /Explorer 2000 v2/);
+  assert.match(answer.reply, /HomePower 3600 Plus/);
+  assert.match(answer.reply, /which one do you want/i);
+  assert.equal((answer.quote.items || []).length, 0);
+  const picked = await ask("The Explorer 2000 v2");
+  assert.equal(picked.quote.items.length, 1);
+  assert.equal(picked.quote.items[0].sku, "JACKERY-E2000V2");
+  const weather = await post("/api/chat", { messages: [{ role: "user", content: "What's the weather today?" }] });
+  const weatherBody = await weather.json();
+  assert.match(weatherBody.reply, /I stick to tools/i);
 });
