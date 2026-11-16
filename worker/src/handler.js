@@ -645,7 +645,7 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false, 
   const sawLine = (item) => /\b(sawzall|sawzaw|reciprocat)/i.test(`${item?.name || ""} ${item?.sku || ""}`);
   const onlySaws = lines.some(sawLine) && !lines.some((item) => specificItem(item) && !sawLine(item));
   if ((sawAsk || onlySaws) && !MODEL.test(asked) && !lines.some((item) => specificItem(item) && !sawLine(item))) {
-    return "Which model do you want, or do you want it cordless or corded?";
+    return sawAsk || "Which model do you want, or do you want it cordless or corded?";
   }
   if (!named.length && !confirmed && lines.every((item) => item.estimate == null)) return genericCategoryReply(lines, asked);
   const quoteLines = named.length ? lines.filter((item) => specificItem(item) || accessoryLine(item)) : lines;
@@ -860,7 +860,11 @@ function alertFingerprint(identity, items) {
 
 async function sendOwnerMail(env, mail) {
   if (Array.isArray(env.handoffOutbox)) env.handoffOutbox.push({ subject: mail.subject, text: mail.text, html: mail.html });
-  if (!env.RESEND_API_KEY) return Boolean(env.handoffOutbox);
+  // Same RESEND_API_KEY, from address, and sales inbox as the quote-form mail.
+  if (!env.RESEND_API_KEY) {
+    console.error("handoff mail skipped: RESEND_API_KEY is not set");
+    return Boolean(env.handoffOutbox);
+  }
   const from = env.FROM_EMAIL || "Yorktown Tools <quotes@quotes.yorktowntools.com>";
   const sales = env.SALES_EMAIL || SALES_EMAIL;
   const write = fetch("https://api.resend.com/emails", {
@@ -890,9 +894,10 @@ async function maybeAlert(env, messages, reply, items, sessionKey) {
   const prior = handoffSent.get(sessionKey);
   if (!isOwnerHandoff(reply) && !prior) return { reply, alerted: false };
   if (!canSend) return { reply, alerted: false };
+  const listed = (items || []).length ? items : cartFromThread(messages.slice(0, -1));
   let next = reply;
   if (isOwnerHandoff(reply)) {
-    const close = readyClose(identity, askedForReach(messages.slice(0, -1)));
+    const close = readyClose(identity, askedForReach(messages.slice(0, -1)), listed);
     next = String(reply || "")
       .replace(/What's your name, company, and cell or email\??/gi, "")
       .replace(/\n{3,}/g, "\n\n")
@@ -900,9 +905,11 @@ async function maybeAlert(env, messages, reply, items, sessionKey) {
     if (!/you're all set/i.test(next)) {
       next = next.replace(/A Yorktown Tools specialist will reach out shortly\.?\s*Tools Worth Fighting For!/gi, close).trim();
       if (!/you're all set/i.test(next)) next = `${next}\n\n${close}`.trim();
+    } else if (listed.some((item) => item?.name && !next.includes(item.name))) {
+      const read = listed.filter((item) => item?.name).map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
+      next = `I have ${read}.\n\n${next}`;
     }
   }
-  const listed = (items || []).length ? items : cartFromThread(messages.slice(0, -1));
   const fingerprint = alertFingerprint(identity, listed);
   if ((isOwnerHandoff(reply) || prior) && prior !== fingerprint) {
     const mail = buildHandoffEmail({

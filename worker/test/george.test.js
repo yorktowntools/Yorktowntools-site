@@ -2456,3 +2456,109 @@ test("slang, typos, and the live transcripts stay on what the customer said", as
   assert.match(shipped.reply, /company name/i);
   assert.doesNotMatch(shipped.reply, /running a saw/);
 });
+
+test("preview phrasings stay on the tool, the model, and the gloves", async () => {
+  resetLimits();
+  const first = await (await post("/api/chat", { messages: [{ role: "user", content: "I need a chainsaw and a 55 ft lift" }] })).json();
+  assert.doesNotMatch(first.reply, /I stick to tools/i);
+  assert.match(first.reply, /Chainsaw/);
+  assert.match(first.reply, /55 ft lift/);
+  assert.match(first.reply, /Those are for our team to price/);
+
+  const thread = [
+    { role: "user", content: "I need a chainsaw and a 55 ft lift" },
+    { role: "assistant", content: first.reply },
+    { role: "user", content: "1 each" },
+  ];
+  const each = await (await post("/api/chat", { messages: thread })).json();
+  assert.match(each.reply, /1 × Chainsaw/);
+  assert.match(each.reply, /1 × 55 ft lift/);
+  thread.push({ role: "assistant", content: each.reply }, { role: "user", content: "Ben Peralta Zach knows me" });
+  const errors = [];
+  const originalError = console.error;
+  console.error = (...args) => { errors.push(args.map(String).join(" ")); };
+  let ben;
+  try {
+    ben = await (await post("/api/chat", { messages: thread })).json();
+  } finally {
+    console.error = originalError;
+  }
+  assert.match(ben.reply, /Thanks, Ben/);
+  assert.match(ben.reply, /I have 1 × Chainsaw, 1 × 55 ft lift/);
+  assert.match(ben.reply, /You're all set/i);
+  assert.ok(errors.some((line) => /handoff mail skipped: RESEND_API_KEY is not set/.test(line)));
+  assert.ok(errors.every((line) => !/Ben Peralta|Zach knows me|757-/.test(line)));
+
+  resetLimits();
+  let searches = 0;
+  const needed = await (await liveChat([{ role: "user", content: "I need a DCD996B" }], {
+    callXai: async () => {
+      searches += 1;
+      return {
+        output_text: `QUOTE_JSON: ${JSON.stringify({
+          items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: 209, source: "A" }],
+        })}`,
+      };
+    },
+  })).json();
+  assert.ok(searches >= 1);
+  assert.doesNotMatch(needed.reply, /I stick to tools/i);
+  assert.match(needed.reply, /DCD996B/);
+  assert.match(needed.reply, /Out the door that's \$230\.34/);
+
+  const impact = await (await post("/api/chat", { messages: [{ role: "user", content: "milwalkee impack" }] })).json();
+  assert.doesNotMatch(impact.reply, /I stick to tools/i);
+  assert.match(impact.reply, /Milwaukee/);
+  assert.match(impact.reply, /Impact driver or impact wrench\?/);
+
+  const bare = await (await post("/api/chat", { messages: [{ role: "user", content: "need a duwalt sawzall bare" }] })).json();
+  assert.doesNotMatch(bare.reply, /I stick to tools/i);
+  assert.match(bare.reply, /DeWalt/);
+  assert.match(bare.reply, /reciprocating saw/i);
+  assert.match(bare.reply, /cordless bare tool/i);
+  assert.match(bare.reply, /20V MAX or 60V FLEXVOLT/);
+  assert.doesNotMatch(bare.reply, /cordless or corded/i);
+
+  const box = await (await post("/api/chat", { messages: [{ role: "user", content: "box of gloces" }] })).json();
+  assert.doesNotMatch(box.reply, /a Gloves/);
+  assert.match(box.reply, /Victory Series drivers gloves/);
+  assert.match(box.reply, /\$19\.99 a pair/);
+  assert.match(box.reply, /Other glove types are available/);
+
+  const pair = await (await post("/api/chat", { messages: [{ role: "user", content: "I need 1 pair of gloves" }] })).json();
+  assert.match(pair.reply, /1 × Victory Series drivers gloves/);
+  assert.match(pair.reply, /\$19\.99/);
+  assert.match(pair.reply, /Out the door that's \$22\.03/);
+  assert.match(pair.reply, /Other glove types are available/);
+  assert.doesNotMatch(pair.reply, /driving, cold weather, or cut protection/i);
+
+  resetLimits();
+  const calls = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), authorization: init?.headers?.Authorization || "" });
+    return { ok: true };
+  };
+  try {
+    await handleRequest(new Request("https://george.example/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+      body: JSON.stringify({
+        sessionId: "resend-key-01",
+        messages: [
+          { role: "user", content: "I need a chainsaw and a 55 ft lift" },
+          { role: "assistant", content: "I have 1 × Chainsaw, 1 × 55 ft lift. Those are for our team to price. What's your name, company, and cell or email?" },
+          { role: "user", content: "Ben Peralta Zach knows me" },
+        ],
+      }),
+    }), {
+      MOCK_MODE: "true",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      RESEND_API_KEY: "test-resend-key",
+      handoffOutbox: [],
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  assert.ok(calls.some((call) => call.url === "https://api.resend.com/emails" && call.authorization === "Bearer test-resend-key"));
+});

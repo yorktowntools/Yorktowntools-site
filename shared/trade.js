@@ -130,6 +130,7 @@ export function normalizeTrade(text) {
   raw = raw.replace(/\b60\s*-?\s*volts?\b/g, "60v");
   raw = raw.replace(/\b5\s*ah\s*batts?\b/g, "5ah battery");
   raw = raw.replace(/\bthabks\b|\bthanx\b|\bthx\b/g, "thanks");
+  raw = raw.replace(/\bimpack\b/g, "impact");
   const phrases = TOOLS.flatMap((tool) => tool.aliases.map((alias) => ({ alias, name: tool.name.toLowerCase() })))
     .sort((a, b) => b.alias.length - a.alias.length);
   for (const phrase of phrases) {

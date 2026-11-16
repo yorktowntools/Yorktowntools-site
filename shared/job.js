@@ -137,11 +137,19 @@ export function listReadback(items) {
   return `I have ${read}. ${team} What's your name, company, and cell or email?`;
 }
 
-export function readyClose(identity, alreadyAsked) {
-  if (identity.phone || identity.email) return READY_LINE;
+function itemRead(items) {
+  const named = (items || []).filter((item) => item?.name);
+  if (!named.length) return "";
+  return named.map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
+}
+
+export function readyClose(identity, alreadyAsked, items = []) {
+  const read = itemRead(items);
+  const list = read ? ` I have ${read}.` : "";
+  if (identity.phone || identity.email) return read ? `I have ${read}. ${READY_LINE}` : READY_LINE;
   if (identity.knowsZach && !alreadyAsked) {
     const who = identity.first ? `Thanks, ${identity.first}. ` : "";
-    return `${who}I'll note that he knows you. What's the best cell or email so we can reach you?\n\n${READY_LINE}`;
+    return `${who}I'll note that he knows you.${list} What's the best cell or email so we can reach you?\n\n${READY_LINE}`;
   }
-  return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+  return `${read ? `I have ${read}. ` : ""}${HANDOFF_LINE} ${CLOSING_LINE}`;
 }
