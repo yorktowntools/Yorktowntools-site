@@ -1,21 +1,23 @@
 import catalog from "../../data/prices.json" with { type: "json" };
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
-import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
+import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, isShortReply } from "../../shared/talk.js";
 import {
   fillMissingShelf,
+  formatMoney,
   hasFirmPrice,
   matchCatalog,
+  roundMoney,
   shouldSearch,
   splitRequestedItems,
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
 import { privateCostFor, readPrivateCosts } from "../config/private-costs.js";
-import { presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
+import { itemLinkLine, presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
 const buckets = new Map();
 
@@ -419,7 +421,7 @@ function withSiblingLines(latest, prior, local) {
       ...local.quote,
       items: preferSpecific([...priorItems, ...current]),
       bulk: Boolean(base.quote?.bulk || local.quote?.bulk),
-      stage: "quote",
+      stage: local.quote?.stage === "script" || local.quote?.stage === "form" ? local.quote.stage : "quote",
     },
   };
 }
@@ -432,6 +434,50 @@ function replaceRepeatedReply(modelReply, drafted, priorMessages) {
   const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
   if (!previous || normalizedReply(modelReply) !== normalizedReply(previous)) return drafted;
   return confusedWhatReply(priorMessages);
+}
+
+function itemAmount(item) {
+  if (item.estimate == null) return "";
+  if (item.estimateHigh != null && item.estimateHigh !== item.estimate) {
+    return `${formatMoney(item.estimate)} to ${formatMoney(item.estimateHigh)}`;
+  }
+  return formatMoney(item.estimate);
+}
+
+function scriptOrderReply(baseReply, items, { government = false, bulk = false } = {}) {
+  const lines = (items || []).filter((item) => item?.name);
+  if (!lines.length) return String(baseReply || "");
+  const read = lines.map((item) => {
+    const amount = itemAmount(item);
+    const label = amount && item.ballpark ? `Starting estimate ${amount}` : amount;
+    const stock = /pre-order|out of stock/i.test(item.stockNote || "") ? ` ${item.stockNote}` : "";
+    return `${item.qty || 1} × ${item.name}${label ? `: ${label}` : ""}${stock}`;
+  }).join(", ");
+  const uncertain = lines.some((item) => item.confirm || item.estimate == null);
+  let low = 0;
+  let high = 0;
+  for (const item of lines) {
+    if (item.estimate == null) continue;
+    const qty = item.qty || 1;
+    low += item.estimate * qty;
+    high += (item.estimateHigh ?? item.estimate) * qty;
+  }
+  const factor = (government ? 1 : 1.07) * 1.03;
+  const otdLow = roundMoney(low * factor);
+  const otdHigh = roundMoney(high * factor);
+  const over = (otdHigh || otdLow || 0) > 500;
+  const upsell = String(baseReply || "").match(/Need [^\n?]+\?/i)?.[0] || "";
+  const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
+  const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
+  const head = upsell ? `${upsell}\n\n` : "";
+  if (uncertain || over || bulk) {
+    const bulkNote = bulk ? ` ${BULK_LINE}` : "";
+    return `${head}I have ${read}.${bulkNote} That's one for our team to price. ${HANDOFF_LINE} ${CLOSING_LINE}${linkBlock}`;
+  }
+  const total = otdHigh && otdHigh !== otdLow
+    ? `${formatMoney(otdLow)} to ${formatMoney(otdHigh)}`
+    : formatMoney(otdLow);
+  return `${head}I have ${read}. Out the door that's ${total}. Would you like to place an order?${linkBlock}`;
 }
 
 function withQuoteOffer(reply) {
@@ -570,11 +616,11 @@ async function chat(request, env) {
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
-  if (stage === "form" || (stage !== "quote" && !(followUp && pricedLocally))) {
+  if (stage === "form" || stage === "script" || (stage !== "quote" && !(followUp && pricedLocally))) {
     return json({
       reply: finalizeReply(local.reply, messages),
       quote: {
-        items: stage === "form" || stage === "recommend" ? (local.quote?.items || []) : [],
+        items: stage === "form" || stage === "recommend" || (stage === "script" && (local.quote?.items || []).length) ? (local.quote?.items || []) : [],
         offerForm: Boolean(local.quote?.offerForm),
         hold: Boolean(local.quote?.hold),
         bulk: Boolean(local.quote?.bulk),
@@ -590,8 +636,11 @@ async function chat(request, env) {
       : alignRequested(local.quote?.items || [], convo));
     const lines = linesFromQuote({ items: sourceItems }, convo, await costsFromEnv(env));
     const view = viewFor(lines, { text: convo });
-    const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));
     const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
+    const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
+    const reply = kept.length
+      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk) }), messages)
+      : finalizeReply(local.reply, messages);
     return json({
       reply,
       quote: { items: kept, offerForm: false, hold: true, bulk: view.lead.bulk || Boolean(local.quote?.bulk) },

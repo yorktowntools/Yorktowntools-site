@@ -287,6 +287,39 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return `Which ones do you want, ${choice}?`;
   };
   const lastAssistant = [...history].reverse().find((entry) => entry.role === "assistant");
+  const lastText = lastAssistant?.content || "";
+  if (/would you like the invoice by text or email/i.test(lastText)) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    if (/\b(?:\d[ -]?){13,16}\b/.test(text)) {
+      return {
+        reply: "Don't send card numbers in this chat. Text or email for the invoice?",
+        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+      };
+    }
+    if (/\b(text|email)\b/i.test(text)) {
+      return {
+        reply: "What's the delivery address?",
+        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+      };
+    }
+    return {
+      reply: "Text or email?",
+      quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+    };
+  }
+  if (/what's the delivery address/i.test(lastText)) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    if (/\b(?:\d[ -]?){13,16}\b/.test(text)) {
+      return {
+        reply: "Don't send card numbers in this chat. What's the delivery address?",
+        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+      };
+    }
+    return {
+      reply: `A secure QuickBooks payment link comes with the invoice. Don't send card numbers in this chat. ${CLOSING_LINE}`,
+      quote: { items: carried?.quote?.items || [], offerForm: false, hold: false, stage: "script" },
+    };
+  }
   if (/which ones do you want/i.test(lastAssistant?.content || "")) {
     const earlierUsers = history.filter((entry) => entry.role === "user" && !isShortReply(entry.content));
     const base = earlierUsers.length
@@ -298,7 +331,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     if (!picked.length) {
       return {
         reply: offer ? whichLine(offer.suggestions) : "Which of those do you want?",
-        quote: { items: base.quote?.items || [], offerForm: false, hold: true, stage: "quote", bulk: Boolean(base.quote?.bulk) },
+        quote: { items: base.quote?.items || [], offerForm: false, hold: true, stage: "script", bulk: Boolean(base.quote?.bulk) },
       };
     }
     const extra = picked.map((item) => {
@@ -332,6 +365,13 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     }
     return asked && !answered;
   })();
+  if (/would you like to place an order/i.test(lastText) && yes && !accessoryPending && !isAccessoryQuestion(lastText)) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    return {
+      reply: "Would you like the invoice by text or email?",
+      quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+    };
+  }
   if ((yes || no) && accessoryPending) {
     const earlierUsers = history.filter((entry) => entry.role === "user" && !isShortReply(entry.content));
     const base = earlierUsers.length
@@ -349,7 +389,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
           items: base.quote?.items || [],
           offerForm: false,
           hold: (base.quote?.items || []).length > 0,
-          stage: (base.quote?.items || []).length ? "quote" : "script",
+          stage: "script",
           bulk: Boolean(base.quote?.bulk),
         },
       };
@@ -423,6 +463,9 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     };
   }
 
+  const consignmentFollow = consignmentTurn(text, history);
+  if (consignmentFollow) return finish(consignmentFollow, [], false);
+
   const stage = chatStage(text, history, catalog);
   if (stage === "clarify") {
     return { reply: clarifyingQuestion(text, history), quote: { items: [], offerForm: false, stage: "clarify" } };
@@ -460,9 +503,8 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return finish(SCAM_CLOSE, [], false);
   }
 
-  if (/\boregon\b/i.test(text) && /\b(ship|deliver|send)\b/i.test(text)) {
-    return finish("Happy to look at that. What's the company name?", [], false);
-  }
+  const screen = screenOutOfArea(text, history);
+  if (screen) return finish(screen, [], false);
 
   if (/\b(talk to|speak to|real person|human|someone on the phone)\b/i.test(text)) {
     return finish(
@@ -498,25 +540,12 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (/\b(government purchase|purchase cards?|\bgpc\b)\b/i.test(text) || (/\bgovernment\b/i.test(text) && /\b(card|tax|buy)\b/i.test(text))) {
-    return finish(
-      "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. Tax is 0% for government.",
-      [],
-      false,
-    );
-  }
+  const government = governmentTurn(text, history);
+  if (government) return finish(government, [], false);
 
   if (/\b(pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
     return finish(
       `Card, a government purchase card, ACH, and check are all fine. Card costs more to process than ACH, and a check has no fee. Don't send card or bank numbers in this chat. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms. Virginia sales tax is on the quote unless the order is tax-exempt, and a tax-exempt order needs a certificate.`,
-      [],
-      false,
-    );
-  }
-
-  if (/\bconsign/i.test(text)) {
-    return finish(
-      `We can stock consumables like blades, bits, fasteners, and PPE on site, and you pay only for what you use. Here's the card: [consignment](${CONSIGNMENT_URL}). What kind of work do you do, and how big is the crew?`,
       [],
       false,
     );
@@ -600,6 +629,88 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     [],
     false,
   );
+}
+
+const SHIP_WORD = /\b(ships?|shipped|shipping|delivers?|delivered|delivery|sends?|sending)\b/i;
+const OUT_OF_AREA = /\b(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|washington|west virginia|wisconsin|wyoming|atlanta|chicago|dallas|denver|los angeles|miami|phoenix|portland|seattle)\b/i;
+const CREDS = "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. Tax is 0% for government.";
+
+function assistantText(history) {
+  return (history || []).filter((entry) => entry.role === "assistant").map((entry) => entry.content || "").join("\n");
+}
+
+function userText(history, latest = "") {
+  return [...(history || []).filter((entry) => entry.role === "user").map((entry) => entry.content || ""), latest].filter(Boolean).join("\n");
+}
+
+function screenOutOfArea(text, history) {
+  const users = userText(history, text);
+  const asked = assistantText(history);
+  const started = /what's the company name/i.test(asked) && OUT_OF_AREA.test(users);
+  const trigger = OUT_OF_AREA.test(text) && SHIP_WORD.test(text);
+  if (!started && !trigger) return "";
+  if (/\b(overpay|extra for shipping|freight forwarder)\b/i.test(`${text}\n${users}`)) return SCAM_CLOSE;
+  const heard = `${asked}\n${text}`;
+  if (!/what's the company name/i.test(asked)) return "Happy to look at that. What's the company name?";
+  if (!/website|www\.|\.com|\.example/i.test(heard)) return "Thanks. What's the company website?";
+  if (!/business address/i.test(asked) && !/\d+\s+[a-z]/i.test(text)) return "What's the business address?";
+  if (!/how did you find us/i.test(asked) && !/found you|google|referral/i.test(text)) return "How did you find us?";
+  if (!/how do you plan to pay/i.test(asked) && !/\b(card|check|ach|wire)\b/i.test(text)) return "How do you plan to pay?";
+  return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+}
+
+function governmentBuyer(text) {
+  return /\b(government purchase|purchase cards?|\bgpc\b)\b/i.test(text)
+    || (/\bgovernment\b/i.test(text) && /\b(cards?|tax|buy)\b/i.test(text));
+}
+
+function specialtyAsk(text) {
+  if (!/\b(jp-?8|generators?|specialty)\b/i.test(text)) return "";
+  const qty = String(text || "").match(/\b(\d{1,4})\b/);
+  const name = String(text || "").replace(/\b(gpc|government purchase cards?|and we pay with a)\b/ig, "").replace(/\s+/g, " ").trim();
+  return `${qty ? `${qty[1]} ` : ""}${name}`.replace(/\s+/g, " ").trim();
+}
+
+function governmentTurn(text, history) {
+  const asked = assistantText(history);
+  const saidCreds = /SMYXDLJDJMZ4/.test(asked);
+  const buyer = governmentBuyer(text) || (saidCreds && governmentBuyer(text));
+  if (!buyer && !saidCreds) return "";
+  if (saidCreds && !governmentBuyer(text) && !specialtyAsk(userText(history, text))) return "";
+  const product = specialtyAsk(text) || specialtyAsk(userText(history));
+  if (!product && !saidCreds) return CREDS;
+  if (!product) return "";
+  const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text) || (/\b(my name|i'm|i am)\b/i.test(text) && /\b(unit|company|navy|army)\b/i.test(text));
+  if (saidCreds && contact) return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+  const creds = saidCreds ? "Yes." : CREDS;
+  return `${creds} I have ${product}. What's your name, unit or company, and cell or email?`;
+}
+
+function crewAlready(text) {
+  return /\bcrew\b/i.test(text) && /\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|twelve|dozen)\b/i.test(text);
+}
+
+function consignmentTurn(text, history) {
+  const asked = assistantText(history);
+  const inThread = /\bconsign/i.test(text) || /pay only for what you use|consignment/i.test(asked);
+  if (!inThread) return "";
+  if (/brands or sizes/i.test(asked) && /name, company, and cell/i.test(asked)) {
+    if (/\b[\w.+-]+@|\b\d{3}[-.\s]?\d{3}/.test(text) || /\b(my name|i'm|i am)\b/i.test(text)) {
+      return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+    }
+  }
+  if (/brands or sizes/i.test(asked) && !/name, company, and cell/i.test(asked)) {
+    return "What's your name, company, and cell or email?";
+  }
+  if (/pay only for what you use/i.test(asked) && /\b(blades?|bits?|fasteners?|ppe)\b/i.test(text)) {
+    return "Got it. Do you want specific brands or sizes, or should we pick them together?";
+  }
+  if (/\bconsign/i.test(text)) {
+    const crew = crewAlready(text) || (history || []).some((entry) => entry.role === "user" && crewAlready(entry.content || ""));
+    const crewAsk = crew ? "" : " How big is the crew?";
+    return `We can stock consumables like blades, bits, fasteners, and PPE on site, and you pay only for what you use. Here's the card: [consignment](${CONSIGNMENT_URL}). What kind of work do you do?${crewAsk}`;
+  }
+  return "";
 }
 
 export function confusedWhatReply(history) {

@@ -53,6 +53,11 @@ function contentTokens(value) {
     .filter((token) => token && token.length > 1 && !MATCH_STOP.has(token));
 }
 
+const TYPE_WORDS = new Set([
+  "sds", "rotary", "pneumatic", "demolition", "jackhammer",
+  "circular", "miter", "reciprocating", "oscillating",
+]);
+
 function scoreKey(queryTokens, keyTokens) {
   if (!queryTokens.length || !keyTokens.length) return 0;
   const query = queryTokens.join(" ");
@@ -159,6 +164,8 @@ export function matchCatalog(catalog, query) {
   const hits = [];
   for (const item of catalog?.items || []) {
     const keys = [item.sku, item.model, item.name, ...(item.aliases || [])].filter(Boolean);
+    const covered = new Set(contentTokens(keys.join(" ")));
+    if (queryTokens.some((token) => TYPE_WORDS.has(token) && !covered.has(token))) continue;
     let score = 0;
     for (const key of keys) {
       score = Math.max(score, scoreKey(queryTokens, contentTokens(key)));

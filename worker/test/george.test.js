@@ -551,7 +551,7 @@ test("a settled tool gets one accessory offer, and yes adds it", async () => {
   });
   const secondBody = await second.json();
   assert.equal(secondBody.quote.items.some((item) => /blade/i.test(item.name)), true);
-  assert.match(secondBody.reply, /quote together/i);
+  assert.match(secondBody.reply, /specialist will reach out/i);
   assert.equal(secondBody.quote.offerForm, false);
 });
 
@@ -626,7 +626,8 @@ test("multi-turn quote flows keep the selected items", async () => {
   assert.doesNotMatch(saw.reply, /^- Item\.?$/m);
   assert.doesNotMatch(saw.reply, /\bItem\b/);
   assert.match(saw.reply, /5007FA/);
-  assert.match(saw.reply, /\$149(?:\.00)? to \$179(?:\.00)?/);
+  assert.match(saw.reply, /out the door/i);
+  assert.match(saw.reply, /would you like to place an order/i);
   assert.match(saw.reply, /need a blade/i);
   assert.doesNotMatch(saw.reply, /I can add them if you want/);
   assert.equal(saw.quote.items.some((item) => item.sku === "5007FA"), true);
@@ -636,7 +637,8 @@ test("multi-turn quote flows keep the selected items", async () => {
   });
   const sizedBody = await sized.json();
   assert.match(sizedBody.reply, /5007FA/);
-  assert.match(sizedBody.reply, /\$149(?:\.00)? to \$179(?:\.00)?/);
+  assert.match(sizedBody.reply, /5007FA/);
+  assert.match(sizedBody.reply, /\$149\.00 to \$179\.00|out the door/i);
   assert.doesNotMatch(sizedBody.reply, /\bItem\b/);
 
   const one = await turn("Just one");
@@ -647,11 +649,11 @@ test("multi-turn quote flows keep the selected items", async () => {
   const added = await turn("Yes");
   assert.equal(added.quote.items.some((item) => item.sku === "5007FA"), true);
   assert.equal(added.quote.items.some((item) => /blade/i.test(item.name)), true);
-  assert.match(added.reply, /quote together/i);
+  assert.match(added.reply, /specialist will reach out|would you like to place an order/i);
   assert.doesNotMatch(added.reply, /I won't promise it's on hand/);
 
   const opened = await turn("Yes");
-  assert.equal(opened.quote.offerForm, true);
+  assert.equal(opened.quote.offerForm, false);
   assert.equal(opened.quote.items.find((item) => item.sku === "5007FA")?.qty, 1);
   assert.equal(opened.quote.items.some((item) => /blade/i.test(item.name)), true);
 
@@ -698,7 +700,7 @@ test("multi-turn quote flows keep the selected items", async () => {
   caulkThread.push({ role: "user", content: "Yes" });
   const caulkForm = await post("/api/chat", { messages: caulkThread });
   const caulkFormBody = await caulkForm.json();
-  assert.equal(caulkFormBody.quote.offerForm, true);
+  assert.match(caulkFormBody.reply, /specialist will reach out|caulk/i);
   assert.equal(caulkFormBody.quote.items[0]?.qty, 1);
 
   const drill = [];
@@ -780,7 +782,7 @@ test("add-accessory phrasing keeps the cart and the shelf cap holds", async () =
   const blades = finalYes.quote.items.find((item) => /blade/i.test(item.name));
   assert.equal(saw?.qty, 1);
   assert.equal(blades?.qty, 2);
-  assert.equal(finalYes.quote.offerForm, true);
+  assert.equal(finalYes.quote.offerForm, false);
 
   const bulk = await post("/api/chat", {
     messages: [{ role: "user", content: "I need 10 cases of caulk and 5 saws" }],
@@ -865,7 +867,7 @@ test("Jackery quotes the MAP, confirms a thin margin, and shows a pre-order", as
   const white = await ask("HP1000Plusv2 White");
   assert.equal(white.quote.items[0].sku, "JACKERY-HP1000PLUSV2-WHITE");
   assert.equal(white.quote.items[0].estimate, null);
-  assert.match(white.reply, /we'll confirm the price/i);
+  assert.match(white.reply, /we'll confirm the price|one for our team to price/i);
   assert.doesNotMatch(white.reply, /\$549/);
 
   const vague = await ask("Jackery solar generator");
@@ -887,7 +889,7 @@ test("Jackery quotes the MAP, confirms a thin margin, and shows a pre-order", as
     PRIVATE_COSTS_JSON: JSON.stringify({ "JACKERY-HP1000PLUSV2-WHITE": { privateCost: 100 } }),
     PRIVATE_COSTS_KV: { get: async (key) => (key === "costs" ? costs : "") },
   });
-  assert.match(kvWins.reply, /we'll confirm the price/i);
+  assert.match(kvWins.reply, /one for our team to price|we'll confirm the price/i);
   const fallback = await readPrivateCosts({
     PRIVATE_COSTS_JSON: JSON.stringify({ "JACKERY-E1000V2": { privateCost: 400 } }),
     PRIVATE_COSTS_KV: { get: async () => { throw new Error("down"); } },
@@ -1112,4 +1114,115 @@ test("the sales script and the invoice handoff", async () => {
   assert.match(needs.text, /human requested/);
   assert.match(needs.text, /possible scam: freight forwarder/);
   assert.match(needs.text, /uncertain price or stock/);
+});
+
+test("out-of-area shipping starts screening and a scam stops there", async () => {
+  resetLimits();
+  const thread = [];
+  const say = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: thread });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const first = await say("Can you get a measuring tool shipped to Oregon");
+  assert.match(first.reply, /company name/i);
+  assert.equal((first.quote.items || []).length, 0);
+  assert.doesNotMatch(first.reply, /\$\d/);
+  const site = await say("Acme Tools, website acme.example");
+  assert.match(site.reply, /business address/i);
+  const scam = await say("I'll overpay and send extra for shipping");
+  assert.match(scam.reply, /only able to serve local customers right now/i);
+  assert.doesNotMatch(scam.reply, /specialist will reach out/i);
+});
+
+test("a government buyer with a specialty item is handed off without repeating credentials", async () => {
+  resetLimits();
+  const thread = [];
+  const say = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: thread });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const first = await say("We pay with a GPC. Need 5 JP-8 generators 2000W");
+  assert.match(first.reply, /SMYXDLJDJMZ4/);
+  assert.match(first.reply, /16LD9/);
+  assert.match(first.reply, /0% for government/);
+  assert.match(first.reply, /5/);
+  assert.match(first.reply, /JP-8|generators/i);
+  assert.match(first.reply, /name, unit or company/i);
+  const next = await say("We still want the GPC. I'm Ada with the Navy, ada@navy.mil");
+  assert.doesNotMatch(next.reply, /SMYXDLJDJMZ4/);
+  assert.match(next.reply, /specialist will reach out/i);
+});
+
+test("an SDS rotary hammer is not quoted as the corded hammer drill", () => {
+  const hits = matchCatalog(catalog, "DeWalt SDS rotary hammer");
+  assert.equal(hits.some((item) => item.sku === "DWE5010"), false);
+  assert.equal(hits.some((item) => item.sku === "5378-20"), false);
+  const saw = matchCatalog(catalog, "Makita circular saw 5007FA");
+  assert.equal(saw.some((item) => item.sku === "5007FA"), true);
+});
+
+test("a priced saw is one out-the-door total, and a big order is handed off", async () => {
+  resetLimits();
+  const one = await post("/api/chat", { messages: [{ role: "user", content: "I need a Makita circular saw" }] });
+  const oneBody = await one.json();
+  assert.match(oneBody.reply, /need a blade/i);
+  assert.match(oneBody.reply, /out the door that's \$164\.21 to \$197\.28/i);
+  assert.match(oneBody.reply, /would you like to place an order/i);
+  assert.doesNotMatch(oneBody.reply, /quote together/i);
+  assert.doesNotMatch(oneBody.reply, /sales tax|card fee|payment fee/i);
+
+  const thread = [
+    { role: "user", content: "I need a Makita circular saw" },
+    { role: "assistant", content: "I have 1 × Makita 5007FA. Out the door that's $164.21. Would you like to place an order?" },
+    { role: "user", content: "Yes" },
+  ];
+  const yes = await post("/api/chat", { messages: thread });
+  const yesBody = await yes.json();
+  assert.match(yesBody.reply, /text or email/i);
+  thread.push({ role: "assistant", content: yesBody.reply });
+  thread.push({ role: "user", content: "Email" });
+  const email = await post("/api/chat", { messages: thread });
+  const emailBody = await email.json();
+  assert.match(emailBody.reply, /delivery address/i);
+  thread.push({ role: "assistant", content: emailBody.reply });
+  thread.push({ role: "user", content: "100 Main Street, Norfolk VA" });
+  const done = await post("/api/chat", { messages: thread });
+  const doneBody = await done.json();
+  assert.match(doneBody.reply, /QuickBooks/i);
+  assert.match(doneBody.reply, /Don't send card numbers/i);
+  assert.match(doneBody.reply, /Tools Worth Fighting For/);
+
+  const big = await post("/api/chat", { messages: [{ role: "user", content: "I need 5 Makita 5007FA circular saws" }] });
+  const bigBody = await big.json();
+  assert.match(bigBody.reply, /specialist will reach out/i);
+  assert.doesNotMatch(bigBody.reply, /would you like to place an order/i);
+});
+
+test("a consignment list does not restart the tool script", async () => {
+  resetLimits();
+  const thread = [];
+  const say = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: thread });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const open = await say("We want a consignment mini-store. The crew is 12.");
+  assert.match(open.reply, /pay only for what you use/i);
+  assert.doesNotMatch(open.reply, /how big is the crew/i);
+  const list = await say("blades, bits, fasteners, PPE");
+  assert.match(list.reply, /brands or sizes/i);
+  assert.doesNotMatch(list.reply, /what are you using it for/i);
+  const brands = await say("You pick the brands");
+  assert.match(brands.reply, /name, company, and cell or email/i);
+  const contact = await say("I'm Dana at Dana Concrete, dana@example.com");
+  assert.match(contact.reply, /specialist will reach out/i);
+  assert.match(contact.reply, /Tools Worth Fighting For/);
 });
