@@ -19,7 +19,8 @@ import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
-import { loadPrivateCosts, privateCostFor } from "../config/private-costs.js";
+import { loadPrivateCosts, privateCostFor, readPrivateCosts } from "../config/private-costs.js";
+import jackeryCatalog from "../config/jackery-catalog.json" with { type: "json" };
 import { accessoryOffer } from "../config/accessories.js";
 import { renderSafeHtml } from "../../shared/customer-text.js";
 import { formatEstimate } from "../../shared/pricing.js";
@@ -801,4 +802,82 @@ test("a handler exception comes back as a friendly reply", async () => {
   assert.equal(body.mode, "error");
   assert.match(body.reply, /Something went wrong on my side/);
   assert.equal(body.quote.offerForm, false);
+});
+
+test("Jackery quotes the MAP, confirms a thin margin, and shows a pre-order", async () => {
+  assert.equal(jackeryCatalog.length, 91);
+  assert.doesNotMatch(JSON.stringify(jackeryCatalog), /privateCost|costSource|power 77/i);
+  const bare = loadPrivateCosts(JSON.stringify({ "JACKERY-E1000V2": { privateCost: 400 } }));
+  assert.equal(bare["JACKERY-E1000V2"].costSource, "dealer");
+  const map = priceFromShelf({ shelf: 559, source: "A", privateCost: 400, mapPrice: true });
+  assert.equal(map.estimate, 559);
+  assert.equal(map.skipFuel, true);
+  const thin = priceFromShelf({ shelf: 549, source: "A", privateCost: 520, mapPrice: true });
+  assert.equal(thin.confirm, true);
+  assert.equal(thin.estimate, null);
+
+  resetLimits();
+  const costs = JSON.stringify({
+    "JACKERY-E1000V2": { privateCost: 400 },
+    "JACKERY-HP1000PLUSV2-WHITE": { privateCost: 520 },
+  });
+  const ask = async (text, extra = {}) => {
+    const response = await handleRequest(new Request("https://george.example/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+      body: JSON.stringify({ messages: [{ role: "user", content: text }] }),
+    }), { ...env, PRIVATE_COSTS_JSON: costs, ...extra });
+    return response.json();
+  };
+
+  const e1000 = await ask("Jackery E1000v2 for a job in Newport News");
+  assert.equal(e1000.quote.items[0].sku, "JACKERY-E1000V2");
+  assert.equal(e1000.quote.items[0].estimate, 559);
+  assert.equal(e1000.quote.items[0].estimateHigh, null);
+  assert.match(e1000.reply, /\$559\.00/);
+  assert.match(e1000.reply, /solar panel/i);
+  assert.match(e1000.reply, /jackery\.com/i);
+  assert.doesNotMatch(e1000.reply, /\$480|\$4[6-9]\d|power 77|privateCost|costSource/i);
+
+  const explorer = await ask("Explorer 1000 v2");
+  assert.equal(explorer.quote.items[0].sku, "JACKERY-E1000V2");
+  const e2000 = await ask("E2000");
+  assert.equal(e2000.quote.items[0].sku, "JACKERY-E2000V2");
+  assert.equal(e2000.quote.items[0].estimate, 999);
+  const home = await ask("HomePower 3600 Plus");
+  assert.equal(home.quote.items[0].sku, "JACKERY-HP3600PLUS");
+  assert.equal(home.quote.items[0].estimate, 1899);
+  assert.match(home.reply, /Pre-order ongoing\. New order shipment begins Nov 22/);
+
+  const white = await ask("HP1000Plusv2 White");
+  assert.equal(white.quote.items[0].sku, "JACKERY-HP1000PLUSV2-WHITE");
+  assert.equal(white.quote.items[0].estimate, null);
+  assert.match(white.reply, /we'll confirm the price/i);
+  assert.doesNotMatch(white.reply, /\$549/);
+
+  const vague = await ask("Jackery solar generator");
+  assert.equal((vague.quote.items || []).length, 0);
+  assert.match(vague.reply, /what are you powering/i);
+  assert.match(vague.reply, /Explorer 1000 v2/);
+  const jobsite = await ask("portable power station for job site");
+  assert.equal((jobsite.quote.items || []).length, 0);
+  assert.match(jobsite.reply, /solar with it/i);
+  const thousand = await ask("Jackery 1000");
+  assert.equal((thousand.quote.items || []).length, 0);
+  assert.match(thousand.reply, /Explorer 1000 v2/);
+  assert.match(thousand.reply, /HomePower 1000/);
+
+  const hidden = filterCustomerText("Power 77 shipped it at our cost.").text;
+  assert.doesNotMatch(hidden, /power 77/i);
+
+  const kvWins = await ask("HP1000Plusv2 White", {
+    PRIVATE_COSTS_JSON: JSON.stringify({ "JACKERY-HP1000PLUSV2-WHITE": { privateCost: 100 } }),
+    PRIVATE_COSTS_KV: { get: async (key) => (key === "costs" ? costs : "") },
+  });
+  assert.match(kvWins.reply, /we'll confirm the price/i);
+  const fallback = await readPrivateCosts({
+    PRIVATE_COSTS_JSON: JSON.stringify({ "JACKERY-E1000V2": { privateCost: 400 } }),
+    PRIVATE_COSTS_KV: { get: async () => { throw new Error("down"); } },
+  });
+  assert.equal(fallback["JACKERY-E1000V2"].privateCost, 400);
 });

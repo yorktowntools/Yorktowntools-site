@@ -149,7 +149,39 @@ function boundFor(shelf, channel, privateCost) {
   return priceBound(shelf, channel);
 }
 
-export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice, privateCost }) {
+export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice, privateCost, mapPrice }) {
+  const shelfPrice = Number(shelf);
+  if (mapPrice) {
+    const map = roundMoney(shelfPrice);
+    if (!map) {
+      return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false, mapPrice: true, skipFuel: true };
+    }
+    const cost = Number(privateCost);
+    if (cost > 0 && (map - cost) / map < rules.minGrossMargin) {
+      return {
+        estimate: null,
+        estimateHigh: null,
+        cost: roundMoney(cost),
+        firm: false,
+        confirm: true,
+        ballpark: false,
+        mapPrice: true,
+        skipFuel: true,
+        shelfCeiling: map,
+      };
+    }
+    return {
+      estimate: map,
+      estimateHigh: null,
+      cost: cost > 0 ? roundMoney(cost) : null,
+      shelfCeiling: map,
+      firm: true,
+      confirm: false,
+      ballpark: false,
+      mapPrice: true,
+      skipFuel: true,
+    };
+  }
   if (fixedPrice && listPrice != null) {
     return {
       estimate: roundMoney(listPrice),
@@ -160,7 +192,6 @@ export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice
       ballpark: false,
     };
   }
-  const shelfPrice = Number(shelf);
   if (!Number.isFinite(shelfPrice) || shelfPrice <= 0) {
     return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false };
   }
@@ -204,7 +235,7 @@ function capToShelf(line) {
 }
 
 export function applyFuel(lines, miles) {
-  const priced = lines.filter((line) => line.estimate != null && !line.confirm && !line.fixedListed);
+  const priced = lines.filter((line) => line.estimate != null && !line.confirm && !line.fixedListed && !line.skipFuel && !line.mapPrice);
   const marginDollars = priced.reduce((sum, line) => {
     if (line.cost == null) return sum;
     return sum + (line.estimate - line.cost) * (line.qty || 1);
@@ -295,7 +326,8 @@ export function leadTimeNote({ bulk, owned, localPickup }) {
 }
 
 function publicLine(line, bulk) {
-  const confirm = Boolean(line.confirm) || (bulk && !line.fixedListed);
+  const locked = Boolean(line.fixedListed || line.mapPrice);
+  const confirm = Boolean(line.confirm) || (bulk && !locked);
   return {
     name: line.name,
     sku: line.sku || "",
@@ -303,10 +335,12 @@ function publicLine(line, bulk) {
     estimate: confirm && bulk ? line.estimate : (line.confirm ? null : line.estimate),
     estimateHigh: confirm && !bulk ? null : (line.estimateHigh ?? null),
     firm: !confirm && line.firm,
-    ballpark: bulk && line.estimate != null && !line.fixedListed,
+    ballpark: bulk && line.estimate != null && !locked,
     confirm: line.confirm && !bulk,
     confidence: line.confirm ? "unsure" : (bulk ? "ballpark" : "list"),
-    kind: line.fixedListed ? "listed" : (bulk ? "ballpark" : "instant"),
+    kind: locked ? "listed" : (bulk ? "ballpark" : "instant"),
+    stockNote: line.stockNote || "",
+    mapPrice: Boolean(line.mapPrice),
     model: line.model || "",
     manufacturer: line.manufacturer || "",
     manufacturerUrl: line.manufacturerUrl || "",
@@ -443,8 +477,9 @@ export function itemPriceLine(item) {
   if (item.ballpark && amount) {
     return `${qty}${name}: Starting estimate ${amount}.`;
   }
-  if (!amount || item.confirm) return `${qty}${name}.`;
-  return `${qty}${name}: ${amount}.`;
+  const stock = /pre-order|out of stock/i.test(item.stockNote || "") ? ` ${item.stockNote}` : "";
+  if (!amount || item.confirm) return `${qty}${name}.${stock}`.trim();
+  return `${qty}${name}: ${amount}.${stock}`;
 }
 
 /** Chat text uses the same rounded figures as the quote form. Shelf dollars that differ are dropped. */

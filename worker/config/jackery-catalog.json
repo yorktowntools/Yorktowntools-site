@@ -1,0 +1,645 @@
+[
+  {
+    "id": "JACKERY-E100PLUS-BAG",
+    "model": "E100Plus (bag)",
+    "description": "E100Plus with Mini Carring Bag",
+    "category": "Power Stations",
+    "shelfPrice": 129.0
+  },
+  {
+    "id": "JACKERY-E300D",
+    "model": "E300D",
+    "description": "288Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 209.0
+  },
+  {
+    "id": "JACKERY-E300V2",
+    "model": "E300v2",
+    "description": "288Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 249.0
+  },
+  {
+    "id": "JACKERY-E500V2",
+    "model": "E500v2",
+    "description": "512Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 399.0,
+    "stockNote": "Temporarily out of stock - ETA TBD"
+  },
+  {
+    "id": "JACKERY-E600V2",
+    "model": "E600v2",
+    "description": "640Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 499.0,
+    "stockNote": "Temporarily out of stock - ETA TBD"
+  },
+  {
+    "id": "JACKERY-E1000V2",
+    "model": "E1000v2",
+    "description": "1070Wh Portable Power Station (Not compatible with E1000 Plus Battery Pack)",
+    "category": "Power Stations",
+    "shelfPrice": 559.0
+  },
+  {
+    "id": "JACKERY-E1000V2-DUNE-WHITE",
+    "model": "E1000v2 Dune White",
+    "description": "All parameters are the same as E1000v2, only the color is different",
+    "category": "Power Stations",
+    "shelfPrice": 589.0
+  },
+  {
+    "id": "JACKERY-HP1000V2",
+    "model": "HP1000v2",
+    "description": "Jackery HomePower 1000 v2 Black",
+    "category": "Power Stations",
+    "shelfPrice": 559.0
+  },
+  {
+    "id": "JACKERY-HP1000V2-WHITE",
+    "model": "HP1000v2 White",
+    "description": "Jackery HomePower 1000 v2 White",
+    "category": "Power Stations",
+    "shelfPrice": 549.0
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2",
+    "model": "HP1000Plusv2",
+    "description": "Jackery HomePower 1000Plus v2 Black",
+    "category": "Power Stations",
+    "shelfPrice": 749.0
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2-WHITE",
+    "model": "HP1000Plusv2 White",
+    "description": "Jackery HomePower 1000Plus v2 White",
+    "category": "Power Stations",
+    "shelfPrice": 549.0
+  },
+  {
+    "id": "JACKERY-E1500V2",
+    "model": "E1500v2",
+    "description": "1536Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 849.0
+  },
+  {
+    "id": "JACKERY-E1500ULTRA",
+    "model": "E1500Ultra",
+    "description": "Jackery Explorer 1500 Ultra",
+    "category": "Power Stations",
+    "shelfPrice": 1199.0
+  },
+  {
+    "id": "JACKERY-E2000V2",
+    "model": "E2000v2",
+    "description": "2042Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 999.0
+  },
+  {
+    "id": "JACKERY-HP2000PLUSV2",
+    "model": "HP2000Plusv2",
+    "description": "Jackery HomePower 2000 Plus v2",
+    "category": "Power Stations",
+    "shelfPrice": 1199.0,
+    "stockNote": "Pre-order ongoing. Shipment begins December 7"
+  },
+  {
+    "id": "JACKERY-HP3000",
+    "model": "HP3000",
+    "description": "3072Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 1499.0
+  },
+  {
+    "id": "JACKERY-HP3600PLUS",
+    "model": "HP3600Plus",
+    "description": "Jackery HomePower 3600 Plus",
+    "category": "Power Stations",
+    "shelfPrice": 1899.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PROMAX",
+    "model": "HP3600ProMax",
+    "description": "Jackery HomePower 3600 Pro Max",
+    "category": "Power Stations",
+    "shelfPrice": 2099.0,
+    "stockNote": "Out of stock - ETA not confirmed yet"
+  },
+  {
+    "id": "JACKERY-E5000PLUS",
+    "model": "E5000Plus",
+    "description": "5040Wh Portable Power Station",
+    "category": "Power Stations",
+    "shelfPrice": 3499.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-HP2000PLUSV2-BATTERY-PACK",
+    "model": "HP2000Plusv2 Battery Pack",
+    "description": "Battery Pack 2000 Plus v2",
+    "category": "Battery Packs",
+    "shelfPrice": 799.0
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-BATTERY-PACK",
+    "model": "HP3600Plus Battery Pack",
+    "description": "Jackery Battery Pack 3600",
+    "category": "Battery Packs",
+    "shelfPrice": 1449.0
+  },
+  {
+    "id": "JACKERY-E5000PLUS-BATTERY-PACK",
+    "model": "E5000Plus Battery Pack",
+    "description": "Battery Pack for E5000Plus, 5040Wh",
+    "category": "Battery Packs",
+    "shelfPrice": 2599.0
+  },
+  {
+    "id": "JACKERY-STS",
+    "model": "STS",
+    "description": "Smart Transfer Switch",
+    "category": "Power Conversion Accessories",
+    "shelfPrice": 1159.0
+  },
+  {
+    "id": "JACKERY-DC-DC-CHARGER",
+    "model": "DC-DC Charger",
+    "description": "Jackery DC-DC Alternator Charger",
+    "category": "Power Conversion Accessories",
+    "shelfPrice": 269.0
+  },
+  {
+    "id": "JACKERY-40WAIR",
+    "model": "40Wair",
+    "description": "40W Air Solar Panel",
+    "category": "Solar Panels",
+    "shelfPrice": 129.0
+  },
+  {
+    "id": "JACKERY-100WPRIME",
+    "model": "100Wprime",
+    "description": "100W Prime Solar Panel",
+    "category": "Solar Panels",
+    "shelfPrice": 199.0
+  },
+  {
+    "id": "JACKERY-100WAIR",
+    "model": "100Wair",
+    "description": "SolarSaga 100 Air",
+    "category": "Solar Panels",
+    "shelfPrice": 299.0
+  },
+  {
+    "id": "JACKERY-200W",
+    "model": "200W",
+    "description": "200W Solar Panel",
+    "category": "Solar Panels",
+    "shelfPrice": 429.0
+  },
+  {
+    "id": "JACKERY-500WX",
+    "model": "500Wx",
+    "description": "500W Solar Panel (SolarSaga 85 x 6)",
+    "category": "Solar Panels",
+    "shelfPrice": 999.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 30"
+  },
+  {
+    "id": "JACKERY-E300V2-40WAIR",
+    "model": "E300v2+40Wair",
+    "description": "1*E300V2+1*40Wair",
+    "category": "Solar Generators",
+    "shelfPrice": 379.0
+  },
+  {
+    "id": "JACKERY-E500V2-100WAIR",
+    "model": "E500v2+100Wair",
+    "description": "1*E500V2+1*100Wair",
+    "category": "Solar Generators",
+    "shelfPrice": 589.0,
+    "stockNote": "Temporarily out of stock - ETA TBD"
+  },
+  {
+    "id": "JACKERY-E600V2-100WAIR",
+    "model": "E600v2+100Wair",
+    "description": "1*E600V2 + 1*SolarSaga 100",
+    "category": "Solar Generators",
+    "shelfPrice": 599.0,
+    "stockNote": "Temporarily out of stock - ETA TBD"
+  },
+  {
+    "id": "JACKERY-E1000V2-200W",
+    "model": "E1000V2+200W",
+    "description": "1*E1000V2 + 1*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 879.0
+  },
+  {
+    "id": "JACKERY-HP1000V2-200W",
+    "model": "HP1000v2+200W",
+    "description": "1*HP1000v2 + 1*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 879.0
+  },
+  {
+    "id": "JACKERY-HP1000V2-WHITE-200W",
+    "model": "HP1000v2 (White)+200W",
+    "description": "1*HP1000v2 (White)+1*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 749.0
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2-200W",
+    "model": "HP1000Plusv2+200W",
+    "description": "1*HP1000Plusv2+ 1*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 949.0
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2-100WAIRX2",
+    "model": "HP1000Plusv2+100WAirx2",
+    "description": "1*HP1000Plusv2+ 2*100Wair",
+    "category": "Solar Generators",
+    "shelfPrice": 999.0
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2-BP2000",
+    "model": "HP1000Plusv2+BP2000",
+    "description": "1*HP1000Plusv2+ 1*Battery Pack 2000 Plusv2",
+    "category": "Solar Generators",
+    "shelfPrice": 1269.0
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2-WHITE-100WAIRX2",
+    "model": "HP1000Plusv2 White+100WAirx2",
+    "description": "1*HP1000Plusv2 (White)+2*100Wair",
+    "category": "Solar Generators",
+    "shelfPrice": 899.0
+  },
+  {
+    "id": "JACKERY-E1500V2-100WAIRX2",
+    "model": "E1500v2+100Wairx2",
+    "description": "1*E1500v2+2*100Wair",
+    "category": "Solar Generators",
+    "shelfPrice": 1279.0
+  },
+  {
+    "id": "JACKERY-E1500ULTRA-200WX2",
+    "model": "E1500Ultra+200Wx2",
+    "description": "1*E1500 Ultra+2*200W",
+    "category": "Solar Generators",
+    "shelfPrice": 1659.0
+  },
+  {
+    "id": "JACKERY-E2000V2-100WAIRX2",
+    "model": "E2000v2+100Wairx2",
+    "description": "1*E2000V2 + 2*100Wair",
+    "category": "Solar Generators",
+    "shelfPrice": 1239.0
+  },
+  {
+    "id": "JACKERY-E2000V2-200W",
+    "model": "E2000v2+200W",
+    "description": "1*E2000V2 + 1*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 1249.0
+  },
+  {
+    "id": "JACKERY-E2000V2-200WX2",
+    "model": "E2000v2+200Wx2",
+    "description": "1*E2000V2 + 2*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 1399.0
+  },
+  {
+    "id": "JACKERY-E2000V2-500WX",
+    "model": "E2000v2+500Wx",
+    "description": "1*E2000V2 + 1*SolarSaga 500X",
+    "category": "Solar Generators",
+    "shelfPrice": 1499.0
+  },
+  {
+    "id": "JACKERY-E2000V2-BAG",
+    "model": "E2000v2+Bag",
+    "description": "1*E2000V2 + 1*Guard Carrying Bag",
+    "category": "Solar Generators",
+    "shelfPrice": 1129.0
+  },
+  {
+    "id": "JACKERY-HP2000PLUSV2-200WX2",
+    "model": "HP2000Plusv2+200Wx2",
+    "description": "1*HomePower 2000 Plus+2*SolarSaga 200",
+    "category": "Solar Generators",
+    "shelfPrice": 1839.0,
+    "stockNote": "Pre-order ongoing. Shipment begins December 7"
+  },
+  {
+    "id": "JACKERY-HP2000PLUSV2-500WX",
+    "model": "HP2000Plusv2+500Wx",
+    "description": "1*HomePower 2000 Plus+1*Solar Saga 500",
+    "category": "Solar Generators",
+    "shelfPrice": 1889.0,
+    "stockNote": "Pre-order ongoing. Shipment begins December 7"
+  },
+  {
+    "id": "JACKERY-HP2000PLUSV2-BP2000",
+    "model": "HP2000Plusv2+BP2000",
+    "description": "1*HomePower 2000 Plus+1*Battery Pack 2000 Plusv2",
+    "category": "Solar Generators",
+    "shelfPrice": 1679.0,
+    "stockNote": "Pre-order ongoing. Shipment begins December 7"
+  },
+  {
+    "id": "JACKERY-HP3000-200WX2",
+    "model": "HP3000+200Wx2",
+    "description": "1*HP3000+2*Solar Panel 200",
+    "category": "Solar Generators",
+    "shelfPrice": 2149.0
+  },
+  {
+    "id": "JACKERY-HP3000-500WX",
+    "model": "HP3000+500Wx",
+    "description": "1*HP3000+1*Solar Panel 500",
+    "category": "Solar Generators",
+    "shelfPrice": 2329.0
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-200WX2",
+    "model": "HP3600Plus+200Wx2",
+    "description": "Jackery HP3600Plus+200Wx2",
+    "category": "Solar Generators",
+    "shelfPrice": 2549.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-200WX2-MTS",
+    "model": "HP3600Plus+200Wx2+MTS",
+    "description": "Jackery HP3600Plus+200Wx2+Manual Transfer Switch",
+    "category": "Solar Generators",
+    "shelfPrice": 2949.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-500WX",
+    "model": "HP3600Plus+500Wx",
+    "description": "Jackery HomePower 3600 Plus + SolarSaga 500 X",
+    "category": "Solar Generators",
+    "shelfPrice": 2729.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-MTS",
+    "model": "HP3600Plus+MTS",
+    "description": "Jackery HomePower 3600 Plus+Manual Transfer Switch",
+    "category": "Solar Generators",
+    "shelfPrice": 2339.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-BATTERY-PACK-3600-500WX",
+    "model": "HP3600Plus+Battery Pack 3600+500Wx",
+    "description": "Jackery HomePower 3600 Plus (7.2kWh) + SolarSaga 500 X",
+    "category": "Solar Generators",
+    "shelfPrice": 3999.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PLUS-X2-CONNECT",
+    "model": "HP3600Plus x2+Connect",
+    "description": "Jackery HomePower 3600 Plus Double Kit",
+    "category": "Solar Generators",
+    "shelfPrice": 3979.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 22"
+  },
+  {
+    "id": "JACKERY-HP3600PROMAX-500WX",
+    "model": "HP3600ProMax+500Wx",
+    "description": "Jackery HomePower 3600 Pro Max + SolarSaga 500 X",
+    "category": "Solar Generators",
+    "shelfPrice": 2899.0,
+    "stockNote": "Out of stock - ETA not confirmed yet"
+  },
+  {
+    "id": "JACKERY-HP3600PROMAX-BATTERY-PACK-3600",
+    "model": "HP3600ProMax+Battery Pack 3600",
+    "description": "Jackery HomePower 3600 Pro Max + Battery Pack 3600",
+    "category": "Solar Generators",
+    "shelfPrice": 3509.0,
+    "stockNote": "Out of stock - ETA not confirmed yet"
+  },
+  {
+    "id": "JACKERY-E5000PLUS-500WXX2",
+    "model": "E5000Plus+500Wxx2",
+    "description": "E5000Plus+SolarSaga500Xx2",
+    "category": "Solar Generators",
+    "shelfPrice": 5159.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-E5000PLUS-E5000PLUS-BP",
+    "model": "E5000Plus+E5000Plus BP",
+    "description": "E5000Plus+E5000Plus Battery Pack",
+    "category": "Solar Generators",
+    "shelfPrice": 5899.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-E5000PLUS-STS",
+    "model": "E5000Plus+STS",
+    "description": "E5000Plus+Smart Transfer Switch",
+    "category": "Solar Generators",
+    "shelfPrice": 4439.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-E5000PLUS-E5000PLUS-BP-STS",
+    "model": "E5000Plus+E5000Plus BP+STS",
+    "description": "E5000Plus+E5000Plus Battery Pack+Smart Transfer Switch",
+    "category": "Solar Generators",
+    "shelfPrice": 6799.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-E5000PLUS-STS-500WXX2",
+    "model": "E5000Plus+STS+500Wxx2",
+    "description": "E5000Plus+Smart Transfer Switch+ SolarSaga500Xx2",
+    "category": "Solar Generators",
+    "shelfPrice": 6089.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-WHOLE-HOME-BACKUP-KIT-5000-PLUS-20KWH",
+    "model": "Whole-Home Backup Kit 5000 Plus (20kWh)",
+    "description": "E5000Plusx2+Battery Pack 5000 Plusx2+STS",
+    "category": "Solar Generators",
+    "shelfPrice": 10999.0,
+    "stockNote": "Pre-order ongoing. New order shipment begins Nov 28"
+  },
+  {
+    "id": "JACKERY-HP1000PLUSV2RED-CROSS",
+    "model": "HP1000Plusv2Red Cross",
+    "description": "Jackery HomePower 1000 Plus v2 Red Cross Edition",
+    "category": "Red Cross",
+    "shelfPrice": 669.0,
+    "stockNote": "Available"
+  },
+  {
+    "id": "JACKERY-HP2000PLUSV2RED-CROSS",
+    "model": "HP2000Plusv2Red Cross",
+    "description": "Jackery HomePower 2000 Plus v2 Red Cross Edition",
+    "category": "Red Cross",
+    "shelfPrice": 1069.0,
+    "stockNote": "Available"
+  },
+  {
+    "id": "JACKERY-HP3600PLUSRED-CROSS",
+    "model": "HP3600PlusRed Cross",
+    "description": "Jackery HomePower3600 Plus Red Cross Edition",
+    "category": "Red Cross",
+    "shelfPrice": 1609.0,
+    "stockNote": "Available"
+  },
+  {
+    "id": "JACKERY-UPGRADED-CARRYING-CASE-S",
+    "model": "Jackery Upgraded Carrying Case (S)",
+    "category": "Accessories",
+    "shelfPrice": 44.99
+  },
+  {
+    "id": "JACKERY-UPGRADED-CARRYING-CASE-M",
+    "model": "Jackery Upgraded Carrying Case (M)",
+    "category": "Accessories",
+    "shelfPrice": 59.99
+  },
+  {
+    "id": "JACKERY-UPGRADED-CARRYING-CASE-L",
+    "model": "Jackery Upgraded Carrying Case (L)",
+    "category": "Accessories",
+    "shelfPrice": 69.99
+  },
+  {
+    "id": "JACKERY-EXTREME-GUARD-CARRYING-BAG",
+    "model": "Jackery Extreme Guard Carrying Bag",
+    "category": "Accessories",
+    "shelfPrice": 129.0
+  },
+  {
+    "id": "JACKERY-EXTREME-GUARD-CARRYING-BAG-L-SIZE",
+    "model": "Jackery Extreme Guard Carrying Bag (L Size)",
+    "category": "Accessories",
+    "shelfPrice": 129.0
+  },
+  {
+    "id": "JACKERY-EXPLORER-5000-PLUS-PROTECTIVE-COVER",
+    "model": "Jackery Explorer 5000 Plus Protective Cover",
+    "category": "Accessories",
+    "shelfPrice": 99.99
+  },
+  {
+    "id": "JACKERY-DC-EXTENSION-CABLE-FOR-SOLAR-PANEL",
+    "model": "Jackery DC Extension Cable for Solar Panel",
+    "category": "Accessories",
+    "shelfPrice": 39.0
+  },
+  {
+    "id": "JACKERY-12V-AUTOMOBILE-BATTERY-CHARGING-CABLE",
+    "model": "Jackery 12V Automobile Battery Charging Cable",
+    "category": "Accessories",
+    "shelfPrice": 35.99
+  },
+  {
+    "id": "JACKERY-CAR-CHARGING-CABLE",
+    "model": "Jackery Car Charging Cable",
+    "category": "Accessories",
+    "shelfPrice": 29.9
+  },
+  {
+    "id": "JACKERY-ANDERSON-EXTENSION-CABLE",
+    "model": "Jackery Anderson Extension Cable",
+    "category": "Accessories",
+    "shelfPrice": 24.0
+  },
+  {
+    "id": "JACKERY-ANDERSON-Y-PARELLEL-CONNECTOR",
+    "model": "Jackery Anderson Y Parellel Connector",
+    "category": "Accessories",
+    "shelfPrice": 19.0
+  },
+  {
+    "id": "JACKERY-ANDERSON-Y-SERIES-CONNECTOR",
+    "model": "Jackery Anderson Y Series Connector",
+    "category": "Accessories",
+    "shelfPrice": 19.0
+  },
+  {
+    "id": "JACKERY-SOLAR-PANEL-CONNECTOR",
+    "model": "Jackery Solar Panel Connector",
+    "category": "Accessories",
+    "shelfPrice": 69.0
+  },
+  {
+    "id": "JACKERY-POWER-INPUT-OUTPUT-CABLE",
+    "model": "Jackery Power Input/Output Cable",
+    "category": "Accessories",
+    "shelfPrice": 149.0
+  },
+  {
+    "id": "JACKERY-CONNECTOR",
+    "model": "Jackery Connector",
+    "category": "Accessories",
+    "shelfPrice": 199.0
+  },
+  {
+    "id": "JACKERY-ADAPTER-DC7909-TO-DC8020",
+    "model": "Jackery Adapter DC7909 to DC8020",
+    "category": "Accessories",
+    "shelfPrice": 19.9
+  },
+  {
+    "id": "JACKERY-ADAPTER-DC8020-TO-DC7909",
+    "model": "Jackery Adapter DC8020 to DC7909",
+    "category": "Accessories",
+    "shelfPrice": 19.9
+  },
+  {
+    "id": "JACKERY-ADAPTER-DC8020-TO-USB-C",
+    "model": "Jackery Adapter DC8020 to USB-C",
+    "category": "Accessories",
+    "shelfPrice": 19.9
+  },
+  {
+    "id": "JACKERY-102W-GAN-3-PORT-FAST-CHARGER",
+    "model": "Jackery 102W GaN 3-Port Fast Charger",
+    "category": "Accessories",
+    "shelfPrice": 99.99
+  },
+  {
+    "id": "JACKERY-MANUAL-TRANSFER-SWITCH-FOR-EXPLORER-5000-PLUS",
+    "model": "Jackery Manual Transfer Switch for Explorer 5000 Plus",
+    "category": "Accessories",
+    "shelfPrice": 499.0
+  },
+  {
+    "id": "JACKERY-MANUAL-TRANSFER-SWITCH-FOR-2000-PLUS-AND-3600-PLUS",
+    "model": "Jackery Manual Transfer Switch for 2000 Plus and 3600 Plus",
+    "category": "Accessories",
+    "shelfPrice": 399.0
+  },
+  {
+    "id": "JACKERY-POWER-STATION-TROLLEY",
+    "model": "Jackery Power Station Trolley",
+    "category": "Accessories",
+    "shelfPrice": 99.0
+  },
+  {
+    "id": "JACKERY-10M-DC-EXTENSION-CABLE-PLUS",
+    "model": "Jackery 10m DC Extension Cable Plus",
+    "category": "Accessories",
+    "shelfPrice": 59.0
+  }
+]

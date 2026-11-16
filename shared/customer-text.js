@@ -128,6 +128,7 @@ const COST_PATTERNS = [
   /\b(?:our|my) distributor\b/i,
   /\bors\b/i,
   /\bnasco\b/i,
+  /\bpower\s*77\b/i,
   /\bprivate cost\b/i,
   /\bcost source\b/i,
   /\bstart at cost\b/i,

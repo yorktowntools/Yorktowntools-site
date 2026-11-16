@@ -6,6 +6,16 @@ compatibility_date = "2026-11-01"
 # Set those with: npx wrangler secret put XAI_API_KEY
 # PRIVATE_COSTS_JSON is a JSON object keyed by catalog sku: {"SKU":{"privateCost":1.23,"costSource":"example"}}
 # 1.23 is a fake example. Put the real numbers only in the secret.
+# costSource is optional and defaults to dealer.
+# A secret is capped around 5 kB. The full dealer cost file is larger than that.
+# Put it in KV instead. From this folder:
+#   npx wrangler kv namespace create PRIVATE_COSTS_KV
+#   npx wrangler kv key put --namespace-id <id printed above> costs --path costs.json
+# costs.json stays on your machine. Do not commit it.
+# Then uncomment the binding and replace the placeholder id.
+# [[kv_namespaces]]
+# binding = "PRIVATE_COSTS_KV"
+# id = "00000000000000000000000000000000"
 
 [vars]
 XAI_MODEL = "grok-4.3"

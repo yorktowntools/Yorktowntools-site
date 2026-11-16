@@ -1,4 +1,6 @@
 import catalog from "../../data/prices.json" with { type: "json" };
+import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
+import { jackeryItems, resolveJackery } from "../config/jackery.js";
 import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
@@ -12,7 +14,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
-import { loadPrivateCosts, privateCostFor } from "../config/private-costs.js";
+import { privateCostFor, readPrivateCosts } from "../config/private-costs.js";
 import { presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
 const buckets = new Map();
@@ -275,8 +277,35 @@ function preferSpecific(items) {
   return out;
 }
 
-function costsFromEnv(env) {
-  return loadPrivateCosts(env?.PRIVATE_COSTS_JSON);
+const quoteCatalog = {
+  ...catalog,
+  items: [...catalog.items.filter((item) => item.sku !== "JACKERY"), ...jackeryItems],
+};
+
+async function costsFromEnv(env) {
+  return readPrivateCosts(env);
+}
+
+function withJackery(latest, prior, local) {
+  const hit = resolveJackery(latest);
+  if (!hit) return local;
+  if (hit.action === "ask") {
+    return {
+      reply: hit.reply,
+      quote: { items: [], offerForm: false, hold: false, stage: "clarify" },
+    };
+  }
+  const offer = accessoryOffer(`${latest} ${hit.item.name}`);
+  const ask = offer && !accessoryAsked(prior) ? `\n\n${offer.line}` : "";
+  return {
+    reply: `Okay, the ${hit.item.name}.${ask}`,
+    quote: {
+      items: [{ name: hit.item.name, sku: hit.item.sku, qty: 1, stockNote: hit.item.stockNote || "" }],
+      offerForm: false,
+      hold: true,
+      stage: "quote",
+    },
+  };
 }
 
 function linesFromQuote(rawQuote, prose = "", costs = {}) {
@@ -304,10 +333,10 @@ function linesFromQuote(rawQuote, prose = "", costs = {}) {
         asOf: null,
       };
     }
-    const filled = fillMissingShelf(raw, catalog, prose);
+    const filled = fillMissingShelf(raw, quoteCatalog, prose);
     const name = String(filled?.name || filled?.sku || "Item").slice(0, 160);
-    const exact = (catalog.items || []).find((item) => item.sku && filled?.sku && String(item.sku).toLowerCase() === String(filled.sku).toLowerCase());
-    const hits = exact ? [exact] : (filled?.lockName && !filled?.sku ? [] : matchCatalog(catalog, `${filled?.sku || ""} ${name}`));
+    const exact = (quoteCatalog.items || []).find((item) => item.sku && filled?.sku && String(item.sku).toLowerCase() === String(filled.sku).toLowerCase());
+    const hits = exact ? [exact] : (filled?.lockName && !filled?.sku ? [] : matchCatalog(quoteCatalog, `${filled?.sku || ""} ${name}`));
     const known = hits.find(hasFirmPrice) || hits[0];
     const fixed = Boolean(known?.fixedPrice);
     let shelf = null;
@@ -331,6 +360,7 @@ function linesFromQuote(rawQuote, prose = "", costs = {}) {
       fixedPrice: fixed || Boolean(filled?.fixedPrice),
       listPrice: fixed ? known.price : (filled?.listPrice ?? null),
       privateCost: privateCostFor(sku, costs),
+      mapPrice: Boolean(known?.mapPrice),
     });
     const qty = Number(filled?.qty);
     const displayName = known?.name || (name && name !== "Item" ? name : "Item");
@@ -341,6 +371,7 @@ function linesFromQuote(rawQuote, prose = "", costs = {}) {
       manufacturer: known?.manufacturer || "",
       qty: Number.isFinite(qty) && qty > 0 ? qty : null,
       ...priced,
+      stockNote: known?.stockNote || filled?.stockNote || "",
       fixedListed: fixed || Boolean(filled?.fixedPrice),
       manufacturerUrl: known?.manufacturerUrl || filled?.manufacturerUrl || "",
       categoryPage: known?.categoryPage || filled?.categoryPage || "",
@@ -489,7 +520,7 @@ async function chat(request, env) {
   const convo = [...prior.filter((message) => message.role === "user").map((message) => message.content), latest].join("\n");
   const matches = matchCatalog(catalog, latest);
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
-  const local = localReply({ message: latest, history: prior, catalog, discount: percent, page });
+  const local = withJackery(latest, prior, localReply({ message: latest, history: prior, catalog: quoteCatalog, discount: percent, page }));
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
@@ -511,7 +542,7 @@ async function chat(request, env) {
     const sourceItems = preferSpecific(followUp || alreadyNamed
       ? (local.quote?.items || [])
       : alignRequested(local.quote?.items || [], convo));
-    const lines = linesFromQuote({ items: sourceItems }, convo, costsFromEnv(env));
+    const lines = linesFromQuote({ items: sourceItems }, convo, await costsFromEnv(env));
     const view = viewFor(lines, { text: convo });
     const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));
     const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
@@ -537,13 +568,13 @@ async function chat(request, env) {
   try {
     const data = await callXai(
       env,
-      buildInstructions({ catalog, discount: percent, page }),
+      buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
       messages.map((message) => ({ role: message.role, content: message.content })),
       canSearch,
     );
     const parsed = splitModelOutput(outputText(data));
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
-    const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, costsFromEnv(env));
+    const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
     const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
@@ -616,7 +647,7 @@ async function quote(request, env) {
   if (!lead.items.length || lead.items.some((item) => !item.qty || !item.name)) missing.push("quantity");
   if (missing.length) return json({ error: "missing", missing }, 400, request, env);
 
-  const view = viewFor(linesFromQuote({ items: lead.items }, "", costsFromEnv(env)), {
+  const view = viewFor(linesFromQuote({ items: lead.items }, "", await costsFromEnv(env)), {
     text: `${lead.notes} ${lead.company}`,
     company: lead.company,
     jobsite: lead.jobsite,

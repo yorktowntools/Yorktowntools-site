@@ -6,6 +6,15 @@
 
 export const accessoryRules = [
   {
+    id: "jackery",
+    test: (text) => /jackery|home\s*power|\bexplorer\s+\d|\bhp\s*\d{3,4}|\be\s*\d{3,4}/i.test(text),
+    prompt: "Need a solar panel, or a carrying case and an extra cable, with that?",
+    suggestions: [
+      { name: "200W Solar Panel", sku: "JACKERY-200W", qty: 1 },
+      { name: "Jackery Upgraded Carrying Case (M)", sku: "JACKERY-UPGRADED-CARRYING-CASE-M", qty: 1 },
+    ],
+  },
+  {
     id: "hammer-drill",
     test: (text) => /hammer drill|rotary hammer|\bsds\b/i.test(text),
     prompt: "Need SDS or masonry bits, or anchors, with that?",
