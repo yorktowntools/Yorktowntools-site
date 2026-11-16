@@ -1,4 +1,5 @@
 import { CLOSING_LINE, HANDOFF_LINE, READY_LINE } from "./copy.js";
+import { interpretLine, normalizeTrade } from "./trade.js";
 
 const BRANDS = "dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt";
 
@@ -20,13 +21,7 @@ export function eachQty(text) {
 }
 
 export function productsInText(text) {
-  const raw = String(text || "");
-  const found = [];
-  if (/\bchain\s*saws?\b/i.test(raw)) found.push("Chainsaw");
-  const lift = raw.match(/(\d+(?:\.\d+)?)\s*(?:ft|foot|feet)\s+lifts?/i);
-  if (lift) found.push(`${lift[1]} ft lift`);
-  if (/\b(?:circ(?:ular)?\s+saws?)\b/i.test(raw)) found.push("Circular saw");
-  return found;
+  return interpretLine(text).tools.map((tool) => tool.name);
 }
 
 export function cartFromThread(history, latest = "") {
@@ -56,12 +51,14 @@ export function readIdentity(history, latest = "") {
     if (/\bzach knows me\b|\bknows zach\b/i.test(line)) {
       identity.knowsZach = true;
       identity.note = identity.note || "Zach knows me";
+      const before = line.replace(/\bzach knows me\b|\bknows zach\b/ig, " ").replace(/\s+/g, " ").trim();
+      if (before) identity.name = titleName(before);
     }
     const named = line.match(/\b(?:i'm|i am|my name is|this is)\s+([A-Za-z]+(?:\s+[A-Za-z]+){0,2})/i);
-    const leading = line.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b/);
-    const picked = named?.[1] || leading?.[1] || "";
+    const leading = line.match(/^([A-Za-z]+(?:\s+[A-Za-z]+)+)\b/);
+    const picked = named?.[1] || (!identity.knowsZach ? leading?.[1] : "") || "";
     if (picked && !/yorktown|george|washington/i.test(picked)) {
-      identity.name = picked.replace(/\s+(zach|and|at)$/i, "").trim();
+      identity.name = titleName(picked.replace(/\s+(zach|and|at)$/i, "").trim());
     }
     const company = line.match(/\bat\s+([A-Za-z0-9&.' -]+?)(?:,|$)/i);
     if (company && !/zach/i.test(company[1])) identity.company = company[1].trim();
@@ -71,7 +68,11 @@ export function readIdentity(history, latest = "") {
 }
 
 export function askedForReach(history) {
-  return (history || []).some((entry) => entry.role === "assistant" && /best cell or email|cell or email/i.test(entry.content || ""));
+  return (history || []).some((entry) => entry.role === "assistant" && /best cell or email/i.test(entry.content || ""));
+}
+
+function titleName(value) {
+  return String(value || "").toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
 }
 
 export function washingtonReply() {
@@ -87,7 +88,7 @@ export function isLastNameAsk(text, history = []) {
 }
 
 export function sawAttributes(history, latest = "") {
-  const blob = userBlob(history, latest);
+  const blob = normalizeTrade(userBlob(history, latest));
   const size = blob.match(/(\d+)\s*[- ]\s*(\d+)\s*\/\s*(\d+)/);
   const voltage = /60\s*v|flexvolt/i.test(blob) ? "60V" : (/\b20\s*v\b/i.test(blob) ? "20V" : "");
   return {

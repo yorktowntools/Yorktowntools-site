@@ -17,7 +17,8 @@ import {
 } from "./copy.js";
 import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
 import { acceptingQuote, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
-import { cartFromThread, eachQty, isLastNameAsk, listReadback, sawGuide, washingtonReply } from "./job.js";
+import { askedForReach, cartFromThread, eachQty, isLastNameAsk, listReadback, readIdentity, readyClose, sawGuide, washingtonReply } from "./job.js";
+import { acceptsModel, interpretLine, isThanks, pendingModelConfirm } from "./trade.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
   discountPercent,
@@ -231,8 +232,29 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
   }
 
+  if (isThanks(text)) {
+    const items = cartFromThread(history);
+    return { reply: "You bet.", quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true } };
+  }
+
   if (isLastNameAsk(text, history)) {
     return { reply: washingtonReply(), quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+
+  const pending = pendingModelConfirm(history);
+  if (pending && acceptsModel(text)) {
+    return {
+      reply: `I can price the ${pending.label} for you.`,
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+    };
+  }
+
+  const heard = interpretLine(text);
+  if (heard.confirm) {
+    return { reply: heard.confirm, quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+  if (heard.clarify && heard.tools.length === 0) {
+    return { reply: heard.clarify, quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
   }
 
   const each = eachQty(text);
@@ -249,6 +271,32 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   const guided = sawGuide(history, text);
   if (guided) {
     return { reply: guided, quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+
+  const identity = readIdentity(history, text);
+  const openHandoff = (history || []).some((entry) => entry.role === "assistant" && /team to price|cell or email/i.test(entry.content || ""));
+  if (openHandoff && identity.name && (identity.phone || identity.email || identity.knowsZach)) {
+    const items = cartFromThread(history);
+    return {
+      reply: readyClose(identity, askedForReach(history)),
+      quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true },
+    };
+  }
+
+  if (heard.tools.length === 1 && !/\b(jack\s*hammers?|grinders?|gloves?|ladders?|respirators?|ppe|hi-vis|safety glasses|glasses)\b/i.test(text)) {
+    const name = heard.tools[0].name;
+    if (name === "Jackhammer") {
+      return {
+        reply: "We can source a jackhammer. What are you breaking up, and do you want electric corded, cordless, or pneumatic?",
+        quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
+      };
+    }
+    if (/grinder|gloves|ladder|respirator|hi-vis|ppe|safety glasses|battery/i.test(name)) {
+      return {
+        reply: `We can source a ${name}. What brand or size do you want?`,
+        quote: { items: [{ name, qty: null, sku: "", source: "U" }], offerForm: false, hold: true, stage: "script", scripted: true },
+      };
+    }
   }
 
   const picked = pickedModel(text, history);

@@ -4,6 +4,7 @@ import test from "node:test";
 import { BULK_LINE, CONFIRM_PRICE, GREETING, SAFE_COST_REPLY } from "../../shared/copy.js";
 import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl, isCustomerPriceAsk, isPrivateCostAsk, rewriteOwnerName, sayConfirmOnce } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
+import { canonicalBrand, interpretLine, modelCandidates } from "../../shared/trade.js";
 import {
   extractQty,
   fillMissingShelf,
@@ -2261,4 +2262,197 @@ test("DCF887B is priced from a search snippet when the product page is blocked",
   assert.match(body.reply, /DCF887B/);
   assert.match(body.reply, /Out the door that's \$186\.25/);
   assert.doesNotMatch(body.reply, /team to price|home depot|lowe|margin|privateCost/i);
+});
+
+function chatTurn(thread, text, outbox, sessionId) {
+  thread.push({ role: "user", content: text });
+  return handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ sessionId, messages: thread }),
+  }), {
+    MOCK_MODE: "true",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+    handoffOutbox: outbox,
+  }).then(async (response) => {
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  });
+}
+
+test("slang, typos, and the live transcripts stay on what the customer said", async () => {
+  assert.equal(canonicalBrand("DUWALT"), "dewalt");
+  assert.equal(canonicalBrand("Dewault"), "dewalt");
+  assert.equal(canonicalBrand("Duwalt"), "dewalt");
+  assert.equal(canonicalBrand("Milwalkee"), "milwaukee");
+  assert.equal(canonicalBrand("Milwakee"), "milwaukee");
+  assert.equal(canonicalBrand("Makitta"), "makita");
+  assert.equal(canonicalBrand("Ryobe"), "ryobi");
+  assert.equal(canonicalBrand("Rigid"), "ridgid");
+  assert.equal(interpretLine("SAWZAW").tools[0].name, "Reciprocating saw");
+  assert.equal(interpretLine("sawsall").tools[0].name, "Reciprocating saw");
+  assert.equal(interpretLine("recip").tools[0].name, "Reciprocating saw");
+  assert.equal(interpretLine("CIRC SAW").tools[0].name, "Circular saw");
+  assert.equal(interpretLine("cirular saw").tools[0].name, "Circular saw");
+  assert.equal(interpretLine("sircular saw").tools[0].name, "Circular saw");
+  assert.equal(interpretLine("skilsaw").tools[0].name, "Circular saw");
+  assert.equal(interpretLine("skilsaw").brand, "");
+  assert.equal(interpretLine("grinderr").tools[0].name, "Grinder");
+  assert.equal(interpretLine("4-1/2 grinderr").tools[0].name, "4-1/2 in. grinder");
+  assert.equal(interpretLine("impack driver").tools[0].name, "Impact driver");
+  assert.equal(interpretLine("hammerdril").tools[0].name, "Hammer drill");
+  assert.equal(interpretLine("jakhammer").tools[0].name, "Jackhammer");
+  assert.equal(interpretLine("lader").tools[0].name, "Ladder");
+  assert.equal(interpretLine("latter").tools[0].name, "Ladder");
+  assert.equal(interpretLine("respirater").tools[0].name, "Respirator");
+  assert.equal(interpretLine("gloces").tools[0].name, "Gloves");
+  assert.equal(interpretLine("chop saw").tools[0].name, "Miter saw");
+  assert.equal(interpretLine("ox").tools[0].name, "Oscillating multi-tool");
+  assert.equal(interpretLine("5ah batt").tools[0].name, "5Ah battery");
+  assert.equal(interpretLine("hi-vis").tools[0].name, "Hi-vis");
+  assert.equal(interpretLine("I need an impact").clarify, "Impact driver or impact wrench?");
+  assert.equal(modelCandidates("DSC577")[0].code, "DCS577");
+  assert.equal(modelCandidates("DCF878")[0].code, "DCF887");
+  assert.equal(matchCatalog(catalog, "duwalt eight and a quarter circular saw").length, 0);
+  assert.equal(matchCatalog(catalog, "makita circular saw")[0].sku, "5007FA");
+
+  resetLimits();
+  const impact = await (await post("/api/chat", { messages: [{ role: "user", content: "I NEED AN IMPACT" }] })).json();
+  assert.match(impact.reply, /Impact driver or impact wrench/);
+  const thanks = await (await post("/api/chat", {
+    messages: [
+      { role: "user", content: "I need a chainsaw" },
+      { role: "assistant", content: "I have 1 × Chainsaw. That one's for our team to price." },
+      { role: "user", content: "THABKS" },
+    ],
+  })).json();
+  assert.match(thanks.reply, /You bet/);
+  assert.equal(thanks.quote.items[0].name, "Chainsaw");
+
+  const sawzall = await (await post("/api/chat", { messages: [{ role: "user", content: "what about my cost on a dewalt SAWZAW" }] })).json();
+  assert.match(sawzall.reply, /cordless or corded/i);
+  assert.doesNotMatch(sawzall.reply, /don't get into what we pay/i);
+
+  resetLimits();
+  const typo = await (await post("/api/chat", { messages: [{ role: "user", content: "price a DSC577" }] })).json();
+  assert.match(typo.reply, /Did you mean the DeWalt DCS577\?/);
+  assert.doesNotMatch(typo.reply, /Out the door|DCF887|Makita/);
+  const confirmed = await (await post("/api/chat", {
+    messages: [
+      { role: "user", content: "price a DSC577" },
+      { role: "assistant", content: typo.reply },
+      { role: "user", content: "yes" },
+    ],
+  })).json();
+  assert.match(confirmed.reply, /DCS577/);
+  assert.doesNotMatch(confirmed.reply, /Makita|DCF878|5007FA/);
+
+  const wrongImpact = await (await post("/api/chat", { messages: [{ role: "user", content: "DCF878" }] })).json();
+  assert.match(wrongImpact.reply, /Did you mean the DeWalt DCF887\?/);
+  assert.doesNotMatch(wrongImpact.reply, /Out the door/);
+
+  resetLimits();
+  const outbox = [];
+  const thread = [];
+  const say = (text) => chatTurn(thread, text, outbox, "handoff-list-01");
+  await say("I need a chainsaw and a 55 ft lift");
+  const each = await say("1 each");
+  assert.match(each.reply, /1 × Chainsaw/);
+  assert.match(each.reply, /1 × 55 ft lift/);
+  assert.match(each.reply, /Those are for our team to price/);
+  assert.doesNotMatch(each.reply, /1 × each\b/);
+  const ben = await say("Ben Peralta Zach knows me");
+  assert.match(ben.reply, /best cell or email/i);
+  assert.match(ben.reply, /You're all set, a Yorktown Tools specialist will reach out shortly/i);
+  assert.match(ben.reply, /Tools Worth Fighting For/);
+  assert.doesNotMatch(ben.reply, /\bZach\b/);
+  assert.equal(outbox.length, 1);
+  assert.match(outbox[0].text, /Ben Peralta/);
+  assert.match(outbox[0].text, /Zach knows me/);
+  assert.match(outbox[0].text, /Chainsaw/);
+  assert.match(outbox[0].text, /55 ft lift/);
+  assert.match(outbox[0].subject, /missing phone or email/i);
+  assert.doesNotMatch(`${outbox[0].text} ${outbox[0].subject}`, /privateCost|home depot/i);
+  await say("THABKS");
+  assert.equal(outbox.length, 1);
+  await say("757-555-0100");
+  assert.equal(outbox.length, 2);
+  assert.match(outbox[1].subject, /UPDATE/);
+  assert.match(outbox[1].text, /757-555-0100/);
+  assert.match(outbox[1].text, /Chainsaw/);
+  assert.match(outbox[1].text, /55 ft lift/);
+
+  resetLimits();
+  let invented = 0;
+  const turns = [];
+  const ask = async (text) => {
+    turns.push({ role: "user", content: text });
+    const response = await handleRequest(new Request("https://george.example/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+      body: JSON.stringify({ messages: turns }),
+    }), {
+      MOCK_MODE: "false",
+      XAI_API_KEY: "test-key",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      callXai: async () => {
+        invented += 1;
+        return {
+          output_text: `QUOTE_JSON: ${JSON.stringify({
+            items: [{ name: "Makita 5007FA 7-1/4 in. circular saw", sku: "5007FA", qty: 1, shelf: 149, source: "A" }],
+          })}`,
+        };
+      },
+    });
+    const body = await response.json();
+    turns.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const stock = await ask("I NEED A DEWALT CIRC SAW, DO YOU HAVE ONE STOCK?");
+  assert.doesNotMatch(stock.reply, /makita|5007FA|7-1\/4|in stock/i);
+  assert.match(stock.reply, /DeWalt circular saw/i);
+  const sized = await ask("8-1/4 WITH BRAKE");
+  assert.doesNotMatch(sized.reply, /makita|5007FA|7-1\/4/i);
+  assert.match(sized.reply, /8-1\/4/);
+  const power = await ask("dewalt and cordless");
+  assert.match(power.reply, /20V MAX or 60V FLEXVOLT/);
+  assert.doesNotMatch(power.reply, /makita|5007FA/i);
+  const volts = await ask("60v");
+  assert.match(volts.reply, /DCS577B/);
+  assert.match(volts.reply, /DCS577X1/);
+  assert.match(volts.reply, /8-1\/4/);
+  assert.match(volts.reply, /60V/);
+  assert.match(volts.reply, /brake/i);
+  assert.doesNotMatch(volts.reply, /makita|5007FA|7-1\/4|what are you using it for/i);
+  const wood = await ask("wood");
+  assert.match(wood.reply, /DCS577/);
+  assert.doesNotMatch(wood.reply, /makita|5007FA|brand or model in mind|7-1\/4/i);
+  const corrected = await ask("I said dewalt? and cordless?");
+  assert.doesNotMatch(corrected.reply, /makita|5007FA|7-1\/4/i);
+  assert.match(corrected.reply, /DeWalt|DCS577/i);
+  assert.equal(invented, 0);
+
+  resetLimits();
+  const last = await (await post("/api/chat", { messages: [{ role: "user", content: "what's your last name?" }] })).json();
+  assert.match(last.reply, /Washington/);
+  assert.match(last.reply, /Battle of Yorktown/);
+  assert.match(last.reply, /Historic Triangle/);
+  assert.match(last.reply, /Jamestown/);
+  assert.match(last.reply, /Williamsburg/);
+  assert.match(last.reply, /running a saw/);
+  assert.doesNotMatch(last.reply, /\bZach/i);
+  const made = await (await post("/api/chat", {
+    messages: [
+      { role: "user", content: "what's your last name?" },
+      { role: "assistant", content: last.reply },
+      { role: "user", content: "Make it Washington" },
+    ],
+  })).json();
+  assert.match(made.reply, /Washington/);
+  assert.match(made.reply, /running a saw/);
+  assert.doesNotMatch(made.reply, /Which part should I answer|I don't have a last name/i);
+  const shipped = await (await post("/api/chat", { messages: [{ role: "user", content: "Can you get a measuring tool shipped to Washington?" }] })).json();
+  assert.match(shipped.reply, /company name/i);
+  assert.doesNotMatch(shipped.reply, /running a saw/);
 });

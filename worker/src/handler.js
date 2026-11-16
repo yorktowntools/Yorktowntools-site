@@ -3,6 +3,7 @@ import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
 import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE } from "../../shared/copy.js";
 import { cartFromThread, eachQty, listReadback, readIdentity, readyClose, askedForReach, sawGuide, userBlob } from "../../shared/job.js";
+import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
 import { filterCustomerText, isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
@@ -884,31 +885,35 @@ async function sendOwnerMail(env, mail) {
 }
 
 async function maybeAlert(env, messages, reply, items, sessionKey) {
-  if (!isOwnerHandoff(reply)) return { reply, alerted: false };
   const identity = readIdentity(messages);
   const canSend = identity.name && (identity.phone || identity.email || identity.knowsZach);
+  const prior = handoffSent.get(sessionKey);
+  if (!isOwnerHandoff(reply) && !prior) return { reply, alerted: false };
+  if (!canSend) return { reply, alerted: false };
   let next = reply;
-  if (canSend) {
+  if (isOwnerHandoff(reply)) {
     const close = readyClose(identity, askedForReach(messages.slice(0, -1)));
     next = String(reply || "")
       .replace(/What's your name, company, and cell or email\??/gi, "")
-      .replace(/A Yorktown Tools specialist will reach out shortly\.?\s*Tools Worth Fighting For!/gi, close)
       .replace(/\n{3,}/g, "\n\n")
       .trim();
-    if (!/you're all set/i.test(next)) next = `${next}\n\n${close}`.trim();
-    const fingerprint = alertFingerprint(identity, items);
-    const prior = handoffSent.get(sessionKey);
-    if (prior !== fingerprint) {
-      const mail = buildHandoffEmail({
-        identity,
-        items,
-        why: handoffWhy(reply),
-        transcript: messages.map((message) => `${message.role}: ${message.content}`).slice(-8).join("\n"),
-        update: Boolean(prior),
-      });
-      await sendOwnerMail(env, mail);
-      handoffSent.set(sessionKey, fingerprint);
+    if (!/you're all set/i.test(next)) {
+      next = next.replace(/A Yorktown Tools specialist will reach out shortly\.?\s*Tools Worth Fighting For!/gi, close).trim();
+      if (!/you're all set/i.test(next)) next = `${next}\n\n${close}`.trim();
     }
+  }
+  const listed = (items || []).length ? items : cartFromThread(messages.slice(0, -1));
+  const fingerprint = alertFingerprint(identity, listed);
+  if ((isOwnerHandoff(reply) || prior) && prior !== fingerprint) {
+    const mail = buildHandoffEmail({
+      identity,
+      items: listed,
+      why: handoffWhy(reply) || "contact update",
+      transcript: messages.map((message) => `${message.role}: ${message.content}`).slice(-8).join("\n"),
+      update: Boolean(prior),
+    });
+    await sendOwnerMail(env, mail);
+    handoffSent.set(sessionKey, fingerprint);
   }
   return { reply: next, alerted: canSend };
 }
@@ -949,6 +954,12 @@ async function chat(request, env, ctx) {
   const sid = sessionId(body.data?.sessionId) || clientIp(request);
   const prior = messages.slice(0, -1);
   const respond = async (payload, status = 200) => {
+    const meant = pendingModelConfirm(prior);
+    if (meant && acceptsModel(latest) && !new RegExp(meant.code, "i").test(payload.reply || "")) {
+      const items = (payload.quote?.items || []).filter((item) => new RegExp(meant.code, "i").test(`${item?.name || ""} ${item?.sku || ""}`));
+      payload.reply = `I can price the ${meant.label} for you.`;
+      payload.quote = { ...(payload.quote || {}), items };
+    }
     const guided = sawGuide(prior, latest);
     if (guided && (/makita/i.test(payload.reply || "") || /what are you using it for|brand or model in mind/i.test(payload.reply || ""))) {
       payload.reply = guided;

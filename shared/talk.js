@@ -1,4 +1,5 @@
 import { matchCatalog } from "./pricing.js";
+import { normalizeTrade } from "./trade.js";
 
 const GENERIC = new Set(["drill", "drills", "saw", "saws", "ladder", "ladders", "glove", "gloves", "tool", "tools", "bit", "bits", "blade", "blades"]);
 
@@ -63,7 +64,8 @@ export function concreteDrillingAdvice(text) {
 export function genericSawQuestion(text) {
   const raw = String(text || "");
   if (/\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/i.test(raw)) return "";
-  if (!/\b(sawzalls?|sawzaws?|reciprocating(?:\s+saws?)?)\b/i.test(raw)) return "";
+  const heard = normalizeTrade(raw);
+  if (!/\breciprocating saws?\b|\bsawzalls?\b/i.test(heard)) return "";
   return "Which model do you want, or do you want it cordless or corded?";
 }
 

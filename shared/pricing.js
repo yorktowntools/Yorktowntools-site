@@ -158,15 +158,20 @@ export function priceEntry(entry, percent) {
   };
 }
 
-const TOOL_BRANDS = ["dewalt", "milwaukee", "makita", "bosch", "hilti", "festool", "metabo", "ridgid", "skil", "flex", "hercules", "kobalt"];
+import { canonicalBrand } from "./trade.js";
+
+const TOOL_BRANDS = ["dewalt", "milwaukee", "makita", "bosch", "hilti", "festool", "metabo", "ridgid", "skil", "flex", "hercules", "kobalt", "ryobi"];
 
 export function customerBrand(text) {
-  const hits = [...String(text || "").toLowerCase().matchAll(new RegExp(`\\b(${TOOL_BRANDS.join("|")})\\b`, "g"))];
-  return hits.length ? hits[hits.length - 1][1] : "";
+  return canonicalBrand(text);
 }
 
 export function customerBladeSize(text) {
-  const hits = [...String(text || "").matchAll(/(\d+)\s*[- ]\s*(\d+)\s*\/\s*(\d+)/g)];
+  const normalized = String(text || "")
+    .replace(/\beight and a quarter\b/gi, "8-1/4")
+    .replace(/\bseven and a quarter\b/gi, "7-1/4")
+    .replace(/\bfour and a half\b/gi, "4-1/2");
+  const hits = [...normalized.matchAll(/(\d+)\s*[- ]\s*(\d+)\s*\/\s*(\d+)/g)];
   if (!hits.length) return "";
   const last = hits[hits.length - 1];
   return `${last[1]}-${last[2]}/${last[3]}`;
