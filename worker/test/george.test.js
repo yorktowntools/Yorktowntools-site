@@ -1159,6 +1159,18 @@ test("a government buyer with a specialty item is handed off without repeating c
   assert.match(next.reply, /specialist will reach out/i);
 });
 
+test("a specialty ask restates the item, not the buyer's preamble", async () => {
+  resetLimits();
+  const response = await post("/api/chat", {
+    messages: [{ role: "user", content: "I'm a government buyer with a GPC and I need 5 JP-8 generators at 2000W." }],
+  });
+  const body = await response.json();
+  assert.match(body.reply, /I have 5 JP-8 generators at 2000W\./);
+  assert.doesNotMatch(body.reply, /government buyer/i);
+  assert.doesNotMatch(body.reply, /I need 5/i);
+  assert.match(body.reply, /name, unit or company/i);
+});
+
 test("an SDS rotary hammer is not quoted as the corded hammer drill", () => {
   const hits = matchCatalog(catalog, "DeWalt SDS rotary hammer");
   assert.equal(hits.some((item) => item.sku === "DWE5010"), false);

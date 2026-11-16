@@ -686,10 +686,12 @@ function governmentBuyer(text) {
 }
 
 function specialtyAsk(text) {
-  if (!/\b(jp-?8|generators?|specialty)\b/i.test(text)) return "";
-  const qty = String(text || "").match(/\b(\d{1,4})\b/);
-  const name = String(text || "").replace(/\b(gpc|government purchase cards?|and we pay with a)\b/ig, "").replace(/\s+/g, " ").trim();
-  return `${qty ? `${qty[1]} ` : ""}${name}`.replace(/\s+/g, " ").trim();
+  const raw = String(text || "");
+  if (!/\b(jp-?8|generators?|specialty)\b/i.test(raw)) return "";
+  const compact = raw.match(/\b(\d{1,4})\s+((?:jp-?8\s+)?generators?(?:\s+at)?(?:\s+\d{2,5}\s*w)?|jp-?8(?:\s+generators?)?(?:\s+at)?(?:\s+\d{2,5}\s*w)?)/i);
+  if (compact) return `${compact[1]} ${compact[2]}`.replace(/\s+/g, " ").trim();
+  const bare = raw.match(/\b((?:jp-?8\s+)?generators?(?:\s+at)?(?:\s+\d{2,5}\s*w)?|jp-?8(?:\s+generators?)?(?:\s+at)?(?:\s+\d{2,5}\s*w)?)/i);
+  return bare ? bare[1].replace(/\s+/g, " ").trim() : "";
 }
 
 function governmentTurn(text, history) {
