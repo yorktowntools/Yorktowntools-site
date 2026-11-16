@@ -141,7 +141,8 @@ export async function writeModelShelf(env, model, shelf, ctx) {
       console.error(`shelf cache: waitUntil failed for ${key}: ${error instanceof Error ? error.message : "error"}`);
     }
   }
-  await write;
+  const saved = await write;
+  if (saved != null) console.log(`shelf cache: put ok ${key}`);
   return stored;
 }
 
@@ -159,7 +160,7 @@ export function usableProductUrl(value) {
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return "";
   if (!hostOk(url.hostname)) return "";
-  if (/\/s(?:earch)?\/|\/b\/|\/browse|\/s\?/i.test(`${url.pathname}${url.search}`)) return "";
+  if (/\/s(?:earch)?\/|\/b\/|\/browse|\/reviews?(?:\/|$)|\/questions?(?:\/|$)|\/s\?/i.test(`${url.pathname}${url.search}`)) return "";
   return url.toString();
 }
 
@@ -276,6 +277,10 @@ export function extractPageModel(html) {
     const fromTitle = exactModelsIn(title[1])[0];
     if (fromTitle) return fromTitle;
   }
+  for (const match of text.matchAll(/"(?:sku|mpn|model|modelNumber|itemNumber)"\s*:\s*"([^"]{3,40})"/gi)) {
+    const found = exactModelsIn(match[1])[0];
+    if (found) return found;
+  }
   return "";
 }
 
@@ -339,10 +344,111 @@ function walkUrls(value, pages, seen, depth) {
   });
 }
 
-export function collectSearchUrls(data, limit = 2) {
+export function priceFromSnippet(text) {
+  const raw = String(text || "");
+  const found = [];
+  const patterns = [
+    /\$\s?(\d{1,5}(?:\.\d{2})?)/g,
+    /(\d{1,5}(?:\.\d{2})?)\s*(?:USD|usd)\b/g,
+    /\b(?:USD|usd)\s*(\d{1,5}(?:\.\d{2})?)/g,
+    /"(?:price|currentPrice|sellingPrice|salePrice)"\s*:\s*"?(\d+(?:\.\d{2})?)"?/g,
+  ];
+  for (const pattern of patterns) {
+    for (const match of raw.matchAll(pattern)) found.push(match[1] || match[0]);
+  }
+  const prices = found.map((item) => asShelf(item)).filter((price) => price > 0);
+  if (!prices.length) return null;
+  return Math.min(...prices);
+}
+
+function pricesNearModel(text, model) {
+  const raw = String(text || "");
+  if (!model || !textHasExactModel(raw, model)) return [];
+  const wanted = normalizeModel(model);
+  const lower = raw.toLowerCase();
+  const spans = [];
+  const tokens = lower.split(/[^a-z0-9]+/).filter(Boolean);
+  let cursor = 0;
+  for (let i = 0; i < tokens.length; i += 1) {
+    let joined = "";
+    let start = lower.indexOf(tokens[i], cursor);
+    if (start < 0) start = cursor;
+    for (let j = i; j < tokens.length; j += 1) {
+      joined += tokens[j];
+      if (joined === wanted) {
+        const end = start + (lower.slice(start).indexOf(tokens[j]) + tokens[j].length);
+        spans.push([Math.max(0, start - 220), Math.min(raw.length, end + 220)]);
+        break;
+      }
+      if (joined.length >= wanted.length) break;
+    }
+    cursor = start + tokens[i].length;
+  }
+  const prices = [];
+  for (const [from, to] of (spans.length ? spans : [[0, raw.length]])) {
+    const shelf = priceFromSnippet(raw.slice(from, to));
+    if (shelf > 0) prices.push(shelf);
+  }
+  return prices;
+}
+
+function walkSearchShelves(value, pages, seen, depth, model) {
+  if (depth > 8 || value == null || pages.length >= COLLECT_LIMIT) return;
+  if (typeof value === "string") {
+    for (const shelf of pricesNearModel(value, model)) {
+      const key = `text|${shelf}|${normalizeModel(model)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      pages.push({ url: "", title: value.slice(0, 200), shelf, model: normalizeModel(model) });
+      if (pages.length >= COLLECT_LIMIT) return;
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => walkSearchShelves(item, pages, seen, depth + 1, model));
+    return;
+  }
+  if (typeof value !== "object") return;
+  const title = String(value.title || value.name || "");
+  const snippet = String(value.snippet || value.description || value.content || "");
+  const url = String(value.url || value.link || "");
+  const blob = [title, snippet, url, value.sku || "", value.model || ""].join(" ");
+  const matches = !model || pageMatchesModel({ url, title, name: title, model: value.model, sku: value.sku }, model) || textHasExactModel(blob, model);
+  if (matches) {
+    const direct = asShelf(value.price ?? value.salePrice ?? value.lowPrice);
+    const shelf = direct || priceFromSnippet(`${title} ${snippet}`);
+    if (shelf > 0) {
+      const key = `${url}|${shelf}|${normalizeModel(model || title)}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        pages.push({
+          url: url || "",
+          title,
+          shelf,
+          model: normalizeModel(model) || exactModelsIn(blob)[0] || "",
+        });
+      }
+    }
+  }
+  if (pages.length >= COLLECT_LIMIT) return;
+  Object.values(value).forEach((item) => {
+    if (item && typeof item === "object") walkSearchShelves(item, pages, seen, depth + 1, model);
+  });
+}
+
+export function collectSearchShelves(data, model, limit = 8) {
+  const pages = [];
+  walkSearchShelves(data, pages, new Set(), 0, model);
+  return pages.slice(0, limit);
+}
+
+export function collectSearchUrls(data, limit = 2, model = "") {
   const pages = [];
   walkUrls(data, pages, new Set(), 0);
-  return pickDiverseProductPages(pages, limit);
+  const ranked = model
+    ? [...pages].sort((a, b) => Number(pageMatchesModel(b, model)) - Number(pageMatchesModel(a, model)))
+    : pages;
+  return pickDiverseProductPages(ranked, limit);
 }
 
 async function loadOne(page, fetchImpl, budgetMs, now) {
@@ -376,6 +482,10 @@ async function loadOne(page, fetchImpl, budgetMs, now) {
       }),
       timeout,
     ]);
+    const status = typeof response === "string" ? 200 : Number(response?.status) || 0;
+    if (status && status >= 400) {
+      return { ...page, shelf: null, model: page.model || "", cached: false, status };
+    }
     const raw = typeof response === "string"
       ? response
       : await Promise.race([response.text(), timeout]);
@@ -384,9 +494,10 @@ async function loadOne(page, fetchImpl, budgetMs, now) {
     const model = extractPageModel(html);
     const title = [page.title, htmlTitle(html)].filter(Boolean).join(" ");
     if (shelf) cache.set(page.url, { shelf, model, title, expires: now + TTL_MS });
-    return { ...page, title: title || page.title || "", shelf, model: model || page.model || "", cached: false };
-  } catch {
-    return { ...page, shelf: null, cached: false };
+    return { ...page, title: title || page.title || "", shelf, model: model || page.model || "", cached: false, status };
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : "error";
+    return { ...page, shelf: null, cached: false, status: 0, error: reason };
   } finally {
     clearTimeout(rejectTimer);
   }

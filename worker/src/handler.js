@@ -6,6 +6,7 @@ import { filterCustomerText, isCustomerPriceAsk } from "../../shared/customer-te
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
 import {
+  collectSearchShelves,
   collectSearchUrls,
   exactModelsIn,
   fetchShelfPrices,
@@ -817,7 +818,7 @@ async function routeRequest(request, env = {}, ctx) {
 }
 
 function followUpSearch(code) {
-  return `Search again for the current shelf price of exact model ${code}. Check both Home Depot and Lowe's, and use a different retailer if the first results were only one store. Return product page URLs for ${code} only. Do not substitute a different model.`;
+  return `Search again for the current shelf price of exact model ${code}. Check both Home Depot and Lowe's, and use a different retailer if the first results were only one store. Return product page URLs for ${code} only, and write the visible shelf price next to each URL as $123.45. Do not substitute a different model.`;
 }
 
 async function chat(request, env, ctx) {
@@ -930,18 +931,23 @@ async function chat(request, env, ctx) {
         const budgetMs = num(env.SHELF_FETCH_TIMEOUT_MS, 4000);
         const deadline = Date.now() + budgetMs;
         const askModel = typeof env.callXai === "function" ? env.callXai : callXai;
-        let pages = collectSearchUrls(data, 4);
         const code = exactModelsIn(latest)[0] || "";
+        let pages = collectSearchUrls(data, 4, code);
+        const dollarBits = collectDollarText(data).concat(searchCards(data));
+        console.log(`shelf search: model=${code || "none"} urls=${pages.map((page) => page.url).join(" | ") || "none"} dollarTexts=${dollarBits.length} sample=${(dollarBits[0] || outputText(data) || "").replace(/\s+/g, " ").slice(0, 220)}`);
         const matchedUrls = code ? pages.filter((page) => pageMatchesModel(page, code)) : pages;
         const already = canSearch ? Math.max(1, countSearches(data)) : 0;
-        const room = already < searchCap
-          && underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
-          && underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
+        const firstSnippets = code ? collectSearchShelves(data, code) : [];
+        const ipRoom = underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
+        // Home Depot and Lowe's product pages 403 from the Worker, so a named
+        // model with no snippet price gets one follow-up even at the chat cap.
+        const room = ipRoom && (already < searchCap
+          || (firstSnippets.length === 0 && underCap(`search-s:${sid}`, searchCap + 1, 6 * 60 * 60 * 1000, now)));
         const firstFetch = pages.length
           ? fetchShelfPrices(pages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 })
           : Promise.resolve([]);
         let secondSearch = Promise.resolve(null);
-        if (code && matchedUrls.length < 2 && room) {
+        if (code && (matchedUrls.length < 2 || firstSnippets.length < 2) && room) {
           take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
           take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
           extraSearches += 1;
@@ -961,8 +967,10 @@ async function chat(request, env, ctx) {
         const [firstPages, extra] = await Promise.all([firstFetch, secondSearch]);
         let fetched = firstPages;
         if (extra) {
+          const extraBits = collectDollarText(extra).concat(searchCards(extra));
+          console.log(`shelf search follow-up: urls=${collectSearchUrls(extra, 4, code).map((page) => page.url).join(" | ") || "none"} dollarTexts=${extraBits.length} sample=${(extraBits[0] || outputText(extra) || "").replace(/\s+/g, " ").slice(0, 220)}`);
           const seen = new Set(pages.map((page) => page.url));
-          const morePages = collectSearchUrls(extra, 4).filter((page) => page.url && !seen.has(page.url));
+          const morePages = collectSearchUrls(extra, 4, code).filter((page) => page.url && !seen.has(page.url));
           if (morePages.length && Date.now() + 30 < deadline) {
             const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
             fetched = fetched.concat(more);
@@ -982,23 +990,34 @@ async function chat(request, env, ctx) {
             true,
           );
           const seen = new Set(pages.map((page) => page.url));
-          const morePages = collectSearchUrls(follow, 4).filter((page) => page.url && !seen.has(page.url));
+          const morePages = collectSearchUrls(follow, 4, code).filter((page) => page.url && !seen.has(page.url));
           if (morePages.length && Date.now() + 30 < deadline) {
             const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
             fetched = fetched.concat(more);
           }
         }
+        const snippets = (code ? firstSnippets.concat(extra ? collectSearchShelves(extra, code) : []) : []);
+        if (snippets.length) fetched = fetched.concat(snippets);
         rawItems = applyLowestFetchedShelves(rawItems, fetched, preload);
+        const wrote = [];
         for (const item of rawItems) {
           const itemCode = modelCodeOf(item);
           if (!itemCode) continue;
           const seen = pagesForLine(item, fetched).map((page) => Number(page.shelf)).filter((price) => price > 0);
+          const quoted = Number(item.shelf);
           const saved = Number(preload[normalizeModel(itemCode)]) || 0;
-          const durable = lowestShelf(saved, seen);
+          // Persist the lowest shelf we are actually quoting, including a
+          // model- or snippet-supplied price when product-page fetches miss.
+          const durable = lowestShelf(saved, seen.concat(quoted > 0 ? [quoted] : []));
           if (!(durable > 0) || (saved > 0 && durable > saved)) continue;
-          if (!seen.length && saved > 0) continue;
-          await writeModelShelf(env, itemCode, durable, ctx);
+          const stored = await writeModelShelf(env, itemCode, durable, ctx);
+          if (stored > 0) wrote.push(`${normalizeModel(itemCode).toUpperCase()}:${stored}`);
         }
+        const fetchNotes = fetched.map((page) => {
+          const host = (() => { try { return new URL(page.url).hostname.replace(/^www\./, ""); } catch { return "snippet"; } })();
+          return `${host}${page.status ? ":" + page.status : ""}:${page.shelf || 0}`;
+        });
+        console.log(`shelf lookup: model=${code || "none"} pages=${pages.length} fetched=${fetchNotes.join(",") || "none"} snippets=${snippets.length} wrote=${wrote.join(",") || "none"} ctx=${ctx && typeof ctx.waitUntil === "function" ? "yes" : "no"}`);
         lines = linesFromQuote({ items: rawItems }, prose, costs);
       } catch (error) {
         console.error(`shelf lookup failed: ${error instanceof Error ? error.message : "error"}`);
