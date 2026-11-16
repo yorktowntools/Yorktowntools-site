@@ -1,15 +1,19 @@
 import {
+  AFTER_HOURS_LINE,
   BULK_LINE,
   CATEGORIES,
   CONSIGNMENT_URL,
   CREDIT_APP_URL,
-  ESTIMATE_NOTE,
+  GREETING,
   HOURS,
   PHONE_DISPLAY,
+  QUOTE_OFFER,
   SAFE_COST_REPLY,
   SERVICE_AREA,
 } from "./copy.js";
 import { filterCustomerText } from "./customer-text.js";
+import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn, isShortReply } from "./talk.js";
+import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
   discountPercent,
   extractQty,
@@ -45,6 +49,8 @@ function toQuoteItem(priced, qty) {
   return {
     name: priced.name,
     sku: priced.sku,
+    model: priced.model,
+    manufacturer: priced.manufacturer,
     qty,
     estimate: priced.estimate,
     estimateHigh: priced.estimateHigh,
@@ -56,7 +62,111 @@ function toQuoteItem(priced, qty) {
   };
 }
 
-export function localReply({ message, catalog, discount, page }) {
+function recommendCordedHammers(catalog, percent) {
+  const wanted = ["DWE5010", "5378-20"];
+  const picks = wanted
+    .map((sku) => (catalog?.items || []).find((item) => item.sku === sku))
+    .filter(Boolean)
+    .map((item) => priceEntry(item, percent));
+  const why = {
+    DWE5010: "Corded, so it keeps going on a long day of anchors.",
+    "5378-20": "A tougher housing when the bit stays in the hole.",
+  };
+  const lines = picks.map((priced) => {
+    const amount = formatEstimate(priced);
+    const link = itemLink(priced);
+    return `${priced.model}. ${why[priced.sku] || "A solid corded hammer drill for concrete."} Starting estimate ${amount}. ${link}.`;
+  });
+  const reply = [
+    "Okay, here are a couple of good options for concrete.",
+    lines.join("\n\n"),
+    "Which one do you want, the DeWalt DWE5010 or the Milwaukee 5378-20?",
+  ].filter(Boolean).join("\n\n");
+  return {
+    reply,
+    quote: {
+      items: [],
+      offerForm: false,
+      hold: false,
+      stage: "choose",
+      bulk: false,
+    },
+  };
+}
+
+function substantiveUsers(history) {
+  return (history || []).filter((entry) => entry.role === "user" && !isShortReply(entry.content));
+}
+
+function accessoryLine(addition, catalog, discount) {
+  const known = addition.sku ? (catalog?.items || []).find((entry) => entry.sku === addition.sku) : null;
+  const priced = known ? priceEntry({ ...known, qty: addition.qty }, discountPercent(discount, catalog?.discountPercent ?? 0)) : null;
+  return priced
+    ? toQuoteItem(priced, addition.qty)
+    : { name: addition.name, sku: addition.sku || "", qty: addition.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+}
+
+function carryQuote(text, history, catalog, discount, page) {
+  const users = (history || []).filter((entry) => entry.role === "user");
+  const subject = [...users].reverse().find((entry) => !isShortReply(entry.content) && !addedAccessory(entry.content))?.content || "";
+  if (!subject) return null;
+  const base = localReply({ message: subject, history, catalog, discount, page, rebuilding: true });
+  if (!base.quote?.items?.length) return null;
+  const qty = addedAccessory(text) ? null : (extractQty(text) || extractQty(subject));
+  const tools = base.quote.items.filter((item) => !item.lockName);
+  let items = qty && tools.length === 1
+    ? base.quote.items.map((item) => (item.lockName ? item : { ...item, qty }))
+    : base.quote.items.slice();
+  for (const entry of users) {
+    const addition = addedAccessory(entry.content);
+    if (!addition) continue;
+    items = items.filter((item) => item.name !== addition.name);
+    items.push(accessoryLine(addition, catalog, discount));
+  }
+  let asked = false;
+  let accepted = false;
+  for (const entry of history || []) {
+    if (entry.role === "assistant" && isAccessoryQuestion(entry.content)) asked = true;
+    if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|ok|okay)\b/i.test(String(entry.content || "").trim()) && !addedAccessory(entry.content)) accepted = true;
+  }
+  if (accepted) {
+    const offer = accessoryOffer(`${subject}\n${items.map((item) => item.name).join(" ")}`);
+    for (const suggestion of offer?.suggestions || []) {
+      if (items.some((item) => item.name === suggestion.name)) continue;
+      items.push(accessoryLine(suggestion, catalog, discount));
+    }
+  }
+  return { ...base, quote: { ...base.quote, items, stage: base.quote.stage || "quote" } };
+}
+
+function pickedModel(text, history) {
+  const asked = (history || []).some((entry) => entry.role === "assistant" && /which one do you want/i.test(entry.content || ""));
+  if (!asked) return null;
+  if (/dewalt|dwe5010/i.test(text)) return "DWE5010";
+  if (/milwaukee|5378/i.test(text)) return "5378-20";
+  return null;
+}
+
+function addedAccessory(text) {
+  const raw = String(text || "");
+  if (!/\b(add|throw in|include)\b/i.test(raw)) return null;
+  let name = "";
+  if (/\bblades?\b/i.test(raw)) name = "Circular saw blades";
+  else if (/\banchors?\b/i.test(raw)) name = "Concrete anchors";
+  else if (/\bbits?\b/i.test(raw)) name = "Driver bits";
+  else if (/\b(discs?|wheels?)\b/i.test(raw)) name = "Grinding discs";
+  else if (/\bnails?\b/i.test(raw)) name = "Nails";
+  else if (/\bcaulk gun\b/i.test(raw)) name = "Caulk gun";
+  else if (/\bbatter/i.test(raw)) name = "Extra battery";
+  else if (/\bcharg/i.test(raw)) name = "Charger";
+  else if (/\bstabilizer\b/i.test(raw)) name = "Ladder stabilizer";
+  else if (/\bgloves?\b/i.test(raw)) name = "Victory Series drivers gloves";
+  else return null;
+  const qty = /\b(a couple|couple of|two|2)\b/i.test(raw) ? 2 : (extractQty(raw) || 1);
+  return { name, qty, sku: /victory/i.test(name) ? "VICTORY-GLOVE" : "" };
+}
+
+export function localReply({ message, history = [], catalog, discount, page, rebuilding = false }) {
   const text = String(message || "").trim();
   const percent = discountPercent(discount, catalog?.discountPercent ?? 1);
   const filteredUser = filterCustomerText(text);
@@ -93,21 +203,203 @@ export function localReply({ message, catalog, discount, page }) {
     const shaped = bulk
       ? items.map((item) => (item.kind === "listed" ? item : { ...item, kind: "ballpark", firm: false }))
       : items;
-    const withBulk = bulk ? `${reply}\n\n${BULK_LINE}` : reply;
-    const safe = filterCustomerText(withBulk);
+    const withBulk = bulk && items.length ? `${reply}\n\n${BULK_LINE}` : reply;
+    const offer = accessoryOffer(`${text}\n${items.map((item) => item.name).join(" ")}`);
+    const askAccessories = items.length && offer && !accessoryAsked(history);
+    const withOffer = askAccessories
+      ? `${withBulk}\n\n${offer.line}`
+      : (items.length && !/quote together/i.test(withBulk) ? `${withBulk}\n\n${QUOTE_OFFER}` : withBulk);
+    const safe = filterCustomerText(withOffer);
     const body = safe.costHit ? SAFE_COST_REPLY : safe.text;
     return {
       reply: body,
-      quote: { items: shaped, offerForm: Boolean(offerForm || shaped.length), bulk },
+      quote: {
+        items: shaped,
+        offerForm: false,
+        hold: shaped.length > 0,
+        stage: shaped.length ? "quote" : "script",
+        bulk,
+      },
     };
   };
 
   if (!text) {
-    return finish(
-      "Hey, I'm George with Yorktown Tools. You build the project. We deliver the tools. What do you need on the job?",
-      [],
-      false,
-    );
+    return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script" } };
+  }
+
+  const picked = pickedModel(text, history);
+  if (picked) {
+    const item = (catalog?.items || []).find((entry) => entry.sku === picked);
+    if (item) {
+      const priced = priceEntry({ ...item, qty: 1 }, percent);
+      return finish(`Okay, the ${priced.model}.`, [priced], true);
+    }
+  }
+
+  if (!rebuilding) {
+    const addition = addedAccessory(text);
+    if (addition) {
+      const carried = carryQuote(text, history, catalog, discount, page);
+      const kept = (carried?.quote?.items || []).filter((item) => item.name !== addition.name);
+      const known = addition.sku ? (catalog?.items || []).find((entry) => entry.sku === addition.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: addition.qty }, percent) : null;
+      const extra = priced
+        ? toQuoteItem(priced, addition.qty)
+        : { name: addition.name, sku: addition.sku || "", qty: addition.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+      const items = [...kept, extra];
+      return {
+        reply: `Okay, I'll add ${addition.qty} × ${addition.name}.\n\n${QUOTE_OFFER}`,
+        quote: {
+          items,
+          offerForm: false,
+          hold: true,
+          stage: "quote",
+          bulk: Boolean(carried?.quote?.bulk),
+        },
+      };
+    }
+  }
+
+  if (!rebuilding) {
+  const yes = /^(yes|yeah|yep|sure|ok|okay|add them|do it)\b/i.test(text);
+  const no = /^(no|nope|nah|i'm set|im set|all set|we're set)\b/i.test(text);
+  const pickNamed = (suggestions) => {
+    const raw = text.toLowerCase();
+    if (/\b(both|all of them|all)\b/i.test(raw)) return suggestions;
+    return suggestions.filter((item) => {
+      const name = item.name.toLowerCase();
+      if (raw.includes(name)) return true;
+      return name.split(/\s+/).some((word) => {
+        if (word.length <= 3) return false;
+        const stem = word.endsWith("s") ? word.slice(0, -1) : word;
+        return raw.includes(word) || (stem.length > 3 && raw.includes(stem));
+      });
+    });
+  };
+  const whichLine = (suggestions) => {
+    const names = suggestions.map((item) => item.name);
+    const choice = names.length === 2 ? `the ${names[0]} or the ${names[1]}` : names.map((name) => `the ${name}`).join(", ");
+    return `Which ones do you want, ${choice}?`;
+  };
+  const lastAssistant = [...history].reverse().find((entry) => entry.role === "assistant");
+  if (/which ones do you want/i.test(lastAssistant?.content || "")) {
+    const earlierUsers = history.filter((entry) => entry.role === "user" && !isShortReply(entry.content));
+    const base = earlierUsers.length
+      ? localReply({ message: earlierUsers[earlierUsers.length - 1].content, history, catalog, discount, page, rebuilding: true })
+      : { quote: { items: [] } };
+    const toolText = [...earlierUsers.map((entry) => entry.content), ...(base.quote?.items || []).map((item) => item.name)].join("\n");
+    const offer = accessoryOffer(toolText);
+    const picked = offer ? pickNamed(offer.suggestions) : [];
+    if (!picked.length) {
+      return {
+        reply: offer ? whichLine(offer.suggestions) : "Which of those do you want?",
+        quote: { items: base.quote?.items || [], offerForm: false, hold: true, stage: "quote", bulk: Boolean(base.quote?.bulk) },
+      };
+    }
+    const extra = picked.map((item) => {
+      const known = item.sku ? (catalog?.items || []).find((entry) => entry.sku === item.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: item.qty }, percent) : null;
+      return priced
+        ? toQuoteItem(priced, item.qty)
+        : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+    });
+    return {
+      reply: `Okay, I'll add ${picked.map((item) => item.name).join(" and ")}.\n\n${QUOTE_OFFER}`,
+      quote: {
+        items: [...(base.quote?.items || []), ...extra],
+        offerForm: false,
+        hold: true,
+        stage: "quote",
+        bulk: Boolean(base.quote?.bulk),
+      },
+    };
+  }
+  const accessoryPending = (() => {
+    let asked = false;
+    let answered = false;
+    for (const entry of history) {
+      if (entry.role === "assistant" && isAccessoryQuestion(entry.content)) asked = true;
+      if (entry.role === "assistant" && /which ones do you want/i.test(entry.content || "")) answered = true;
+      if (asked && entry.role === "user" && (
+        addedAccessory(entry.content)
+        || /^(yes|yeah|yep|sure|no|nope|nah|ok|okay|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim())
+      )) answered = true;
+    }
+    return asked && !answered;
+  })();
+  if ((yes || no) && accessoryPending) {
+    const earlierUsers = history.filter((entry) => entry.role === "user" && !isShortReply(entry.content));
+    const base = earlierUsers.length
+      ? localReply({ message: earlierUsers[earlierUsers.length - 1].content, history, catalog, discount, page, rebuilding: true })
+      : { quote: { items: [] } };
+    const toolText = [...earlierUsers.map((entry) => entry.content), ...(base.quote?.items || []).map((item) => item.name)].join("\n");
+    const offer = accessoryOffer(toolText);
+    const chosen = yes && offer
+      ? (offer.suggestions.length > 1 ? pickNamed(offer.suggestions) : offer.suggestions)
+      : [];
+    if (yes && offer && offer.suggestions.length > 1 && chosen.length === 0) {
+      return {
+        reply: whichLine(offer.suggestions),
+        quote: {
+          items: base.quote?.items || [],
+          offerForm: false,
+          hold: (base.quote?.items || []).length > 0,
+          stage: (base.quote?.items || []).length ? "quote" : "script",
+          bulk: Boolean(base.quote?.bulk),
+        },
+      };
+    }
+    const extra = chosen.map((item) => {
+      const known = item.sku ? (catalog?.items || []).find((entry) => entry.sku === item.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: item.qty }, percent) : null;
+      return priced
+        ? toQuoteItem(priced, item.qty)
+        : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
+    });
+    const items = [...(base.quote?.items || []), ...extra];
+    return {
+      reply: yes
+        ? `Okay, I'll add those.\n\n${QUOTE_OFFER}`
+        : `No problem.\n\n${QUOTE_OFFER}`,
+      quote: {
+        items,
+        offerForm: false,
+        hold: items.length > 0,
+        stage: items.length ? "quote" : "script",
+        bulk: Boolean(base.quote?.bulk),
+      },
+    };
+  }
+
+  if (acceptingQuote(text, history)) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    return {
+      reply: "Okay. Add your name and the job site and we'll send it.",
+      quote: {
+        items: carried?.quote?.items || [],
+        offerForm: true,
+        hold: false,
+        stage: "form",
+        bulk: Boolean(carried?.quote?.bulk),
+      },
+    };
+  }
+
+  if (isShortReply(text) && history.some((entry) => entry.role === "user" && !isShortReply(entry.content))) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    if (carried?.quote?.items?.length) return carried;
+  }
+  }
+
+  const drill = drillTurn(text, history);
+  if (drill?.stage === "clarify") {
+    return { reply: drill.reply, quote: { items: [], offerForm: false, stage: "clarify" } };
+  }
+  if (drill?.stage === "recommend") return recommendCordedHammers(catalog, percent);
+
+  const stage = chatStage(text, history, catalog);
+  if (stage === "clarify") {
+    return { reply: clarifyingQuestion(text, history), quote: { items: [], offerForm: false, stage: "clarify" } };
   }
 
   if (/ignore (all |any |the )?(previous|above|prior) instructions|system prompt|you are now|jailbreak|developer mode/i.test(text)) {
@@ -119,12 +411,12 @@ export function localReply({ message, catalog, discount, page }) {
   }
 
   if (filteredUser.costHit || /\b(your cost|the margin|markup|military discount|supplier discount)\b/i.test(text)) {
-    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: true } };
+    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script" } };
   }
 
   if (/^(hi|hey|hello|yo|good morning|good afternoon)\b/i.test(text) && text.length < 40) {
     return finish(
-      "Hey, I'm George with Yorktown Tools. You build the project. We deliver the tools. What do you need on the job?",
+      GREETING,
       [],
       false,
     );
@@ -132,7 +424,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(hour|open|close|when are you)\b/i.test(text)) {
     return finish(
-      `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. After hours, Zachary will reply by 9 a.m. the next business day.`,
+      `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. ${AFTER_HOURS_LINE}`,
       [],
       false,
     );
@@ -164,7 +456,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(who are you|who is zach|about you|veteran|army|truck|cobalt|silverado)\b/i.test(text)) {
     let reply =
-      "Yorktown Tools is Zachary Barber's company in Yorktown, Virginia. He's a veteran. Army aviation maintenance and leadership. The whole point is to keep your crew on the job site. Veteran-owned, and the money stays local. SAM.gov registered.";
+      "Yorktown Tools is a veteran-owned company in Yorktown, Virginia. The founder spent 19-plus years in Army aviation. The whole point is to keep your crew on the job site, and the money stays local. SAM.gov registered.";
     if (/\b(cobalt|silverado|truck)\b/i.test(text)) {
       reply += " He started deliveries in a Chevy Cobalt. The work truck now is a Silverado.";
     }
@@ -173,7 +465,7 @@ export function localReply({ message, catalog, discount, page }) {
 
   if (/\b(gsa|government|sam\.gov|cage|uei)\b/i.test(text)) {
     return finish(
-      "We're SAM.gov registered. UEI SMYXDLJDJMZ4. CAGE 16LD9. I can't promise a GSA schedule or special terms. Zachary handles government pricing and purchase orders directly. Call or text (757) 940-5171.",
+      "We're SAM.gov registered. UEI SMYXDLJDJMZ4. CAGE 16LD9. I can't promise a GSA schedule or special terms. We handle government pricing and purchase orders directly. Call or text (757) 940-5171.",
       [],
       true,
     );
@@ -184,7 +476,7 @@ export function localReply({ message, catalog, discount, page }) {
       const lineQty = priced.qty || qty;
       const amount = formatEstimate(priced);
       const qtyBit = lineQty ? `${lineQty} × ` : "";
-      if (priced.estimate == null) return `- ${qtyBit}${priced.name}: Zachary will confirm the price.`;
+      if (priced.estimate == null) return `- ${qtyBit}${priced.name}.`;
       if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
         const fees = paymentOnTop(priced.estimate);
         return `- ${qtyBit}${priced.name}: ${amount} a pair. Card about ${formatMoney(fees.card)}. ACH about ${formatMoney(fees.ach)}. No fee by check.`;
@@ -201,13 +493,12 @@ export function localReply({ message, catalog, discount, page }) {
     }
     const blocks = [lines.join("\n")];
     if (links.length) blocks.push(links.join("\n"));
-    blocks.push(ESTIMATE_NOTE);
     return finish(blocks.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
   }
 
   if (/\b(price|pricing|how much|quote|cost)\b/i.test(text)) {
     return finish(
-      `Tell me the brand and model, and how many you need. I'll write the estimate. If I'm not sure of the number, I'll say so and Zachary will confirm it quickly. Free delivery from ${SERVICE_AREA}.`,
+      `Tell me the brand and model, and how many you need. I'll write the estimate. Free delivery from ${SERVICE_AREA}.`,
       [],
       true,
     );
@@ -227,6 +518,13 @@ export function localReply({ message, catalog, discount, page }) {
   if (page && /what.*(page|sell|categor)/i.test(text)) {
     const list = CATEGORIES.map((cat) => pageLink(cat.path, cat.name)).join(", ");
     return finish(`Here's how the site is split: ${list}.`, [], false);
+  }
+
+  if (!rebuilding && (history || []).some((entry) => entry.role === "assistant")) {
+    return {
+      reply: "Okay, I'm still on that. What else do you need?",
+      quote: { items: [], offerForm: false, stage: "clarify" },
+    };
   }
 
   return finish(

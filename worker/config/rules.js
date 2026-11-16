@@ -19,8 +19,13 @@ export const rules = {
   // Gross margin floor: (price - cost) / price.
   // At a 0% match and a 10% cost gap, margin is exactly 10%.
   // After a 3% card fee that is about 7% left. If a price would sit under this
-  // floor, the customer sees "Zachary will confirm the price" instead.
+  // floor, the customer sees "We'll confirm the price" instead.
   minGrossMargin: 0.10,
+
+  // Private supplier or dealer cost. 1.20 means the candidate price is cost × 1.20.
+  // Used only when that result is at or below the shelf and clears minGrossMargin.
+  // The customer price never goes above the shelf. Never shown.
+  privateMarkup: 1.20,
 
   // One-off price from some other local shop (not a national home-improvement
   // chain). 10 means 10% over that shop's price.
@@ -60,7 +65,7 @@ export const rules = {
   timezone: "America/New_York",
   openHour: 8,
   closeHour: 17,
-  // After hours, George still quotes. He says Zachary will reply by this time
+  // After hours, if they ask about hours, George says we'll get back to them by this time
   // the next business day.
   replyByHour: 9,
 

@@ -438,35 +438,8 @@
             box-shadow: var(--shadow);
         }
 
-        .call-button {
-            position: fixed;
-            right: clamp(16px, 4vw, 24px);
-            bottom: clamp(16px, 4vw, 24px);
-            width: clamp(70px, 16vw, 86px);
-            height: clamp(70px, 16vw, 86px);
-            background: var(--red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 30px rgba(200,16,46,0.5);
-            z-index: 999;
-            text-decoration: none;
-            animation: pulse 2.8s infinite;
-        }
-        .call-button img { 
-            width: 68%; 
-            height: auto; 
-            border-radius: 50%; 
-            border: 3px solid var(--white);
-        }
-
-        @keyframes pulse { 
-            0% { box-shadow: 0 0 0 0 rgba(200,16,46,0.7); } 
-            70% { box-shadow: 0 0 0 26px rgba(200,16,46,0); } 
-            100% { box-shadow: 0 0 0 0 rgba(200,16,46,0); } 
-        }
-
+                
+        
         .quote-form { display:grid; gap:1.9rem; }
         .form-group label { font-weight:600; color:var(--navy); margin-bottom:0.6rem; display:block; }
         .required { color:var(--red); }
@@ -512,12 +485,8 @@
 </head>
 <body>
 
-    <!-- Floating Call Button -->
-    <a href="tel:757-940-5171" class="call-button" aria-label="Call Yorktown Tools" id="call-button">
-        <img src="/Yorktown.PNG" alt="George" loading="eager" decoding="async">
-    </a>
 
-    <div class="top-red-banner">
+<div class="top-red-banner">
         <div class="banner-text active">757-940-5171</div>
         <div class="banner-text">Free Delivery.</div>
         <div class="banner-text">Free Quote.</div>

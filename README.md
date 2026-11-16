@@ -42,11 +42,32 @@ The Worker also caps abuse: 20 chats an hour and 60 a day per network address, 8
 Homeowners and one-off orders should be able to finish on their own. Contractors and government buyers are the accounts to grow.
 
 - A small order matches the shelf price. `matchPercentBelow` in `worker/config/rules.js` is **0**. Fuel is folded into the item price when the drive is long enough. The quote still says delivery is free.
-- If a price would sit under the margin floor, George does not show it. He says Zachary will confirm the price.
-- A bulk order is not a locked price. George gives a starting estimate, says bulk pricing usually comes in better, and the customer email says Zachary will send the bulk pricing.
+- If a price would sit under the margin floor, George does not show it. He says we'll confirm the price.
+- A bulk order is not a locked price. George gives a starting estimate, says bulk pricing usually comes in better, and the customer email says we'll send the bulk pricing. The customer never hears the founder's name.
 - Gloves and shirts marked `fixedPrice` stay at the price printed on the site. Virginia sales tax is 7% unless the buyer is government or tax-exempt, and a tax-exempt order needs a certificate.
 - Card and a government purchase card, ACH, and check are shown on the quote with their fees. Net terms stay approval-only.
 - He never tells a customer your cost, your margin, a supplier, or where an item was picked up. He never names other retailers. Change the numbers only in `worker/config/rules.js`.
+- Private product costs are not in the website or in git. Key them by catalog sku: `{"SKU":{"privateCost":1.23,"costSource":"example"}}`. `1.23` is a fake example. `costSource` is optional and defaults to `dealer`. A quote uses cost × 1.20 only when that result is at or below the shelf and the margin is at least 10%. Otherwise it uses the shelf, or says we'll confirm the price. If no cost is on file, George uses the shelf. The customer never sees the cost or who it came from.
+- Jackery is the exception. The public list in `worker/config/jackery-catalog.json` is the promo MAP, with no costs in it. George quotes that number exactly. He does not go under it, and he does not add fuel. Free shipping is already in the dealer price. If `(shelf - cost) / shelf` is under 10%, he says we'll confirm the price and does not show a number.
+- A Worker secret holds about 5 kB. The full cost file is larger, so the live costs go in KV. From the `worker` folder:
+
+```bash
+npx wrangler kv namespace create PRIVATE_COSTS_KV
+```
+
+Wrangler prints an id. In `worker/wrangler.toml`, uncomment the `kv_namespaces` block and replace the placeholder id `00000000000000000000000000000000` with that id. Save the real JSON on your machine as `worker/costs.json` (git already ignores it). One key, named `costs`:
+
+```bash
+npx wrangler kv key put --namespace-id <id> costs --path costs.json
+cd worker
+npx wrangler deploy
+```
+
+If that KV key is empty or KV cannot be read, George falls back to the `PRIVATE_COSTS_JSON` secret. A small file can still use the secret:
+
+```bash
+npx wrangler secret put PRIVATE_COSTS_JSON
+```
 - Every email to sales@ includes the tier. A company that looks like a bulk or ongoing account is **TIER 1 / PRIORITY**. A small order is still an instant quote, even from a big company. Homeowners are tier 3.
 
 ## 1. Preview George on your computer

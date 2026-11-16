@@ -2,14 +2,14 @@ import { rules } from "../config/rules.js";
 import { isAllowedCustomerUrl } from "../../shared/customer-text.js";
 import { formatEstimate, formatMoney, paymentOnTop, roundMoney } from "../../shared/pricing.js";
 
-const CONFIRM = "Zachary will confirm the price";
+const CONFIRM = "We'll confirm the price";
 const BALLPARK = "Starting estimate, bulk pricing usually comes in better.";
-const BULK_EMAIL = "Zachary will send your bulk pricing.";
-const SAME_DAY = "This looks available for same-day delivery. Zachary will confirm before you count on a clock time.";
-const SOURCED = "I can't get this one locally today, so it has to be sourced. I won't guess the lead time. Zachary will confirm it.";
-const GLOVES = "We keep the Victory Series on hand. Same-day delivery is often possible if your size is here. Zachary will confirm before you count on it.";
-const BULK_TIME = "For a bulk order, figure the next business day or one to two business days. That is a plan, not a promise. Zachary will confirm it.";
-const AFTER_HOURS = "It's outside business hours. Zachary will reply by 9 a.m. the next business day.";
+const BULK_EMAIL = "We'll send your bulk pricing.";
+const SAME_DAY = "This looks available for same-day delivery. We'll confirm before you count on a clock time.";
+const SOURCED = "I can't get this one locally today, so it has to be sourced. I won't guess the lead time. We'll confirm it.";
+const GLOVES = "We keep the Victory Series on hand. Same-day delivery is often possible if your size is here. We'll confirm before you count on it.";
+const BULK_TIME = "For a bulk order, figure the next business day or one to two business days.";
+const AFTER_HOURS = "It's outside business hours. We'll get back to you by 9 a.m. the next business day.";
 
 const PLACES = [
   ["virginia beach", 36.8529, -75.978],
@@ -132,7 +132,56 @@ function priceBound(shelf, channel) {
   return { estimate, cost, confirm: false };
 }
 
-export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice }) {
+function privateMarked(shelf, privateCost) {
+  const cost = Number(privateCost);
+  const shelfPrice = Number(shelf);
+  if (!(cost > 0) || !(shelfPrice > 0) || cost > shelfPrice) return null;
+  const marked = roundMoney(cost * rules.privateMarkup);
+  if (marked == null || marked > shelfPrice) return null;
+  const margin = (marked - cost) / marked;
+  if (margin + 1e-9 < rules.minGrossMargin) return null;
+  return marked;
+}
+
+function boundFor(shelf, channel, privateCost) {
+  const marked = privateMarked(shelf, privateCost);
+  if (marked != null) return { estimate: marked, cost: roundMoney(privateCost), confirm: false };
+  return priceBound(shelf, channel);
+}
+
+export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice, privateCost, mapPrice }) {
+  const shelfPrice = Number(shelf);
+  if (mapPrice) {
+    const map = roundMoney(shelfPrice);
+    if (!map) {
+      return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false, mapPrice: true, skipFuel: true };
+    }
+    const cost = Number(privateCost);
+    if (cost > 0 && (map - cost) / map < rules.minGrossMargin) {
+      return {
+        estimate: null,
+        estimateHigh: null,
+        cost: roundMoney(cost),
+        firm: false,
+        confirm: true,
+        ballpark: false,
+        mapPrice: true,
+        skipFuel: true,
+        shelfCeiling: map,
+      };
+    }
+    return {
+      estimate: map,
+      estimateHigh: null,
+      cost: cost > 0 ? roundMoney(cost) : null,
+      shelfCeiling: map,
+      firm: true,
+      confirm: false,
+      ballpark: false,
+      mapPrice: true,
+      skipFuel: true,
+    };
+  }
   if (fixedPrice && listPrice != null) {
     return {
       estimate: roundMoney(listPrice),
@@ -143,7 +192,6 @@ export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice
       ballpark: false,
     };
   }
-  const shelfPrice = Number(shelf);
   if (!Number.isFinite(shelfPrice) || shelfPrice <= 0) {
     return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false };
   }
@@ -151,31 +199,43 @@ export function priceFromShelf({ shelf, shelfHigh, source, fixedPrice, listPrice
   if (channel === "unknown") {
     return { estimate: null, estimateHigh: null, cost: null, firm: false, confirm: true, ballpark: false };
   }
-  const low = priceBound(shelfPrice, channel);
+  const low = boundFor(shelfPrice, channel, privateCost);
   if (low.confirm || low.estimate == null) {
     return { estimate: null, estimateHigh: null, cost: low.cost, firm: false, confirm: true, ballpark: false };
   }
   const highShelf = Number(shelfHigh);
   let estimateHigh = null;
   if (Number.isFinite(highShelf) && highShelf > shelfPrice) {
-    const high = priceBound(highShelf, channel);
+    const high = boundFor(highShelf, channel, privateCost);
     if (high.confirm || high.estimate == null) {
       return { estimate: null, estimateHigh: null, cost: low.cost, firm: false, confirm: true, ballpark: false };
     }
-    estimateHigh = high.estimate;
+    if (high.estimate > low.estimate) estimateHigh = high.estimate;
   }
   return {
     estimate: low.estimate,
     estimateHigh,
     cost: low.cost,
+    shelfCeiling: roundMoney(shelfPrice),
+    shelfHighCeiling: Number.isFinite(highShelf) && highShelf > shelfPrice ? roundMoney(highShelf) : null,
     firm: estimateHigh == null,
     confirm: false,
     ballpark: estimateHigh != null,
   };
 }
 
+function capToShelf(line) {
+  if (!line) return;
+  if (line.shelfCeiling != null && line.estimate != null && line.estimate > line.shelfCeiling) {
+    line.estimate = line.shelfCeiling;
+  }
+  if (line.shelfHighCeiling != null && line.estimateHigh != null && line.estimateHigh > line.shelfHighCeiling) {
+    line.estimateHigh = line.shelfHighCeiling;
+  }
+}
+
 export function applyFuel(lines, miles) {
-  const priced = lines.filter((line) => line.estimate != null && !line.confirm && !line.fixedListed);
+  const priced = lines.filter((line) => line.estimate != null && !line.confirm && !line.fixedListed && !line.skipFuel && !line.mapPrice);
   const marginDollars = priced.reduce((sum, line) => {
     if (line.cost == null) return sum;
     return sum + (line.estimate - line.cost) * (line.qty || 1);
@@ -183,6 +243,7 @@ export function applyFuel(lines, miles) {
   const fuel = fuelDollars(miles);
   const trip = miles || 0;
   if (!(fuel > 0) || !(marginDollars > 0) || fuel <= rules.fuelShareOfMargin * marginDollars) {
+    lines.forEach(capToShelf);
     return { lines, fuelAdded: 0, miles: trip };
   }
   const base = priced.reduce((sum, line) => sum + line.estimate * (line.qty || 1), 0);
@@ -198,6 +259,7 @@ export function applyFuel(lines, miles) {
     line.estimate = roundMoney(line.estimate + each);
     if (line.estimateHigh != null) line.estimateHigh = roundMoney(line.estimateHigh + each);
   });
+  lines.forEach(capToShelf);
   return { lines, fuelAdded: fuel, miles: trip };
 }
 
@@ -260,11 +322,12 @@ export function leadTimeNote({ bulk, owned, localPickup }) {
   if (owned) return GLOVES;
   if (localPickup === true) return SAME_DAY;
   if (localPickup === false) return SOURCED;
-  return "I won't promise it's on hand. Zachary will confirm timing.";
+  return "";
 }
 
 function publicLine(line, bulk) {
-  const confirm = Boolean(line.confirm) || (bulk && !line.fixedListed);
+  const locked = Boolean(line.fixedListed || line.mapPrice);
+  const confirm = Boolean(line.confirm) || (bulk && !locked);
   return {
     name: line.name,
     sku: line.sku || "",
@@ -272,10 +335,12 @@ function publicLine(line, bulk) {
     estimate: confirm && bulk ? line.estimate : (line.confirm ? null : line.estimate),
     estimateHigh: confirm && !bulk ? null : (line.estimateHigh ?? null),
     firm: !confirm && line.firm,
-    ballpark: bulk && line.estimate != null && !line.fixedListed,
+    ballpark: bulk && line.estimate != null && !locked,
     confirm: line.confirm && !bulk,
     confidence: line.confirm ? "unsure" : (bulk ? "ballpark" : "list"),
-    kind: line.fixedListed ? "listed" : (bulk ? "ballpark" : "instant"),
+    kind: locked ? "listed" : (bulk ? "ballpark" : "instant"),
+    stockNote: line.stockNote || "",
+    mapPrice: Boolean(line.mapPrice),
     model: line.model || "",
     manufacturer: line.manufacturer || "",
     manufacturerUrl: line.manufacturerUrl || "",
@@ -308,10 +373,9 @@ export function presentQuote({
   const totals = lead.bulk ? null : moneyTotals(working.filter((line) => !line.confirm), { taxExempt });
   const notes = [
     lead.bulk ? `${BALLPARK} ${BULK_EMAIL}` : "",
-    leadTimeNote({ bulk: lead.bulk, owned, localPickup }),
-    afterHoursNote(now),
+    lead.bulk ? "" : leadTimeNote({ bulk: false, owned, localPickup }),
     lead.askVolume ? "About how often do you order, and is this a typical size for you?" : "",
-    taxExempt ? "Tax-exempt orders need a certificate. Zachary will follow up for that." : "",
+    taxExempt ? "Tax-exempt orders need a certificate. We'll follow up for that." : "",
   ].filter(Boolean);
   return {
     items,
@@ -403,7 +467,7 @@ function withoutModelLinks(sentence) {
 
 export function itemPriceLine(item) {
   const name = String(item?.name || "").trim();
-  if (!name) return "";
+  if (!name || /^item$/i.test(name)) return "";
   const qty = item.qty ? `${item.qty} × ` : "";
   const fees = gloveFees(item);
   if (fees) {
@@ -413,8 +477,9 @@ export function itemPriceLine(item) {
   if (item.ballpark && amount) {
     return `${qty}${name}: Starting estimate ${amount}.`;
   }
-  if (!amount || item.confirm) return `${qty}${name}: Zachary will confirm the price.`;
-  return `${qty}${name}: ${amount}.`;
+  const stock = /pre-order|out of stock/i.test(item.stockNote || "") ? ` ${item.stockNote}` : "";
+  if (!amount || item.confirm) return `${qty}${name}.${stock}`.trim();
+  return `${qty}${name}: ${amount}.${stock}`;
 }
 
 /** Chat text uses the same rounded figures as the quote form. Shelf dollars that differ are dropped. */
@@ -437,15 +502,20 @@ export function replyWithFinalPrices(modelReply, items) {
   const seen = new Set(itemLines.map((line) => line.toLowerCase()));
   const explanation = [];
   const questions = [];
-  for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+/)) {
+  for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+(?=[A-Z])/)) {
     const trimmed = withoutModelLinks(sentence.trim());
     if (!trimmed || /^(our page|maker page|makita|dewalt|milwaukee)$/i.test(trimmed)) continue;
+    if (/^-?\s*item\.?$/i.test(trimmed)) continue;
+    if (/not a promise that it(?:'s| is) on the truck/i.test(trimmed)) continue;
+    if (/that is a plan, not a promise/i.test(trimmed)) continue;
+    if (/that(?:'s| is) an estimate/i.test(trimmed)) continue;
     const key = trimmed.toLowerCase();
     if (seen.has(key)) continue;
     const amounts = dollarTokens(trimmed);
+    if (amounts.length && itemLines.length) continue;
     if (amounts.length && amounts.some((amount) => !allowed.has(amount))) continue;
     if (restatesServerPrice(trimmed, list)) continue;
-    if (list.some((item) => item.ballpark) && /bulk pricing usually comes in better|zachary will send (your |the )?bulk pricing/i.test(trimmed)) continue;
+    if (list.some((item) => item.ballpark) && /bulk pricing usually comes in better|we['’]?ll send (your |the )?bulk pricing|zachary will send (your |the )?bulk pricing/i.test(trimmed)) continue;
     seen.add(key);
     if (/\?\s*$/.test(trimmed)) questions.push(trimmed);
     else explanation.push(trimmed);
@@ -460,6 +530,8 @@ export function replyWithFinalPrices(modelReply, items) {
   if (links.length) blocks.push(links.join("\n"));
   if (explanation.length) blocks.push(explanation.join(" "));
   if (questions.length) blocks.push(questions.join(" "));
+  const anyPrice = list.some((item) => formatEstimate(item));
+  if (!anyPrice && list.some((item) => !formatEstimate(item) || item.confirm)) blocks.push("We'll confirm the price.");
   return blocks.join("\n\n").trim();
 }
 

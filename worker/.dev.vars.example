@@ -4,3 +4,7 @@
 XAI_API_KEY=
 RESEND_API_KEY=
 MOCK_MODE=true
+# Real costs stay in this local file or in the Worker secret PRIVATE_COSTS_JSON.
+# Do not commit them. Example shape only, with a fake number:
+# PRIVATE_COSTS_JSON={"EXAMPLE-SKU":{"privateCost":1.23,"costSource":"example"}}
+# Larger cost files belong in KV key "costs", not in this file. See README.

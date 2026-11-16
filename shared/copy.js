@@ -6,10 +6,17 @@ export const SALES_EMAIL = "sales@yorktowntools.com";
 export const HOURS = "Monday–Friday, 8:00 AM – 5:00 PM Eastern";
 export const SERVICE_AREA = "Richmond to Virginia Beach, including Hampton Roads and the military bases";
 
-export const BULK_LINE =
-  "Starting estimate, bulk pricing usually comes in better. Zachary will send your bulk pricing.";
+export const GREETING = "Hey, I'm George with Yorktown Tools. How can I help you today?";
 
-export const CONFIRM_PRICE = "Zachary will confirm the price.";
+export const QUOTE_OFFER = "Want me to put a quote together?";
+
+export const BULK_LINE =
+  "Starting estimate, bulk pricing usually comes in better. We'll send your bulk pricing.";
+
+export const CONFIRM_PRICE = "We'll confirm the price.";
+
+export const AFTER_HOURS_LINE =
+  "It's outside business hours. We'll get back to you by 9 a.m. the next business day.";
 
 export const SAFE_COST_REPLY =
   "I don't get into what we pay or how a price is built. " + CONFIRM_PRICE;
@@ -17,8 +24,7 @@ export const SAFE_COST_REPLY =
 export const SAFE_RETAILER_REPLY =
   "I only quote Yorktown Tools. Tell me the brand, model, and quantity and I'll put an estimate together. Delivery to the job site is free.";
 
-export const ESTIMATE_NOTE =
-  "That's an estimate, not a promise that it's on the truck.";
+export const ESTIMATE_NOTE = "";
 
 export const CREDIT_APP_URL =
   "https://yorktowntools.com/yorktown%20tools%20credit%20application.pdf";
