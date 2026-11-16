@@ -18,7 +18,7 @@ import {
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
-import { extractShelfPrice } from "../src/shelf-fetch.js";
+import { collectSearchUrls, extractShelfPrice, pageMatchesModel, readModelShelf, resetShelfCache, writeModelShelf } from "../src/shelf-fetch.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
 import { loadPrivateCosts, privateCostFor, readPrivateCosts } from "../config/private-costs.js";
 import jackeryCatalog from "../config/jackery-catalog.json" with { type: "json" };
@@ -483,8 +483,13 @@ test("private cost comes from the environment and stays off the customer reply",
   const marked = priceFromShelf({ shelf: 80, source: "A", privateCost: 40 });
   assert.equal(marked.estimate, 48);
   const aboveShelf = priceFromShelf({ shelf: 149, shelfHigh: 179, source: "A", privateCost: 400 });
-  assert.equal(aboveShelf.estimate, 149);
-  assert.equal(aboveShelf.estimateHigh, 179);
+  assert.equal(aboveShelf.estimate, null);
+  assert.equal(aboveShelf.confirm, true);
+  const thinShelf = priceFromShelf({ shelf: 209, source: "A", privateCost: 200 });
+  assert.equal(thinShelf.estimate, null);
+  assert.equal(thinShelf.confirm, true);
+  const floorOk = priceFromShelf({ shelf: 100, source: "A", privateCost: 90 });
+  assert.equal(floorOk.estimate, 100);
   const dealer = priceFromShelf({ shelf: 400, source: "A", privateCost: 250 });
   assert.equal(dealer.estimate, 300);
   rules.privateMarkup = 1.05;
@@ -509,8 +514,9 @@ test("private cost comes from the environment and stays off the customer reply",
   }), { ...env, PRIVATE_COSTS_JSON: secret });
   const body = await chat.json();
   const packed = JSON.stringify(body.quote.items);
-  assert.equal(body.quote.items[0].estimate, 149);
-  assert.equal(body.quote.items[0].estimateHigh, 179);
+  assert.equal(body.quote.items[0].estimate, null);
+  assert.match(body.reply, /for our team to price/i);
+  assert.doesNotMatch(body.reply, /Out the door/);
   assert.doesNotMatch(`${body.reply}\n${packed}`, /400|privateCost|costSource|nasco|\bORS\b|dealer cost/i);
   assert.equal(body.quote.items[0].cost, undefined);
 
@@ -1692,6 +1698,254 @@ test("a search URL with no snippet is priced from the product page and cached", 
   assert.match(fromModel.reply, /Out the door that's \$208\.30/);
   assert.match(fromModel.reply, /Would you like to place an order\?/);
   assert.doesNotMatch(fromModel.reply, /home depot|lowe/i);
+});
+
+test("two product pages for the same model use the lowest shelf price", async () => {
+  resetLimits();
+  resetShelfCache();
+  const high = "https://www.homedepot.com/p/DEWALT-20V-MAX-XR-DCD996B/206936571";
+  const low = "https://www.lowes.com/pd/DEWALT-DCD996B/100000000";
+  const pages = {
+    [high]: `<html><title>DEWALT DCD996B</title><script type="application/ld+json">{"@type":"Product","name":"DEWALT DCD996B","offers":{"price":"259.00"}}</script></html>`,
+    [low]: `<html><title>DEWALT DCD996B</title><script type="application/ld+json">{"@type":"Product","name":"DEWALT DCD996B","offers":{"price":"209.00"}}</script></html>`,
+  };
+  const envFor = (first, second, shelf = null) => ({
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf, source: shelf ? "A" : "U" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: first, title: "DEWALT DCD996B", snippet: "" },
+          { url: second, title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async (asked) => {
+      const html = pages[asked];
+      assert.ok(html, asked);
+      return { text: async () => html };
+    },
+  });
+  const first = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], envFor(high, low))).json();
+  assert.equal(first.quote.items[0].estimate, 209);
+  assert.match(first.reply, /1 × DeWalt DCD996B: \$209\.00/);
+  assert.match(first.reply, /Out the door that's \$230\.34/);
+  assert.match(first.reply, /Would you like to place an order\?/);
+  assert.doesNotMatch(first.reply, /\$259|285\.44/);
+  assert.doesNotMatch(first.reply, /home depot|lowe|privateCost|margin|wholesale/i);
+
+  resetLimits();
+  resetShelfCache();
+  const flipped = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], envFor(low, high))).json();
+  assert.equal(flipped.quote.items[0].estimate, 209);
+  assert.match(flipped.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(flipped.reply, /\$259|285\.44|home depot|lowe/i);
+
+  resetLimits();
+  resetShelfCache();
+  const alreadyPriced = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], envFor(high, low, 259))).json();
+  assert.equal(alreadyPriced.quote.items[0].estimate, 209);
+  assert.match(alreadyPriced.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(alreadyPriced.reply, /\$259|285\.44|home depot|lowe/i);
+
+  const hd2 = "https://www.homedepot.com/p/DEWALT-20V-MAX-XR-DCD996B/206936579";
+  const picked = collectSearchUrls({
+    output: [{
+      type: "web_search_result",
+      results: [
+        { url: high, title: "DEWALT DCD996B" },
+        { url: hd2, title: "DEWALT DCD996B" },
+        { url: low, title: "DEWALT DCD996B" },
+      ],
+    }],
+  });
+  assert.equal(picked.length, 2);
+  assert.deepEqual(picked.map((page) => page.url).sort(), [high, low].sort());
+
+  pages[hd2] = pages[high];
+  resetLimits();
+  resetShelfCache();
+  const laterLower = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: 259, source: "A" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: high, title: "DEWALT DCD996B", snippet: "" },
+          { url: hd2, title: "DEWALT DCD996B", snippet: "" },
+          { url: low, title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async (asked) => {
+      const html = pages[asked];
+      assert.ok(html, asked);
+      return { text: async () => html };
+    },
+  })).json();
+  assert.equal(laterLower.quote.items[0].estimate, 209);
+  assert.match(laterLower.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(laterLower.reply, /\$259|285\.44|home depot|lowe/i);
+});
+
+test("a lowest shelf under the minimum margin is a team handoff", async () => {
+  resetLimits();
+  resetShelfCache();
+  const high = "https://www.homedepot.com/p/DEWALT-20V-MAX-XR-DCD996B/206936572";
+  const low = "https://www.lowes.com/pd/DEWALT-DCD996B/100000001";
+  const secret = JSON.stringify({ DCD996B: { privateCost: 200, costSource: "example" } });
+  const body = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    PRIVATE_COSTS_JSON: secret,
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: null, source: "U" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: high, title: "DEWALT DCD996B", snippet: "" },
+          { url: low, title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async (asked) => {
+      const price = asked === high ? "259.00" : "209.00";
+      return {
+        text: async () => `<html><title>DEWALT DCD996B</title><script type="application/ld+json">{"@type":"Product","name":"DEWALT DCD996B","offers":{"price":"${price}"}}</script></html>`,
+      };
+    },
+  })).json();
+  assert.match(body.reply, /That one's for our team to price/);
+  assert.match(body.reply, /DCD996B/);
+  assert.doesNotMatch(body.reply, /Out the door/);
+  assert.doesNotMatch(body.reply, /Would you like to place an order/);
+  assert.doesNotMatch(body.reply, /\$209|\$259|230\.34|285\.44|\$200|privateCost|costSource|margin|wholesale|home depot|lowe/i);
+  const packed = JSON.stringify(body.quote || {});
+  assert.doesNotMatch(packed, /\b200\b|privateCost|costSource|margin/i);
+  assert.equal(body.quote.items[0].cost, undefined);
+  assert.equal(body.quote.items[0].estimate, null);
+});
+
+test("an exact model never accepts a different model, and the lowest shelf stays cached", async () => {
+  assert.equal(pageMatchesModel({ url: "https://www.homedepot.com/p/DEWALT-DCD-996B/1", title: "" }, "DCD996B"), true);
+  assert.equal(pageMatchesModel({ title: "DEWALT DCD 996B drill" }, "dcd996b"), true);
+  assert.equal(pageMatchesModel({ model: "DCD996B" }, "DCD 996B"), true);
+  assert.equal(pageMatchesModel({
+    url: "https://www.homedepot.com/p/DEWALT-DCD771C2-Kit/207000001",
+    title: "DEWALT DCD771C2 kit",
+    model: "DCD771C2",
+  }, "DCD996B"), false);
+  assert.equal(pageMatchesModel({ title: "DEWALT DCD996B2 kit" }, "DCD996B"), false);
+
+  resetShelfCache();
+  assert.equal(await readModelShelf({ PRIVATE_COSTS_KV: { get: async () => { throw new Error("down"); } } }, "DCD996B"), null);
+  await writeModelShelf({ PRIVATE_COSTS_KV: { put: async () => { throw new Error("down"); } } }, "DCD-996B", 209);
+  assert.equal(await readModelShelf({}, "dcd 996b"), 209);
+  assert.equal(await readModelShelf({}, "DCD771C2"), null);
+
+  resetLimits();
+  const wrong = "https://www.homedepot.com/p/DEWALT-DCD771C2-Kit/207000001";
+  const blocked = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD771C2 kit", sku: "DCD771C2", qty: 1, shelf: 149, source: "A" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [{ url: wrong, title: "DEWALT DCD771C2 kit", snippet: "" }],
+      }],
+    }),
+    fetchProductPage: async () => ({
+      text: async () => `<html><title>DEWALT DCD771C2 kit</title><script type="application/ld+json">{"@type":"Product","sku":"DCD771C2","name":"DEWALT DCD771C2","offers":{"price":"149.00"}}</script></html>`,
+    }),
+  })).json();
+  assert.match(blocked.reply, /DCD996B/);
+  assert.doesNotMatch(blocked.reply, /DCD771C2/);
+  assert.doesNotMatch(blocked.reply, /\$149|Out the door|149\.00/);
+  assert.match(blocked.reply, /That one's for our team to price/);
+  assert.doesNotMatch(blocked.reply, /home depot|lowe|margin|privateCost|wholesale/i);
+
+  resetLimits();
+  const high = "https://www.homedepot.com/p/DEWALT-20V-MAX-XR-DCD996B/206936580";
+  const highAgain = "https://www.homedepot.com/p/DEWALT-20V-MAX-XR-DCD996B/206936581";
+  const low = "https://www.lowes.com/pd/DEWALT-DCD996B/100000010";
+  const kvStore = new Map();
+  const kv = {
+    async get(key) { return kvStore.has(key) ? kvStore.get(key) : null; },
+    async put(key, value) { kvStore.set(key, value); },
+  };
+  const pageHtml = (url) => {
+    const price = url === low ? "209.00" : "259.00";
+    return `<html><title>DEWALT DCD996B</title><script type="application/ld+json">{"@type":"Product","sku":"DCD996B","name":"DEWALT DCD996B","offers":{"price":"${price}"}}</script></html>`;
+  };
+  let calls = 0;
+  const first = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    PRIVATE_COSTS_KV: kv,
+    callXai: async () => {
+      calls += 1;
+      const url = calls === 1 ? high : low;
+      return {
+        output_text: `QUOTE_JSON: ${JSON.stringify({
+          items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: null, source: "U" }],
+        })}`,
+        output: [{ type: "web_search_result", results: [{ url, title: "DEWALT DCD996B", snippet: "" }] }],
+      };
+    },
+    fetchProductPage: async (asked) => ({ text: async () => pageHtml(asked) }),
+  })).json();
+  assert.equal(calls, 2);
+  assert.equal(first.quote.items[0].estimate, 209);
+  assert.match(first.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(first.reply, /\$259|285\.44|DCD771C2|home depot|lowe|margin|privateCost/i);
+  assert.equal(JSON.parse(kvStore.get("shelf:DCD996B")).shelf, 209);
+
+  const repeat = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    PRIVATE_COSTS_KV: kv,
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: 259, source: "A" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: high, title: "DEWALT DCD996B", snippet: "" },
+          { url: highAgain, title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async (asked) => ({ text: async () => pageHtml(asked) }),
+  })).json();
+  assert.equal(repeat.quote.items[0].estimate, 209);
+  assert.match(repeat.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(repeat.reply, /\$259|285\.44|home depot|lowe|margin|privateCost/i);
+  assert.equal(JSON.parse(kvStore.get("shelf:DCD996B")).shelf, 209);
+
+  resetLimits();
+  const shaky = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    PRIVATE_COSTS_KV: {
+      get: async () => { throw new Error("down"); },
+      put: async () => { throw new Error("down"); },
+    },
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: null, source: "U" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: high, title: "DEWALT DCD996B", snippet: "" },
+          { url: low, title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async (asked) => ({ text: async () => pageHtml(asked) }),
+  })).json();
+  assert.equal(shaky.quote.items[0].estimate, 209);
+  assert.doesNotMatch(shaky.reply, /down|privateCost|margin|home depot|lowe|\$259/i);
 });
 
 test("a product page that does not answer still prices the question before the handoff", async () => {

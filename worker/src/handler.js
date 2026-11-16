@@ -5,7 +5,16 @@ import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared
 import { filterCustomerText, isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
-import { collectSearchUrls, fetchShelfPrices, resetShelfCache } from "./shelf-fetch.js";
+import {
+  collectSearchUrls,
+  exactModelsIn,
+  fetchShelfPrices,
+  normalizeModel,
+  pageMatchesModel,
+  readModelShelf,
+  resetShelfCache,
+  writeModelShelf,
+} from "./shelf-fetch.js";
 import {
   fillMissingShelf,
   formatMoney,
@@ -531,24 +540,68 @@ function modelCodeOf(item) {
   return match ? match[0] : "";
 }
 
-function shelfNotes(lines, pages) {
-  const waiting = (lines || []).filter((line) => line.estimate == null);
-  const notes = [];
-  const used = new Set();
-  for (const page of pages || []) {
-    if (!(Number(page?.shelf) > 0)) continue;
-    const blob = `${page.url || ""} ${page.title || ""}`.toLowerCase();
-    let match = waiting.find((line) => {
-      if (used.has(line)) return false;
-      const code = modelCodeOf(line);
-      return code && blob.includes(code.toLowerCase());
-    });
-    if (!match && waiting.length === 1 && !used.has(waiting[0])) match = waiting[0];
-    if (!match) continue;
-    used.add(match);
-    notes.push(`${match.name} ${match.sku || ""} $${Number(page.shelf)}`);
+const BRAND_PRETTY = {
+  dewalt: "DeWalt",
+  milwaukee: "Milwaukee",
+  makita: "Makita",
+  bosch: "Bosch",
+  ridgid: "Ridgid",
+  hilti: "Hilti",
+};
+
+function pagesForLine(line, pages, waiting = []) {
+  const code = modelCodeOf(line);
+  const priced = (pages || []).filter((page) => Number(page?.shelf) > 0);
+  if (code) return priced.filter((page) => pageMatchesModel(page, code));
+  if (waiting.length === 1) return priced;
+  return [];
+}
+
+function alignItemsToCustomerModels(items, latest) {
+  const wanted = exactModelsIn(latest);
+  if (!wanted.length) return items || [];
+  return wanted.map((code) => {
+    const hit = (items || []).find((item) => pageMatchesModel({
+      title: `${item?.name || ""} ${item?.sku || ""}`,
+      model: item?.model || "",
+      sku: item?.sku || "",
+    }, code));
+    if (hit) return { ...hit };
+    const brand = String(latest || "").match(/\b(dewalt|milwaukee|makita|bosch|ridgid|hilti)\b/i);
+    const label = brand ? BRAND_PRETTY[brand[1].toLowerCase()] || brand[1] : "";
+    const pretty = code.toUpperCase();
+    return {
+      name: label ? `${label} ${pretty}` : pretty,
+      sku: pretty,
+      qty: 1,
+      shelf: null,
+      source: "U",
+    };
+  });
+}
+
+function applyLowestFetchedShelves(items, pages, cached = {}) {
+  const list = (items || []).map((item) => ({ ...item }));
+  for (const item of list) {
+    const hits = pagesForLine(item, pages, list);
+    const prices = hits.map((page) => Number(page.shelf)).filter((price) => price > 0);
+    const saved = Number(cached[normalizeModel(modelCodeOf(item))]);
+    if (saved > 0) prices.push(saved);
+    if (!prices.length) continue;
+    const fetched = Math.min(...prices);
+    const current = Number(item.shelf);
+    item.shelf = current > 0 ? Math.min(current, fetched) : fetched;
+    if (item.shelf > 0 && (!item.source || String(item.source).toUpperCase() === "U")) item.source = "A";
   }
-  return notes.join("\n");
+  return list;
+}
+
+function matchingPageCount(items, pages) {
+  const urls = new Set();
+  for (const item of items || []) {
+    for (const page of pagesForLine(item, pages)) urls.add(page.url || `${page.title}:${page.shelf}`);
+  }
+  return urls.size;
 }
 
 function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "", latest = "" } = {}) {
@@ -855,23 +908,62 @@ async function chat(request, env) {
     );
     const parsed = splitModelOutput(outputText(data));
     let prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
-    const rawItems = alignRequested(parsed.quote?.items || [], latest);
+    let rawItems = alignItemsToCustomerModels(alignRequested(parsed.quote?.items || [], latest), latest);
     const costs = await costsFromEnv(env);
     let lines = linesFromQuote({ items: rawItems }, prose, costs);
-    if (lines.some((line) => line.estimate == null && (specificItem(line) || customerConfirmed(latest)))) {
+    let extraSearches = 0;
+    const namedModel = exactModelsIn(latest).length > 0 || rawItems.some((item) => modelCodeOf(item));
+    if (namedModel && (lines.some((line) => specificItem(line) || customerConfirmed(latest)) || exactModelsIn(latest).length)) {
       try {
-        const pages = collectSearchUrls(data);
-        if (pages.length) {
-          const fetched = await fetchShelfPrices(pages, {
-            fetchImpl: typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch,
-            timeoutMs: num(env.SHELF_FETCH_TIMEOUT_MS, 1800),
-          });
-          const note = shelfNotes(lines, fetched);
-          if (note) {
-            prose = `${prose}\n${note}`;
-            lines = linesFromQuote({ items: rawItems }, prose, costs);
+        const fetchImpl = typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch;
+        const budgetMs = num(env.SHELF_FETCH_TIMEOUT_MS, 2500);
+        const deadline = Date.now() + budgetMs;
+        let pages = collectSearchUrls(data, 4);
+        let fetched = pages.length
+          ? await fetchShelfPrices(pages, { fetchImpl, timeoutMs: budgetMs, deadline })
+          : [];
+        const room = underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
+          && underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
+        if (matchingPageCount(rawItems, fetched) < 2 && exactModelsIn(latest).length && room && Date.now() + 150 < deadline) {
+          take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
+          take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
+          extraSearches += 1;
+          const code = exactModelsIn(latest)[0].toUpperCase();
+          const extra = await (typeof env.callXai === "function" ? env.callXai : callXai)(
+            env,
+            buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
+            [
+              ...messages.map((message) => ({ role: message.role, content: message.content })),
+              { role: "user", content: `Search again for the current retail price of exact model ${code}. Return product pages for ${code} only. Do not substitute a different model.` },
+            ],
+            true,
+          );
+          const seen = new Set(pages.map((page) => page.url));
+          const morePages = collectSearchUrls(extra, 4).filter((page) => page.url && !seen.has(page.url));
+          if (morePages.length && Date.now() + 30 < deadline) {
+            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline });
+            fetched = fetched.concat(more);
+            pages = pages.concat(morePages);
           }
         }
+        const cached = {};
+        for (const item of rawItems) {
+          const code = modelCodeOf(item);
+          if (!code) continue;
+          const saved = await readModelShelf(env, code);
+          if (saved > 0) cached[normalizeModel(code)] = saved;
+        }
+        rawItems = applyLowestFetchedShelves(rawItems, fetched, cached);
+        for (const item of rawItems) {
+          const code = modelCodeOf(item);
+          if (!code) continue;
+          const verified = pagesForLine(item, fetched).map((page) => Number(page.shelf)).filter((price) => price > 0);
+          const saved = Number(cached[normalizeModel(code)]) || 0;
+          const prices = saved > 0 ? verified.concat(saved) : verified;
+          if (!prices.length) continue;
+          await writeModelShelf(env, code, Math.min(...prices));
+        }
+        lines = linesFromQuote({ items: rawItems }, prose, costs);
       } catch {
         // A page that does not load still ends in the team handoff.
       }
@@ -902,11 +994,12 @@ async function chat(request, env) {
     }
     const finalized = finalizeReply(ordered, messages, latest);
     const reply = advice ? finalized : replaceRepeatedReply(parsed.reply, finalized, messages);
-    const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
-    if (canSearch && searchesUsed > 1) {
-      take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
-      take(`search-ip:${ip}`, searchesUsed - 1, 24 * 60 * 60 * 1000, now);
+    const firstSearches = canSearch ? Math.max(1, countSearches(data)) : 0;
+    if (canSearch && firstSearches > 1) {
+      take(`search-s:${sid}`, firstSearches - 1, 6 * 60 * 60 * 1000, now);
+      take(`search-ip:${ip}`, firstSearches - 1, 24 * 60 * 60 * 1000, now);
     }
+    const searchesUsed = firstSearches + extraSearches;
     return json({
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {

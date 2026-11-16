@@ -144,6 +144,15 @@ function privateMarked(shelf, privateCost) {
 }
 
 function boundFor(shelf, channel, privateCost) {
+  const cost = Number(privateCost);
+  const shelfPrice = Number(shelf);
+  // Selling at this shelf must still clear the minimum margin over what we pay.
+  if (cost > 0 && shelfPrice > 0) {
+    const margin = (shelfPrice - cost) / shelfPrice;
+    if (margin + 1e-9 < rules.minGrossMargin) {
+      return { estimate: null, cost: roundMoney(cost), confirm: true };
+    }
+  }
   const marked = privateMarked(shelf, privateCost);
   if (marked != null) return { estimate: marked, cost: roundMoney(privateCost), confirm: false };
   return priceBound(shelf, channel);

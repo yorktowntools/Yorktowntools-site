@@ -1,7 +1,10 @@
-/** Pull a shelf price off one or two product pages when search returns URLs only. */
+/** Pull a shelf price off a few product pages when search returns URLs only. */
 
 const TTL_MS = 6 * 60 * 60 * 1000;
+const MODEL_TTL_MS = 24 * 60 * 60 * 1000;
+const MAX_FETCH_PAGES = 4;
 const cache = new Map();
+const modelShelves = new Map();
 
 const PRODUCT_HOSTS = [
   "homedepot.com",
@@ -18,6 +21,90 @@ const PRODUCT_HOSTS = [
 
 export function resetShelfCache() {
   cache.clear();
+  modelShelves.clear();
+}
+
+export function normalizeModel(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+const MODEL_TOKEN = /\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/gi;
+
+export function exactModelsIn(text) {
+  const found = [];
+  const seen = new Set();
+  const add = (value) => {
+    const norm = normalizeModel(value);
+    if (norm.length < 5 || !/\d{3,}/.test(norm) || seen.has(norm)) return;
+    seen.add(norm);
+    found.push(norm);
+  };
+  const raw = String(text || "");
+  for (const match of raw.matchAll(MODEL_TOKEN)) add(match[0]);
+  for (const match of raw.matchAll(/\b([a-z]{2,6})[\s-]+(\d{3,}[a-z0-9]*)\b/gi)) add(`${match[1]}${match[2]}`);
+  return found;
+}
+
+export function textHasExactModel(value, model) {
+  const wanted = normalizeModel(model);
+  if (!wanted || wanted.length < 5) return false;
+  const tokens = String(value || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  for (let i = 0; i < tokens.length; i += 1) {
+    let joined = "";
+    for (let j = i; j < tokens.length; j += 1) {
+      joined += tokens[j];
+      if (joined === wanted) return true;
+      if (joined.length >= wanted.length) break;
+    }
+  }
+  return false;
+}
+
+export function pageMatchesModel(page, model) {
+  const fields = [page?.url, page?.title, page?.name, page?.model, page?.sku];
+  return fields.some((field) => textHasExactModel(field, model));
+}
+
+function shelfKey(model) {
+  const norm = normalizeModel(model).toUpperCase();
+  return norm ? `shelf:${norm}` : "";
+}
+
+export async function readModelShelf(env, model) {
+  const key = shelfKey(model);
+  if (!key) return null;
+  const now = Date.now();
+  const memory = modelShelves.get(key);
+  if (memory && memory.expires > now && Number(memory.shelf) > 0) return Number(memory.shelf);
+  const kv = env?.PRIVATE_COSTS_KV;
+  if (!kv || typeof kv.get !== "function") return null;
+  try {
+    const raw = await kv.get(key);
+    if (raw == null || !String(raw).trim()) return null;
+    const parsed = JSON.parse(String(raw));
+    const shelf = Number(parsed?.shelf);
+    const expires = Number(parsed?.expires) || 0;
+    if (!(shelf > 0) || (expires && expires <= now)) return null;
+    modelShelves.set(key, { shelf, expires: expires || now + MODEL_TTL_MS });
+    return shelf;
+  } catch {
+    return null;
+  }
+}
+
+export async function writeModelShelf(env, model, shelf) {
+  const price = Number(shelf);
+  const key = shelfKey(model);
+  if (!key || !(price > 0)) return;
+  const record = { shelf: Math.round(price * 100) / 100, expires: Date.now() + MODEL_TTL_MS };
+  modelShelves.set(key, record);
+  const kv = env?.PRIVATE_COSTS_KV;
+  if (!kv || typeof kv.put !== "function") return;
+  try {
+    await kv.put(key, JSON.stringify(record), { expirationTtl: 24 * 60 * 60 });
+  } catch {
+    // The in-memory shelf still keeps this run consistent.
+  }
 }
 
 function hostOk(hostname) {
@@ -108,8 +195,73 @@ export function extractShelfPrice(html) {
   return null;
 }
 
+function modelFromJson(value, depth = 0) {
+  if (depth > 6 || value == null) return "";
+  if (typeof value === "string") {
+    try {
+      return modelFromJson(JSON.parse(value), depth + 1);
+    } catch {
+      return "";
+    }
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = modelFromJson(item, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
+  if (typeof value !== "object") return "";
+  const type = String(value["@type"] || "");
+  if (/product/i.test(type) || value.sku || value.mpn || value.model) {
+    const direct = exactModelsIn(`${value.sku || ""} ${value.mpn || ""} ${value.model || ""}`)[0];
+    if (direct) return direct;
+    const named = exactModelsIn(String(value.name || ""))[0];
+    if (named) return named;
+  }
+  if (value["@graph"]) return modelFromJson(value["@graph"], depth + 1);
+  return "";
+}
+
+export function extractPageModel(html) {
+  const text = String(html || "");
+  const blocks = text.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
+  for (const block of blocks) {
+    const model = modelFromJson(block[1]);
+    if (model) return model;
+  }
+  return "";
+}
+
+const COLLECT_LIMIT = 8;
+
+function hostKey(value) {
+  try {
+    return new URL(value).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+function pickDiverseProductPages(pages, limit = 2) {
+  const firstByHost = [];
+  const seenHost = new Set();
+  const rest = [];
+  for (const page of pages || []) {
+    const host = hostKey(page?.url);
+    if (!page?.url || !host) continue;
+    if (seenHost.has(host)) {
+      rest.push(page);
+      continue;
+    }
+    seenHost.add(host);
+    firstByHost.push(page);
+  }
+  return [...firstByHost, ...rest].slice(0, limit);
+}
+
 function walkUrls(value, pages, seen, depth) {
-  if (depth > 8 || value == null || pages.length >= 2) return;
+  if (depth > 8 || value == null || pages.length >= COLLECT_LIMIT) return;
   if (typeof value === "string") {
     const found = value.match(/https?:\/\/[^\s"'<>]+/gi) || [];
     for (const raw of found) {
@@ -117,7 +269,7 @@ function walkUrls(value, pages, seen, depth) {
       if (!url || seen.has(url)) continue;
       seen.add(url);
       pages.push({ url, title: "" });
-      if (pages.length >= 2) return;
+      if (pages.length >= COLLECT_LIMIT) return;
     }
     return;
   }
@@ -131,7 +283,7 @@ function walkUrls(value, pages, seen, depth) {
     seen.add(url);
     pages.push({ url, title: String(value.title || value.name || "") });
   }
-  if (pages.length >= 2) return;
+  if (pages.length >= COLLECT_LIMIT) return;
   Object.values(value).forEach((item) => {
     if (item && (typeof item === "object" || typeof item === "string")) walkUrls(item, pages, seen, depth + 1);
   });
@@ -140,12 +292,12 @@ function walkUrls(value, pages, seen, depth) {
 export function collectSearchUrls(data, limit = 2) {
   const pages = [];
   walkUrls(data, pages, new Set(), 0);
-  return pages.slice(0, limit);
+  return pickDiverseProductPages(pages, limit);
 }
 
 async function loadOne(page, fetchImpl, budgetMs, now) {
   const hit = cache.get(page.url);
-  if (hit && hit.expires > now) return { ...page, shelf: hit.shelf, cached: true };
+  if (hit && hit.expires > now) return { ...page, shelf: hit.shelf, model: hit.model || page.model || "", cached: true };
   if (budgetMs < 30) return { ...page, shelf: null, cached: false };
   const controller = new AbortController();
   let rejectTimer;
@@ -169,9 +321,11 @@ async function loadOne(page, fetchImpl, budgetMs, now) {
     const raw = typeof response === "string"
       ? response
       : await Promise.race([response.text(), timeout]);
-    const shelf = extractShelfPrice(String(raw).slice(0, 250000));
-    if (shelf) cache.set(page.url, { shelf, expires: now + TTL_MS });
-    return { ...page, shelf, cached: false };
+    const html = String(raw).slice(0, 250000);
+    const shelf = extractShelfPrice(html);
+    const model = extractPageModel(html);
+    if (shelf) cache.set(page.url, { shelf, model, expires: now + TTL_MS });
+    return { ...page, shelf, model: model || page.model || "", cached: false };
   } catch {
     return { ...page, shelf: null, cached: false };
   } finally {
@@ -181,16 +335,16 @@ async function loadOne(page, fetchImpl, budgetMs, now) {
 
 export async function fetchShelfPrices(pages, options = {}) {
   const fetchImpl = options.fetchImpl || fetch;
-  const timeoutMs = Number(options.timeoutMs) > 0 ? Number(options.timeoutMs) : 1800;
+  const timeoutMs = Number(options.timeoutMs) > 0 ? Number(options.timeoutMs) : 2500;
   const now = options.now || Date.now();
-  const list = (Array.isArray(pages) ? pages : []).slice(0, 2).map((page) => {
+  const deadline = Number(options.deadline) > 0 ? Number(options.deadline) : now + timeoutMs;
+  const list = (Array.isArray(pages) ? pages : []).slice(0, MAX_FETCH_PAGES).map((page) => {
     if (typeof page === "string") return { url: usableProductUrl(page), title: "" };
-    return { url: usableProductUrl(page?.url || ""), title: String(page?.title || "") };
+    return { url: usableProductUrl(page?.url || ""), title: String(page?.title || ""), model: page?.model || "" };
   }).filter((page) => page.url);
   if (!list.length) return [];
-  const started = Date.now();
   const results = await Promise.all(list.map((page) => {
-    const budget = Math.max(0, timeoutMs - (Date.now() - started));
+    const budget = Math.max(0, deadline - Date.now());
     return loadOne(page, fetchImpl, budget, now);
   }));
   return results;
