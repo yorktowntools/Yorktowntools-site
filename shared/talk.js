@@ -1,4 +1,5 @@
 import { matchCatalog } from "./pricing.js";
+import { brandLabel, canonicalBrand, normalizeTrade } from "./trade.js";
 
 const GENERIC = new Set(["drill", "drills", "saw", "saws", "ladder", "ladders", "glove", "gloves", "tool", "tools", "bit", "bits", "blade", "blades"]);
 
@@ -63,7 +64,22 @@ export function concreteDrillingAdvice(text) {
 export function genericSawQuestion(text) {
   const raw = String(text || "");
   if (/\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/i.test(raw)) return "";
-  if (!/\b(sawzalls?|sawzaws?|reciprocating(?:\s+saws?)?)\b/i.test(raw)) return "";
+  const heard = normalizeTrade(raw);
+  if (!/\breciprocating saws?\b|\bsawzalls?\b/i.test(heard)) return "";
+  const label = brandLabel(canonicalBrand(heard));
+  const bare = /\bbare\b/.test(heard);
+  const cordless = bare || (/\bcordless\b/.test(heard) && !/\bcorded\b/.test(heard));
+  const corded = /\bcorded\b/.test(heard) && !bare;
+  const voltage = /60\s*v|flexvolt/.test(heard) ? "60V" : (/\b20\s*v\b/.test(heard) ? "20V" : "");
+  if (bare && !voltage) {
+    const who = label ? `${label} reciprocating saw, cordless bare tool.` : "Cordless bare reciprocating saw.";
+    return `${who} Do you want 20V MAX or 60V FLEXVOLT, or which model?`;
+  }
+  if (cordless && !voltage) {
+    const who = label ? `${label} reciprocating saw, cordless.` : "Cordless reciprocating saw.";
+    return `${who} Do you want 20V MAX or 60V FLEXVOLT, or which model?`;
+  }
+  if (corded) return `${label ? `${label} ` : ""}reciprocating saw, corded. Which model do you want?`;
   return "Which model do you want, or do you want it cordless or corded?";
 }
 

@@ -17,6 +17,8 @@ import {
 } from "./copy.js";
 import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
 import { acceptingQuote, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
+import { askedForReach, cartFromThread, eachQty, isLastNameAsk, listReadback, readIdentity, readyClose, sawGuide, washingtonReply } from "./job.js";
+import { acceptsModel, brandLabel, interpretLine, isThanks, pendingModelConfirm } from "./trade.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
   discountPercent,
@@ -26,6 +28,7 @@ import {
   matchCatalog,
   paymentOnTop,
   priceEntry,
+  roundMoney,
   splitRequestedItems,
 } from "./pricing.js";
 
@@ -228,6 +231,83 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (!text) {
     return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
+  }
+
+  if (isThanks(text)) {
+    const items = cartFromThread(history);
+    return { reply: "You bet.", quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true } };
+  }
+
+  if (isLastNameAsk(text, history)) {
+    return { reply: washingtonReply(), quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+
+  const pending = pendingModelConfirm(history);
+  if (pending && acceptsModel(text)) {
+    return {
+      reply: `I can price the ${pending.label} for you.`,
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+    };
+  }
+
+  const heard = interpretLine(text);
+  if (heard.confirm) {
+    return { reply: heard.confirm, quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+  if (heard.clarify && heard.tools.length === 0) {
+    const label = brandLabel(heard.brand);
+    return {
+      reply: label ? `${label}. ${heard.clarify}` : heard.clarify,
+      quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
+    };
+  }
+
+  const gloves = gloveTurn(text, heard, catalog, percent);
+  if (gloves) return gloves;
+
+  const each = eachQty(text);
+  if (each) {
+    const items = cartFromThread(history, text);
+    if (items.length) {
+      return {
+        reply: listReadback(items),
+        quote: { items, offerForm: false, hold: true, stage: "script", scripted: true },
+      };
+    }
+  }
+
+  const guided = sawGuide(history, text);
+  if (guided) {
+    return { reply: guided, quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
+  }
+
+  const identity = readIdentity(history, text);
+  const openHandoff = (history || []).some((entry) => entry.role === "assistant" && /team to price|cell or email/i.test(entry.content || ""));
+  if (openHandoff && identity.name && (identity.phone || identity.email || identity.knowsZach)) {
+    const items = cartFromThread(history);
+    return {
+      reply: readyClose(identity, askedForReach(history), items),
+      quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true },
+    };
+  }
+
+  if (heard.tools.length === 1 && !/\b(jack\s*hammers?|grinders?|gloves?|ladders?|respirators?|ppe|hi-vis|safety glasses|glasses)\b/i.test(text)) {
+    const name = heard.tools[0].name;
+    if (name === "Jackhammer") {
+      return {
+        reply: "We can source a jackhammer. What are you breaking up, and do you want electric corded, cordless, or pneumatic?",
+        quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
+      };
+    }
+    if (/grinder|ladder|respirator|hi-vis|ppe|safety glasses|battery/i.test(name) && !/glove/i.test(name)) {
+      const label = brandLabel(heard.brand);
+      const ask = label ? "What size do you want?" : "What brand or size do you want?";
+      const named = label ? `${label} ${name}` : name;
+      return {
+        reply: `We can source a ${named}. ${ask}`,
+        quote: { items: [{ name: named, qty: null, sku: "", source: "U" }], offerForm: false, hold: true, stage: "script", scripted: true },
+      };
+    }
   }
 
   const picked = pickedModel(text, history);
@@ -668,6 +748,25 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return finish(`Here's how the site is split: ${list}.`, [], false);
   }
 
+  if (heard.tools.length) {
+    const items = cartFromThread([], text);
+    if (items.length) {
+      return {
+        reply: listReadback(items),
+        quote: { items, offerForm: false, hold: true, stage: "script", scripted: true },
+      };
+    }
+  }
+
+  const modelCode = text.match(/\b([a-z]{1,6}\d{3,}[a-z0-9-]*)\b/i);
+  if (modelCode || /\b(i need|i'm looking|im looking|looking for|got any|do you have)\b/i.test(text)) {
+    const code = modelCode ? modelCode[1].toUpperCase() : "";
+    return {
+      reply: code ? `I can price the ${code} for you.` : "I can quote that. Brand and model help, plus the quantity.",
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+    };
+  }
+
   if (!rebuilding && (history || []).some((entry) => entry.role === "assistant")) {
     return {
       reply: "Yes, we can help with that. What is the job, and do you have a brand in mind?",
@@ -680,6 +779,27 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     [],
     false,
   );
+}
+
+function gloveTurn(text, heard, catalog, percent) {
+  const names = (heard?.tools || []).map((tool) => tool.name);
+  if (names.length !== 1 || !/glove/i.test(names[0])) return null;
+  if (/\bvictory\b/i.test(text)) return null;
+  const victory = (catalog?.items || []).find((item) => item.sku === "VICTORY-GLOVE");
+  const priced = victory ? priceEntry({ ...victory, qty: 1 }, percent) : null;
+  const qty = extractQty(text);
+  if (qty && priced) {
+    const each = formatMoney(priced.estimate);
+    const otd = formatMoney(roundMoney(priced.estimate * qty * 1.07 * 1.03));
+    return {
+      reply: `We keep Victory Series drivers gloves on hand. I have ${qty} × ${priced.name}: ${each} a pair. Out the door that's ${otd} on a card. Other glove types are available. Would you like to place an order?`,
+      quote: { items: [toQuoteItem(priced, qty)], offerForm: false, hold: true, stage: "script", scripted: true },
+    };
+  }
+  return {
+    reply: "We keep Victory Series drivers gloves on hand at $19.99 a pair. Other glove types are available. How many pairs do you want?",
+    quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
+  };
 }
 
 const SHIP_WORD = /\b(ships?|shipped|shipping|delivers?|delivered|delivery|sends?|sending)\b/i;
@@ -791,6 +911,7 @@ function consignmentTurn(text, history) {
 export function confusedWhatReply(history) {
   const prior = [...(history || [])].reverse().find((entry) => entry.role === "assistant")?.content || "";
   const recentUsers = (history || []).filter((entry) => entry.role === "user").slice(-4).map((entry) => entry.content || "").join("\n");
+  if (isLastNameAsk(recentUsers, history) || /make it washington|last name/i.test(recentUsers)) return washingtonReply();
   if (/jack\s*hammer|demolition hammer/i.test(`${prior}\n${recentUsers}`)) {
     return "Sorry, let me make it simpler. What kind of work is the jack hammer for: breaking concrete, tile, or something else?";
   }
