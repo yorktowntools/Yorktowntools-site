@@ -397,6 +397,30 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   }
   if (drill?.stage === "recommend") return recommendCordedHammers(catalog, percent);
 
+  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text)) {
+    return {
+      reply: "Yes, we can source a jack hammer. What are you breaking up? And do you want it electric corded, cordless, or pneumatic?",
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+    };
+  }
+
+  if (/^what\??$/i.test(text)) {
+    const repeated = (history || []).some((entry) => entry.role === "assistant" && /which part should I answer/i.test(entry.content || ""));
+    return {
+      reply: repeated
+        ? "Tell me the tool, or say delivery or payment, and I'll answer that part."
+        : "Which part should I answer: the tool, delivery, or payment?",
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+    };
+  }
+
+  if (/\bpvc\b/i.test(text) && /\b(saw|cutt)/i.test(text)) {
+    return {
+      reply: "For cutting PVC pipe, a fine-tooth saw or a PVC cutter keeps the cut clean. Are you cutting a few sticks or a lot of pipe?",
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+    };
+  }
+
   const stage = chatStage(text, history, catalog);
   if (stage === "clarify") {
     return { reply: clarifyingQuestion(text, history), quote: { items: [], offerForm: false, stage: "clarify" } };
@@ -430,15 +454,17 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (/\b(deliver|delivery|service area|how far|richmond|virginia beach|hampton roads|jobsite|job site)\b/i.test(text) && !matches.length) {
+  if (/\b(deliver|delivery|service area|how far|norfolk|newport news|richmond|virginia beach|hampton roads|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester|jobsite|job site)\b/i.test(text) && !matches.length) {
+    const named = text.match(/\b(norfolk|newport news|richmond|virginia beach|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester)\b/i);
+    const place = named ? named[1] : "the job site";
     return finish(
-      `Delivery to the job site, shop, or trailer is free from ${SERVICE_AREA}. No minimum. You stay on the job. We bring the tools.`,
+      `Yes. Delivery to ${place} is free. We cover ${SERVICE_AREA}. No minimum. You stay on the job. We bring the tools.`,
       [],
       false,
     );
   }
 
-  if (/\b(pay|payment|card|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
+  if (/\b(purchase cards?|government purchase|gpc|pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
     return finish(
       `Card, a government purchase card, ACH, and check are all fine. Card costs more to process than ACH, and a check has no fee. Don't send card or bank numbers in this chat. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms. Virginia sales tax is on the quote unless the order is tax-exempt, and a tax-exempt order needs a certificate.`,
       [],
@@ -522,8 +548,8 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (!rebuilding && (history || []).some((entry) => entry.role === "assistant")) {
     return {
-      reply: "Okay, I'm still on that. What else do you need?",
-      quote: { items: [], offerForm: false, stage: "clarify" },
+      reply: "Yes, we can help with that. What is the job, and do you have a brand in mind?",
+      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
     };
   }
 

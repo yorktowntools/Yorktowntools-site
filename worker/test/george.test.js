@@ -941,3 +941,44 @@ test("refining one bulk line keeps the others, and a Jackery answer stays on top
   const weatherBody = await weather.json();
   assert.match(weatherBody.reply, /I stick to tools/i);
 });
+
+test("free-form questions get a direct answer and the chat has no chips", async () => {
+  resetLimits();
+  const widget = readFileSync(new URL("../../george/george.js", import.meta.url), "utf8");
+  assert.doesNotMatch(widget, /george-chips|function chips/);
+  const ask = async (messages) => {
+    const response = await post("/api/chat", { messages });
+    const body = await response.json();
+    assert.equal(body.chips, undefined);
+    assert.equal(body.suggestions, undefined);
+    assert.doesNotMatch(body.reply, /still on that/i);
+    return body;
+  };
+  const norfolk = await ask([{ role: "user", content: "do you deliver to Norfolk?" }]);
+  assert.match(norfolk.reply, /norfolk/i);
+  assert.match(norfolk.reply, /free/i);
+  const pvc = await ask([{ role: "user", content: "what's the best saw for cutting PVC pipe?" }]);
+  assert.match(pvc.reply, /pvc/i);
+  assert.doesNotMatch(pvc.reply, /what are you cutting/i);
+  const card = await ask([{ role: "user", content: "do you take government purchase cards?" }]);
+  assert.match(card.reply, /government purchase card/i);
+  assert.doesNotMatch(card.reply, /I stick to tools/i);
+
+  const thread = [];
+  const say = async (text) => {
+    thread.push({ role: "user", content: text });
+    const body = await ask(thread);
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const deliver = await say("Where do you deliver?");
+  assert.match(deliver.reply, /free/i);
+  const hammer = await say("I need a jack hammer do you sell them?");
+  assert.match(hammer.reply, /jack hammer|demolition hammer/i);
+  assert.match(hammer.reply, /breaking up|corded|cordless|pneumatic/i);
+  assert.equal(hammer.quote.stage, undefined);
+  const confused = await say("What");
+  assert.notEqual(confused.reply, hammer.reply);
+  assert.match(confused.reply, /tool|delivery|payment/i);
+  assert.doesNotMatch(confused.reply, /still on that/i);
+});

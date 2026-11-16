@@ -46,6 +46,7 @@ const catalogReady = fetch(new URL("../data/prices.json", import.meta.url))
 
 const root = document.createElement("div");
 root.innerHTML = `
+  <div class="george-backdrop" hidden></div>
   <button type="button" class="george-launcher" aria-label="Chat with George for quotes and pricing" aria-expanded="false" aria-controls="george-panel">
     ${mascotPicture("george-launcher-mascot", 72, 68)}
     <span class="george-launcher-copy">
@@ -102,6 +103,7 @@ root.innerHTML = `
 document.body.appendChild(root);
 
 const launcher = root.querySelector(".george-launcher");
+const backdrop = root.querySelector(".george-backdrop");
 const panel = root.querySelector(".george-panel");
 const log = root.querySelector(".george-log");
 const quoteForm = root.querySelector(".george-quote");
@@ -139,31 +141,6 @@ function showBanner(text) {
   note.className = "george-banner";
   note.textContent = text;
   log.prepend(note);
-}
-
-function chips() {
-  const row = document.createElement("div");
-  row.className = "george-chips";
-  const options = [
-    ["Delivery", "Where do you deliver?"],
-    ["Payment", "How do I pay, and do you offer terms?"],
-    ["Quote", null],
-  ];
-  for (const [label, prompt] of options) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = label;
-    button.addEventListener("click", () => {
-      if (!prompt) {
-        openQuote();
-        return;
-      }
-      textarea.value = prompt;
-      compose.requestSubmit();
-    });
-    row.appendChild(button);
-  }
-  log.appendChild(row);
 }
 
 function addBlankItem() {
@@ -436,14 +413,70 @@ async function onQuote(event) {
   }
 }
 
+let lockedScrollY = 0;
+let pageLocked = false;
+
+function setPageInert(on) {
+  for (const node of document.body.children) {
+    if (node === root) continue;
+    if (on) node.setAttribute("inert", "");
+    else node.removeAttribute("inert");
+  }
+}
+
+function lockPage() {
+  if (pageLocked) return;
+  lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${lockedScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+  pageLocked = true;
+  setPageInert(true);
+}
+
+function unlockPage() {
+  if (!pageLocked) return;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  pageLocked = false;
+  setPageInert(false);
+  window.scrollTo(0, lockedScrollY);
+}
+
+function fitToKeyboard() {
+  const viewport = window.visualViewport;
+  if (!viewport || panel.hidden) return;
+  if (!window.matchMedia("(max-width: 640px)").matches) {
+    panel.style.top = "";
+    panel.style.height = "";
+    return;
+  }
+  panel.style.top = `${viewport.offsetTop}px`;
+  panel.style.height = `${viewport.height}px`;
+}
+
+function focusableInPanel() {
+  return [...panel.querySelectorAll("a[href], button, input, textarea, select")].filter((node) => {
+    if (node.disabled || node.getAttribute("aria-hidden") === "true") return false;
+    return node.closest("[hidden]") == null;
+  });
+}
+
 function openPanel() {
   panel.hidden = false;
+  backdrop.hidden = false;
   launcher.hidden = true;
   launcher.setAttribute("aria-expanded", "true");
+  lockPage();
+  fitToKeyboard();
   if (!log.childElementCount) {
     if (preview) showBanner("Preview on this computer. Quotes are not emailed from here.");
     addMessage("assistant", "Hey, I'm George with Yorktown Tools. How can I help you today?");
-    chips();
     detect();
   }
   textarea.focus();
@@ -451,8 +484,12 @@ function openPanel() {
 
 function closePanel() {
   panel.hidden = true;
+  backdrop.hidden = true;
+  panel.style.top = "";
+  panel.style.height = "";
   launcher.hidden = false;
   launcher.setAttribute("aria-expanded", "false");
+  unlockPage();
   launcher.focus();
 }
 
@@ -470,7 +507,12 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
 }
 
 launcher.addEventListener("click", openPanel);
+backdrop.addEventListener("click", closePanel);
 root.querySelector(".george-close").addEventListener("click", closePanel);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", fitToKeyboard);
+  window.visualViewport.addEventListener("scroll", fitToKeyboard);
+}
 compose.addEventListener("submit", onSend);
 quoteForm.addEventListener("submit", onQuote);
 root.querySelector(".george-add").addEventListener("click", () => {
@@ -488,6 +530,19 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     event.preventDefault();
     closePanel();
+    return;
+  }
+  if (event.key !== "Tab") return;
+  const items = focusableInPanel();
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
   }
 });
 
