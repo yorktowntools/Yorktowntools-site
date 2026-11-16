@@ -1,7 +1,7 @@
 import { handleRequest } from "./handler.js";
 
 export default {
-  async fetch(request, env) {
-    return handleRequest(request, env);
+  async fetch(request, env, ctx) {
+    return handleRequest(request, env, ctx);
   },
 };

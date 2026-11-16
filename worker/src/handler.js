@@ -9,6 +9,7 @@ import {
   collectSearchUrls,
   exactModelsIn,
   fetchShelfPrices,
+  lowestShelf,
   normalizeModel,
   pageMatchesModel,
   readModelShelf,
@@ -769,9 +770,9 @@ function validPhone(value) {
   return digits.length >= 10 && digits.length <= 15;
 }
 
-export async function handleRequest(request, env = {}) {
+export async function handleRequest(request, env = {}, ctx) {
   try {
-    return await routeRequest(request, env);
+    return await routeRequest(request, env, ctx || env.ctx);
   } catch {
     return json({
       reply: "Something went wrong on my side. Tell me the tool again, or call or text (757) 940-5171.",
@@ -782,7 +783,7 @@ export async function handleRequest(request, env = {}) {
   }
 }
 
-async function routeRequest(request, env = {}) {
+async function routeRequest(request, env = {}, ctx) {
   if (env?.FORCE_HANDLER_ERROR) throw new Error("forced");
   const url = new URL(request.url);
   if (request.method === "OPTIONS") {
@@ -807,7 +808,7 @@ async function routeRequest(request, env = {}) {
   }
 
   if (url.pathname === "/api/chat" && request.method === "POST") {
-    return chat(request, env);
+    return chat(request, env, ctx);
   }
   if (url.pathname === "/api/quote" && request.method === "POST") {
     return quote(request, env);
@@ -815,7 +816,11 @@ async function routeRequest(request, env = {}) {
   return json({ error: "not_found" }, 404, request, env);
 }
 
-async function chat(request, env) {
+function followUpSearch(code) {
+  return `Search again for the current shelf price of exact model ${code}. Check both Home Depot and Lowe's, and use a different retailer if the first results were only one store. Return product page URLs for ${code} only. Do not substitute a different model.`;
+}
+
+async function chat(request, env, ctx) {
   const ip = clientIp(request);
   const now = Date.now();
   const perHour = limit(`chat-h:${ip}`, num(env.RATE_LIMIT_CHAT_PER_HOUR, 20), 60 * 60 * 1000, now);
@@ -899,6 +904,12 @@ async function chat(request, env) {
     take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
   }
 
+  const preload = {};
+  for (const code of exactModelsIn(latest)) {
+    const saved = await readModelShelf(env, code);
+    if (saved > 0) preload[normalizeModel(code)] = saved;
+  }
+
   try {
     const data = await (typeof env.callXai === "function" ? env.callXai : callXai)(
       env,
@@ -916,56 +927,83 @@ async function chat(request, env) {
     if (namedModel && (lines.some((line) => specificItem(line) || customerConfirmed(latest)) || exactModelsIn(latest).length)) {
       try {
         const fetchImpl = typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch;
-        const budgetMs = num(env.SHELF_FETCH_TIMEOUT_MS, 2500);
+        const budgetMs = num(env.SHELF_FETCH_TIMEOUT_MS, 4000);
         const deadline = Date.now() + budgetMs;
+        const askModel = typeof env.callXai === "function" ? env.callXai : callXai;
         let pages = collectSearchUrls(data, 4);
-        let fetched = pages.length
-          ? await fetchShelfPrices(pages, { fetchImpl, timeoutMs: budgetMs, deadline })
-          : [];
-        const room = underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
+        const code = exactModelsIn(latest)[0] || "";
+        const matchedUrls = code ? pages.filter((page) => pageMatchesModel(page, code)) : pages;
+        const already = canSearch ? Math.max(1, countSearches(data)) : 0;
+        const room = already < searchCap
+          && underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
           && underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
-        if (matchingPageCount(rawItems, fetched) < 2 && exactModelsIn(latest).length && room && Date.now() + 150 < deadline) {
+        const firstFetch = pages.length
+          ? fetchShelfPrices(pages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 })
+          : Promise.resolve([]);
+        let secondSearch = Promise.resolve(null);
+        if (code && matchedUrls.length < 2 && room) {
           take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
           take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
           extraSearches += 1;
-          const code = exactModelsIn(latest)[0].toUpperCase();
-          const extra = await (typeof env.callXai === "function" ? env.callXai : callXai)(
+          secondSearch = askModel(
             env,
             buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
             [
               ...messages.map((message) => ({ role: message.role, content: message.content })),
-              { role: "user", content: `Search again for the current retail price of exact model ${code}. Return product pages for ${code} only. Do not substitute a different model.` },
+              { role: "user", content: followUpSearch(code.toUpperCase()) },
+            ],
+            true,
+          ).catch((error) => {
+            console.error(`shelf search: follow-up failed: ${error instanceof Error ? error.message : "error"}`);
+            return null;
+          });
+        }
+        const [firstPages, extra] = await Promise.all([firstFetch, secondSearch]);
+        let fetched = firstPages;
+        if (extra) {
+          const seen = new Set(pages.map((page) => page.url));
+          const morePages = collectSearchUrls(extra, 4).filter((page) => page.url && !seen.has(page.url));
+          if (morePages.length && Date.now() + 30 < deadline) {
+            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
+            fetched = fetched.concat(more);
+            pages = pages.concat(morePages);
+          }
+        } else if (code && matchingPageCount(rawItems, fetched) < 2 && extraSearches === 0 && room && Date.now() + 150 < deadline) {
+          take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
+          take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
+          extraSearches += 1;
+          const follow = await askModel(
+            env,
+            buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
+            [
+              ...messages.map((message) => ({ role: message.role, content: message.content })),
+              { role: "user", content: followUpSearch(code.toUpperCase()) },
             ],
             true,
           );
           const seen = new Set(pages.map((page) => page.url));
-          const morePages = collectSearchUrls(extra, 4).filter((page) => page.url && !seen.has(page.url));
+          const morePages = collectSearchUrls(follow, 4).filter((page) => page.url && !seen.has(page.url));
           if (morePages.length && Date.now() + 30 < deadline) {
-            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline });
+            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
             fetched = fetched.concat(more);
-            pages = pages.concat(morePages);
           }
         }
-        const cached = {};
+        rawItems = applyLowestFetchedShelves(rawItems, fetched, preload);
         for (const item of rawItems) {
-          const code = modelCodeOf(item);
-          if (!code) continue;
-          const saved = await readModelShelf(env, code);
-          if (saved > 0) cached[normalizeModel(code)] = saved;
-        }
-        rawItems = applyLowestFetchedShelves(rawItems, fetched, cached);
-        for (const item of rawItems) {
-          const code = modelCodeOf(item);
-          if (!code) continue;
-          const verified = pagesForLine(item, fetched).map((page) => Number(page.shelf)).filter((price) => price > 0);
-          const saved = Number(cached[normalizeModel(code)]) || 0;
-          const prices = saved > 0 ? verified.concat(saved) : verified;
-          if (!prices.length) continue;
-          await writeModelShelf(env, code, Math.min(...prices));
+          const itemCode = modelCodeOf(item);
+          if (!itemCode) continue;
+          const seen = pagesForLine(item, fetched).map((page) => Number(page.shelf)).filter((price) => price > 0);
+          const saved = Number(preload[normalizeModel(itemCode)]) || 0;
+          const durable = lowestShelf(saved, seen);
+          if (!(durable > 0) || (saved > 0 && durable > saved)) continue;
+          if (!seen.length && saved > 0) continue;
+          await writeModelShelf(env, itemCode, durable, ctx);
         }
         lines = linesFromQuote({ items: rawItems }, prose, costs);
-      } catch {
-        // A page that does not load still ends in the team handoff.
+      } catch (error) {
+        console.error(`shelf lookup failed: ${error instanceof Error ? error.message : "error"}`);
+        rawItems = applyLowestFetchedShelves(rawItems, [], preload);
+        lines = linesFromQuote({ items: rawItems }, prose, costs);
       }
     }
     const view = viewFor(lines, { text: latest });

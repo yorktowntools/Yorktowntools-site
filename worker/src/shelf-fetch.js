@@ -70,41 +70,79 @@ function shelfKey(model) {
   return norm ? `shelf:${norm}` : "";
 }
 
+export function lowestShelf(cached, seen) {
+  const prices = [cached, ...(Array.isArray(seen) ? seen : [])].map(Number).filter((price) => price > 0);
+  if (!prices.length) return null;
+  return Math.min(...prices);
+}
+
+let loggedMissingShelfKv = false;
+
 export async function readModelShelf(env, model) {
   const key = shelfKey(model);
   if (!key) return null;
   const now = Date.now();
+  let best = null;
   const memory = modelShelves.get(key);
-  if (memory && memory.expires > now && Number(memory.shelf) > 0) return Number(memory.shelf);
+  if (memory && memory.expires > now && Number(memory.shelf) > 0) best = Number(memory.shelf);
   const kv = env?.PRIVATE_COSTS_KV;
-  if (!kv || typeof kv.get !== "function") return null;
+  if (!kv || typeof kv.get !== "function") return best;
   try {
     const raw = await kv.get(key);
-    if (raw == null || !String(raw).trim()) return null;
+    if (raw == null || !String(raw).trim()) {
+      if (best > 0) modelShelves.set(key, { shelf: best, expires: now + MODEL_TTL_MS });
+      return best;
+    }
     const parsed = JSON.parse(String(raw));
     const shelf = Number(parsed?.shelf);
     const expires = Number(parsed?.expires) || 0;
-    if (!(shelf > 0) || (expires && expires <= now)) return null;
-    modelShelves.set(key, { shelf, expires: expires || now + MODEL_TTL_MS });
-    return shelf;
-  } catch {
-    return null;
+    if (shelf > 0 && !(expires && expires <= now) && (!best || shelf < best)) best = shelf;
+  } catch (error) {
+    console.error(`shelf cache: get failed for ${key}: ${error instanceof Error ? error.message : "error"}`);
   }
+  if (best > 0) modelShelves.set(key, { shelf: best, expires: now + MODEL_TTL_MS });
+  return best;
 }
 
-export async function writeModelShelf(env, model, shelf) {
+export async function writeModelShelf(env, model, shelf, ctx) {
   const price = Number(shelf);
   const key = shelfKey(model);
-  if (!key || !(price > 0)) return;
-  const record = { shelf: Math.round(price * 100) / 100, expires: Date.now() + MODEL_TTL_MS };
+  if (!key || !(price > 0)) return null;
+  const now = Date.now();
+  const memory = modelShelves.get(key);
+  let stored = Math.round(price * 100) / 100;
+  if (memory && memory.expires > now && Number(memory.shelf) > 0 && Number(memory.shelf) < stored) {
+    stored = Number(memory.shelf);
+  }
+  const record = { shelf: stored, expires: now + MODEL_TTL_MS };
   modelShelves.set(key, record);
   const kv = env?.PRIVATE_COSTS_KV;
-  if (!kv || typeof kv.put !== "function") return;
-  try {
-    await kv.put(key, JSON.stringify(record), { expirationTtl: 24 * 60 * 60 });
-  } catch {
-    // The in-memory shelf still keeps this run consistent.
+  if (!kv || typeof kv.put !== "function") {
+    if (!loggedMissingShelfKv) {
+      loggedMissingShelfKv = true;
+      console.error("shelf cache: PRIVATE_COSTS_KV.put is unavailable");
+    }
+    return stored;
   }
+  const ttl = Math.max(60, Math.floor(MODEL_TTL_MS / 1000));
+  const body = JSON.stringify({ shelf: record.shelf, expires: record.expires });
+  const write = Promise.resolve()
+    .then(() => kv.put(key, body, { expirationTtl: ttl }))
+    .then(() => stored)
+    .catch((error) => {
+      console.error(`shelf cache: put failed for ${key}: ${error instanceof Error ? error.message : "error"}`);
+      return null;
+    });
+  const holder = ctx || env?.ctx;
+  if (holder && typeof holder.waitUntil === "function") {
+    try {
+      holder.waitUntil(write);
+    } catch (error) {
+      console.error(`shelf cache: waitUntil failed for ${key}: ${error instanceof Error ? error.message : "error"}`);
+    }
+  }
+  await write;
+  return stored;
 }
 
 function hostOk(hostname) {
@@ -187,7 +225,10 @@ export function extractShelfPrice(html) {
     if (amount) return amount;
   }
   const named = text.match(/"(?:currentPrice|sellingPrice|specialPrice|salePrice)"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/i)
-    || text.match(/"pricing"\s*:\s*\{[^}]{0,240}"value"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/i);
+    || text.match(/"(?:currentPrice|specialPrice|salePrice)"\s*:\s*\{[^}]{0,240}"(?:value|price)"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/i)
+    || text.match(/"(?:pricing|priceInfo)"\s*:\s*\{[^}]{0,400}"(?:value|sellingPrice|finalPrice|specialPrice|rawPrice)"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/i)
+    || text.match(/"(?:rawPrice|finalPrice|offerPrice|customerPrice)"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/i)
+    || text.match(/price-format__main-price[^$]{0,120}\$\s?(\d{1,5}(?:\.\d{2})?)/i);
   if (named) {
     const amount = asShelf(named[1]);
     if (amount) return amount;
@@ -230,7 +271,16 @@ export function extractPageModel(html) {
     const model = modelFromJson(block[1]);
     if (model) return model;
   }
+  const title = text.match(/<title[^>]*>([^<]{0,300})<\/title>/i);
+  if (title) {
+    const fromTitle = exactModelsIn(title[1])[0];
+    if (fromTitle) return fromTitle;
+  }
   return "";
+}
+
+export function htmlTitle(html) {
+  return String(html || "").match(/<title[^>]*>([^<]{0,300})<\/title>/i)?.[1]?.replace(/\s+/g, " ").trim() || "";
 }
 
 const COLLECT_LIMIT = 8;
@@ -297,7 +347,15 @@ export function collectSearchUrls(data, limit = 2) {
 
 async function loadOne(page, fetchImpl, budgetMs, now) {
   const hit = cache.get(page.url);
-  if (hit && hit.expires > now) return { ...page, shelf: hit.shelf, model: hit.model || page.model || "", cached: true };
+  if (hit && hit.expires > now) {
+    return {
+      ...page,
+      title: page.title || hit.title || "",
+      shelf: hit.shelf,
+      model: hit.model || page.model || "",
+      cached: true,
+    };
+  }
   if (budgetMs < 30) return { ...page, shelf: null, cached: false };
   const controller = new AbortController();
   let rejectTimer;
@@ -324,8 +382,9 @@ async function loadOne(page, fetchImpl, budgetMs, now) {
     const html = String(raw).slice(0, 250000);
     const shelf = extractShelfPrice(html);
     const model = extractPageModel(html);
-    if (shelf) cache.set(page.url, { shelf, model, expires: now + TTL_MS });
-    return { ...page, shelf, model: model || page.model || "", cached: false };
+    const title = [page.title, htmlTitle(html)].filter(Boolean).join(" ");
+    if (shelf) cache.set(page.url, { shelf, model, title, expires: now + TTL_MS });
+    return { ...page, title: title || page.title || "", shelf, model: model || page.model || "", cached: false };
   } catch {
     return { ...page, shelf: null, cached: false };
   } finally {
@@ -343,8 +402,9 @@ export async function fetchShelfPrices(pages, options = {}) {
     return { url: usableProductUrl(page?.url || ""), title: String(page?.title || ""), model: page?.model || "" };
   }).filter((page) => page.url);
   if (!list.length) return [];
+  const perPageMs = Number(options.perPageMs) > 0 ? Number(options.perPageMs) : 1500;
   const results = await Promise.all(list.map((page) => {
-    const budget = Math.max(0, deadline - Date.now());
+    const budget = Math.min(perPageMs, Math.max(0, deadline - Date.now()));
     return loadOne(page, fetchImpl, budget, now);
   }));
   return results;

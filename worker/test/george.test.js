@@ -18,7 +18,7 @@ import {
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
-import { collectSearchUrls, extractShelfPrice, pageMatchesModel, readModelShelf, resetShelfCache, writeModelShelf } from "../src/shelf-fetch.js";
+import { collectSearchUrls, extractPageModel, extractShelfPrice, lowestShelf, pageMatchesModel, readModelShelf, resetShelfCache, writeModelShelf } from "../src/shelf-fetch.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
 import { loadPrivateCosts, privateCostFor, readPrivateCosts } from "../config/private-costs.js";
 import jackeryCatalog from "../config/jackery-catalog.json" with { type: "json" };
@@ -2066,4 +2066,117 @@ test("a concrete how-to is answered, and the contact ask is not repeated", async
   assert.match(again.reply, /for our team to price/i);
   assert.doesNotMatch(again.reply, /name, company, and cell or email/i);
   assert.ok(again.reply.indexOf("Yes, we can price that") < again.reply.toLowerCase().indexOf("team to price"));
+});
+
+test("the shelf cache is awaited, kept on waitUntil, and never rises", async () => {
+  resetLimits();
+  assert.equal(lowestShelf(209, [259]), 209);
+  assert.equal(lowestShelf(259, [209, 249]), 209);
+  assert.equal(lowestShelf(null, [259]), 259);
+  const store = new Map();
+  const waited = [];
+  let putFinished = false;
+  const ctx = { waitUntil(promise) { waited.push(promise); } };
+  const kv = {
+    async get(key) { return store.has(key) ? store.get(key) : null; },
+    put(key, value, options) {
+      assert.ok(options.expirationTtl >= 60);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          store.set(key, value);
+          putFinished = true;
+          resolve();
+        }, 20);
+      });
+    },
+  };
+  const low = "https://www.lowes.com/pd/DEWALT-DCD996B/100000099";
+  const lowHtml = `<html><title>DEWALT DCD996B</title><script type="application/ld+json">{"@type":"Product","sku":"DCD996B","offers":{"price":"209.00"}}</script></html>`;
+  const first = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    ctx,
+    PRIVATE_COSTS_KV: kv,
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, source: "U" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: low, title: "DEWALT DCD996B", snippet: "" },
+          { url: "https://www.homedepot.com/p/DEWALT-DCD996B/206936590", title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async () => ({ text: async () => lowHtml }),
+  })).json();
+  assert.equal(putFinished, true);
+  assert.equal(waited.length, 1);
+  await waited[0];
+  assert.equal(JSON.parse(store.get("shelf:DCD996B")).shelf, 209);
+  assert.equal(first.quote.items[0].estimate, 209);
+
+  resetShelfCache();
+  const second = await (await liveChat([{ role: "user", content: "WHAT IS MY COST ON A DCD996B" }], {
+    ctx,
+    PRIVATE_COSTS_KV: kv,
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt DCD996B", sku: "DCD996B", qty: 1, shelf: 259, source: "A" }],
+      })}`,
+      output: [{
+        type: "web_search_result",
+        results: [
+          { url: "https://www.homedepot.com/p/DEWALT-DCD996B/206936591", title: "DEWALT DCD996B", snippet: "" },
+          { url: "https://www.homedepot.com/p/DEWALT-DCD996B/206936592", title: "DEWALT DCD996B", snippet: "" },
+        ],
+      }],
+    }),
+    fetchProductPage: async () => ({
+      text: async () => `<html><title>DEWALT DCD996B</title><script type="application/ld+json">{"@type":"Product","sku":"DCD996B","offers":{"price":"259.00"}}</script></html>`,
+    }),
+  })).json();
+  assert.equal(second.quote.items[0].estimate, 209);
+  assert.match(second.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(second.reply, /\$259|285\.44|home depot|lowe|margin|privateCost/i);
+  assert.equal(JSON.parse(store.get("shelf:DCD996B")).shelf, 209);
+});
+
+test("DCF887B is priced when the page splits the model and nests the price", async () => {
+  resetLimits();
+  const html = `<html><title>DEWALT 20V MAX XR Impact Driver DCF 887B</title>
+    <script type="application/ld+json">{"@type":"Product","sku":"DCF887B","name":"DEWALT DCF 887B"}</script>
+    "currentPrice":{"currency":"USD","value":169.00}
+    </html>`;
+  assert.equal(extractShelfPrice(html), 169);
+  assert.equal(extractPageModel(html), "dcf887b");
+  assert.equal(pageMatchesModel({ title: "DEWALT DCF 887B" }, "DCF887B"), true);
+  assert.equal(pageMatchesModel({ url: "https://www.homedepot.com/p/DEWALT-20V-MAX-Impact-Driver/312345678" }, "DCF887B"), false);
+  const url = "https://www.homedepot.com/p/DEWALT-20V-MAX-Impact-Driver/312345678";
+  let calls = 0;
+  const body = await (await liveChat([{ role: "user", content: "what is my cost on a DCF887B" }], {
+    callXai: async (_env, _instructions, input) => {
+      calls += 1;
+      if (calls >= 2) {
+        assert.match(input[input.length - 1].content, /different retailer/i);
+        assert.match(input[input.length - 1].content, /Home Depot/);
+        assert.match(input[input.length - 1].content, /Lowe's/);
+        assert.match(input[input.length - 1].content, /DCF887B/);
+        return { output_text: "QUOTE_JSON: {\"items\":[]}" };
+      }
+      return {
+        output_text: `QUOTE_JSON: ${JSON.stringify({
+          items: [{ name: "DeWalt impact driver", qty: 1, source: "U" }],
+        })}`,
+        output: [{ type: "web_search_result", results: [{ url, title: "DEWALT Impact Driver", snippet: "" }] }],
+      };
+    },
+    fetchProductPage: async () => ({ text: async () => html }),
+  })).json();
+  assert.ok(calls >= 2);
+  assert.equal(body.quote.items[0].sku, "DCF887B");
+  assert.equal(body.quote.items[0].estimate, 169);
+  assert.match(body.reply, /DCF887B/);
+  assert.match(body.reply, /Out the door that's \$186\.25/);
+  assert.match(body.reply, /Would you like to place an order\?/);
+  assert.doesNotMatch(body.reply, /team to price|home depot|lowe|margin|privateCost/i);
 });
