@@ -53,6 +53,11 @@ function contentTokens(value) {
     .filter((token) => token && token.length > 1 && !MATCH_STOP.has(token));
 }
 
+const TYPE_WORDS = new Set([
+  "sds", "rotary", "pneumatic", "demolition", "jackhammer",
+  "circular", "miter", "reciprocating", "oscillating",
+]);
+
 function scoreKey(queryTokens, keyTokens) {
   if (!queryTokens.length || !keyTokens.length) return 0;
   const query = queryTokens.join(" ");
@@ -159,6 +164,8 @@ export function matchCatalog(catalog, query) {
   const hits = [];
   for (const item of catalog?.items || []) {
     const keys = [item.sku, item.model, item.name, ...(item.aliases || [])].filter(Boolean);
+    const covered = new Set(contentTokens(keys.join(" ")));
+    if (queryTokens.some((token) => TYPE_WORDS.has(token) && !covered.has(token))) continue;
     let score = 0;
     for (const key of keys) {
       score = Math.max(score, scoreKey(queryTokens, contentTokens(key)));
@@ -232,29 +239,19 @@ export function extractQty(text) {
   return null;
 }
 
-/** Pull a shelf price for one item out of prose. Numbers only; store names are ignored. */
-export function shelvesFromText(prose, name) {
-  const nameTokens = contentTokens(name);
-  if (!nameTokens.length) return null;
-  const sentences = String(prose || "").split(/\n+|(?<=[.!?])\s+/);
-  let best = "";
-  let bestScore = 0;
-  for (const sentence of sentences) {
-    if (!/\$\s?\d/.test(sentence)) continue;
-    const overlap = nameTokens.filter((token) => contentTokens(sentence).includes(token)).length;
-    if (overlap > bestScore) {
-      bestScore = overlap;
-      best = sentence;
-    }
-  }
-  if (!best || bestScore < 1) return null;
-  const range = best.match(/\$\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:to|through|-|–|—)\s*\$?\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)/i);
+const OTHER_PRODUCT = new Set([
+  "saw", "drill", "hammer", "blade", "bit", "grinder", "nailer", "battery",
+  "glove", "ladder", "caulk", "gun", "compressor", "generator", "wrench",
+]);
+
+function priceFromSnippet(text) {
+  const range = String(text || "").match(/\$\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)\s*(?:to|through|-|–|—)\s*\$?\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)/i);
   if (range) {
     const low = asMoney(range[1]);
     const high = asMoney(range[2]);
     if (low && high) return { shelfLow: Math.min(low, high), shelfHigh: Math.max(low, high), source: "A" };
   }
-  const amounts = [...best.matchAll(/\$\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)/g)]
+  const amounts = [...String(text || "").matchAll(/\$\s?(\d+(?:,\d{3})*(?:\.\d{1,2})?)/g)]
     .map((match) => asMoney(match[1]))
     .filter(Boolean);
   if (!amounts.length) return null;
@@ -262,11 +259,61 @@ export function shelvesFromText(prose, name) {
   return { shelf: amounts[amounts.length - 1], source: "A" };
 }
 
+function modelCode(name) {
+  const match = String(name || "").match(/\b[a-z]{0,6}\d{3,}[a-z0-9-]*\b/i);
+  return match ? match[0] : "";
+}
+
+function namesItem(text, nameTokens, sku) {
+  if (sku && String(text || "").toLowerCase().includes(sku.toLowerCase())) return true;
+  const overlap = nameTokens.filter((token) => contentTokens(text).includes(token)).length;
+  return overlap >= 2;
+}
+
+function productConflict(text, nameTokens) {
+  return contentTokens(text).some((token) => OTHER_PRODUCT.has(token) && !nameTokens.includes(token));
+}
+
+/**
+ * Pull a shelf price for one item out of prose. A price in the same sentence
+ * wins. A search card often puts the model on one line and the dollar amount
+ * on the next, so a nearby price counts when that line is not a different product.
+ */
+export function shelvesFromText(prose, name) {
+  const nameTokens = contentTokens(name);
+  if (!nameTokens.length) return null;
+  const text = String(prose || "");
+  const parts = text.split(/\n+|(?<=[.!?])\s+/).map((part) => part.trim()).filter(Boolean);
+  let best = "";
+  let bestScore = 0;
+  for (const part of parts) {
+    if (!/\$\s?\d/.test(part)) continue;
+    const overlap = nameTokens.filter((token) => contentTokens(part).includes(token)).length;
+    if (overlap > bestScore) {
+      bestScore = overlap;
+      best = part;
+    }
+  }
+  if (best && bestScore >= 1) return priceFromSnippet(best);
+  const sku = modelCode(name);
+  for (let i = 0; i < parts.length; i += 1) {
+    if (!/\$\s?\d/.test(parts[i]) || productConflict(parts[i], nameTokens)) continue;
+    for (let back = 1; back <= 3 && i - back >= 0; back += 1) {
+      if (namesItem(parts[i - back], nameTokens, sku)) return priceFromSnippet(parts[i]);
+      if (productConflict(parts[i - back], nameTokens)) break;
+    }
+  }
+  return null;
+}
+
 export function fillMissingShelf(raw, catalog, prose = "") {
   const next = { ...raw };
-  next.shelf = asMoney(next.shelf);
+  const givenShelf = asMoney(next.shelf);
+  const altShelf = asMoney(next.price) || asMoney(next.shelfPrice) || asMoney(next.unitPrice);
+  next.shelf = givenShelf || altShelf;
   next.shelfLow = asMoney(next.shelfLow);
   next.shelfHigh = asMoney(next.shelfHigh);
+  if (!givenShelf && altShelf && (!next.source || String(next.source).toUpperCase() === "U")) next.source = "A";
   const hasShelf = (next.shelf && next.shelf > 0) || (next.shelfLow && next.shelfLow > 0);
   if (!hasShelf && !next.fixedPrice) {
     const exact = (catalog?.items || []).find((item) => item.sku && next.sku && String(item.sku).toLowerCase() === String(next.sku).toLowerCase());

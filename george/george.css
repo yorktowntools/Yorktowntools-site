@@ -4,9 +4,21 @@
   box-sizing: border-box;
 }
 
+.george-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(11, 30, 63, 0.55);
+  pointer-events: auto;
+}
+
+.george-backdrop[hidden] {
+  display: none;
+}
+
 .george-launcher {
   position: fixed;
-  z-index: 1001;
+  z-index: 10002;
   left: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
   display: flex;
@@ -82,7 +94,7 @@
 
 .george-panel {
   position: fixed;
-  z-index: 1002;
+  z-index: 10001;
   left: 16px;
   top: 16px;
   bottom: calc(16px + env(safe-area-inset-bottom));
@@ -141,19 +153,25 @@
   background: rgba(255, 255, 255, 0.12);
   border: 0;
   border-radius: 999px;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 10px;
+  min-height: 36px;
+  padding: 6px 8px;
   font: 700 13px/1 Inter, system-ui, sans-serif;
   text-decoration: none;
   cursor: pointer;
   text-align: center;
 }
 
+.george-close {
+  min-width: 44px;
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
 .george-log {
   flex: 1 1 45%;
   min-height: 38%;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 14px;
   background: #f6f7f9;
 }
@@ -232,14 +250,6 @@
   font-size: 13px;
 }
 
-.george-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.george-chips button,
 .george-send,
 .george-submit,
 .george-add {
@@ -249,7 +259,6 @@
   font: 700 14px/1 Inter, system-ui, sans-serif;
 }
 
-.george-chips button,
 .george-add {
   background: #fff;
   color: #0b1e3f;
@@ -423,10 +432,44 @@
 
 @media (max-width: 640px) {
   .george-panel {
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
+    background: #fff;
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .george-actions {
+    gap: 4px;
+  }
+
+  .george-actions a {
+    min-height: 32px;
+    padding: 4px 7px;
+    font-size: 12px;
+  }
+
+  .george-close {
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  .george-head h2 {
+    font-size: 15px;
+  }
+
+  .george-head p {
+    font-size: 12px;
   }
 }
 

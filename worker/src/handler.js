@@ -1,21 +1,23 @@
 import catalog from "../../data/prices.json" with { type: "json" };
-import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../config/accessories.js";
+import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
-import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
+import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
-import { localReply } from "../../shared/local-reply.js";
-import { chatStage, isShortReply } from "../../shared/talk.js";
+import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
+import { chatStage, clarifyingQuestion, isShortReply } from "../../shared/talk.js";
 import {
   fillMissingShelf,
+  formatMoney,
   hasFirmPrice,
   matchCatalog,
+  roundMoney,
   shouldSearch,
   splitRequestedItems,
 } from "../../shared/pricing.js";
 import { buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
 import { privateCostFor, readPrivateCosts } from "../config/private-costs.js";
-import { presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
+import { itemLinkLine, presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
 const buckets = new Map();
 
@@ -225,6 +227,26 @@ function collectDollarText(value, out = [], depth = 0) {
   return out;
 }
 
+function searchCards(value, out = [], depth = 0) {
+  if (depth > 8 || !value || typeof value !== "object") return out;
+  if (Array.isArray(value)) {
+    value.forEach((item) => searchCards(item, out, depth + 1));
+    return out;
+  }
+  const bits = [];
+  for (const key of ["title", "name", "snippet", "description", "content"]) {
+    if (typeof value[key] === "string" && value[key].trim()) bits.push(value[key].trim());
+  }
+  const numeric = [value.price, value.salePrice].find((item) => typeof item === "number" && item > 0);
+  if (numeric) bits.push(`$${numeric}`);
+  const blob = bits.join("\n");
+  if (bits.length >= 2 && /\$\s?\d|\b\d{2,5}(?:\.\d{2})\b/.test(blob)) out.push(blob);
+  Object.values(value).forEach((item) => {
+    if (item && typeof item === "object") searchCards(item, out, depth + 1);
+  });
+  return out;
+}
+
 function alignRequested(rawItems, userText) {
   const requested = splitRequestedItems(userText);
   if (requested.length < 2) return rawItems;
@@ -419,15 +441,122 @@ function withSiblingLines(latest, prior, local) {
       ...local.quote,
       items: preferSpecific([...priorItems, ...current]),
       bulk: Boolean(base.quote?.bulk || local.quote?.bulk),
-      stage: "quote",
+      stage: local.quote?.stage === "script" || local.quote?.stage === "form" ? local.quote.stage : "quote",
     },
   };
 }
 
-function withQuoteOffer(reply) {
-  const text = String(reply || "").trim();
-  if (/quote together/i.test(text) || isAccessoryQuestion(text) || /which ones do you want/i.test(text)) return text;
-  return text ? `${text}\n\nWant me to put a quote together?` : "Want me to put a quote together?";
+function normalizedReply(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function replaceRepeatedReply(modelReply, drafted, priorMessages) {
+  const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
+  if (!previous || normalizedReply(modelReply) !== normalizedReply(previous)) return drafted;
+  return confusedWhatReply(priorMessages);
+}
+
+function itemAmount(item) {
+  if (item.estimate == null) return "";
+  if (item.estimateHigh != null && item.estimateHigh !== item.estimate) {
+    return `${formatMoney(item.estimate)} to ${formatMoney(item.estimateHigh)}`;
+  }
+  return formatMoney(item.estimate);
+}
+
+const BRAND = /\b(dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt|stanley|klein|werner|stabila|jackery|porter|dap)\b/i;
+const BRAND_WORDS = new Set(String(BRAND.source).match(/[a-z]+/g));
+const MODEL = /\b[a-z]{0,6}\d{3,}[a-z0-9-]*\b/i;
+const GENERIC = new Set([
+  "jack", "hammer", "drill", "saw", "grinder", "nailer", "tool", "ladder", "glove",
+  "battery", "blade", "bit", "wrench", "caulk", "case", "box", "pair", "demolition",
+  "rotary", "sds", "corded", "cordless", "electric", "pneumatic", "power", "impact",
+  "driver", "circular", "angle", "heat", "gun", "kit", "plus", "inch", "amp",
+  "item", "product",
+]);
+
+function nameTokens(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .split(" ")
+    .map((word) => (word.length > 3 && word.endsWith("s") ? word.slice(0, -1) : word))
+    .filter((word) => word.length > 2);
+}
+
+function isPlaceholderName(name) {
+  return /^(items?|tools?|products?)$/i.test(String(name || "").trim());
+}
+
+function specificItem(item) {
+  const blob = `${item?.name || ""} ${item?.sku || ""} ${item?.model || ""} ${item?.manufacturer || ""}`;
+  if (MODEL.test(blob)) return true;
+  return nameTokens(blob).some((token) => !GENERIC.has(token) && !BRAND_WORDS.has(token));
+}
+
+function customerConfirmed(text) {
+  const value = String(text || "");
+  if (MODEL.test(value)) return true;
+  const use = /\b(concrete|tile|asphalt|brick|masonry|wood|steel|metal|drywall)\b/i.test(value);
+  const power = /\b(corded|cordless|pneumatic|electric)\b/i.test(value);
+  return use && power;
+}
+
+function genericCategoryReply(items, text) {
+  const blob = `${text || ""}\n${(items || []).map((item) => item?.name || "").join("\n")}`;
+  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text || "")) {
+    return "We can source a jack hammer for you. What are you breaking up, and do you want electric corded, cordless, or pneumatic?";
+  }
+  if (BRAND.test(blob) && !MODEL.test(blob)) return "Which model or size do you want?";
+  return clarifyingQuestion(text || blob);
+}
+
+function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "" } = {}) {
+  const lines = (items || []).filter((item) => item?.name && !isPlaceholderName(item.name));
+  if (!lines.length) {
+    if (/\b(jack\s*hammers?|demolition hammers?|drills?|saws?|grinders?|hammers?)\b/i.test(text || "") || (BRAND.test(text || "") && !MODEL.test(text || ""))) {
+      return genericCategoryReply([], text);
+    }
+    return String(baseReply || "");
+  }
+  const read = lines.map((item) => {
+    const amount = itemAmount(item);
+    const label = amount && item.ballpark ? `Starting estimate ${amount}` : amount;
+    const stock = /pre-order|out of stock/i.test(item.stockNote || "") ? ` ${item.stockNote}` : "";
+    return `${item.qty || 1} × ${item.name}${label ? `: ${label}` : ""}${stock}`;
+  }).join(", ");
+  const uncertain = lines.some((item) => item.confirm || item.estimate == null);
+  const missingPrice = lines.every((item) => item.estimate == null);
+  let low = 0;
+  let high = 0;
+  for (const item of lines) {
+    if (item.estimate == null) continue;
+    const qty = item.qty || 1;
+    low += item.estimate * qty;
+    high += (item.estimateHigh ?? item.estimate) * qty;
+  }
+  const factor = (government ? 1 : 1.07) * 1.03;
+  const otdLow = roundMoney(low * factor);
+  const otdHigh = roundMoney(high * factor);
+  const over = (otdHigh || otdLow || 0) > 500;
+  const upsell = String(baseReply || "").match(/(?:^|[.!?]\s+|\n+)(Need [^\n?]+\?)/)?.[1]?.trim() || "";
+  const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
+  const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
+  const head = upsell ? `${upsell}\n\n` : "";
+  if (missingPrice && !bulk && !(lines.some(specificItem) || customerConfirmed(text))) {
+    return genericCategoryReply(lines, text);
+  }
+  if (missingPrice && !bulk) {
+    return `${head}I have ${read}. That one's for our team to price. What's your name, company, and cell or email?${linkBlock}`;
+  }
+  if (uncertain || over || bulk) {
+    const bulkNote = bulk ? ` ${BULK_LINE}` : "";
+    return `${head}I have ${read}.${bulkNote} That's one for our team to price. ${HANDOFF_LINE} ${CLOSING_LINE}${linkBlock}`;
+  }
+  const total = otdHigh && otdHigh !== otdLow
+    ? `${formatMoney(otdLow)} to ${formatMoney(otdHigh)}`
+    : formatMoney(otdLow);
+  return `${head}I have ${read}. Out the door that's ${total}. Would you like to place an order?${linkBlock}`;
 }
 
 function mergeNotes(reply, notes) {
@@ -452,8 +581,20 @@ function viewFor(lines, extra) {
   });
 }
 
+function withoutRepeatedGreeting(reply, priorMessages) {
+  const greeted = (priorMessages || []).some((message) => message.role === "assistant" && /hey, i'm george|welcome to yorktown tools/i.test(message.content || ""));
+  if (!greeted) return String(reply || "");
+  const stripped = String(reply || "")
+    .replace(/Hey, I'm George\.\s*Welcome to Yorktown Tools!(?:\s*Are you putting together a tool order for an upcoming jobsite\?)?/gi, "")
+    .replace(/Hey, I'm George\.\s*/gi, "")
+    .replace(/Welcome to Yorktown Tools!\s*/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return stripped || "What do you need for the job?";
+}
+
 function finalizeReply(reply, priorMessages = []) {
-  return withoutRepeatedAfterHours(filterCustomerText(reply).text, priorMessages);
+  return withoutRepeatedAfterHours(filterCustomerText(withoutRepeatedGreeting(reply, priorMessages)).text, priorMessages);
 }
 
 async function readJson(request) {
@@ -560,11 +701,14 @@ async function chat(request, env) {
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
-  if (stage === "form" || (stage !== "quote" && !(followUp && pricedLocally))) {
+  const keepLocal = Boolean(local.quote?.scripted)
+    || stage === "form"
+    || ((stage !== "quote" && stage !== "script") && !(followUp && pricedLocally));
+  if (keepLocal) {
     return json({
       reply: finalizeReply(local.reply, messages),
       quote: {
-        items: stage === "form" || stage === "recommend" ? (local.quote?.items || []) : [],
+        items: stage === "form" || stage === "recommend" || (stage === "script" && (local.quote?.items || []).length) ? (local.quote?.items || []) : [],
         offerForm: Boolean(local.quote?.offerForm),
         hold: Boolean(local.quote?.hold),
         bulk: Boolean(local.quote?.bulk),
@@ -580,8 +724,11 @@ async function chat(request, env) {
       : alignRequested(local.quote?.items || [], convo));
     const lines = linesFromQuote({ items: sourceItems }, convo, await costsFromEnv(env));
     const view = viewFor(lines, { text: convo });
-    const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));
     const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
+    const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
+    const reply = kept.length
+      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk), text: convo }), messages)
+      : finalizeReply(local.reply, messages);
     return json({
       reply,
       quote: { items: kept, offerForm: false, hold: true, bulk: view.lead.bulk || Boolean(local.quote?.bulk) },
@@ -602,17 +749,23 @@ async function chat(request, env) {
   }
 
   try {
-    const data = await callXai(
+    const data = await (typeof env.callXai === "function" ? env.callXai : callXai)(
       env,
       buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
       messages.map((message) => ({ role: message.role, content: message.content })),
       canSearch,
     );
     const parsed = splitModelOutput(outputText(data));
-    const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
+    const prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
-    const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
+    const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
+    const quotable = view.items.filter((item) => item?.name && !isPlaceholderName(item.name));
+    const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, quotable), view.notes);
+    const ordered = view.items.length
+      ? scriptOrderReply(pricedReply, quotable, { government, bulk: view.lead.bulk, text: convo })
+      : pricedReply;
+    const reply = replaceRepeatedReply(parsed.reply, finalizeReply(ordered, messages), messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
@@ -621,9 +774,9 @@ async function chat(request, env) {
     return json({
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {
-        items: view.items,
+        items: quotable,
         offerForm: false,
-        hold: true,
+        hold: quotable.length > 0,
         bulk: view.lead.bulk,
       },
       searchesUsed,
