@@ -188,21 +188,26 @@ export function matchCatalog(catalog, query) {
  */
 export function splitRequestedItems(text) {
   const source = String(text || "");
-  const re = /(\d{1,4})\s+(?:(cases?|boxes|pairs?|packs?)\s+of\s+)?([a-z0-9][^.\n;]{1,80}?)(?=\s*(?:,|\band\b|\bfor\b|\bin\b)|$)/gi;
+  const re = /(?:(\d{1,4})|(?:\b(?:a|an|one)\b))\s+(?:(cases?|boxes|pairs?|packs?)\s+of\s+)?([a-z0-9][^.\n;]{1,80}?)(?=\s*(?:,|\band\b|\bfor\b|\bin\b)|$)/gi;
   const found = [];
   let match;
   while ((match = re.exec(source))) {
     let product = match[3].replace(/\s+/g, " ").trim().replace(/^(a|an|the)\s+/i, "");
     if (product.length < 2) continue;
+    if (!match[1] && !match[2]) continue;
     const unit = (match[2] || "").toLowerCase();
     const name = unit.startsWith("case") ? `cases of ${product}` : product;
-    found.push({ qty: Number(match[1]), name, query: product });
+    const qty = match[1] ? Number(match[1]) : 1;
+    found.push({ qty, name, query: product });
   }
   return found;
 }
 
 export function extractQty(text) {
   const raw = String(text || "");
+  if (/^(?:just\s+)?one\b/i.test(raw.trim()) && raw.trim().split(/\s+/).length <= 3) return 1;
+  if (/^(?:just\s+)?(\d{1,4})\s*$/i.test(raw.trim())) return Number(raw.trim().match(/(\d{1,4})/)[1]);
+  if (/\b(?:a|an|one)\s+(?:case|cases|pair|pairs|box|boxes)\b/i.test(raw)) return 1;
   const patterns = [
     /\b(?:need|needs|want|wants|order|quote|get|send)\s+(\d{1,4})\b/i,
     /\b(\d{1,4})\s*(?:x|pcs|pc|pieces|piece|units|unit|pairs|pair|qty|each|gloves|saws|drills|kits)\b/i,

@@ -37,6 +37,12 @@ function lastAssistant(history) {
   return [...(history || [])].reverse().find((entry) => entry.role === "assistant");
 }
 
+export function isShortReply(text) {
+  const value = String(text || "").trim();
+  if (!value || value.length > 48) return false;
+  return /^(yes|yeah|yep|sure|no|nope|nah|ok|okay|please|just one|one|two|three|white|a case|a pair|\d{1,4})$/i.test(value);
+}
+
 export function acceptingQuote(message, history) {
   return /^(yes|yeah|yep|sure|please|ok|okay|do it|sounds good)\b/i.test(String(message || "").trim())
     && /quote together/i.test(lastAssistant(history)?.content || "");
@@ -52,7 +58,6 @@ export function drillTurn(message, history) {
   const brand = /\b(dewalt|milwaukee|makita|bosch|ridgid|don't care|dont care|do not care|no preference|any brand)\b/i.test(blob);
   const voltage = /\b(12v|18v|20v|36v|40v|m12|m18|flexvolt)\b/i.test(blob);
   const cordless = /\b(cordless|battery)\b/i.test(blob) && !/\bcorded\b/i.test(blob);
-  const quantity = /\b(\d+|one|two|a couple|few)\b/i.test(blob);
   if (!use) return { stage: "clarify", reply: "Okay, what are you using the drill for?" };
   if (!power || !brand) {
     return {
@@ -63,7 +68,6 @@ export function drillTurn(message, history) {
   if (cordless && !voltage) {
     return { stage: "clarify", reply: "Okay, what voltage or battery platform are you on?" };
   }
-  if (!quantity) return { stage: "clarify", reply: "Okay, how many do you need?" };
   return { stage: "recommend" };
 }
 

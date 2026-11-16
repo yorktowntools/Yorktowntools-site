@@ -13,7 +13,7 @@ import {
   SERVICE_AREA,
 } from "./copy.js";
 import { filterCustomerText } from "./customer-text.js";
-import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn } from "./talk.js";
+import { acceptingQuote, chatStage, clarifyingQuestion, drillTurn, isShortReply } from "./talk.js";
 import { accessoryAsked, accessoryOffer } from "../worker/config/accessories.js";
 import {
   discountPercent,
@@ -95,6 +95,41 @@ function recommendCordedHammers(catalog, percent) {
   };
 }
 
+function substantiveUsers(history) {
+  return (history || []).filter((entry) => entry.role === "user" && !isShortReply(entry.content));
+}
+
+function carryQuote(text, history, catalog, discount, page) {
+  const users = substantiveUsers(history);
+  const subject = users.at(-1)?.content || "";
+  if (!subject) return null;
+  const base = localReply({ message: subject, history, catalog, discount, page });
+  if (!base.quote?.items?.length) return null;
+  const qty = extractQty(text) || extractQty(subject);
+  const tools = base.quote.items.filter((item) => !item.lockName);
+  let items = qty && tools.length === 1
+    ? base.quote.items.map((item) => (item.lockName ? item : { ...item, qty }))
+    : base.quote.items;
+  let asked = false;
+  let accepted = false;
+  for (const entry of history || []) {
+    if (entry.role === "assistant" && /I can add them if you want/i.test(entry.content || "")) asked = true;
+    if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|ok|okay)\b/i.test(String(entry.content || "").trim())) accepted = true;
+  }
+  if (accepted) {
+    const offer = accessoryOffer(`${subject}\n${items.map((item) => item.name).join(" ")}`);
+    for (const suggestion of offer?.suggestions || []) {
+      if (items.some((item) => item.name === suggestion.name)) continue;
+      const known = suggestion.sku ? (catalog?.items || []).find((entry) => entry.sku === suggestion.sku) : null;
+      const priced = known ? priceEntry({ ...known, qty: suggestion.qty }, discountPercent(discount, catalog?.discountPercent ?? 0)) : null;
+      items.push(priced
+        ? toQuoteItem(priced, suggestion.qty)
+        : { name: suggestion.name, sku: suggestion.sku || "", qty: suggestion.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true });
+    }
+  }
+  return { ...base, quote: { ...base.quote, items, stage: base.quote.stage || "quote" } };
+}
+
 export function localReply({ message, history = [], catalog, discount, page }) {
   const text = String(message || "").trim();
   const percent = discountPercent(discount, catalog?.discountPercent ?? 1);
@@ -158,9 +193,16 @@ export function localReply({ message, history = [], catalog, discount, page }) {
 
   const yes = /^(yes|yeah|yep|sure|please|ok|okay|add them|do it)\b/i.test(text);
   const no = /^(no|nope|nah|i'm set|im set|all set|we're set)\b/i.test(text);
-  const lastAssistant = [...history].reverse().find((entry) => entry.role === "assistant");
-  const askedAccessories = /I can add them if you want/i.test(lastAssistant?.content || "");
-  if ((yes || no) && askedAccessories && !/quote together/i.test(lastAssistant?.content || "")) {
+  const accessoryPending = (() => {
+    let asked = false;
+    let answered = false;
+    for (const entry of history) {
+      if (entry.role === "assistant" && /I can add them if you want/i.test(entry.content || "")) asked = true;
+      if (asked && entry.role === "user" && /^(yes|yeah|yep|sure|no|nope|nah|ok|okay|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim())) answered = true;
+    }
+    return asked && !answered;
+  })();
+  if ((yes || no) && accessoryPending) {
     const earlierUsers = history.filter((entry) => entry.role === "user" && !/^(yes|yeah|yep|sure|no|nope|nah|ok|okay|add them|do it|i'm set|im set|all set)\b/i.test(String(entry.content || "").trim()));
     const base = earlierUsers.length
       ? localReply({ message: earlierUsers.at(-1).content, history, catalog, discount, page })
@@ -192,20 +234,22 @@ export function localReply({ message, history = [], catalog, discount, page }) {
   }
 
   if (acceptingQuote(text, history)) {
-    const earlier = [...history].reverse().find((entry) => entry.role === "user");
-    const again = earlier
-      ? localReply({ message: earlier.content, history: history.filter((entry) => entry !== earlier), catalog, discount, page })
-      : { quote: { items: [] } };
+    const carried = carryQuote(text, history, catalog, discount, page);
     return {
       reply: "Okay. Add your name and the job site and we'll send it.",
       quote: {
-        items: again.quote?.items || [],
+        items: carried?.quote?.items || [],
         offerForm: true,
         hold: false,
         stage: "form",
-        bulk: Boolean(again.quote?.bulk),
+        bulk: Boolean(carried?.quote?.bulk),
       },
     };
+  }
+
+  if (isShortReply(text) && history.some((entry) => entry.role === "user" && !isShortReply(entry.content))) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    if (carried?.quote?.items?.length) return carried;
   }
 
   const drill = drillTurn(text, history);

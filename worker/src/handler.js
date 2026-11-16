@@ -2,7 +2,7 @@ import catalog from "../../data/prices.json" with { type: "json" };
 import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
 import { localReply } from "../../shared/local-reply.js";
-import { chatStage } from "../../shared/talk.js";
+import { chatStage, isShortReply } from "../../shared/talk.js";
 import {
   fillMissingShelf,
   hasFirmPrice,
@@ -436,11 +436,14 @@ async function chat(request, env) {
 
   const latest = userTurns[userTurns.length - 1].content;
   const prior = messages.slice(0, -1);
+  const convo = [...prior.filter((message) => message.role === "user").map((message) => message.content), latest].join("\n");
   const matches = matchCatalog(catalog, latest);
   const mock = env.MOCK_MODE === "true" || !env.XAI_API_KEY;
   const local = localReply({ message: latest, history: prior, catalog, discount: percent, page });
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
-  if (stage !== "quote") {
+  const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
+  const followUp = isShortReply(latest);
+  if (stage === "form" || (stage !== "quote" && !(followUp && pricedLocally))) {
     return json({
       reply: finalizeReply(local.reply, messages),
       quote: {
@@ -453,15 +456,17 @@ async function chat(request, env) {
       mode: mock ? "mock" : "live",
     }, 200, request, env);
   }
-  if (mock) {
-    const lines = linesFromQuote({ items: alignRequested(local.quote?.items || [], latest) }, latest, costsFromEnv(env));
-    const view = viewFor(lines, { text: latest });
+  if (mock || pricedLocally || followUp) {
+    const sourceItems = followUp ? (local.quote?.items || []) : alignRequested(local.quote?.items || [], convo);
+    const lines = linesFromQuote({ items: sourceItems }, convo, costsFromEnv(env));
+    const view = viewFor(lines, { text: convo });
     const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(local.reply, view.items), view.notes), messages));
+    const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
     return json({
       reply,
-      quote: { items: view.items.length ? view.items : local.quote.items, offerForm: false, hold: true, bulk: view.lead.bulk },
+      quote: { items: kept, offerForm: false, hold: true, bulk: view.lead.bulk || Boolean(local.quote?.bulk) },
       searchesUsed: 0,
-      mode: "mock",
+      mode: mock ? "mock" : "live",
     }, 200, request, env);
   }
 

@@ -606,3 +606,102 @@ test("a vague drill ask stays a question, and an exact model still quotes", asyn
   assert.equal(exactBody.quote.offerForm, false);
   assert.equal(exactBody.quote.items[0].qty, 2);
 });
+
+test("multi-turn quote flows keep the selected items", async () => {
+  resetLimits();
+  const thread = [];
+  const turn = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: thread });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+
+  const saw = await turn("I need a Makita circular saw");
+  assert.doesNotMatch(saw.reply, /^- Item\.?$/m);
+  assert.doesNotMatch(saw.reply, /\bItem\b/);
+  assert.match(saw.reply, /5007FA/);
+  assert.match(saw.reply, /\$149(?:\.00)? to \$179(?:\.00)?/);
+  assert.match(saw.reply, /I can add them if you want/);
+  assert.equal(saw.quote.items.some((item) => item.sku === "5007FA"), true);
+
+  const sized = await post("/api/chat", {
+    messages: [{ role: "user", content: "The 7-1/4 Makita 5007FA" }],
+  });
+  const sizedBody = await sized.json();
+  assert.match(sizedBody.reply, /5007FA/);
+  assert.match(sizedBody.reply, /\$149(?:\.00)? to \$179(?:\.00)?/);
+  assert.doesNotMatch(sizedBody.reply, /\bItem\b/);
+
+  const one = await turn("Just one");
+  assert.doesNotMatch(one.reply, /I stick to tools/i);
+  assert.equal(one.quote.items.find((item) => item.sku === "5007FA")?.qty, 1);
+  assert.doesNotMatch(one.reply, /I won't promise it's on hand/);
+
+  const added = await turn("Yes");
+  assert.equal(added.quote.items.some((item) => item.sku === "5007FA"), true);
+  assert.equal(added.quote.items.some((item) => /blade/i.test(item.name)), true);
+  assert.match(added.reply, /quote together/i);
+  assert.doesNotMatch(added.reply, /I won't promise it's on hand/);
+
+  const opened = await turn("Yes");
+  assert.equal(opened.quote.offerForm, true);
+  assert.equal(opened.quote.items.find((item) => item.sku === "5007FA")?.qty, 1);
+  assert.equal(opened.quote.items.some((item) => /blade/i.test(item.name)), true);
+
+  const bulkThread = [];
+  const bulkTurn = async (text) => {
+    bulkThread.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: bulkThread });
+    const body = await response.json();
+    bulkThread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const bulk = await bulkTurn("I need 10 cases of caulk and 5 Makita 5007FA saws");
+  assert.equal(bulk.quote.bulk, true);
+  const bulkSaw = bulk.quote.items.find((item) => item.sku === "5007FA");
+  assert.equal(bulkSaw?.qty, 5);
+  assert.equal(bulkSaw?.ballpark, true);
+  assert.ok(bulkSaw?.estimate > 0);
+  const bulkYes = await bulkTurn("Yes");
+  assert.equal(bulkYes.quote.bulk, true);
+  assert.equal(bulkYes.quote.items.find((item) => item.sku === "5007FA")?.qty, 5);
+  assert.equal(bulkYes.quote.items.some((item) => /blade/i.test(item.name)), true);
+
+  const caulk = await post("/api/chat", {
+    messages: [{ role: "user", content: "a case of DAP Alex Plus" }],
+  });
+  const caulkBody = await caulk.json();
+  assert.equal(caulkBody.quote.items[0]?.qty, 1);
+  assert.match(caulkBody.reply, /caulk gun/i);
+  assert.doesNotMatch(caulkBody.reply, /how many cases/i);
+  const caulkThread = [
+    { role: "user", content: "a case of DAP Alex Plus" },
+    { role: "assistant", content: caulkBody.reply },
+    { role: "user", content: "No" },
+  ];
+  const caulkNo = await post("/api/chat", { messages: caulkThread });
+  const caulkNoBody = await caulkNo.json();
+  caulkThread.push({ role: "assistant", content: caulkNoBody.reply });
+  caulkThread.push({ role: "user", content: "Yes" });
+  const caulkForm = await post("/api/chat", { messages: caulkThread });
+  const caulkFormBody = await caulkForm.json();
+  assert.equal(caulkFormBody.quote.offerForm, true);
+  assert.equal(caulkFormBody.quote.items[0]?.qty, 1);
+
+  const drill = [];
+  const drillTurn = async (text) => {
+    drill.push({ role: "user", content: text });
+    const response = await post("/api/chat", { messages: drill });
+    const body = await response.json();
+    drill.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  await drillTurn("I'm looking for a drill.");
+  await drillTurn("Concrete.");
+  const picks = await drillTurn("Corded hammer drill, I don't care about the brand.");
+  assert.match(picks.reply, /DeWalt|Milwaukee/i);
+  assert.doesNotMatch(picks.reply, /how many do you need/i);
+  assert.equal(picks.quote.items[0]?.qty, 1);
+});

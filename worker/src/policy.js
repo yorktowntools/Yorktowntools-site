@@ -277,7 +277,7 @@ export function leadTimeNote({ bulk, owned, localPickup }) {
   if (owned) return GLOVES;
   if (localPickup === true) return SAME_DAY;
   if (localPickup === false) return SOURCED;
-  return "I won't promise it's on hand.";
+  return "";
 }
 
 function publicLine(line, bulk) {
@@ -419,7 +419,7 @@ function withoutModelLinks(sentence) {
 
 export function itemPriceLine(item) {
   const name = String(item?.name || "").trim();
-  if (!name) return "";
+  if (!name || /^item$/i.test(name)) return "";
   const qty = item.qty ? `${item.qty} × ` : "";
   const fees = gloveFees(item);
   if (fees) {
@@ -456,6 +456,7 @@ export function replyWithFinalPrices(modelReply, items) {
   for (const sentence of String(modelReply || "").split(/\n+|(?<=[.!?])\s+/)) {
     const trimmed = withoutModelLinks(sentence.trim());
     if (!trimmed || /^(our page|maker page|makita|dewalt|milwaukee)$/i.test(trimmed)) continue;
+    if (/^-?\s*item\.?$/i.test(trimmed)) continue;
     const key = trimmed.toLowerCase();
     if (seen.has(key)) continue;
     const amounts = dollarTokens(trimmed);
