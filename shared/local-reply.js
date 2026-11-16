@@ -12,7 +12,6 @@ import {
   SCAM_CLOSE,
   HOURS,
   PHONE_DISPLAY,
-  QUOTE_OFFER,
   SAFE_COST_REPLY,
   SERVICE_AREA,
 } from "./copy.js";
@@ -199,7 +198,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     : matchCatalog(catalog, text).map((item) => priceEntry({ ...item, qty }, percent))
   );
 
-  const finish = (reply, items, offerForm) => {
+  const finish = (reply, items, _offerForm, options = {}) => {
     const bulk = /\b(bulk|pallet|truckload)\b/i.test(text)
       || (qty >= 5 && /\b(saw|saws|drill|drills|tool|tools|ladder|ladders|impact|impacts)\b/i.test(text))
       || (qty >= 2 && /\b(case|cases|caulk)\b/i.test(text))
@@ -211,25 +210,25 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     const withBulk = bulk && items.length ? `${reply}\n\n${BULK_LINE}` : reply;
     const offer = accessoryOffer(`${text}\n${items.map((item) => item.name).join(" ")}`);
     const askAccessories = items.length && offer && !accessoryAsked(history);
-    const withOffer = askAccessories
-      ? `${withBulk}\n\n${offer.line}`
-      : (items.length && !/quote together/i.test(withBulk) ? `${withBulk}\n\n${QUOTE_OFFER}` : withBulk);
+    const withOffer = askAccessories ? `${withBulk}\n\n${offer.line}` : withBulk;
     const safe = filterCustomerText(withOffer);
     const body = safe.costHit ? SAFE_COST_REPLY : safe.text;
+    const stage = options.stage || (shaped.length ? "quote" : "script");
     return {
       reply: body,
       quote: {
         items: shaped,
         offerForm: false,
         hold: shaped.length > 0,
-        stage: shaped.length ? "quote" : "script",
+        stage,
         bulk,
+        scripted: stage === "script",
       },
     };
   };
 
   if (!text) {
-    return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script" } };
+    return { reply: GREETING, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
   }
 
   const picked = pickedModel(text, history);
@@ -253,7 +252,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
         : { name: addition.name, sku: addition.sku || "", qty: addition.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
       const items = [...kept, extra];
       return {
-        reply: `Okay, I'll add ${addition.qty} × ${addition.name}.\n\n${QUOTE_OFFER}`,
+        reply: `Okay, I'll add ${addition.qty} × ${addition.name}.`,
         quote: {
           items,
           offerForm: false,
@@ -293,18 +292,18 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     if (/\b(?:\d[ -]?){13,16}\b/.test(text)) {
       return {
         reply: "Don't send card numbers in this chat. Text or email for the invoice?",
-        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script", scripted: true },
       };
     }
     if (/\b(text|email)\b/i.test(text)) {
       return {
         reply: "What's the delivery address?",
-        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script", scripted: true },
       };
     }
     return {
       reply: "Text or email?",
-      quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+      quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script", scripted: true },
     };
   }
   if (/what's the delivery address/i.test(lastText)) {
@@ -312,12 +311,12 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     if (/\b(?:\d[ -]?){13,16}\b/.test(text)) {
       return {
         reply: "Don't send card numbers in this chat. What's the delivery address?",
-        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+        quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script", scripted: true },
       };
     }
     return {
       reply: `A secure QuickBooks payment link comes with the invoice. Don't send card numbers in this chat. ${CLOSING_LINE}`,
-      quote: { items: carried?.quote?.items || [], offerForm: false, hold: false, stage: "script" },
+      quote: { items: carried?.quote?.items || [], offerForm: false, hold: false, stage: "script", scripted: true },
     };
   }
   if (/which ones do you want/i.test(lastAssistant?.content || "")) {
@@ -331,7 +330,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     if (!picked.length) {
       return {
         reply: offer ? whichLine(offer.suggestions) : "Which of those do you want?",
-        quote: { items: base.quote?.items || [], offerForm: false, hold: true, stage: "script", bulk: Boolean(base.quote?.bulk) },
+        quote: { items: base.quote?.items || [], offerForm: false, hold: true, stage: "script", scripted: true, bulk: Boolean(base.quote?.bulk) },
       };
     }
     const extra = picked.map((item) => {
@@ -342,7 +341,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
         : { name: item.name, sku: item.sku || "", qty: item.qty, estimate: null, estimateHigh: null, confidence: "unsure", kind: "unsure", lockName: true };
     });
     return {
-      reply: `Okay, I'll add ${picked.map((item) => item.name).join(" and ")}.\n\n${QUOTE_OFFER}`,
+      reply: `Okay, I'll add ${picked.map((item) => item.name).join(" and ")}.`,
       quote: {
         items: [...(base.quote?.items || []), ...extra],
         offerForm: false,
@@ -369,7 +368,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     const carried = carryQuote(text, history, catalog, discount, page);
     return {
       reply: "Would you like the invoice by text or email?",
-      quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script" },
+      quote: { items: carried?.quote?.items || [], offerForm: false, hold: true, stage: "script", scripted: true },
     };
   }
   if ((yes || no) && accessoryPending) {
@@ -389,7 +388,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
           items: base.quote?.items || [],
           offerForm: false,
           hold: (base.quote?.items || []).length > 0,
-          stage: "script",
+          stage: "script", scripted: true,
           bulk: Boolean(base.quote?.bulk),
         },
       };
@@ -403,14 +402,13 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     });
     const items = [...(base.quote?.items || []), ...extra];
     return {
-      reply: yes
-        ? `Okay, I'll add those.\n\n${QUOTE_OFFER}`
-        : `No problem.\n\n${QUOTE_OFFER}`,
+      reply: yes ? "Okay, I'll add those." : "No problem.",
       quote: {
         items,
         offerForm: false,
         hold: items.length > 0,
         stage: items.length ? "quote" : "script",
+        scripted: items.length === 0,
         bulk: Boolean(base.quote?.bulk),
       },
     };
@@ -419,12 +417,33 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   if (acceptingQuote(text, history)) {
     const carried = carryQuote(text, history, catalog, discount, page);
     return {
-      reply: "Okay. Add your name and the job site and we'll send it.",
+      reply: "Would you like the invoice by text or email?",
       quote: {
         items: carried?.quote?.items || [],
-        offerForm: true,
-        hold: false,
-        stage: "form",
+        offerForm: false,
+        hold: true,
+        stage: "script",
+        scripted: true,
+        bulk: Boolean(carried?.quote?.bulk),
+      },
+    };
+  }
+
+  if (/we'll confirm the price/i.test(lastText) && /name, company, and cell or email/i.test(lastText)) {
+    const carried = carryQuote(text, history, catalog, discount, page);
+    const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text)
+      || /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(text)
+      || /\b(my name|i'm|i am|this is)\b/i.test(text);
+    return {
+      reply: contact
+        ? `${HANDOFF_LINE} ${CLOSING_LINE}`
+        : "What's your name, company, and cell or email?",
+      quote: {
+        items: carried?.quote?.items || [],
+        offerForm: false,
+        hold: !contact,
+        stage: "script",
+        scripted: true,
         bulk: Boolean(carried?.quote?.bulk),
       },
     };
@@ -480,7 +499,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   }
 
   if (filteredUser.costHit || /\b(your cost|the margin|markup|military discount|supplier discount)\b/i.test(text)) {
-    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script" } };
+    return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
   }
 
   if (/^(hi|hey|hello|yo|good morning|good afternoon)\b/i.test(text) && text.length < 40) {
@@ -598,10 +617,11 @@ export function localReply({ message, history = [], catalog, discount, page, reb
       `Tell me the brand and model, and how many you need. I'll write the estimate. Free delivery from ${SERVICE_AREA}.`,
       [],
       true,
+      { stage: "quote" },
     );
   }
 
-  if (/\b(drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|storage|packout|ppe|hard hats?|lasers?|levels?|jackery|power)\b/i.test(text)) {
+  if (/\b(sds|rotary hammers?|hammers?|grinders?|nailers?|impacts?|drivers?|sanders?|routers?|planers?|compressors?|generators?|heat guns?|blowers?|vacuums?|welders?|power tools?|multi-tools?|oscillating|reciprocating|drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|storage|packout|ppe|hard hats?|lasers?|levels?|jackery|power|dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt)\b/i.test(text)) {
     const hint = CATEGORIES.slice(0, 4)
       .map((cat) => pageLink(cat.path, cat.name))
       .join(", ");
@@ -609,6 +629,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
       `I can quote that. Brand and model help, plus the quantity. A few places to look: ${hint}. Or just tell me what the crew is trying to do.`,
       [],
       true,
+      { stage: "quote" },
     );
   }
 

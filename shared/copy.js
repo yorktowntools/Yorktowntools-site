@@ -19,8 +19,6 @@ export const SCAM_CLOSE = "We're only able to serve local customers right now.";
 
 export const CLOSING_LINE = "Tools Worth Fighting For!";
 
-export const QUOTE_OFFER = "Want me to put a quote together?";
-
 export const BULK_LINE =
   "Starting estimate, bulk pricing usually comes in better. We'll send your bulk pricing.";
 

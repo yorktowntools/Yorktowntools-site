@@ -700,7 +700,7 @@ test("multi-turn quote flows keep the selected items", async () => {
   caulkThread.push({ role: "user", content: "Yes" });
   const caulkForm = await post("/api/chat", { messages: caulkThread });
   const caulkFormBody = await caulkForm.json();
-  assert.match(caulkFormBody.reply, /specialist will reach out|caulk/i);
+  assert.match(caulkFormBody.reply, /specialist will reach out|caulk|name, company, and cell or email/i);
   assert.equal(caulkFormBody.quote.items[0]?.qty, 1);
 
   const drill = [];
@@ -1225,4 +1225,120 @@ test("a consignment list does not restart the tool script", async () => {
   const contact = await say("I'm Dana at Dana Concrete, dana@example.com");
   assert.match(contact.reply, /specialist will reach out/i);
   assert.match(contact.reply, /Tools Worth Fighting For/);
+});
+
+test("a small unmatched power tool is one out-the-door total, then an invoice", async () => {
+  resetLimits();
+  const ask = "I need a DeWalt SDS rotary hammer. Just one for a small job.";
+  const mock = await post("/api/chat", { messages: [{ role: "user", content: ask }] });
+  const mockBody = await mock.json();
+  assert.doesNotMatch(mockBody.reply, /I stick to tools/i);
+  assert.match(mockBody.reply, /I can quote that/i);
+  assert.doesNotMatch(mockBody.reply, /quote together/i);
+
+  const heat = await post("/api/chat", { messages: [{ role: "user", content: "I need a DeWalt heat gun" }] });
+  const heatBody = await heat.json();
+  assert.doesNotMatch(heatBody.reply, /I stick to tools/i);
+  assert.match(heatBody.reply, /I can quote that/i);
+  const grinder = await post("/api/chat", { messages: [{ role: "user", content: "I need a Milwaukee angle grinder" }] });
+  const grinderBody = await grinder.json();
+  assert.doesNotMatch(grinderBody.reply, /I stick to tools/i);
+  assert.match(grinderBody.reply, /I can quote that|angle grinder/i);
+
+  const live = {
+    MOCK_MODE: "false",
+    XAI_API_KEY: "test-key",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+  };
+  const send = (messages, callXai) => handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages }),
+  }), { ...live, callXai });
+
+  for (const text of [
+    "Hi",
+    "Can I talk to a human?",
+    "Do you do consignment?",
+    "We pay with a GPC",
+    "Can you ship this to Oregon?",
+    "I'll overpay and send extra for shipping",
+  ]) {
+    let calls = 0;
+    const response = await send([{ role: "user", content: text }], async () => {
+      calls += 1;
+      return { output_text: "The model should not answer a script turn." };
+    });
+    const body = await response.json();
+    assert.equal(calls, 0, text);
+    assert.doesNotMatch(body.reply, /The model should not answer/i, text);
+  }
+
+  let pricedCalls = 0;
+  const priced = await send([{ role: "user", content: ask }], async () => {
+    pricedCalls += 1;
+    return {
+      output_text: `QUOTE_JSON: ${JSON.stringify({
+        items: [{ name: "DeWalt SDS rotary hammer", qty: 1, shelf: 210, source: "A" }],
+      })}`,
+    };
+  });
+  const pricedBody = await priced.json();
+  assert.equal(pricedCalls, 1);
+  assert.match(pricedBody.reply, /1 × DeWalt SDS rotary hammer/i);
+  assert.match(pricedBody.reply, /Out the door that's \$231\.44/);
+  assert.match(pricedBody.reply, /Would you like to place an order\?/);
+  assert.doesNotMatch(pricedBody.reply, /quote together|Want me to put a quote together/i);
+  assert.doesNotMatch(pricedBody.reply, /sales tax|card fee|payment fee/i);
+  assert.doesNotMatch(pricedBody.reply, /Add your name and the job site/i);
+  assert.equal(pricedBody.quote.items[0].qty, 1);
+  assert.equal(pricedBody.quote.items[0].estimate, 210);
+
+  const thread = [
+    { role: "user", content: ask },
+    { role: "assistant", content: pricedBody.reply },
+  ];
+  const yes = await send([...thread, { role: "user", content: "Yes" }], async () => {
+    throw new Error("invoice yes should stay local");
+  });
+  const yesBody = await yes.json();
+  assert.match(yesBody.reply, /text or email/i);
+  assert.doesNotMatch(yesBody.reply, /Add your name and the job site/i);
+  thread.push({ role: "assistant", content: yesBody.reply }, { role: "user", content: "Email" });
+  const email = await send(thread, async () => {
+    throw new Error("invoice email should stay local");
+  });
+  const emailBody = await email.json();
+  assert.match(emailBody.reply, /delivery address/i);
+  thread.push({ role: "assistant", content: emailBody.reply }, { role: "user", content: "100 Main Street, Norfolk VA" });
+  const done = await send(thread, async () => {
+    throw new Error("invoice close should stay local");
+  });
+  const doneBody = await done.json();
+  assert.match(doneBody.reply, /QuickBooks/i);
+  assert.match(doneBody.reply, /Don't send card numbers/i);
+  assert.match(doneBody.reply, /Tools Worth Fighting For/);
+
+  const unpriced = await send([{ role: "user", content: ask }], async () => ({
+    output_text: `QUOTE_JSON: ${JSON.stringify({
+      items: [{ name: "DeWalt SDS rotary hammer", qty: 1, source: "U" }],
+    })}`,
+  }));
+  const unpricedBody = await unpriced.json();
+  assert.match(unpricedBody.reply, /DeWalt SDS rotary hammer/);
+  assert.match(unpricedBody.reply, /We'll confirm the price/);
+  assert.match(unpricedBody.reply, /name, company, and cell or email/i);
+  assert.doesNotMatch(unpricedBody.reply, /would you like to place an order/i);
+  assert.doesNotMatch(unpricedBody.reply, /Add your name and the job site/i);
+  assert.doesNotMatch(unpricedBody.reply, /specialist will reach out/i);
+  const handed = await send([
+    { role: "user", content: ask },
+    { role: "assistant", content: unpricedBody.reply },
+    { role: "user", content: "I'm Dana at Dana Concrete, dana@example.com" },
+  ], async () => {
+    throw new Error("specialist handoff should stay local");
+  });
+  const handedBody = await handed.json();
+  assert.match(handedBody.reply, /A Yorktown Tools specialist will reach out shortly/);
+  assert.match(handedBody.reply, /Tools Worth Fighting For/);
 });

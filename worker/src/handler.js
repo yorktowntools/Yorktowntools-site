@@ -1,5 +1,5 @@
 import catalog from "../../data/prices.json" with { type: "json" };
-import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../config/accessories.js";
+import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
 import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
@@ -454,6 +454,7 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false }
     return `${item.qty || 1} × ${item.name}${label ? `: ${label}` : ""}${stock}`;
   }).join(", ");
   const uncertain = lines.some((item) => item.confirm || item.estimate == null);
+  const missingPrice = lines.every((item) => item.estimate == null);
   let low = 0;
   let high = 0;
   for (const item of lines) {
@@ -470,6 +471,9 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false }
   const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
   const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
   const head = upsell ? `${upsell}\n\n` : "";
+  if (missingPrice && !bulk) {
+    return `${head}I have ${read}. We'll confirm the price. What's your name, company, and cell or email?${linkBlock}`;
+  }
   if (uncertain || over || bulk) {
     const bulkNote = bulk ? ` ${BULK_LINE}` : "";
     return `${head}I have ${read}.${bulkNote} That's one for our team to price. ${HANDOFF_LINE} ${CLOSING_LINE}${linkBlock}`;
@@ -478,12 +482,6 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false }
     ? `${formatMoney(otdLow)} to ${formatMoney(otdHigh)}`
     : formatMoney(otdLow);
   return `${head}I have ${read}. Out the door that's ${total}. Would you like to place an order?${linkBlock}`;
-}
-
-function withQuoteOffer(reply) {
-  const text = String(reply || "").trim();
-  if (/quote together/i.test(text) || isAccessoryQuestion(text) || /which ones do you want/i.test(text)) return text;
-  return text ? `${text}\n\nWant me to put a quote together?` : "Want me to put a quote together?";
 }
 
 function mergeNotes(reply, notes) {
@@ -616,7 +614,10 @@ async function chat(request, env) {
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
-  if (stage === "form" || stage === "script" || (stage !== "quote" && !(followUp && pricedLocally))) {
+  const keepLocal = Boolean(local.quote?.scripted)
+    || stage === "form"
+    || ((stage !== "quote" && stage !== "script") && !(followUp && pricedLocally));
+  if (keepLocal) {
     return json({
       reply: finalizeReply(local.reply, messages),
       quote: {
@@ -671,8 +672,12 @@ async function chat(request, env) {
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
-    const drafted = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
-    const reply = replaceRepeatedReply(parsed.reply, drafted, messages);
+    const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
+    const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes);
+    const ordered = view.items.length
+      ? scriptOrderReply(pricedReply, view.items, { government, bulk: view.lead.bulk })
+      : pricedReply;
+    const reply = replaceRepeatedReply(parsed.reply, finalizeReply(ordered, messages), messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);

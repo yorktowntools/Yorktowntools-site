@@ -92,6 +92,7 @@ export function clarifyingQuestion(message, history) {
 }
 
 const VAGUE_TOOL = /\b(drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|grinders?|nailers?)\b/i;
+const NAMED_POWER = /\b(dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt|sds|rotary hammers?|angle grinders?|heat guns?|impact drivers?)\b/i;
 
 export function chatStage(message, history, catalog) {
   const latest = String(message || "").trim();
@@ -101,6 +102,6 @@ export function chatStage(message, history, catalog) {
   if (drill?.stage === "recommend") return "recommend";
   const blob = userBlob(latest, history);
   if (isSpecificAsk(latest, catalog) || isSpecificAsk(blob, catalog)) return "quote";
-  if (VAGUE_TOOL.test(latest) || VAGUE_TOOL.test(blob)) return "clarify";
+  if ((VAGUE_TOOL.test(latest) || VAGUE_TOOL.test(blob)) && !NAMED_POWER.test(latest)) return "clarify";
   return "chat";
 }
