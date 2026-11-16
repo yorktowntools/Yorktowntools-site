@@ -254,6 +254,23 @@ export function buildHandoffEmail({ identity, items, why, transcript, update = f
   return { subject, html, text };
 }
 
+export function handoffFormspreeBody(mail) {
+  const text = String(mail?.text || "");
+  const pick = (label) => {
+    const match = text.match(new RegExp(`^${label}: (.+)$`, "m"));
+    const value = match?.[1]?.trim() || "";
+    return value === "—" ? "" : value;
+  };
+  return {
+    name: pick("Name"),
+    company: pick("Company"),
+    email: pick("Email"),
+    phone: pick("Phone"),
+    message: text,
+    _subject: mail?.subject || "HANDOFF — George",
+  };
+}
+
 export function formspreeBody(lead, items, leadInfo) {
   const tier = leadInfo?.tier || 3;
   const bulk = Boolean(leadInfo?.bulk);

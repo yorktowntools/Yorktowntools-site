@@ -1414,9 +1414,9 @@ test("a small unmatched power tool is one out-the-door total, then an invoice", 
     throw new Error("specialist handoff should stay local");
   });
   const handedBody = await handed.json();
-  assert.match(handedBody.reply, /A Yorktown Tools specialist will reach out shortly/);
+  assert.match(handedBody.reply, /You're all set, a Yorktown Tools specialist will reach out shortly/);
   assert.match(handedBody.reply, /Tools Worth Fighting For/);
-  assert.ok(handedBody.reply.indexOf("A Yorktown Tools specialist will reach out shortly") < handedBody.reply.indexOf("Tools Worth Fighting For"));
+  assert.ok(handedBody.reply.indexOf("a Yorktown Tools specialist will reach out shortly") < handedBody.reply.indexOf("Tools Worth Fighting For"));
 });
 
 test("a search snippet price with no shelf becomes one out-the-door total", async () => {
@@ -2524,6 +2524,8 @@ test("preview phrasings stay on the tool, the model, and the gloves", async () =
   assert.match(box.reply, /Victory Series drivers gloves/);
   assert.match(box.reply, /\$19\.99 a pair/);
   assert.match(box.reply, /Other glove types are available/);
+  assert.match(box.reply, /How many pairs are in the box\?/);
+  assert.doesNotMatch(box.reply, /12 ×/);
 
   const pair = await (await post("/api/chat", { messages: [{ role: "user", content: "I need 1 pair of gloves" }] })).json();
   assert.match(pair.reply, /1 × Victory Series drivers gloves/);
@@ -2534,31 +2536,131 @@ test("preview phrasings stay on the tool, the model, and the gloves", async () =
 
   resetLimits();
   const calls = [];
+  let resendOk = true;
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, init) => {
-    calls.push({ url: String(url), authorization: init?.headers?.Authorization || "" });
-    return { ok: true };
+    calls.push({ url: String(url), authorization: init?.headers?.Authorization || "", body: init?.body || "" });
+    return { ok: !String(url).includes("api.resend.com") || resendOk };
   };
+  const handoffMessages = [
+    { role: "user", content: "I need a chainsaw and a 55 ft lift" },
+    { role: "assistant", content: "I have 1 × Chainsaw, 1 × 55 ft lift. Those are for our team to price. What's your name, company, and cell or email?" },
+    { role: "user", content: "Ben Peralta Zach knows me" },
+  ];
+  let live;
+  const handoff = (sessionId, extra = {}) => handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ sessionId, messages: extra.messages || handoffMessages }),
+  }), {
+    MOCK_MODE: extra.mock ?? "false",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+    XAI_API_KEY: "test-key",
+    handoffOutbox: extra.outbox || [],
+    ...extra.env,
+  });
   try {
-    await handleRequest(new Request("https://george.example/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
-      body: JSON.stringify({
-        sessionId: "resend-key-01",
+    await handoff("resend-key-01", { mock: "true", env: { RESEND_API_KEY: "test-resend-key" } });
+    assert.ok(calls.some((call) => call.url === "https://api.resend.com/emails" && call.authorization === "Bearer test-resend-key"));
+    assert.ok(calls.every((call) => !call.url.includes("formspree.io")));
+
+    resetLimits();
+    calls.length = 0;
+    const logs = [];
+    const originalError = console.error;
+    const originalLog = console.log;
+    console.error = (...args) => { logs.push(args.map(String).join(" ")); };
+    console.log = (...args) => { logs.push(args.map(String).join(" ")); };
+    try {
+      live = await (await handoff("formspree-live-01")).json();
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].url, "https://formspree.io/f/xanlvyan");
+      const payload = JSON.parse(calls[0].body);
+      assert.equal(payload.name, "Ben Peralta");
+      assert.match(payload.message, /Zach knows me/);
+      assert.match(payload.message, /1 × Chainsaw/);
+      assert.match(payload.message, /1 × 55 ft lift/);
+      assert.match(payload.message, /Why:/);
+      assert.match(payload.message, /Transcript:/);
+      assert.match(payload._subject, /^HANDOFF — George — Ben Peralta/);
+      assert.ok(logs.some((line) => /using formspree/.test(line)));
+      assert.ok(logs.some((line) => /handoff mail sent via formspree/.test(line)));
+      const handoffLogs = logs.filter((line) => /handoff mail/.test(line));
+      assert.ok(handoffLogs.every((line) => !/Ben Peralta|Zach knows me|Chainsaw|757-/.test(line)));
+      calls.length = 0;
+      await handoff("formspree-live-01");
+      assert.equal(calls.length, 0);
+      calls.length = 0;
+      await handoff("formspree-live-01", {
         messages: [
-          { role: "user", content: "I need a chainsaw and a 55 ft lift" },
-          { role: "assistant", content: "I have 1 × Chainsaw, 1 × 55 ft lift. Those are for our team to price. What's your name, company, and cell or email?" },
-          { role: "user", content: "Ben Peralta Zach knows me" },
+          ...handoffMessages,
+          { role: "assistant", content: live.reply },
+          { role: "user", content: "757-555-0100" },
         ],
-      }),
-    }), {
-      MOCK_MODE: "true",
-      ALLOWED_ORIGINS: "http://localhost:8765",
-      RESEND_API_KEY: "test-resend-key",
-      handoffOutbox: [],
-    });
+      });
+      assert.equal(calls.length, 1);
+      const update = JSON.parse(calls[0].body);
+      assert.match(update._subject, /UPDATE/);
+      assert.match(update.message, /757-555-0100/);
+      assert.match(update.message, /Chainsaw/);
+      assert.match(update.message, /55 ft lift/);
+      assert.match(update.phone, /757-555-0100/);
+
+      resetLimits();
+      calls.length = 0;
+      resendOk = false;
+      await handoff("formspree-fail-01", { env: { RESEND_API_KEY: "bad-key" } });
+      assert.ok(calls.some((call) => call.url === "https://api.resend.com/emails"));
+      assert.ok(calls.some((call) => call.url === "https://formspree.io/f/xanlvyan"));
+
+      resetLimits();
+      calls.length = 0;
+      resendOk = true;
+      await handoff("formspree-ok-01", { env: { RESEND_API_KEY: "test-resend-key" } });
+      assert.ok(calls.some((call) => call.url === "https://api.resend.com/emails"));
+      assert.ok(calls.every((call) => !call.url.includes("formspree.io")));
+    } finally {
+      console.error = originalError;
+      console.log = originalLog;
+    }
   } finally {
     globalThis.fetch = originalFetch;
   }
-  assert.ok(calls.some((call) => call.url === "https://api.resend.com/emails" && call.authorization === "Bearer test-resend-key"));
+  assert.match(live.reply, /You're all set, a Yorktown Tools specialist will reach out shortly/);
+  assert.doesNotMatch(live.reply, /You're all set, A /);
+  const thanks = await (await post("/api/chat", {
+    messages: [
+      ...handoffMessages,
+      { role: "assistant", content: live.reply },
+      { role: "user", content: "thanks" },
+    ],
+  })).json();
+  assert.match(thanks.reply, /You bet\. I have 1 × Chainsaw, 1 × 55 ft lift/);
+
+  const boxed = await (await post("/api/chat", { messages: [{ role: "user", content: "box of gloves" }] })).json();
+  assert.match(boxed.reply, /How many pairs are in the box\?/);
+  assert.match(boxed.reply, /\$19\.99 a pair/);
+  assert.doesNotMatch(boxed.reply, /12 ×|Out the door/);
+  const sized = await (await post("/api/chat", {
+    messages: [
+      { role: "user", content: "box of gloves" },
+      { role: "assistant", content: boxed.reply },
+      { role: "user", content: "12" },
+    ],
+  })).json();
+  assert.match(sized.reply, /12 × Victory Series drivers gloves/);
+  assert.match(sized.reply, /Out the door that's \$264\.37/);
+  assert.doesNotMatch(sized.reply, /How many pairs are in the box/);
+  const packed = localReply({
+    message: "box of gloves",
+    catalog: {
+      items: [{
+        ...catalog.items.find((item) => item.sku === "VICTORY-GLOVE"),
+        notes: "12 pairs per box. Sizes S–XL.",
+      }],
+    },
+    discount: 0,
+  });
+  assert.match(packed.reply, /12 × Victory Series drivers gloves/);
+  assert.doesNotMatch(packed.reply, /How many pairs are in the box/);
 });

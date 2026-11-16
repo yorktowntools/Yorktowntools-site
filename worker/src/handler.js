@@ -30,7 +30,7 @@ import {
   shouldSearch,
   splitRequestedItems,
 } from "../../shared/pricing.js";
-import { buildHandoffEmail, buildQuoteEmail, buildSalesEmail, formspreeBody } from "./email.js";
+import { buildHandoffEmail, buildQuoteEmail, buildSalesEmail, formspreeBody, handoffFormspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
 import { privateCostFor, readPrivateCosts } from "../config/private-costs.js";
 import { itemLinkLine, presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
@@ -858,34 +858,55 @@ function alertFingerprint(identity, items) {
   return [identity.name, identity.phone, identity.email, identity.note, list].join("~");
 }
 
-async function sendOwnerMail(env, mail) {
-  if (Array.isArray(env.handoffOutbox)) env.handoffOutbox.push({ subject: mail.subject, text: mail.text, html: mail.html });
-  // Same RESEND_API_KEY, from address, and sales inbox as the quote-form mail.
-  if (!env.RESEND_API_KEY) {
-    console.error("handoff mail skipped: RESEND_API_KEY is not set");
-    return Boolean(env.handoffOutbox);
-  }
-  const from = env.FROM_EMAIL || "Yorktown Tools <quotes@quotes.yorktowntools.com>";
-  const sales = env.SALES_EMAIL || SALES_EMAIL;
-  const write = fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [sales],
-      subject: mail.subject,
-      html: mail.html,
-      text: mail.text,
-    }),
-  }).then((response) => response.ok).catch((error) => {
+async function postHandoff(url, init) {
+  try {
+    const response = await fetch(url, init);
+    return Boolean(response?.ok);
+  } catch (error) {
     console.error(`handoff mail failed: ${error instanceof Error ? error.message : "error"}`);
     return false;
+  }
+}
+
+async function sendOwnerMail(env, mail) {
+  if (Array.isArray(env.handoffOutbox)) env.handoffOutbox.push({ subject: mail.subject, text: mail.text, html: mail.html });
+  const mock = env.MOCK_MODE === "true";
+  // Same RESEND_API_KEY, from address, and sales inbox as the quote-form mail.
+  if (env.RESEND_API_KEY) {
+    const from = env.FROM_EMAIL || "Yorktown Tools <quotes@quotes.yorktowntools.com>";
+    const sales = env.SALES_EMAIL || SALES_EMAIL;
+    const sent = await postHandoff("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [sales],
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
+      }),
+    });
+    if (sent) return true;
+    console.error("handoff mail failed: resend");
+  } else if (mock) {
+    console.error("handoff mail skipped: RESEND_API_KEY is not set");
+    return Boolean(env.handoffOutbox);
+  } else {
+    console.error("handoff mail: RESEND_API_KEY is not set, using formspree");
+  }
+  if (mock) return Boolean(env.handoffOutbox);
+  const formspree = env.FORMSPREE_URL || "https://formspree.io/f/xanlvyan";
+  const sent = await postHandoff(formspree, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(handoffFormspreeBody(mail)),
   });
-  if (env.ctx && typeof env.ctx.waitUntil === "function") env.ctx.waitUntil(write);
-  return write;
+  if (sent) console.log("handoff mail sent via formspree");
+  else console.error("handoff mail failed: formspree");
+  return sent;
 }
 
 async function maybeAlert(env, messages, reply, items, sessionKey) {

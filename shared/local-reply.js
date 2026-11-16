@@ -235,7 +235,12 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (isThanks(text)) {
     const items = cartFromThread(history);
-    return { reply: "You bet.", quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true } };
+    const handedOff = (history || []).some((entry) => entry.role === "assistant" && /for our team to price|specialist will reach out|you're all set/i.test(entry.content || ""));
+    const read = items.filter((item) => item?.name).map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
+    return {
+      reply: handedOff && read ? `You bet. I have ${read}.` : "You bet.",
+      quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true },
+    };
   }
 
   if (isLastNameAsk(text, history)) {
@@ -262,7 +267,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     };
   }
 
-  const gloves = gloveTurn(text, heard, catalog, percent);
+  const gloves = gloveTurn(text, heard, catalog, percent, history);
   if (gloves) return gloves;
 
   const each = eachQty(text);
@@ -781,21 +786,51 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   );
 }
 
-function gloveTurn(text, heard, catalog, percent) {
+function boxCount(text) {
+  const numbered = String(text || "").match(/\b(\d+)\s*boxes?\b/i);
+  if (numbered) return Number(numbered[1]);
+  return /\bbox(?:es)?\b/i.test(text) ? 1 : 0;
+}
+
+function pairsInBox(item) {
+  const notes = `${item?.notes || ""} ${(item?.aliases || []).join(" ")}`;
+  const match = notes.match(/(\d+)\s*pairs?\s*(?:per|in a)\s*box/i);
+  return match ? Number(match[1]) : null;
+}
+
+function gloveQuote(priced, qty) {
+  const each = formatMoney(priced.estimate);
+  const otd = formatMoney(roundMoney(priced.estimate * qty * 1.07 * 1.03));
+  return {
+    reply: `We keep Victory Series drivers gloves on hand. I have ${qty} × ${priced.name}: ${each} a pair. Out the door that's ${otd} on a card. Other glove types are available. Would you like to place an order?`,
+    quote: { items: [toQuoteItem(priced, qty)], offerForm: false, hold: true, stage: "script", scripted: true },
+  };
+}
+
+function gloveTurn(text, heard, catalog, percent, history) {
+  const askedBox = (history || []).some((entry) => entry.role === "assistant" && /how many pairs are in the box/i.test(entry.content || ""));
+  const followPairs = askedBox && /^\d{1,4}$/.test(String(text || "").trim()) ? Number(String(text).trim()) : null;
   const names = (heard?.tools || []).map((tool) => tool.name);
-  if (names.length !== 1 || !/glove/i.test(names[0])) return null;
-  if (/\bvictory\b/i.test(text)) return null;
+  const gloveLine = names.length === 1 && /glove/i.test(names[0]);
+  if (!followPairs && !gloveLine) return null;
+  if (/\bvictory\b/i.test(text) && !boxCount(text)) return null;
   const victory = (catalog?.items || []).find((item) => item.sku === "VICTORY-GLOVE");
   const priced = victory ? priceEntry({ ...victory, qty: 1 }, percent) : null;
-  const qty = extractQty(text);
-  if (qty && priced) {
-    const each = formatMoney(priced.estimate);
-    const otd = formatMoney(roundMoney(priced.estimate * qty * 1.07 * 1.03));
+  if (followPairs && priced) return gloveQuote(priced, followPairs);
+  const boxes = boxCount(text);
+  const stated = String(text || "").match(/\b(\d+)\s*pairs?\b/i);
+  const perBox = victory ? pairsInBox(victory) : null;
+  if (boxes && stated && priced) return gloveQuote(priced, boxes * Number(stated[1]));
+  if (boxes && perBox && priced) return gloveQuote(priced, boxes * perBox);
+  if (boxes) {
+    if (askedBox) return null;
     return {
-      reply: `We keep Victory Series drivers gloves on hand. I have ${qty} × ${priced.name}: ${each} a pair. Out the door that's ${otd} on a card. Other glove types are available. Would you like to place an order?`,
-      quote: { items: [toQuoteItem(priced, qty)], offerForm: false, hold: true, stage: "script", scripted: true },
+      reply: "We keep Victory Series drivers gloves on hand at $19.99 a pair. Other glove types are available. How many pairs are in the box?",
+      quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
     };
   }
+  const qty = extractQty(text);
+  if (qty && priced) return gloveQuote(priced, qty);
   return {
     reply: "We keep Victory Series drivers gloves on hand at $19.99 a pair. Other glove types are available. How many pairs do you want?",
     quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
