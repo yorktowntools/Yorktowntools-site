@@ -11,33 +11,73 @@
   bottom: calc(16px + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 56px;
-  padding: 6px 16px 6px 6px;
-  border: 0;
+  gap: 8px;
+  min-height: 64px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 20px 8px 10px;
+  border: 2px solid #f0d48a;
   border-radius: 999px;
   background: #0b1e3f;
   color: #fff;
-  font: 700 15px/1.2 Inter, system-ui, sans-serif;
+  font: 700 16px/1.15 Inter, system-ui, sans-serif;
   cursor: pointer;
-  box-shadow: 0 10px 28px rgba(11, 30, 63, 0.35);
+  box-shadow: 0 14px 36px rgba(11, 30, 63, 0.45);
+  overflow: visible;
+}
+
+.george-launcher[hidden] {
+  display: none;
 }
 
 .george-launcher:focus-visible,
 .george-panel :focus-visible {
   outline: 3px solid #f0d48a;
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
-.george-launcher img,
-.george-head img {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 16%;
-  background: #f4e2c2;
-  border: 2px solid #fff;
+.george-launcher-mascot {
+  display: block;
+  width: auto;
+  height: 68px;
+  margin: -14px 0 -6px -6px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(11, 30, 63, 0.4));
+  pointer-events: none;
+}
+
+.george-launcher-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.george-launcher-copy strong {
+  font: 700 16px/1.15 Inter, system-ui, sans-serif;
+}
+
+.george-launcher-copy small {
+  font: 500 12px/1.2 Inter, system-ui, sans-serif;
+  color: #f0d48a;
+}
+
+.george-head-avatar {
+  width: 42px;
+  height: 40px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+@keyframes george-launcher-nudge {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-7px); }
+  55% { transform: translateY(0); }
+  75% { transform: translateY(-3px); }
+}
+
+.george-launcher-nudge {
+  animation: george-launcher-nudge 0.9s ease-in-out 1;
 }
 
 .george-panel {
@@ -45,7 +85,7 @@
   z-index: 1002;
   left: 16px;
   top: 16px;
-  bottom: calc(84px + env(safe-area-inset-bottom));
+  bottom: calc(16px + env(safe-area-inset-bottom));
   width: min(420px, calc(100vw - 32px));
   display: flex;
   flex-direction: column;
@@ -75,6 +115,7 @@
   margin: 0;
   font-size: 17px;
   font-weight: 700;
+  color: #fff;
 }
 
 .george-head p {
@@ -381,21 +422,6 @@
 }
 
 @media (max-width: 640px) {
-  .george-launcher span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-  }
-
-  .george-launcher {
-    width: 56px;
-    height: 56px;
-    padding: 0;
-    justify-content: center;
-  }
-
   .george-panel {
     inset: 0;
     width: 100%;
@@ -404,9 +430,33 @@
   }
 }
 
+@media (max-width: 430px) {
+  .george-launcher {
+    left: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    min-height: 52px;
+    padding: 6px 14px 6px 8px;
+    gap: 6px;
+  }
+
+  .george-launcher-mascot {
+    height: 52px;
+    margin: -10px 0 -4px -4px;
+  }
+
+  .george-launcher-copy strong {
+    font-size: 14px;
+  }
+
+  .george-launcher-copy small {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .george-panel,
   .george-launcher,
+  .george-launcher-nudge,
   .george-typing span {
     scroll-behavior: auto;
     animation: none;
