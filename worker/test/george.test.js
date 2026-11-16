@@ -282,7 +282,7 @@ test("prompt tells George the rules and the email does not leak them", () => {
     }],
   });
   assert.match(mail.html, /\$19\.99/);
-  assert.match(mail.text, /Free delivery/);
+  assert.match(mail.text, /Delivery is free with no minimum/);
   assert.doesNotMatch(mail.text, /Zachary will send your bulk pricing/);
   const visible = `${mail.html.replace(/style="[^"]*"/g, "")} ${mail.text}`;
   assert.doesNotMatch(visible, /home depot|lowe'?s|\bour cost\b|military discount|supplier discount/i);
@@ -979,6 +979,137 @@ test("free-form questions get a direct answer and the chat has no chips", async 
   assert.equal(hammer.quote.stage, undefined);
   const confused = await say("What");
   assert.notEqual(confused.reply, hammer.reply);
-  assert.match(confused.reply, /tool|delivery|payment/i);
+  assert.match(confused.reply, /breaking concrete, tile, or something else/i);
   assert.doesNotMatch(confused.reply, /still on that/i);
+});
+
+test("a bare What stays local and a repeated model reply is not sent", async () => {
+  resetLimits();
+  const hammer = "Yes, we can source a jack hammer. What are you breaking up? And do you want it electric corded, cordless, or pneumatic?";
+  const live = {
+    MOCK_MODE: "false",
+    XAI_API_KEY: "test-key",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+  };
+  const ask = (messages, callXai) => handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages }),
+  }), { ...live, callXai });
+
+  let whatCalls = 0;
+  const what = await ask([
+    { role: "user", content: "Where do you deliver?" },
+    { role: "assistant", content: "Yes. Delivery to the job site is free." },
+    { role: "user", content: "I need a jack hammer do you sell them?" },
+    { role: "assistant", content: hammer },
+    { role: "user", content: "What" },
+  ], async () => {
+    whatCalls += 1;
+    return { output_text: hammer };
+  });
+  const whatBody = await what.json();
+  assert.equal(whatCalls, 0);
+  assert.match(whatBody.reply, /breaking concrete, tile, or something else/i);
+  assert.notEqual(whatBody.reply.replace(/\s+/g, " ").trim(), hammer);
+
+  const repeated = await ask([
+    { role: "user", content: "Where do you deliver?" },
+    { role: "assistant", content: hammer },
+    { role: "user", content: "I need a jack hammer do you sell them?" },
+  ], async () => ({ output_text: hammer }));
+  const repeatedBody = await repeated.json();
+  assert.match(repeatedBody.reply, /breaking concrete, tile, or something else/i);
+  assert.doesNotMatch(repeatedBody.reply, /electric corded, cordless, or pneumatic/i);
+});
+
+test("the sales script and the invoice handoff", async () => {
+  resetLimits();
+  assert.match(GREETING, /Welcome to Yorktown Tools/);
+  assert.match(GREETING, /upcoming jobsite/);
+  assert.doesNotMatch(GREETING, /\bZach/i);
+
+  const norfolk = await post("/api/chat", { messages: [{ role: "user", content: "do you deliver to Norfolk?" }] });
+  const norfolkBody = await norfolk.json();
+  assert.match(norfolkBody.reply, /Delivery is free with no minimum, to jobsites, shops, and warehouses, on and off military installations/);
+  assert.match(norfolkBody.reply, /Free local delivery covers Richmond to Virginia Beach/);
+  assert.match(norfolkBody.reply, /sales@yorktowntools\.com/);
+
+  const line = localReply({ message: "Can I see the line card?", catalog, discount: 0 });
+  assert.match(line.reply, /Yorktown-Tools-Line-Card-2026\.pdf/);
+
+  const store = localReply({ message: "Do you do consignment?", catalog, discount: 0 });
+  assert.match(store.reply, /pay only for what you use/i);
+  assert.match(store.reply, /Consignment-Card\.pdf/);
+  assert.match(store.reply, /how big is the crew/i);
+
+  const person = localReply({ message: "Can I talk to a human?", catalog, discount: 0 });
+  assert.match(person.reply, /\(757\) 940-5171/);
+  assert.match(person.reply, /8 to 5/);
+  assert.match(person.reply, /specialist will reach out shortly/);
+  assert.match(person.reply, /Tools Worth Fighting For/);
+
+  const far = localReply({ message: "Can you ship this to Oregon?", catalog, discount: 0 });
+  assert.match(far.reply, /company name/i);
+  assert.equal((far.quote.items || []).length, 0);
+  const scam = localReply({ message: "I'll overpay and send extra for shipping", catalog, discount: 0 });
+  assert.match(scam.reply, /only able to serve local customers right now/i);
+  assert.doesNotMatch(scam.reply, /specialist will reach out/i);
+
+  const time = localReply({ message: "Is it worth the crew time to pick them up myself?", catalog, discount: 0 });
+  assert.match(time.reply, /\$100 to \$300/);
+
+  const ready = buildSalesEmail({
+    lead: {
+      name: "Ada",
+      company: "Ada Concrete",
+      phone: "757-555-0100",
+      email: "a@b.com",
+      jobsite: "100 Main, Norfolk",
+      billingAddress: "100 Main, Norfolk",
+      invoiceVia: "email",
+      paymentMethod: "check",
+      neededBy: "2026-11-20",
+      notes: "morning drop",
+    },
+    items: [{ name: "5007FA circular saw", manufacturer: "Makita", qty: 1, estimate: 149 }],
+    leadInfo: { tier: 3, bulk: false },
+    totals: {
+      subtotal: 149,
+      tax: 10.43,
+      total: 159.43,
+      taxLabel: "Virginia sales tax 7%",
+      fees: [
+        { method: "Card or government purchase card", amount: 4.78 },
+        { method: "ACH", amount: 1.59 },
+        { method: "Check", amount: 0 },
+      ],
+    },
+  });
+  assert.match(ready.text, /READY TO INVOICE \(<= \$500\)/);
+  assert.match(ready.text, /Invoice by: email/);
+  assert.match(ready.text, /Billing address: 100 Main, Norfolk/);
+  assert.match(ready.text, /Payment method: check/);
+  assert.match(ready.text, /unit \$149\.00/);
+  assert.match(ready.text, /OTD total: \$159\.43/);
+  assert.doesNotMatch(`${ready.text}\n${ready.html}`, /privateCost|costSource/);
+
+  const needs = buildSalesEmail({
+    lead: {
+      name: "Sam",
+      company: "Forward Co",
+      phone: "757-555-0199",
+      email: "s@b.com",
+      jobsite: "Oregon",
+      humanRequested: true,
+      scamFlags: "freight forwarder",
+    },
+    items: [{ name: "Generator", qty: 1, estimate: null, confirm: true }],
+    leadInfo: { tier: 3, bulk: false },
+    totals: null,
+  });
+  assert.match(needs.text, /NEEDS YOU:/);
+  assert.match(needs.text, /human requested/);
+  assert.match(needs.text, /possible scam: freight forwarder/);
+  assert.match(needs.text, /uncertain price or stock/);
 });

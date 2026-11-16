@@ -1,4 +1,4 @@
-import { BULK_LINE, PHONE_DISPLAY, PHONE_TEL } from "../shared/copy.js";
+import { BULK_LINE, GREETING, PHONE_DISPLAY, PHONE_TEL } from "../shared/copy.js";
 import { filterCustomerText, renderSafeHtml } from "../shared/customer-text.js";
 import { localReply } from "../shared/local-reply.js";
 import { formatEstimate, formatMoney, paymentOnTop } from "../shared/pricing.js";
@@ -476,7 +476,7 @@ function openPanel() {
   fitToKeyboard();
   if (!log.childElementCount) {
     if (preview) showBanner("Preview on this computer. Quotes are not emailed from here.");
-    addMessage("assistant", "Hey, I'm George with Yorktown Tools. How can I help you today?");
+    addMessage("assistant", GREETING);
     detect();
   }
   textarea.focus();

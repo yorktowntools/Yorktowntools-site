@@ -6,7 +6,18 @@ export const SALES_EMAIL = "sales@yorktowntools.com";
 export const HOURS = "Monday–Friday, 8:00 AM – 5:00 PM Eastern";
 export const SERVICE_AREA = "Richmond to Virginia Beach, including Hampton Roads and the military bases";
 
-export const GREETING = "Hey, I'm George with Yorktown Tools. How can I help you today?";
+export const GREETING = "Hey, I'm George. Welcome to Yorktown Tools! Are you putting together a tool order for an upcoming jobsite?";
+
+export const DELIVERY_LINE =
+  "Delivery is free with no minimum, to jobsites, shops, and warehouses, on and off military installations. Free local delivery covers Richmond to Virginia Beach.";
+
+export const LINE_CARD_URL = "https://yorktowntools.com/Yorktown-Tools-Line-Card-2026.pdf";
+
+export const HANDOFF_LINE = "A Yorktown Tools specialist will reach out shortly.";
+
+export const SCAM_CLOSE = "We're only able to serve local customers right now.";
+
+export const CLOSING_LINE = "Tools Worth Fighting For!";
 
 export const QUOTE_OFFER = "Want me to put a quote together?";
 

@@ -2,9 +2,14 @@ import {
   AFTER_HOURS_LINE,
   BULK_LINE,
   CATEGORIES,
+  CLOSING_LINE,
   CONSIGNMENT_URL,
   CREDIT_APP_URL,
+  DELIVERY_LINE,
   GREETING,
+  HANDOFF_LINE,
+  LINE_CARD_URL,
+  SCAM_CLOSE,
   HOURS,
   PHONE_DISPLAY,
   QUOTE_OFFER,
@@ -405,12 +410,9 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   }
 
   if (/^what\??$/i.test(text)) {
-    const repeated = (history || []).some((entry) => entry.role === "assistant" && /which part should I answer/i.test(entry.content || ""));
     return {
-      reply: repeated
-        ? "Tell me the tool, or say delivery or payment, and I'll answer that part."
-        : "Which part should I answer: the tool, delivery, or payment?",
-      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
+      reply: confusedWhatReply(history),
+      quote: { items: [], offerForm: false, hold: false, stage: "clarify" },
     };
   }
 
@@ -454,17 +456,57 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (/\b(deliver|delivery|service area|how far|norfolk|newport news|richmond|virginia beach|hampton roads|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester|jobsite|job site)\b/i.test(text) && !matches.length) {
-    const named = text.match(/\b(norfolk|newport news|richmond|virginia beach|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester)\b/i);
-    const place = named ? named[1] : "the job site";
+  if (/\b(overpay|extra for shipping|freight forwarder)\b/i.test(text)) {
+    return finish(SCAM_CLOSE, [], false);
+  }
+
+  if (/\boregon\b/i.test(text) && /\b(ship|deliver|send)\b/i.test(text)) {
+    return finish("Happy to look at that. What's the company name?", [], false);
+  }
+
+  if (/\b(talk to|speak to|real person|human|someone on the phone)\b/i.test(text)) {
     return finish(
-      `Yes. Delivery to ${place} is free. We cover ${SERVICE_AREA}. No minimum. You stay on the job. We bring the tools.`,
+      `You can reach our team at ${PHONE_DISPLAY}, Monday through Friday, 8 to 5. What's your name, company, and cell or email? ${HANDOFF_LINE} ${CLOSING_LINE}`,
       [],
       false,
     );
   }
 
-  if (/\b(purchase cards?|government purchase|gpc|pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
+  if (/\b(line card|what do you carry|what brands)\b/i.test(text)) {
+    return finish(
+      `Here's our line card: [line card](${LINE_CARD_URL}). Are you putting together a tool order for an upcoming jobsite?`,
+      [],
+      false,
+    );
+  }
+
+  if (/\b(crew time|pick (it|them) up myself)\b/i.test(text)) {
+    return finish(
+      `A supply run feels like it costs $10 to $20, but it really costs $100 to $300 in lost crew time. ${DELIVERY_LINE}`,
+      [],
+      false,
+    );
+  }
+
+  if (/\b(deliver|delivery|service area|how far|norfolk|newport news|richmond|virginia beach|hampton roads|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester|jobsite|job site)\b/i.test(text) && !matches.length) {
+    const named = text.match(/\b(norfolk|newport news|richmond|virginia beach|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester)\b/i);
+    const ack = named ? `Yes, we deliver to ${named[1]}.` : "Yes.";
+    return finish(
+      `${ack} ${DELIVERY_LINE} You can type the list here, or text or email a list or photo to ${PHONE_DISPLAY} or sales@yorktowntools.com.`,
+      [],
+      false,
+    );
+  }
+
+  if (/\b(government purchase|purchase cards?|\bgpc\b)\b/i.test(text) || (/\bgovernment\b/i.test(text) && /\b(card|tax|buy)\b/i.test(text))) {
+    return finish(
+      "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. Tax is 0% for government.",
+      [],
+      false,
+    );
+  }
+
+  if (/\b(pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
     return finish(
       `Card, a government purchase card, ACH, and check are all fine. Card costs more to process than ACH, and a check has no fee. Don't send card or bank numbers in this chat. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms. Virginia sales tax is on the quote unless the order is tax-exempt, and a tax-exempt order needs a certificate.`,
       [],
@@ -474,9 +516,9 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (/\bconsign/i.test(text)) {
     return finish(
-      `We can put a small stock on your site. You pay for what you use, and it costs nothing to start. Here's the one-pager: [consignment](${CONSIGNMENT_URL}).`,
+      `We can stock consumables like blades, bits, fasteners, and PPE on site, and you pay only for what you use. Here's the card: [consignment](${CONSIGNMENT_URL}). What kind of work do you do, and how big is the crew?`,
       [],
-      true,
+      false,
     );
   }
 
@@ -558,6 +600,17 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     [],
     false,
   );
+}
+
+export function confusedWhatReply(history) {
+  const prior = [...(history || [])].reverse().find((entry) => entry.role === "assistant")?.content || "";
+  if (/jack\s*hammer|demolition hammer/i.test(prior)) {
+    return "Sorry, let me make it simpler. What kind of work is the jack hammer for: breaking concrete, tile, or something else?";
+  }
+  if (/let me make it simpler|which part should I answer/i.test(prior)) {
+    return "Tell me the tool, or say delivery or payment, and I'll answer that part.";
+  }
+  return "Which part should I answer: the tool, delivery, or payment?";
 }
 
 export { BULK_LINE };

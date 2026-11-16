@@ -3,7 +3,7 @@ import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../config/a
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
 import { BULK_LINE, SALES_EMAIL } from "../../shared/copy.js";
 import { filterCustomerText } from "../../shared/customer-text.js";
-import { localReply } from "../../shared/local-reply.js";
+import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, isShortReply } from "../../shared/talk.js";
 import {
   fillMissingShelf,
@@ -424,6 +424,16 @@ function withSiblingLines(latest, prior, local) {
   };
 }
 
+function normalizedReply(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function replaceRepeatedReply(modelReply, drafted, priorMessages) {
+  const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
+  if (!previous || normalizedReply(modelReply) !== normalizedReply(previous)) return drafted;
+  return confusedWhatReply(priorMessages);
+}
+
 function withQuoteOffer(reply) {
   const text = String(reply || "").trim();
   if (/quote together/i.test(text) || isAccessoryQuestion(text) || /which ones do you want/i.test(text)) return text;
@@ -602,7 +612,7 @@ async function chat(request, env) {
   }
 
   try {
-    const data = await callXai(
+    const data = await (typeof env.callXai === "function" ? env.callXai : callXai)(
       env,
       buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
       messages.map((message) => ({ role: message.role, content: message.content })),
@@ -612,7 +622,8 @@ async function chat(request, env) {
     const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
-    const reply = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
+    const drafted = withQuoteOffer(finalizeReply(mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes), messages));
+    const reply = replaceRepeatedReply(parsed.reply, drafted, messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
     if (canSearch && searchesUsed > 1) {
       take(`search-s:${sid}`, searchesUsed - 1, 6 * 60 * 60 * 1000, now);
