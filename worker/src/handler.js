@@ -506,8 +506,20 @@ function viewFor(lines, extra) {
   });
 }
 
+function withoutRepeatedGreeting(reply, priorMessages) {
+  const greeted = (priorMessages || []).some((message) => message.role === "assistant" && /hey, i'm george|welcome to yorktown tools/i.test(message.content || ""));
+  if (!greeted) return String(reply || "");
+  const stripped = String(reply || "")
+    .replace(/Hey, I'm George\.\s*Welcome to Yorktown Tools!(?:\s*Are you putting together a tool order for an upcoming jobsite\?)?/gi, "")
+    .replace(/Hey, I'm George\.\s*/gi, "")
+    .replace(/Welcome to Yorktown Tools!\s*/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return stripped || "What do you need for the job?";
+}
+
 function finalizeReply(reply, priorMessages = []) {
-  return withoutRepeatedAfterHours(filterCustomerText(reply).text, priorMessages);
+  return withoutRepeatedAfterHours(filterCustomerText(withoutRepeatedGreeting(reply, priorMessages)).text, priorMessages);
 }
 
 async function readJson(request) {

@@ -502,12 +502,14 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return { reply: SAFE_COST_REPLY, quote: { items: [], offerForm: false, stage: "script", scripted: true } };
   }
 
-  if (/^(hi|hey|hello|yo|good morning|good afternoon)\b/i.test(text) && text.length < 40) {
-    return finish(
-      GREETING,
-      [],
-      false,
-    );
+  if (/^(?:hi|hey|hello|yo|good morning|good afternoon)[.!\s]*$/i.test(text)) {
+    if (alreadyGreeted(history)) {
+      return {
+        reply: "What do you need for the job?",
+        quote: { items: [], offerForm: false, hold: false, stage: "clarify" },
+      };
+    }
+    return finish(GREETING, [], false);
   }
 
   if (/\b(hour|open|close|when are you)\b/i.test(text)) {
@@ -655,6 +657,10 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 const SHIP_WORD = /\b(ships?|shipped|shipping|delivers?|delivered|delivery|sends?|sending)\b/i;
 const OUT_OF_AREA = /\b(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|washington|west virginia|wisconsin|wyoming|atlanta|chicago|dallas|denver|los angeles|miami|phoenix|portland|seattle)\b/i;
 const CREDS = "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. Tax is 0% for government.";
+
+function alreadyGreeted(history) {
+  return (history || []).some((entry) => entry.role === "assistant" && /hey, i'm george|welcome to yorktown tools/i.test(entry.content || ""));
+}
 
 function assistantText(history) {
   return (history || []).filter((entry) => entry.role === "assistant").map((entry) => entry.content || "").join("\n");

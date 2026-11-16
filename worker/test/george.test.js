@@ -1171,6 +1171,55 @@ test("a specialty ask restates the item, not the buyer's preamble", async () => 
   assert.match(body.reply, /name, unit or company/i);
 });
 
+test("the greeting is said only once", async () => {
+  resetLimits();
+  const first = await post("/api/chat", { messages: [{ role: "user", content: "Hi" }] });
+  const firstBody = await first.json();
+  assert.match(firstBody.reply, /Hey, I'm George/);
+  assert.match(firstBody.reply, /Welcome to Yorktown Tools/);
+
+  const again = await post("/api/chat", {
+    messages: [
+      { role: "assistant", content: GREETING },
+      { role: "user", content: "Hey" },
+    ],
+  });
+  const againBody = await again.json();
+  assert.doesNotMatch(againBody.reply, /Hey, I'm George/);
+  assert.doesNotMatch(againBody.reply, /Welcome to Yorktown Tools/);
+
+  const tool = await post("/api/chat", {
+    messages: [
+      { role: "assistant", content: GREETING },
+      { role: "user", content: "Hey, I need a hammer" },
+    ],
+  });
+  const toolBody = await tool.json();
+  assert.doesNotMatch(toolBody.reply, /Hey, I'm George/);
+  assert.doesNotMatch(toolBody.reply, /Welcome to Yorktown Tools/);
+  assert.match(toolBody.reply, /quote|hammer/i);
+
+  const live = await handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({
+      messages: [
+        { role: "assistant", content: GREETING },
+        { role: "user", content: "I need a DeWalt heat gun" },
+      ],
+    }),
+  }), {
+    MOCK_MODE: "false",
+    XAI_API_KEY: "test-key",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+    callXai: async () => ({ output_text: `${GREETING} We can quote a heat gun.` }),
+  });
+  const liveBody = await live.json();
+  assert.doesNotMatch(liveBody.reply, /Hey, I'm George/);
+  assert.doesNotMatch(liveBody.reply, /Welcome to Yorktown Tools/);
+  assert.match(liveBody.reply, /heat gun/i);
+});
+
 test("an SDS rotary hammer is not quoted as the corded hammer drill", () => {
   const hits = matchCatalog(catalog, "DeWalt SDS rotary hammer");
   assert.equal(hits.some((item) => item.sku === "DWE5010"), false);
