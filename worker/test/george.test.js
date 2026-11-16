@@ -1386,15 +1386,21 @@ test("a small unmatched power tool is one out-the-door total, then an invoice", 
     })}`,
   }));
   const unpricedBody = await unpriced.json();
-  assert.match(unpricedBody.reply, /DeWalt SDS rotary hammer/);
-  assert.match(unpricedBody.reply, /That one's for our team to price/);
-  assert.match(unpricedBody.reply, /name, company, and cell or email/i);
-  assert.doesNotMatch(unpricedBody.reply, /would you like to place an order/i);
-  assert.doesNotMatch(unpricedBody.reply, /Add your name and the job site/i);
-  assert.doesNotMatch(unpricedBody.reply, /specialist will reach out/i);
+  assert.match(unpricedBody.reply, /Which model or size do you want\?/);
+  assert.doesNotMatch(unpricedBody.reply, /That one's for our team to price/i);
+  assert.doesNotMatch(unpricedBody.reply, /name, company, and cell or email/i);
+  const coded = await send([{ role: "user", content: "One DeWalt D25133K SDS-Plus rotary hammer, just the tool." }], async () => ({
+    output_text: `QUOTE_JSON: ${JSON.stringify({
+      items: [{ name: "DeWalt D25133K SDS-Plus rotary hammer", sku: "D25133K", qty: 1, source: "U" }],
+    })}`,
+  }));
+  const codedBody = await coded.json();
+  assert.match(codedBody.reply, /That one's for our team to price/);
+  assert.match(codedBody.reply, /name, company, and cell or email/i);
+  assert.doesNotMatch(codedBody.reply, /would you like to place an order/i);
   const handed = await send([
-    { role: "user", content: ask },
-    { role: "assistant", content: unpricedBody.reply },
+    { role: "user", content: "One DeWalt D25133K SDS-Plus rotary hammer, just the tool." },
+    { role: "assistant", content: codedBody.reply },
     { role: "user", content: "I'm Dana at Dana Concrete, dana@example.com" },
   ], async () => {
     throw new Error("specialist handoff should stay local");
@@ -1531,4 +1537,26 @@ test("a generic jack hammer stays a clarifying question, and What does not repea
   const namedBody = await named.json();
   assert.match(namedBody.reply, /That one's for our team to price/);
   assert.match(namedBody.reply, /name, company, and cell or email/i);
+
+  const placeholder = await ask(
+    [{ role: "user", content: "I need a jack hammer do you sell them?" }],
+    async () => unpriced("Item"),
+  );
+  const placeholderBody = await placeholder.json();
+  assert.match(placeholderBody.reply, /We can source a jack hammer for you\. What are you breaking up, and do you want electric corded, cordless, or pneumatic\?/);
+  assert.doesNotMatch(placeholderBody.reply, /1 × Item/i);
+  assert.doesNotMatch(placeholderBody.reply, /That one's for our team to price/i);
+  assert.equal(placeholderBody.quote.items.some((item) => /^item$/i.test(item.name)), false);
+
+  const fromUser = await ask([
+    { role: "user", content: "I need a jack hammer do you sell them?" },
+    { role: "assistant", content: "I have 1 × Item. That one's for our team to price. What's your name, company, and cell or email?" },
+    { role: "user", content: "What" },
+  ], async () => {
+    throw new Error("a bare What stays local");
+  });
+  const fromUserBody = await fromUser.json();
+  assert.match(fromUserBody.reply, /breaking concrete, tile, or something else/i);
+  assert.doesNotMatch(fromUserBody.reply, /Which part should I answer/i);
+  assert.doesNotMatch(fromUserBody.reply, /name, company, and cell or email/i);
 });

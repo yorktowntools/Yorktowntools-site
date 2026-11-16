@@ -465,12 +465,14 @@ function itemAmount(item) {
 }
 
 const BRAND = /\b(dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt|stanley|klein|werner|stabila|jackery|porter|dap)\b/i;
+const BRAND_WORDS = new Set(String(BRAND.source).match(/[a-z]+/g));
 const MODEL = /\b[a-z]{0,6}\d{3,}[a-z0-9-]*\b/i;
 const GENERIC = new Set([
   "jack", "hammer", "drill", "saw", "grinder", "nailer", "tool", "ladder", "glove",
   "battery", "blade", "bit", "wrench", "caulk", "case", "box", "pair", "demolition",
   "rotary", "sds", "corded", "cordless", "electric", "pneumatic", "power", "impact",
   "driver", "circular", "angle", "heat", "gun", "kit", "plus", "inch", "amp",
+  "item", "product",
 ]);
 
 function nameTokens(value) {
@@ -482,15 +484,19 @@ function nameTokens(value) {
     .filter((word) => word.length > 2);
 }
 
+function isPlaceholderName(name) {
+  return /^(items?|tools?|products?)$/i.test(String(name || "").trim());
+}
+
 function specificItem(item) {
   const blob = `${item?.name || ""} ${item?.sku || ""} ${item?.model || ""} ${item?.manufacturer || ""}`;
-  if (BRAND.test(blob) || MODEL.test(blob)) return true;
-  return nameTokens(blob).some((token) => !GENERIC.has(token));
+  if (MODEL.test(blob)) return true;
+  return nameTokens(blob).some((token) => !GENERIC.has(token) && !BRAND_WORDS.has(token));
 }
 
 function customerConfirmed(text) {
   const value = String(text || "");
-  if (BRAND.test(value) || MODEL.test(value)) return true;
+  if (MODEL.test(value)) return true;
   const use = /\b(concrete|tile|asphalt|brick|masonry|wood|steel|metal|drywall)\b/i.test(value);
   const power = /\b(corded|cordless|pneumatic|electric)\b/i.test(value);
   return use && power;
@@ -498,15 +504,21 @@ function customerConfirmed(text) {
 
 function genericCategoryReply(items, text) {
   const blob = `${text || ""}\n${(items || []).map((item) => item?.name || "").join("\n")}`;
-  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(blob)) {
+  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text || "")) {
     return "We can source a jack hammer for you. What are you breaking up, and do you want electric corded, cordless, or pneumatic?";
   }
-  return clarifyingQuestion(blob);
+  if (BRAND.test(blob) && !MODEL.test(blob)) return "Which model or size do you want?";
+  return clarifyingQuestion(text || blob);
 }
 
 function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "" } = {}) {
-  const lines = (items || []).filter((item) => item?.name);
-  if (!lines.length) return String(baseReply || "");
+  const lines = (items || []).filter((item) => item?.name && !isPlaceholderName(item.name));
+  if (!lines.length) {
+    if (/\b(jack\s*hammers?|demolition hammers?|drills?|saws?|grinders?|hammers?)\b/i.test(text || "") || (BRAND.test(text || "") && !MODEL.test(text || ""))) {
+      return genericCategoryReply([], text);
+    }
+    return String(baseReply || "");
+  }
   const read = lines.map((item) => {
     const amount = itemAmount(item);
     const label = amount && item.ballpark ? `Starting estimate ${amount}` : amount;
@@ -748,9 +760,10 @@ async function chat(request, env) {
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
     const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
-    const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, view.items), view.notes);
+    const quotable = view.items.filter((item) => item?.name && !isPlaceholderName(item.name));
+    const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, quotable), view.notes);
     const ordered = view.items.length
-      ? scriptOrderReply(pricedReply, view.items, { government, bulk: view.lead.bulk, text: convo })
+      ? scriptOrderReply(pricedReply, quotable, { government, bulk: view.lead.bulk, text: convo })
       : pricedReply;
     const reply = replaceRepeatedReply(parsed.reply, finalizeReply(ordered, messages), messages);
     const searchesUsed = canSearch ? Math.max(1, countSearches(data)) : 0;
@@ -761,9 +774,9 @@ async function chat(request, env) {
     return json({
       reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
       quote: {
-        items: view.items,
+        items: quotable,
         offerForm: false,
-        hold: true,
+        hold: quotable.length > 0,
         bulk: view.lead.bulk,
       },
       searchesUsed,

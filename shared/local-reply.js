@@ -751,7 +751,8 @@ function consignmentTurn(text, history) {
 
 export function confusedWhatReply(history) {
   const prior = [...(history || [])].reverse().find((entry) => entry.role === "assistant")?.content || "";
-  if (/jack\s*hammer|demolition hammer/i.test(prior)) {
+  const recentUsers = (history || []).filter((entry) => entry.role === "user").slice(-4).map((entry) => entry.content || "").join("\n");
+  if (/jack\s*hammer|demolition hammer/i.test(`${prior}\n${recentUsers}`)) {
     return "Sorry, let me make it simpler. What kind of work is the jack hammer for: breaking concrete, tile, or something else?";
   }
   if (/let me make it simpler|which part should I answer/i.test(prior)) {
