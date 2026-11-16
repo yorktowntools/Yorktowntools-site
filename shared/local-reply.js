@@ -429,7 +429,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     };
   }
 
-  if (/we'll confirm the price/i.test(lastText) && /name, company, and cell or email/i.test(lastText)) {
+  if (/that one's for our team to price|we'll confirm the price/i.test(lastText) && /name, company, and cell or email/i.test(lastText)) {
     const carried = carryQuote(text, history, catalog, discount, page);
     const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text)
       || /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(text)

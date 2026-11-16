@@ -227,6 +227,26 @@ function collectDollarText(value, out = [], depth = 0) {
   return out;
 }
 
+function searchCards(value, out = [], depth = 0) {
+  if (depth > 8 || !value || typeof value !== "object") return out;
+  if (Array.isArray(value)) {
+    value.forEach((item) => searchCards(item, out, depth + 1));
+    return out;
+  }
+  const bits = [];
+  for (const key of ["title", "name", "snippet", "description", "content"]) {
+    if (typeof value[key] === "string" && value[key].trim()) bits.push(value[key].trim());
+  }
+  const numeric = [value.price, value.salePrice].find((item) => typeof item === "number" && item > 0);
+  if (numeric) bits.push(`$${numeric}`);
+  const blob = bits.join("\n");
+  if (bits.length >= 2 && /\$\s?\d|\b\d{2,5}(?:\.\d{2})\b/.test(blob)) out.push(blob);
+  Object.values(value).forEach((item) => {
+    if (item && typeof item === "object") searchCards(item, out, depth + 1);
+  });
+  return out;
+}
+
 function alignRequested(rawItems, userText) {
   const requested = splitRequestedItems(userText);
   if (requested.length < 2) return rawItems;
@@ -467,12 +487,12 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false }
   const otdLow = roundMoney(low * factor);
   const otdHigh = roundMoney(high * factor);
   const over = (otdHigh || otdLow || 0) > 500;
-  const upsell = String(baseReply || "").match(/Need [^\n?]+\?/i)?.[0] || "";
+  const upsell = String(baseReply || "").match(/(?:^|[.!?]\s+|\n+)(Need [^\n?]+\?)/)?.[1]?.trim() || "";
   const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
   const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
   const head = upsell ? `${upsell}\n\n` : "";
   if (missingPrice && !bulk) {
-    return `${head}I have ${read}. We'll confirm the price. What's your name, company, and cell or email?${linkBlock}`;
+    return `${head}I have ${read}. That one's for our team to price. What's your name, company, and cell or email?${linkBlock}`;
   }
   if (uncertain || over || bulk) {
     const bulkNote = bulk ? ` ${BULK_LINE}` : "";
@@ -681,7 +701,7 @@ async function chat(request, env) {
       canSearch,
     );
     const parsed = splitModelOutput(outputText(data));
-    const prose = [latest, parsed.reply, ...collectDollarText(data)].join("\n");
+    const prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
     const lines = linesFromQuote({ items: alignRequested(parsed.quote?.items || [], latest) }, prose, await costsFromEnv(env));
     const view = viewFor(lines, { text: latest });
     const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);

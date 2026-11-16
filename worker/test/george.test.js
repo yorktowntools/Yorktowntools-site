@@ -867,7 +867,7 @@ test("Jackery quotes the MAP, confirms a thin margin, and shows a pre-order", as
   const white = await ask("HP1000Plusv2 White");
   assert.equal(white.quote.items[0].sku, "JACKERY-HP1000PLUSV2-WHITE");
   assert.equal(white.quote.items[0].estimate, null);
-  assert.match(white.reply, /we'll confirm the price|one for our team to price/i);
+  assert.match(white.reply, /we'll confirm the price|for our team to price/i);
   assert.doesNotMatch(white.reply, /\$549/);
 
   const vague = await ask("Jackery solar generator");
@@ -889,7 +889,7 @@ test("Jackery quotes the MAP, confirms a thin margin, and shows a pre-order", as
     PRIVATE_COSTS_JSON: JSON.stringify({ "JACKERY-HP1000PLUSV2-WHITE": { privateCost: 100 } }),
     PRIVATE_COSTS_KV: { get: async (key) => (key === "costs" ? costs : "") },
   });
-  assert.match(kvWins.reply, /one for our team to price|we'll confirm the price/i);
+  assert.match(kvWins.reply, /for our team to price|we'll confirm the price/i);
   const fallback = await readPrivateCosts({
     PRIVATE_COSTS_JSON: JSON.stringify({ "JACKERY-E1000V2": { privateCost: 400 } }),
     PRIVATE_COSTS_KV: { get: async () => { throw new Error("down"); } },
@@ -1387,7 +1387,7 @@ test("a small unmatched power tool is one out-the-door total, then an invoice", 
   }));
   const unpricedBody = await unpriced.json();
   assert.match(unpricedBody.reply, /DeWalt SDS rotary hammer/);
-  assert.match(unpricedBody.reply, /We'll confirm the price/);
+  assert.match(unpricedBody.reply, /That one's for our team to price/);
   assert.match(unpricedBody.reply, /name, company, and cell or email/i);
   assert.doesNotMatch(unpricedBody.reply, /would you like to place an order/i);
   assert.doesNotMatch(unpricedBody.reply, /Add your name and the job site/i);
@@ -1402,4 +1402,66 @@ test("a small unmatched power tool is one out-the-door total, then an invoice", 
   const handedBody = await handed.json();
   assert.match(handedBody.reply, /A Yorktown Tools specialist will reach out shortly/);
   assert.match(handedBody.reply, /Tools Worth Fighting For/);
+  assert.ok(handedBody.reply.indexOf("A Yorktown Tools specialist will reach out shortly") < handedBody.reply.indexOf("Tools Worth Fighting For"));
+});
+
+test("a search snippet price with no shelf becomes one out-the-door total", async () => {
+  resetLimits();
+  const ask = "One DeWalt D25133K SDS-Plus rotary hammer, just the tool.";
+  const response = await handleRequest(new Request("https://george.example/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "http://localhost:8765" },
+    body: JSON.stringify({ messages: [{ role: "user", content: ask }] }),
+  }), {
+    MOCK_MODE: "false",
+    XAI_API_KEY: "test-key",
+    ALLOWED_ORIGINS: "http://localhost:8765",
+    callXai: async () => ({
+      output_text: [
+        "Do you need bits for occasional concrete work too?",
+        "Need SDS or masonry bits, or anchors, with that?",
+        `QUOTE_JSON: ${JSON.stringify({
+          items: [{
+            name: "DeWalt D25133K SDS-Plus rotary hammer",
+            sku: "D25133K",
+            qty: 1,
+            shelf: null,
+            source: "U",
+          }],
+        })}`,
+      ].join("\n"),
+      output: [
+        {
+          type: "web_search_call",
+          status: "completed",
+          action: { type: "search", query: "DeWalt D25133K SDS-Plus rotary hammer" },
+        },
+        {
+          type: "web_search_result",
+          results: [{
+            url: "https://www.homedepot.com/p/DEWALT-D25133K/202522834",
+            title: "DEWALT 1-1/8 in. SDS Plus Rotary Hammer Kit D25133K",
+            snippet: "Current price is $349.00. In stock.",
+          }],
+        },
+      ],
+    }),
+  });
+  const body = await response.json();
+  const card = shelvesFromText(
+    "DEWALT 1-1/8 in. SDS Plus Rotary Hammer Kit D25133K\nCurrent price is $349.00. In stock.",
+    "DeWalt D25133K SDS-Plus rotary hammer D25133K",
+  );
+  assert.equal(card.shelf, 349);
+  assert.equal(body.quote.items[0].sku, "D25133K");
+  assert.equal(body.quote.items[0].qty, 1);
+  assert.equal(body.quote.items[0].estimate, 349);
+  assert.match(body.reply, /1 × DeWalt D25133K SDS-Plus rotary hammer/i);
+  assert.match(body.reply, /Out the door that's \$384\.63/);
+  assert.match(body.reply, /Would you like to place an order\?/);
+  assert.doesNotMatch(body.reply, /sales tax|card fee|payment fee/i);
+  assert.doesNotMatch(body.reply, /need bits for occasional/i);
+  const upsellAt = body.reply.indexOf("Need SDS or masonry bits, or anchors, with that?");
+  const totalAt = body.reply.indexOf("Out the door that's");
+  assert.ok(upsellAt >= 0 && upsellAt < totalAt);
 });
