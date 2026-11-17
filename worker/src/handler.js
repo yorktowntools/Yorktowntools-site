@@ -588,10 +588,22 @@ function alignItemsToCustomerModels(items, latest) {
       model: item?.model || "",
       sku: item?.sku || "",
     }, code));
-    if (hit) return { ...hit };
     const brand = String(latest || "").match(/\b(dewalt|milwaukee|makita|bosch|ridgid|hilti)\b/i);
     const label = brand ? BRAND_PRETTY[brand[1].toLowerCase()] || brand[1] : "";
     const pretty = code.toUpperCase();
+    if (hit) {
+      // Keep the model the customer named. Never let a different sku ride along under it.
+      const flat = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const want = flat(code);
+      const next = { ...hit };
+      if (next.sku && !flat(next.sku).includes(want)) {
+        next.sku = pretty;
+        next.manufacturerUrl = null;
+        next.warrantyUrl = null;
+      }
+      if (!flat(next.name).includes(want)) next.name = label ? `${label} ${pretty}` : pretty;
+      return next;
+    }
     return {
       name: label ? `${label} ${pretty}` : pretty,
       sku: pretty,

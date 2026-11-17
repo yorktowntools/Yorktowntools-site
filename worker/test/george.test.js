@@ -2706,3 +2706,15 @@ test("v2: a named model never matches a different catalog model", () => {
   assert.ok(hits.every((item) => /DCD996B/i.test(`${item.sku} ${item.model} ${item.name}`)), JSON.stringify(hits.map((item) => item.sku)));
   assert.equal(matchCatalog(catalog, "How much is a Makita 5007FA 7-1/4 saw?")[0].sku, "5007FA");
 });
+
+test("v2: the customer's model number stays on the line even if the model output carries another sku", async () => {
+  resetLimits();
+  const body = await (await liveChat([{ role: "user", content: "Need one DeWalt DCD996B, how much?" }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({ items: [{ name: "DeWalt DCD996B", sku: "DCD771C2", qty: 1, shelf: 209, source: "A" }] })}`,
+    }),
+  })).json();
+  assert.ok(body.quote.items.every((item) => !/DCD771C2/i.test(`${item.sku} ${item.name}`)), JSON.stringify(body.quote.items));
+  assert.doesNotMatch(body.reply, /DCD771C2|drill\/driver kit/);
+  assert.match(body.reply, /DCD996B/);
+});
