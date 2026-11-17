@@ -2700,3 +2700,9 @@ test("v2: prompt keeps the owner's text, the pricing policy, and no vendor of th
   assert.match(prompt, /CURATED LIST/);
   assert.equal(BULK_LINE, "I've put a starting estimate on your quote. Bulk pricing usually comes in better, and we'll send your bulk pricing.");
 });
+
+test("v2: a named model never matches a different catalog model", () => {
+  const hits = matchCatalog(catalog, "I need 6 DeWalt DCD996B drills");
+  assert.ok(hits.every((item) => /DCD996B/i.test(`${item.sku} ${item.model} ${item.name}`)), JSON.stringify(hits.map((item) => item.sku)));
+  assert.equal(matchCatalog(catalog, "How much is a Makita 5007FA 7-1/4 saw?")[0].sku, "5007FA");
+});
