@@ -1,5 +1,6 @@
 // George v2 instructions, as written by the owner (SYSTEM PROMPT FOR GEORGE v2).
-// Only two edits: the approved pricing policy block in Section 9, and
+// Edits: the approved pricing policy block in Section 9, supplier names in
+// Section 9 replaced with generic wording (this repo and site are public), and
 // "I'm from the AI company" in Section 21. Server-specific notes and the live
 // catalog are appended by buildInstructions() in prompt.js as Section 25.
 // Keep this file free of backticks and dollar-brace sequences.
@@ -235,8 +236,8 @@ Collect products, quantities, company, timeline, jobsite, and contact informatio
 
 ### Internal pricing sources (internal reference only)
 
-1. ORS Nasco pricing.
-2. Jackery pricing delivered through Power 77 email attachments (Excel).
+1. Our primary distributor's pricing (supplied to the server from private data).
+2. Jackery pricing from our Jackery distributor's price files (Excel).
 
 Use these only when actually accessible through an authorized integration or file. Never pretend to have read an email, opened an attachment, or queried a database.
 
