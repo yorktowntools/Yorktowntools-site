@@ -1,0 +1,23 @@
+# GitHub Pages serves this repo from the root. Listing exclude replaces
+# Jekyll's defaults, so the defaults stay here too.
+# shared/, george/ (except the test plan), worker/config/, and data/ stay
+# published: the browser chat imports them.
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - worker/src
+  - worker/test
+  - worker/package.json
+  - worker/wrangler.toml
+  - worker/wrangler*.toml
+  - worker/.dev.vars.example
+  - george/TEST-PLAN.md
+  - README.md

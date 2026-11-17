@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { BULK_LINE, CONFIRM_PRICE, GREETING, SAFE_COST_REPLY } from "../../shared/copy.js";
-import { ensureBulkLine, filterCustomerText, isAllowedCustomerUrl, isCustomerPriceAsk, isPrivateCostAsk, rewriteOwnerName, sayConfirmOnce } from "../../shared/customer-text.js";
+import { ensureBulkLine, isAllowedCustomerUrl, isCustomerPriceAsk, isPrivateCostAsk, rewriteOwnerName, sayConfirmOnce } from "../../shared/customer-text.js";
+import { filterCustomerText } from "../src/source-filter.js";
 import { localReply } from "../../shared/local-reply.js";
 import { canonicalBrand, interpretLine, modelCandidates } from "../../shared/trade.js";
 import {
@@ -2717,4 +2718,27 @@ test("v2: the customer's model number stays on the line even if the model output
   assert.ok(body.quote.items.every((item) => !/DCD771C2/i.test(`${item.sku} ${item.name}`)), JSON.stringify(body.quote.items));
   assert.doesNotMatch(body.reply, /DCD771C2|drill\/driver kit/);
   assert.match(body.reply, /DCD996B/);
+});
+
+test("a brand plus an exact model uses the cached shelf instead of a team handoff", async () => {
+  resetLimits();
+  resetShelfCache();
+  await writeModelShelf({}, "DCD996B", 209);
+  let calls = 0;
+  const body = await (await liveChat([{ role: "user", content: "I need 1 DeWalt DCD996B drill" }], {
+    callXai: async () => {
+      calls += 1;
+      return {
+        output_text: `QUOTE_JSON: ${JSON.stringify({
+          items: [{ name: "DeWalt DCD996B drill", sku: "DCD996B", qty: 1, shelf: null, source: "U" }],
+        })}`,
+      };
+    },
+    fetchProductPage: async () => ({ status: 403, text: async () => "" }),
+  })).json();
+  assert.ok(calls >= 1);
+  assert.equal(body.quote.items[0].sku, "DCD996B");
+  assert.equal(body.quote.items[0].estimate, 209);
+  assert.match(body.reply, /Out the door that's \$230\.34/);
+  assert.doesNotMatch(body.reply, /team to price|DCD771C2/i);
 });
