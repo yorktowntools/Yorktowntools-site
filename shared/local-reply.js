@@ -10,6 +10,7 @@ import {
   HANDOFF_LINE,
   LINE_CARD_URL,
   SCAM_CLOSE,
+  LOCATION_LINE,
   HOURS,
   PHONE_DISPLAY,
   SAFE_COST_REPLY,
@@ -614,6 +615,10 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return finish(GREETING, [], false);
   }
 
+  if (isLocationAsk(text)) {
+    return finish(LOCATION_LINE, [], false);
+  }
+
   if (/\b(hour|open|close|when are you)\b/i.test(text)) {
     return finish(
       `We're here ${HOURS}. Phone and text ${PHONE_DISPLAY}. Email sales@yorktowntools.com. ${AFTER_HOURS_LINE}`,
@@ -839,7 +844,7 @@ function gloveTurn(text, heard, catalog, percent, history) {
 
 const SHIP_WORD = /\b(ships?|shipped|shipping|delivers?|delivered|delivery|sends?|sending)\b/i;
 const OUT_OF_AREA = /\b(alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|washington|west virginia|wisconsin|wyoming|atlanta|chicago|dallas|denver|los angeles|miami|phoenix|portland|seattle)\b/i;
-const CREDS = "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. Tax is 0% for government.";
+const CREDS = "Yes. We're a Veteran-Owned Small Business with an active SAM registration. UEI SMYXDLJDJMZ4. CAGE 16LD9. We accept government purchase cards. If the purchase is tax-exempt, send the exemption certificate or agency exemption document and we'll note it on the order. Tax stays on the quote until our team verifies it.";
 
 function gaveContact(text) {
   const raw = String(text || "");
@@ -887,6 +892,12 @@ function screenOutOfArea(text, history) {
   return `${HANDOFF_LINE} ${CLOSING_LINE}`;
 }
 
+function isLocationAsk(text) {
+  const raw = String(text || "");
+  if (/\b(deliver|delivery|ship|jobsite|job site)\b/i.test(raw)) return false;
+  return /\bwhere\s+(?:are|r)\s+(?:you|u|y'all|yall)(?:\s+guys)?\s*(?:located|based|at|out of)?\b|\bwhere(?:'s| is)\s+(?:your|the)\s+(?:store|shop|warehouse|office|location|building)\b|\b(?:your|the company's)\s+(?:street\s+)?(?:address|location)\b|\bcan i (?:come|stop) by\b|\bwalk[- ]?in\b/i.test(raw);
+}
+
 function governmentBuyer(text) {
   return /\b(government purchase|purchase cards?|\bgpc\b)\b/i.test(text)
     || (/\bgovernment\b/i.test(text) && /\b(cards?|tax|buy)\b/i.test(text));
@@ -908,7 +919,7 @@ function governmentTurn(text, history) {
   if (!buyer && !saidCreds) return "";
   if (saidCreds && !governmentBuyer(text) && !specialtyAsk(userText(history, text))) return "";
   const product = specialtyAsk(text) || specialtyAsk(userText(history));
-  if (!product && !saidCreds) return CREDS;
+  if (!product && !saidCreds) return `${CREDS} Do you need a formal quote or purchase order?`;
   if (!product) return "";
   const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text) || (/\b(my name|i'm|i am)\b/i.test(text) && /\b(unit|company|navy|army)\b/i.test(text));
   if (saidCreds && contact) return `${HANDOFF_LINE} ${CLOSING_LINE}`;

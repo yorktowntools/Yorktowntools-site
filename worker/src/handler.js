@@ -672,10 +672,12 @@ function composeQuote(baseReply, lines, { government = false, bulk = false, aske
     low += item.estimate * qty;
     high += (item.estimateHigh ?? item.estimate) * qty;
   }
-  const factor = (government ? 1 : 1.07) * 1.03;
+  // v2 Section 13: tax stays on until the team verifies exemption documents.
+  const factor = 1.07 * 1.03;
   const otdLow = roundMoney(low * factor);
   const otdHigh = roundMoney(high * factor);
-  const over = (otdHigh || otdLow || 0) > 500;
+  // v2 Section 16: hand off when any single item is $1,000 or more.
+  const over = lines.some((item) => Number(item.estimateHigh ?? item.estimate) >= 1000);
   const upsell = String(baseReply || "").match(/(?:^|[.!?]\s+|\n+)(Need [^\n?]+\?)/)?.[1]?.trim() || "";
   const links = lines.map((item) => itemLinkLine(item)).filter(Boolean);
   const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
