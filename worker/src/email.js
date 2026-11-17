@@ -1,5 +1,6 @@
 import { CREDIT_APP_URL, DELIVERY_LINE, HOURS, PHONE_DISPLAY, PHONE_TEL } from "../../shared/copy.js";
-import { escapeHtml, filterCustomerText, isAllowedCustomerUrl } from "../../shared/customer-text.js";
+import { escapeHtml, isAllowedCustomerUrl } from "../../shared/customer-text.js";
+import { filterCustomerText } from "./source-filter.js";
 import { formatMoney } from "../../shared/pricing.js";
 import { BULK_EMAIL, feeSentence } from "./policy.js";
 

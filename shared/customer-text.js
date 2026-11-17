@@ -1,42 +1,5 @@
 import { BULK_LINE, SAFE_COST_REPLY, SAFE_RETAILER_REPLY } from "./copy.js";
 
-const BLOCKED_HOSTS = [
-  "homedepot.com",
-  "homedepot.ca",
-  "lowes.com",
-  "lowes.ca",
-  "grainger.com",
-  "whitecap.com",
-  "whitecapdirect.com",
-  "harborfreight.com",
-  "menards.com",
-  "northerntool.com",
-  "fastenal.com",
-  "acehardware.com",
-  "walmart.com",
-  "amazon.com",
-  "amazon.ca",
-  "amzn.to",
-  "a.co",
-  "colonyhardware.com",
-  "hdsupply.com",
-  "hdsupplysolutions.com",
-  "mscdirect.com",
-  "zoro.com",
-  "toolbarn.com",
-  "acmetools.com",
-  "maxtool.com",
-  "cpooutlets.com",
-  "costco.com",
-  "samsclub.com",
-  "target.com",
-  "truevalue.com",
-  "doitbest.com",
-  "ferguson.com",
-  "supplyhouse.com",
-  "homedepotpro.com",
-];
-
 const ALLOWED_HOSTS = [
   "yorktowntools.com",
   "yorktowntools.beehiiv.com",
@@ -88,29 +51,6 @@ const ALLOWED_HOSTS = [
   "gearteam.com",
 ];
 
-const RETAILER_PATTERNS = [
-  /\bh[\W_]*o[\W_]*m[\W_]*e[\W_]*d[\W_]*e[\W_]*p[\W_]*o[\W_]*t\b/i,
-  /\bl[\W_]*o[\W_]*w[\W_]*e[\W_]*['’]?[\W_]*s\b/i,
-  /\bhome[\s\-]*depot\b/i,
-  /\blowes\b/i,
-  /\bgrainger\b/i,
-  /\bwhite[\s\-]*cap\b/i,
-  /\bharbor[\s\-]*freight\b/i,
-  /\bmenards\b/i,
-  /\bnorthern[\s\-]*tool\b/i,
-  /\bfastenal\b/i,
-  /\bace[\s\-]+hardware\b/i,
-  /\bwal[\s\-]*mart\b/i,
-  /\bamazon\b/i,
-  /\bcolony[\s\-]+hardware\b/i,
-  /\bhd[\s\-]*supply\b/i,
-  /\bmsc[\s\-]+(?:industrial|direct)\b/i,
-  /\bcostco\b/i,
-  /\bsam['’]?s[\s\-]*club\b/i,
-  /\btoolbarn\b/i,
-  /\bacme[\s\-]*tools\b/i,
-];
-
 const COST_PATTERNS = [
   /\bour cost\b/i,
   /\byour cost\b/i,
@@ -127,9 +67,6 @@ const COST_PATTERNS = [
   /\bsupplier discount\b/i,
   /\b(?:our|my|your) supplier\b/i,
   /\b(?:our|my|your) distributor\b/i,
-  /\bors\b/i,
-  /\bnasco\b/i,
-  /\bpower\s*77\b/i,
   /\bprivate cost\b/i,
   /\bcost source\b/i,
   /\bstart at cost\b/i,
@@ -164,10 +101,6 @@ export function hostnameOf(value) {
   }
 }
 
-export function isBlockedHost(hostname) {
-  return BLOCKED_HOSTS.some((host) => hostMatches(hostname, host));
-}
-
 export function isAllowedCustomerUrl(value) {
   const raw = String(value || "").trim();
   if (/^tel:\+?17579405171$/i.test(raw)) return true;
@@ -181,7 +114,6 @@ export function isAllowedCustomerUrl(value) {
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return false;
   const host = url.hostname.replace(/^www\./, "").toLowerCase();
-  if (isBlockedHost(host)) return false;
   return ALLOWED_HOSTS.some((allowed) => hostMatches(host, allowed));
 }
 
@@ -214,20 +146,16 @@ export function isCustomerPriceAsk(text) {
 }
 
 function scrubUrls(text) {
-  let retailerHit = false;
   const withoutMarkdown = text.replace(/\[([^\]]*)\]\(([^)\s]+)\)/g, (full, label, url) => {
     if (isAllowedCustomerUrl(url)) return full;
-    retailerHit = retailerHit || isBlockedHost(hostnameOf(url));
     return label || "";
   });
   const withoutBare = withoutMarkdown.replace(/\bhttps?:\/\/[^\s<>"')]+/gi, (url) => {
     const clean = url.replace(/[.,;:!?]+$/, "");
-    const tail = url.slice(clean.length);
     if (isAllowedCustomerUrl(clean)) return url;
-    if (isBlockedHost(hostnameOf(clean))) retailerHit = true;
-    return tail.trim() ? "" : "";
+    return "";
   });
-  return { text: withoutBare, retailerHit };
+  return { text: withoutBare, retailerHit: false };
 }
 
 export function rewriteOwnerName(input) {
@@ -278,7 +206,7 @@ export function filterCustomerText(input, options = {}) {
 
   const urlPass = scrubUrls(original);
   const keptLines = [];
-  let retailerHit = urlPass.retailerHit || matchesAny(original, RETAILER_PATTERNS);
+  let retailerHit = urlPass.retailerHit;
   for (const line of urlPass.text.split("\n")) {
     if (!line.trim()) {
       keptLines.push("");
@@ -286,11 +214,7 @@ export function filterCustomerText(input, options = {}) {
     }
     const kept = [];
     for (const chunk of splitChunks(line)) {
-      if (matchesAny(chunk, RETAILER_PATTERNS) || matchesAny(chunk, COST_PATTERNS)) {
-        retailerHit = true;
-        continue;
-      }
-      if (isBlockedHost(hostnameOf(chunk))) {
+      if (matchesAny(chunk, COST_PATTERNS)) {
         retailerHit = true;
         continue;
       }
@@ -304,7 +228,7 @@ export function filterCustomerText(input, options = {}) {
   if (retailerHit && !text) {
     return { text: SAFE_RETAILER_REPLY, retailerHit: true, costHit: false, replaced: true };
   }
-  if (matchesAny(text, RETAILER_PATTERNS) || matchesAny(text, COST_PATTERNS)) {
+  if (matchesAny(text, COST_PATTERNS)) {
     return { text: SAFE_RETAILER_REPLY, retailerHit: true, costHit: false, replaced: true };
   }
   if (!options.keepName) text = sayConfirmOnce(rewriteOwnerName(text));

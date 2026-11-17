@@ -4,7 +4,8 @@ import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/
 import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE } from "../../shared/copy.js";
 import { cartFromThread, eachQty, listReadback, readIdentity, readyClose, askedForReach, sawGuide, userBlob } from "../../shared/job.js";
 import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
-import { filterCustomerText, isCustomerPriceAsk } from "../../shared/customer-text.js";
+import { isCustomerPriceAsk } from "../../shared/customer-text.js";
+import { filterCustomerText } from "./source-filter.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
 import {
@@ -1045,7 +1046,13 @@ async function chat(request, env, ctx) {
       mode: mock ? "mock" : "live",
     });
   }
-  if (mock || pricedLocally || followUp) {
+  const localHasPrice = (local.quote?.items || []).some((item) => {
+    const estimate = Number(item?.estimate);
+    const shelf = Number(item?.shelf);
+    return (Number.isFinite(estimate) && estimate > 0) || (Number.isFinite(shelf) && shelf > 0);
+  });
+  const exactUnpriced = !mock && exactModelsIn(latest).length > 0 && !localHasPrice;
+  if ((mock || pricedLocally || followUp) && !exactUnpriced) {
     const alreadyNamed = (local.quote?.items || []).length > 0 && (local.quote.items || []).every((item) => item.sku);
     const sourceItems = preferSpecific(followUp || alreadyNamed
       ? (local.quote?.items || [])
