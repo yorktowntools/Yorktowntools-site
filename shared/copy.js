@@ -19,10 +19,12 @@ export const SCAM_CLOSE = "We're only able to serve local customers right now.";
 
 export const CLOSING_LINE = "Tools Worth Fighting For!";
 
-export const READY_LINE = `You're all set, ${HANDOFF_LINE.charAt(0).toLowerCase()}${HANDOFF_LINE.slice(1)} ${CLOSING_LINE}`;
+export const READY_LINE = `You're all set. ${HANDOFF_LINE} ${CLOSING_LINE} If you need help sooner, call or text 757-940-5171.`;
+
+export const LOCATION_LINE = "We are a B2B company based out of Yorktown.";
 
 export const BULK_LINE =
-  "Starting estimate, bulk pricing usually comes in better. We'll send your bulk pricing.";
+  "I've put a starting estimate on your quote. Bulk pricing usually comes in better, and we'll send your bulk pricing.";
 
 export const CONFIRM_PRICE = "We'll confirm the price.";
 

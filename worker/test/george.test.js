@@ -260,10 +260,10 @@ test("tiers, tax, fuel, and the sales email stay private", () => {
 
 test("prompt tells George the rules and the email does not leak them", () => {
   const prompt = buildInstructions({ catalog, page: "/Power-tools.html" });
-  assert.match(prompt, /bulk pricing usually comes in better/);
-  assert.match(prompt, /Do not say "we start at cost."/);
+  assert.match(prompt, /Bulk pricing usually comes in better/);
+  assert.match(prompt, /SYSTEM PROMPT FOR GEORGE \(v2\)/);
   assert.match(prompt, /qty null until they state one/);
-  assert.match(prompt, /9 a\.m\. the next business day/);
+  assert.match(prompt, /Never write dollar amounts/);
   const mail = buildQuoteEmail({
     lead: {
       name: "Ada",
@@ -570,7 +570,7 @@ test("widget carries the same bulk line and the retailer filter", () => {
   assert.match(widget, /qty/);
   const handler = readFileSync(new URL("../../worker/src/handler.js", import.meta.url), "utf8");
   assert.match(handler, /reasoning: \{ effort: useSearch \? "low" : "none" \}/);
-  assert.match(readFileSync(new URL("../../shared/copy.js", import.meta.url), "utf8"), /bulk pricing usually comes in better/);
+  assert.match(readFileSync(new URL("../../shared/copy.js", import.meta.url), "utf8"), /Bulk pricing usually comes in better/);
   assert.doesNotMatch(widget, /\bZach/i);
 });
 
@@ -1158,7 +1158,8 @@ test("a government buyer with a specialty item is handed off without repeating c
   const first = await say("We pay with a GPC. Need 5 JP-8 generators 2000W");
   assert.match(first.reply, /SMYXDLJDJMZ4/);
   assert.match(first.reply, /16LD9/);
-  assert.match(first.reply, /0% for government/);
+  assert.doesNotMatch(first.reply, /0% for government/);
+  assert.match(first.reply, /Tax stays on the quote until our team verifies it/);
   assert.match(first.reply, /5/);
   assert.match(first.reply, /JP-8|generators/i);
   assert.match(first.reply, /name, unit or company/i);
@@ -1414,7 +1415,7 @@ test("a small unmatched power tool is one out-the-door total, then an invoice", 
     throw new Error("specialist handoff should stay local");
   });
   const handedBody = await handed.json();
-  assert.match(handedBody.reply, /You're all set, a Yorktown Tools specialist will reach out shortly/);
+  assert.match(handedBody.reply, /You're all set\. A Yorktown Tools specialist will reach out shortly\. Tools Worth Fighting For! If you need help sooner, call or text 757-940-5171\./);
   assert.match(handedBody.reply, /Tools Worth Fighting For/);
   assert.ok(handedBody.reply.indexOf("a Yorktown Tools specialist will reach out shortly") < handedBody.reply.indexOf("Tools Worth Fighting For"));
 });
@@ -1629,18 +1630,12 @@ test("my cost, my price, and what would I pay are quote requests", async () => {
 
 test("the prompt stores a seen retail price and answers a how-to before contact", () => {
   const prompt = buildInstructions({ catalog, page: "/" });
-  assert.match(prompt, /current typical retail price/);
-  assert.match(prompt, /QUOTE_JSON shelf/);
-  assert.match(prompt, /Never put a store name/);
-  assert.match(prompt, /cordless or corded/);
-  assert.match(prompt, /SDS-Max/);
-  assert.match(prompt, /D25614K/);
-  assert.match(prompt, /13 inches/);
-  assert.match(prompt, /rebar cutter/);
+  assert.match(prompt, /lowest of those shelf prices into QUOTE_JSON shelf/);
+  assert.match(prompt, /Never write a store name/);
+  assert.match(prompt, /SDS-Max rotary hammer/);
+  assert.match(prompt, /Answer technical questions first/);
   assert.match(prompt, /My cost/);
-  assert.match(prompt, /what do you pay/);
-  assert.match(prompt, /Do not repeat the same contact ask/);
-  assert.match(prompt, /Would you like to place an order\?/);
+  assert.match(prompt, /Never repeat\*\* a question the customer has already answered/);
   const html = `<p>Home Depot</p><span>$12.98</span><script type="application/ld+json">{"@type":"Product","name":"DEWALT DCD996B","offers":{"price":"199.00"}}</script>`;
   assert.equal(extractShelfPrice(html), 199);
   assert.equal(extractShelfPrice(`"currentPrice":179.00`), 179);
@@ -2364,7 +2359,7 @@ test("slang, typos, and the live transcripts stay on what the customer said", as
   assert.doesNotMatch(each.reply, /1 × each\b/);
   const ben = await say("Ben Peralta Zach knows me");
   assert.match(ben.reply, /best cell or email/i);
-  assert.match(ben.reply, /You're all set, a Yorktown Tools specialist will reach out shortly/i);
+  assert.match(ben.reply, /You're all set\. A Yorktown Tools specialist will reach out shortly\. Tools Worth Fighting For! If you need help sooner, call or text 757-940-5171\./i);
   assert.match(ben.reply, /Tools Worth Fighting For/);
   assert.doesNotMatch(ben.reply, /\bZach\b/);
   assert.equal(outbox.length, 1);
@@ -2626,8 +2621,8 @@ test("preview phrasings stay on the tool, the model, and the gloves", async () =
   } finally {
     globalThis.fetch = originalFetch;
   }
-  assert.match(live.reply, /You're all set, a Yorktown Tools specialist will reach out shortly/);
-  assert.doesNotMatch(live.reply, /You're all set, A /);
+  assert.match(live.reply, /You're all set\. A Yorktown Tools specialist will reach out shortly\. Tools Worth Fighting For! If you need help sooner, call or text 757-940-5171\./);
+  assert.doesNotMatch(live.reply, /You're all set, /);
   const thanks = await (await post("/api/chat", {
     messages: [
       ...handoffMessages,
@@ -2663,4 +2658,63 @@ test("preview phrasings stay on the tool, the model, and the gloves", async () =
   });
   assert.match(packed.reply, /12 × Victory Series drivers gloves/);
   assert.doesNotMatch(packed.reply, /How many pairs are in the box/);
+});
+
+test("v2: location question gets only the B2B line", async () => {
+  resetLimits();
+  for (const text of ["Where are you located?", "where r u guys based", "What's your address?"]) {
+    const body = await (await post("/api/chat", { messages: [{ role: "user", content: text }] })).json();
+    assert.equal(body.reply, "We are a B2B company based out of Yorktown.", text);
+  }
+  const deliver = await (await post("/api/chat", { messages: [{ role: "user", content: "Do you deliver to Yorktown?" }] })).json();
+  assert.doesNotMatch(deliver.reply, /B2B company based out of Yorktown/);
+});
+
+test("v2: tax stays on for tax-exempt claims, and handoff is per item at $1,000", async () => {
+  resetLimits();
+  const ask = "We're tax exempt. I need a DeWalt SDS rotary hammer. Just one for a small job.";
+  const quote = (shelf) => liveChat([{ role: "user", content: ask }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({ items: [{ name: "DeWalt SDS rotary hammer", qty: 1, shelf, source: "A" }] })}`,
+    }),
+  }).then((response) => response.json());
+  const taxed = await quote(210);
+  assert.match(taxed.reply, /Out the door that's \$231\.44/);
+  const mid = await quote(600);
+  assert.match(mid.reply, /Out the door that's \$661\.26/);
+  assert.match(mid.reply, /Would you like to place an order\?/);
+  const big = await quote(1200);
+  assert.doesNotMatch(big.reply, /Out the door/);
+  assert.match(big.reply, /for our team to price/);
+});
+
+test("v2: prompt keeps the owner's text, the pricing policy, and no vendor of the AI", () => {
+  const prompt = buildInstructions({ catalog, page: "/" });
+  assert.match(prompt, /## 24\. FINAL OPERATING PRINCIPLE/);
+  assert.match(prompt, /Approved customer-facing pricing policy/);
+  assert.match(prompt, /minimum 10% margin/);
+  assert.match(prompt, /19\.99 per pair/);
+  assert.match(prompt, /I'm from the AI company/);
+  assert.doesNotMatch(prompt, /Anthropic|Zachary|\bZach\b/);
+  assert.match(prompt, /QUOTE_JSON:/);
+  assert.match(prompt, /CURATED LIST/);
+  assert.equal(BULK_LINE, "I've put a starting estimate on your quote. Bulk pricing usually comes in better, and we'll send your bulk pricing.");
+});
+
+test("v2: a named model never matches a different catalog model", () => {
+  const hits = matchCatalog(catalog, "I need 6 DeWalt DCD996B drills");
+  assert.ok(hits.every((item) => /DCD996B/i.test(`${item.sku} ${item.model} ${item.name}`)), JSON.stringify(hits.map((item) => item.sku)));
+  assert.equal(matchCatalog(catalog, "How much is a Makita 5007FA 7-1/4 saw?")[0].sku, "5007FA");
+});
+
+test("v2: the customer's model number stays on the line even if the model output carries another sku", async () => {
+  resetLimits();
+  const body = await (await liveChat([{ role: "user", content: "Need one DeWalt DCD996B, how much?" }], {
+    callXai: async () => ({
+      output_text: `QUOTE_JSON: ${JSON.stringify({ items: [{ name: "DeWalt DCD996B", sku: "DCD771C2", qty: 1, shelf: 209, source: "A" }] })}`,
+    }),
+  })).json();
+  assert.ok(body.quote.items.every((item) => !/DCD771C2/i.test(`${item.sku} ${item.name}`)), JSON.stringify(body.quote.items));
+  assert.doesNotMatch(body.reply, /DCD771C2|drill\/driver kit/);
+  assert.match(body.reply, /DCD996B/);
 });

@@ -192,14 +192,29 @@ export function catalogConflict(item, context = "") {
   return false;
 }
 
+function modelCodesIn(text) {
+  const tokens = String(text || "").match(/[a-z0-9][a-z0-9-]{2,}[a-z0-9]/gi) || [];
+  return tokens
+    .filter((token) => /\d/.test(token) && /[a-z]/i.test(token))
+    .filter((token) => !/^\d+(?:v|w|ah|ft|in|mm|cm|lbs?|oz|gal|pcs?|pk|amp|amps|rpm|psi|mah|wh)$/i.test(token))
+    .filter((token) => !/^jp-?8$/i.test(token))
+    .map((token) => token.toLowerCase().replace(/[^a-z0-9]/g, ""));
+}
+
 export function matchCatalog(catalog, query, context = "") {
   const queryTokens = contentTokens(query);
   if (!queryTokens.length) return [];
   const guard = `${context || ""} ${query || ""}`;
   const hits = [];
+  const codes = modelCodesIn(query);
   for (const item of catalog?.items || []) {
     if (catalogConflict(item, guard)) continue;
     const keys = [item.sku, item.model, item.name, ...(item.aliases || [])].filter(Boolean);
+    // A named model number only matches an entry that carries that model. Never substitute.
+    if (codes.length) {
+      const own = keys.join(" ").toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!codes.some((code) => own.includes(code))) continue;
+    }
     const covered = new Set(contentTokens(keys.join(" ")));
     if (queryTokens.some((token) => TYPE_WORDS.has(token) && !covered.has(token))) continue;
     let score = 0;
