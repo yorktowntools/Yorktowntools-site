@@ -107,27 +107,93 @@ export function drillTurn(message, history) {
   return { stage: "recommend" };
 }
 
-export function clarifyingQuestion(message, history) {
-  const drill = drillTurn(message, history);
-  if (drill?.stage === "clarify") return drill.reply;
-  const text = String(message || "");
-  if (/\bgloves?\b/i.test(text) && !/\bvictory\b/i.test(text)) {
-    return "Okay, are these for driving, cold weather, or cut protection? And how many pairs?";
-  }
-  if (/\bsaws?\b/i.test(text) && !/\bcircular\b/i.test(text)) {
-    return "Okay, what are you cutting, and do you have a brand or model in mind?";
-  }
-  if (/\bladders?\b/i.test(text) && !/\b(foot|ft|type ia|type i)\b/i.test(text)) {
-    return "Okay, what height and duty rating do you need?";
-  }
-  if (/\b(jackery|power station)\b/i.test(text) && !/\d/.test(text)) {
-    return "Okay, what capacity do you need, and is this for tools on the job or just charging batteries?";
-  }
-  return "Okay, what are you using it for, and do you have a brand or model in mind?";
-}
-
 const VAGUE_TOOL = /\b(drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|grinders?|nailers?)\b/i;
 const NAMED_POWER = /\b(dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt|sds|rotary hammers?|angle grinders?|heat guns?|impact drivers?)\b/i;
+const STATED_USE = /\b(trees?|tree[- ]?work|limbs?|branches?|logging|firewood|brush|stumps?|wood|lumber|timber|concrete|masonry|steel|metal|pvc|pipe|drywall|deck|framing|demolition|demo|roofing|siding|fencing|paint(?:ing)?|interior|exterior|cutting(?:\s+(?:them|trees?|wood|it|down))?|taking(?:\s+trees?)?\s+down)\b/i;
+const NO_BRAND = /\b(irrelevant(?:\s+brand)?|no brand|any(?:\s+brand)?|doesn'?t matter|don'?t care|do not care|no preference|no particular brand|whatever|you pick)\b/i;
+const LADDER_HEIGHT = /\b(type\s*ia|type\s*i)\b|\b\d+(?:\.\d+)?\s*(?:ft|foot|feet|'|′)\b|\b\d+\s*-\s*(?:ft|foot|feet)\b/i;
+
+function hasUse(blob) {
+  return STATED_USE.test(String(blob || ""));
+}
+
+function hasBrandPreference(blob) {
+  const text = String(blob || "");
+  if (NO_BRAND.test(text)) return true;
+  if (canonicalBrand(text)) return true;
+  if (NAMED_POWER.test(text)) return true;
+  if (/\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/i.test(text)) return true;
+  return false;
+}
+
+function hasLadderSize(blob) {
+  return LADDER_HEIGHT.test(String(blob || ""));
+}
+
+function sameClarifyAsk(previous, next) {
+  const prev = String(previous || "").trim();
+  const ask = String(next || "").trim();
+  if (!prev || !ask) return false;
+  const norm = (value) => value.toLowerCase().replace(/[^a-z0-9?]+/g, " ").trim();
+  if (norm(prev) === norm(ask)) return true;
+  const prevUse = /what are you (?:cutting|using)/i.test(prev);
+  const nextUse = /what are you (?:cutting|using)/i.test(ask);
+  const prevBrand = /brand or model in mind/i.test(prev);
+  const nextBrand = /brand or model in mind/i.test(ask);
+  if (prevUse === nextUse && prevBrand === nextBrand && (nextUse || nextBrand)) return true;
+  if (/height and duty rating/i.test(prev) && /height and duty rating/i.test(ask)) return true;
+  return false;
+}
+
+function neededClarify(message, history) {
+  const drill = drillTurn(message, history);
+  if (drill?.stage === "clarify") return drill.reply;
+  const blob = userBlob(message, history);
+  if (/\bgloves?\b/i.test(blob) && !/\bvictory\b/i.test(blob)) {
+    const purpose = /\b(driving|drivers?|cold|cut protection|cut)\b/i.test(blob);
+    const qty = /\b(\d+|pairs?|box(?:es)?)\b/i.test(blob);
+    if (!purpose || !qty) {
+      return "Okay, are these for driving, cold weather, or cut protection? And how many pairs?";
+    }
+    return "";
+  }
+  if (/\bsaws?\b/i.test(blob) && !/\bcircular\b/i.test(blob)) {
+    const use = hasUse(blob);
+    const brand = hasBrandPreference(blob);
+    if (!use && !brand) return "Okay, what are you cutting, and do you have a brand or model in mind?";
+    if (!use) return "Okay, what are you cutting?";
+    if (!brand) return "Okay, do you have a brand or model in mind?";
+    return "";
+  }
+  if (/\bladders?\b/i.test(blob)) {
+    if (!hasLadderSize(blob)) return "Okay, what height and duty rating do you need?";
+    return "";
+  }
+  if (/\b(jackery|power station)\b/i.test(blob) && !/\d/.test(blob)) {
+    return "Okay, what capacity do you need, and is this for tools on the job or just charging batteries?";
+  }
+  const use = hasUse(blob);
+  const brand = hasBrandPreference(blob);
+  if (!use && !brand) return "Okay, what are you using it for, and do you have a brand or model in mind?";
+  if (!use) return "Okay, what are you using it for?";
+  if (!brand) return "Okay, do you have a brand or model in mind?";
+  return "";
+}
+
+export function clarifyingQuestion(message, history) {
+  const ask = neededClarify(message, history);
+  if (sameClarifyAsk(lastAssistant(history)?.content, ask)) return "";
+  return ask;
+}
+
+export function answeredClarifyingQuestion(message, history) {
+  const previous = lastAssistant(history)?.content || "";
+  if (!previous || !String(message || "").trim()) return false;
+  if (!/okay, what|brand or model in mind|height and duty rating|what voltage or battery|corded or cordless/i.test(previous)) {
+    return false;
+  }
+  return !clarifyingQuestion(message, history);
+}
 
 export function chatStage(message, history, catalog) {
   const latest = String(message || "").trim();
@@ -138,6 +204,8 @@ export function chatStage(message, history, catalog) {
   if (drill?.stage === "recommend") return "recommend";
   const blob = userBlob(latest, history);
   if (isSpecificAsk(latest, catalog) || isSpecificAsk(blob, catalog)) return "quote";
-  if ((VAGUE_TOOL.test(latest) || VAGUE_TOOL.test(blob)) && !NAMED_POWER.test(latest)) return "clarify";
+  if ((VAGUE_TOOL.test(latest) || VAGUE_TOOL.test(blob)) && !NAMED_POWER.test(latest)) {
+    return clarifyingQuestion(latest, history) ? "clarify" : "quote";
+  }
   return "chat";
 }

@@ -7,7 +7,7 @@ import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
 import { isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { filterCustomerText } from "./source-filter.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
-import { chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
+import { answeredClarifyingQuestion, chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
 import {
   collectSearchShelves,
   collectSearchUrls,
@@ -548,7 +548,7 @@ function genericCategoryReply(items, text) {
   const saw = genericSawQuestion(blob);
   if (saw) return saw;
   if (BRAND.test(blob) && !MODEL.test(blob)) return "Which model or size do you want?";
-  return clarifyingQuestion(text || blob);
+  return clarifyingQuestion(text || blob) || "I can quote that. Brand and model help, plus the quantity.";
 }
 
 function priceAnswer(text) {
@@ -641,6 +641,13 @@ function matchingPageCount(items, pages) {
 
 function scriptOrderReply(baseReply, items, { government = false, bulk = false, text = "", latest = "" } = {}) {
   const asked = String(latest || text || "");
+  const context = [text, latest].filter(Boolean).join("\n");
+  const stillNeedsClarify = Boolean(clarifyingQuestion(context));
+  const categoryAsk = (lines, blob) => {
+    const ask = genericCategoryReply(lines, blob || context);
+    if (stillNeedsClarify) return ask;
+    return String(baseReply || "");
+  };
   const lines = (items || []).filter((item) => item?.name && !isPlaceholderName(item.name));
   const sawAsk = genericSawQuestion(asked);
   if (!lines.length) {
@@ -648,7 +655,7 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false, 
     const advice = concreteDrillingAdvice(asked);
     if (advice) return advice;
     if (/\b(jack\s*hammers?|demolition hammers?|drills?|saws?|grinders?|hammers?)\b/i.test(asked) || (BRAND.test(asked) && !MODEL.test(asked))) {
-      return genericCategoryReply([], asked);
+      return categoryAsk([], asked) || String(baseReply || "");
     }
     return String(baseReply || "");
   }
@@ -660,9 +667,11 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false, 
   if ((sawAsk || onlySaws) && !MODEL.test(asked) && !lines.some((item) => specificItem(item) && !sawLine(item))) {
     return sawAsk || "Which model do you want, or do you want it cordless or corded?";
   }
-  if (!named.length && !confirmed && lines.every((item) => item.estimate == null)) return genericCategoryReply(lines, asked);
+  if (!named.length && !confirmed && lines.every((item) => item.estimate == null)) {
+    return categoryAsk(lines, context) || composeQuote(baseReply, lines, { government, bulk, asked });
+  }
   const quoteLines = named.length ? lines.filter((item) => specificItem(item) || accessoryLine(item)) : lines;
-  const vagueAsk = named.length && vague.length ? genericCategoryReply(vague, `${asked}\n${vague.map((item) => item.name).join("\n")}`) : "";
+  const vagueAsk = named.length && vague.length ? categoryAsk(vague, `${context}\n${vague.map((item) => item.name).join("\n")}`) : "";
   const core = composeQuote(baseReply, quoteLines, { government, bulk, asked });
   if (!vagueAsk || vagueAsk === core) return core;
   return `${vagueAsk}\n\n${core}`;
@@ -696,7 +705,7 @@ function composeQuote(baseReply, lines, { government = false, bulk = false, aske
   const linkBlock = links.length ? `\n\n${links.join("\n")}` : "";
   const head = upsell ? `${upsell}\n\n` : "";
   if (missingPrice && !bulk && !(lines.some(specificItem) || customerConfirmed(asked))) {
-    return genericCategoryReply(lines, asked);
+    if (clarifyingQuestion(asked)) return genericCategoryReply(lines, asked);
   }
   const team = lines.length > 1 ? "Those are for our team to price." : "That one's for our team to price.";
   const teamShort = lines.length > 1 ? "Those are for our team to price." : "That's one for our team to price.";
@@ -1030,9 +1039,10 @@ async function chat(request, env, ctx) {
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
+  const answeredClarify = stage !== "recommend" && answeredClarifyingQuestion(latest, prior);
   const keepLocal = Boolean(local.quote?.scripted)
     || stage === "form"
-    || ((stage !== "quote" && stage !== "script") && !(followUp && pricedLocally));
+    || ((stage !== "quote" && stage !== "script") && !(followUp && pricedLocally) && !answeredClarify);
   if (keepLocal) {
     return respond({
       reply: finalizeReply(local.reply, messages, latest),

@@ -19,6 +19,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
+import { chatStage, clarifyingQuestion } from "../../shared/talk.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
 import { collectSearchShelves, collectSearchUrls, extractPageModel, extractShelfPrice, lowestShelf, pageMatchesModel, priceFromSnippet, readModelShelf, resetShelfCache, writeModelShelf } from "../src/shelf-fetch.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
@@ -2742,3 +2743,116 @@ test("a brand plus an exact model uses the cached shelf instead of a team handof
   assert.match(body.reply, /Out the door that's \$230\.34/);
   assert.doesNotMatch(body.reply, /team to price|DCD771C2/i);
 });
+
+test("clarifying questions do not repeat after the customer answers", () => {
+  const sawAsk = clarifyingQuestion("1 chain saw 16 inch", []);
+  assert.match(sawAsk, /what are you cutting/i);
+  assert.match(sawAsk, /brand or model in mind/i);
+  assert.equal(chatStage("1 chain saw 16 inch", [], catalog), "clarify");
+
+  const afterUseAndBrand = [
+    { role: "user", content: "1 chain saw 16 inch" },
+    { role: "assistant", content: sawAsk },
+  ];
+  assert.equal(clarifyingQuestion("Trees and irrelevant brand", afterUseAndBrand), "");
+  assert.equal(chatStage("Trees and irrelevant brand", afterUseAndBrand, catalog), "quote");
+
+  const afterRepeatRisk = [
+    ...afterUseAndBrand,
+    { role: "user", content: "Trees and irrelevant brand" },
+    { role: "assistant", content: "Okay, what are you using it for, and do you have a brand or model in mind?" },
+  ];
+  assert.equal(clarifyingQuestion("Cutting trees down", afterRepeatRisk), "");
+  assert.equal(chatStage("Cutting trees down", afterRepeatRisk, catalog), "quote");
+
+  const onlyUse = clarifyingQuestion("Trees", afterUseAndBrand);
+  assert.match(onlyUse, /brand or model in mind/i);
+  assert.doesNotMatch(onlyUse, /what are you cutting/i);
+  assert.equal(chatStage("Trees", afterUseAndBrand, catalog), "clarify");
+
+  const ladderAsk = clarifyingQuestion("need a ladder", []);
+  assert.match(ladderAsk, /height and duty rating/i);
+  assert.equal(chatStage("need a ladder", [], catalog), "clarify");
+  const afterLadder = [
+    { role: "user", content: "need a ladder" },
+    { role: "assistant", content: ladderAsk },
+  ];
+  assert.equal(clarifyingQuestion("8 ft, painting", afterLadder), "");
+  assert.equal(chatStage("8 ft, painting", afterLadder, catalog), "quote");
+});
+
+test("a answered chainsaw or ladder clarify goes to the model instead of repeating", async () => {
+  resetLimits();
+  const canned = /what are you cutting|what are you using it for|brand or model in mind|height and duty rating/i;
+  const thread = [];
+  const seen = [];
+  const say = async (text) => {
+    thread.push({ role: "user", content: text });
+    const response = await liveChat(thread, {
+      callXai: async (_env, _instructions, messages) => {
+        seen.push(messages.map((message) => ({ role: message.role, content: message.content })));
+        const last = messages.filter((message) => message.role === "user").at(-1)?.content || "";
+        const name = /ladder/i.test(thread.map((m) => m.content).join("\n")) && /ladder/i.test(last + thread[0].content)
+          ? "8 ft ladder"
+          : "16-inch chainsaw";
+        return {
+          output_text: `I can quote a ${name}. QUOTE_JSON: ${JSON.stringify({
+            items: [{ name, sku: null, qty: 1, shelf: null, source: "U" }],
+          })}`,
+        };
+      },
+    });
+    const body = await response.json();
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+
+  const first = await say("1 chain saw 16 inch");
+  assert.equal(seen.length, 0);
+  assert.match(first.reply, /what are you cutting/i);
+  assert.match(first.reply, /brand or model in mind/i);
+  assert.equal((first.quote?.items || []).length, 0);
+
+  const second = await say("Trees and irrelevant brand");
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].length, 3);
+  assert.equal(seen[0][0].content, "1 chain saw 16 inch");
+  assert.equal(seen[0][2].content, "Trees and irrelevant brand");
+  assert.match(second.reply, /16-inch chainsaw/i);
+  assert.doesNotMatch(second.reply, canned);
+  assert.doesNotMatch(second.reply, /stihl|echo|husqvarna/i);
+
+  const third = await say("Cutting trees down");
+  assert.ok(seen.length >= 2);
+  assert.match(third.reply, /16-inch chainsaw/i);
+  assert.doesNotMatch(third.reply, canned);
+  assert.doesNotMatch(third.reply, /stihl|echo|husqvarna/i);
+
+  resetLimits();
+  const ladder = [];
+  const ladderCalls = [];
+  const sayLadder = async (text) => {
+    ladder.push({ role: "user", content: text });
+    const response = await liveChat(ladder, {
+      callXai: async (_env, _instructions, messages) => {
+        ladderCalls.push(messages);
+        return {
+          output_text: `I can quote an 8 ft ladder for painting. QUOTE_JSON: ${JSON.stringify({
+            items: [{ name: "8 ft ladder", sku: null, qty: 1, shelf: null, source: "U" }],
+          })}`,
+        };
+      },
+    });
+    const body = await response.json();
+    ladder.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const ladderAsk = await sayLadder("need a ladder");
+  assert.equal(ladderCalls.length, 0);
+  assert.match(ladderAsk.reply, /height and duty rating/i);
+  const ladderAnswer = await sayLadder("8 ft, painting");
+  assert.equal(ladderCalls.length, 1);
+  assert.match(ladderAnswer.reply, /8 ft ladder/i);
+  assert.doesNotMatch(ladderAnswer.reply, canned);
+});
+

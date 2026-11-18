@@ -17,7 +17,7 @@ import {
   SERVICE_AREA,
 } from "./copy.js";
 import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
-import { acceptingQuote, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
+import { acceptingQuote, answeredClarifyingQuestion, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
 import { askedForReach, cartFromThread, eachQty, isLastNameAsk, listReadback, readIdentity, readyClose, sawGuide, washingtonReply } from "./job.js";
 import { acceptsModel, brandLabel, interpretLine, isThanks, pendingModelConfirm } from "./trade.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
@@ -590,7 +590,13 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   const stage = chatStage(text, history, catalog);
   if (stage === "clarify") {
-    return { reply: clarifyingQuestion(text, history), quote: { items: [], offerForm: false, stage: "clarify" } };
+    const ask = clarifyingQuestion(text, history);
+    if (ask) {
+      return { reply: ask, quote: { items: [], offerForm: false, stage: "clarify" } };
+    }
+  }
+  if (answeredClarifyingQuestion(text, history) && stage !== "recommend" && stage !== "form") {
+    return { reply: "", quote: { items: [], offerForm: false, hold: false, stage: "quote" } };
   }
 
   if (/ignore (all |any |the )?(previous|above|prior) instructions|system prompt|you are now|jailbreak|developer mode/i.test(text)) {
