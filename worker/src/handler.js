@@ -7,7 +7,7 @@ import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
 import { isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { filterCustomerText } from "./source-filter.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
-import { answeredClarifyingQuestion, chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isShortReply } from "../../shared/talk.js";
+import { cannedWouldRepeat, chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isConfusedOrFrustrated, isShortReply, shouldKeepLocal } from "../../shared/talk.js";
 import {
   collectSearchShelves,
   collectSearchUrls,
@@ -643,8 +643,13 @@ function scriptOrderReply(baseReply, items, { government = false, bulk = false, 
   const asked = String(latest || text || "");
   const context = [text, latest].filter(Boolean).join("\n");
   const stillNeedsClarify = Boolean(clarifyingQuestion(context));
+  const followUpTurn = Boolean(String(text || "").trim()) && String(text || "").trim() !== String(latest || "").trim();
+  const protectModel = Boolean(String(baseReply || "").trim()) && (
+    isConfusedOrFrustrated(latest) || followUpTurn
+  );
   const categoryAsk = (lines, blob) => {
     const ask = genericCategoryReply(lines, blob || context);
+    if (protectModel) return String(baseReply || "");
     if (stillNeedsClarify) return ask;
     return String(baseReply || "");
   };
@@ -792,7 +797,10 @@ function finalizeReply(reply, priorMessages = [], latest = "") {
   const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
   let body = withoutRepeatedContactAsk(withoutRepeatedGreeting(reply, priorMessages), priorMessages);
   const onlyContact = !String(body || "").trim() || (CONTACT_ASK.test(body) && !String(body).replace(CONTACT_ASK, "").trim());
-  if (onlyContact && (CONTACT_ASK.test(previous) || needsAnAnswer(latest))) body = fallbackAnswer(latest);
+  if (onlyContact && (CONTACT_ASK.test(previous) || needsAnAnswer(latest))) {
+    const next = fallbackAnswer(latest);
+    if (!isConfusedOrFrustrated(latest) && !cannedWouldRepeat(next, priorMessages)) body = next;
+  }
   return withoutRepeatedAfterHours(filterCustomerText(body).text, priorMessages);
 }
 
@@ -1039,10 +1047,14 @@ async function chat(request, env, ctx) {
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
-  const answeredClarify = stage !== "recommend" && answeredClarifyingQuestion(latest, prior);
-  const keepLocal = Boolean(local.quote?.scripted)
-    || stage === "form"
-    || ((stage !== "quote" && stage !== "script") && !(followUp && pricedLocally) && !answeredClarify);
+  const keepLocal = shouldKeepLocal({
+    latest,
+    prior,
+    userTurns: userTurns.length,
+    stage,
+    scripted: Boolean(local.quote?.scripted),
+    reply: local.reply,
+  });
   if (keepLocal) {
     return respond({
       reply: finalizeReply(local.reply, messages, latest),
@@ -1245,7 +1257,7 @@ async function chat(request, env, ctx) {
     }
     const searchesUsed = firstSearches + extraSearches;
     return respond({
-      reply: reply || localReply({ message: latest, catalog, discount: percent, page }).reply,
+      reply: reply || "",
       quote: {
         items: quoteItems,
         offerForm: false,
@@ -1256,8 +1268,11 @@ async function chat(request, env, ctx) {
       mode: "live",
     });
   } catch {
-    const local = localReply({ message: latest, catalog, discount: percent, page });
-    return json({ ...local, mode: "fallback", searchesUsed: 0 }, 200, request, env);
+    const fallback = localReply({ message: latest, history: prior, catalog, discount: percent, page });
+    const fallbackReply = (!isConfusedOrFrustrated(latest) && !cannedWouldRepeat(fallback.reply, prior) && fallback.reply)
+      ? fallback.reply
+      : "I'm having trouble answering that right now. Call or text (757) 940-5171 and we'll take it from here.";
+    return json({ ...fallback, reply: fallbackReply, mode: "fallback", searchesUsed: 0 }, 200, request, env);
   }
 }
 

@@ -17,7 +17,7 @@ import {
   SERVICE_AREA,
 } from "./copy.js";
 import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
-import { acceptingQuote, answeredClarifyingQuestion, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply } from "./talk.js";
+import { acceptingQuote, answeredClarifyingQuestion, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply, isSpecificAsk } from "./talk.js";
 import { askedForReach, cartFromThread, eachQty, isLastNameAsk, listReadback, readIdentity, readyClose, sawGuide, washingtonReply } from "./job.js";
 import { acceptsModel, brandLabel, interpretLine, isThanks, pendingModelConfirm } from "./trade.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
@@ -702,7 +702,9 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (matches.length) {
+  const namedModel = /\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/i.test(text);
+  const ongoing = (history || []).some((entry) => entry.role === "user" || entry.role === "assistant");
+  if (matches.length && (!ongoing || namedModel || isCustomerPriceAsk(text) || rebuilding || isSpecificAsk(text, catalog))) {
     const lines = matches.map((priced) => {
       const lineQty = priced.qty || qty;
       const amount = formatEstimate(priced);
@@ -747,7 +749,8 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (/\b(sds|rotary hammers?|hammers?|grinders?|nailers?|impacts?|drivers?|sanders?|routers?|planers?|compressors?|generators?|heat guns?|blowers?|vacuums?|welders?|power tools?|multi-tools?|oscillating|reciprocating|drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|storage|packout|ppe|hard hats?|lasers?|levels?|jackery|power|dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt)\b/i.test(text)) {
+  const hasPriorTalk = (history || []).some((entry) => entry.role === "user" || entry.role === "assistant");
+  if (!hasPriorTalk && /\b(sds|rotary hammers?|hammers?|grinders?|nailers?|impacts?|drivers?|sanders?|routers?|planers?|compressors?|generators?|heat guns?|blowers?|vacuums?|welders?|power tools?|multi-tools?|oscillating|reciprocating|drills?|saws?|ladders?|gloves?|batter(?:y|ies)|blades?|bits?|wrenches?|storage|packout|ppe|hard hats?|lasers?|levels?|jackery|power|dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt)\b/i.test(text)) {
     const hint = CATEGORIES.slice(0, 4)
       .map((cat) => pageLink(cat.path, cat.name))
       .join(", ");
@@ -784,10 +787,8 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   }
 
   if (!rebuilding && (history || []).some((entry) => entry.role === "assistant")) {
-    return {
-      reply: "Yes, we can help with that. What is the job, and do you have a brand in mind?",
-      quote: { items: [], offerForm: false, hold: false, stage: "quote" },
-    };
+    // Don't invent a canned follow-up question. The live path should ask the model.
+    return { reply: "", quote: { items: [], offerForm: false, hold: false, stage: "quote" } };
   }
 
   return finish(
