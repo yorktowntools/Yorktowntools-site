@@ -19,7 +19,7 @@ import {
 } from "../../shared/pricing.js";
 import { buildInstructions } from "../src/prompt.js";
 import { buildQuoteEmail, buildSalesEmail } from "../src/email.js";
-import { chatStage, clarifyingQuestion } from "../../shared/talk.js";
+import { cannedWouldRepeat, chatStage, clarifyingQuestion, isConfusedOrFrustrated, shouldKeepLocal } from "../../shared/talk.js";
 import { handleRequest, resetLimits } from "../src/handler.js";
 import { collectSearchShelves, collectSearchUrls, extractPageModel, extractShelfPrice, lowestShelf, pageMatchesModel, priceFromSnippet, readModelShelf, resetShelfCache, writeModelShelf } from "../src/shelf-fetch.js";
 import { afterHoursNote, presentQuote, priceFromShelf, replyWithFinalPrices, withoutRepeatedAfterHours } from "../src/policy.js";
@@ -2856,3 +2856,101 @@ test("a answered chainsaw or ladder clarify goes to the model instead of repeati
   assert.doesNotMatch(ladderAnswer.reply, canned);
 });
 
+test("confused or frustrated follow-ups reach the model instead of a canned loop", async () => {
+  assert.equal(isConfusedOrFrustrated("What are you talking about"), true);
+  assert.equal(isConfusedOrFrustrated("You are not helpful at all"), true);
+  assert.equal(isConfusedOrFrustrated("What"), false);
+  assert.equal(cannedWouldRepeat(
+    "Yes, we can help with that. What is the job, and do you have a brand in mind?",
+    [{ role: "assistant", content: "Yes, we can help with that. What is the job, and do you have a brand in mind?" }],
+  ), true);
+  assert.equal(shouldKeepLocal({
+    latest: "It's made by dewalt",
+    prior: [
+      { role: "user", content: "I need a drill" },
+      { role: "assistant", content: "Okay, what are you using the drill for?" },
+    ],
+    userTurns: 2,
+    stage: "chat",
+    scripted: false,
+    reply: "I can quote that. Brand and model help, plus the quantity. A few places to look: Precision hand tools, Power tools.",
+  }), false);
+
+  const cannedJob = /what is the job, and do you have a brand in mind/i;
+  const places = /places to look|what the crew is trying to do/i;
+  const run = async (lines) => {
+    resetLimits();
+    const thread = [];
+    const seen = [];
+    const say = async (text) => {
+      thread.push({ role: "user", content: text });
+      const callsBefore = seen.length;
+      const response = await liveChat(thread, {
+        callXai: async (_env, _instructions, messages) => {
+          seen.push(messages.map((message) => ({ role: message.role, content: message.content })));
+          const priorUser = messages.filter((message) => message.role === "user").map((message) => message.content).join(" ");
+          const brand = /dewalt/i.test(priorUser) ? "DeWalt" : "that";
+          const tool = /\bsaws?\b/i.test(priorUser) ? "saw" : "drill";
+          const last = messages.filter((message) => message.role === "user").at(-1)?.content || "";
+          let spoken = `Which ${brand} ${tool} or model do you want, and how many?`;
+          if (/talking about/i.test(last)) spoken = `Sorry, I was asking which ${brand} ${tool} you want.`;
+          if (/not helpful/i.test(last)) spoken = `I'll keep this simple. Name a ${brand} ${tool} model, or I can suggest a few.`;
+          return {
+            output_text: spoken,
+          };
+        },
+      });
+      const body = await response.json();
+      thread.push({ role: "assistant", content: body.reply });
+      return { body, modelCalled: seen.length > callsBefore, lastCall: seen.at(-1) };
+    };
+    const turns = [];
+    for (const line of lines) turns.push(await say(line));
+    return { turns, seen };
+  };
+
+  const drill = await run([
+    "I need a drill",
+    "It's made by dewalt",
+    "What are you talking about",
+    "You are not helpful at all",
+  ]);
+  assert.equal(drill.turns[0].modelCalled, false);
+  assert.match(drill.turns[0].body.reply, /what are you using the drill for/i);
+  assert.equal(drill.turns[1].modelCalled, true);
+  assert.equal(drill.turns[1].lastCall.at(-1).content, "It's made by dewalt");
+  assert.match(drill.turns[1].body.reply, /DeWalt/i);
+  assert.match(drill.turns[1].body.reply, /drill/i);
+  assert.doesNotMatch(drill.turns[1].body.reply, places);
+  assert.doesNotMatch(drill.turns[1].body.reply, cannedJob);
+  assert.equal(drill.turns[2].modelCalled, true);
+  assert.equal(drill.turns[2].lastCall.at(-1).content, "What are you talking about");
+  assert.doesNotMatch(drill.turns[2].body.reply, cannedJob);
+  assert.doesNotMatch(drill.turns[2].body.reply, places);
+  assert.notEqual(drill.turns[2].body.reply, drill.turns[1].body.reply);
+  assert.equal(drill.turns[3].modelCalled, true);
+  assert.equal(drill.turns[3].lastCall.at(-1).content, "You are not helpful at all");
+  assert.doesNotMatch(drill.turns[3].body.reply, cannedJob);
+  assert.doesNotMatch(drill.turns[3].body.reply, places);
+  assert.notEqual(drill.turns[3].body.reply, drill.turns[2].body.reply);
+
+  const saw = await run([
+    "Need a saw",
+    "dewalt",
+    "What are you talking about",
+    "You are not helpful at all",
+  ]);
+  assert.equal(saw.turns[0].modelCalled, false);
+  assert.match(saw.turns[0].body.reply, /what are you cutting/i);
+  assert.equal(saw.turns[1].modelCalled, true);
+  assert.equal(saw.turns[1].lastCall.at(-1).content, "dewalt");
+  assert.match(saw.turns[1].body.reply, /DeWalt/i);
+  assert.match(saw.turns[1].body.reply, /saw/i);
+  assert.doesNotMatch(saw.turns[1].body.reply, places);
+  assert.doesNotMatch(saw.turns[1].body.reply, cannedJob);
+  assert.equal(saw.turns[2].modelCalled, true);
+  assert.equal(saw.turns[3].modelCalled, true);
+  assert.doesNotMatch(saw.turns[2].body.reply, cannedJob);
+  assert.doesNotMatch(saw.turns[3].body.reply, cannedJob);
+  assert.notEqual(saw.turns[2].body.reply, saw.turns[3].body.reply);
+});

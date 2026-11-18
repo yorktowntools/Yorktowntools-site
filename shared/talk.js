@@ -209,3 +209,44 @@ export function chatStage(message, history, catalog) {
   }
   return "chat";
 }
+
+function normalizeCanned(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/https?:\S+/g, "")
+    .replace(/[^a-z0-9?]+/g, " ")
+    .trim();
+}
+
+export function isBareWhat(text) {
+  return /^what\??$/i.test(String(text || "").trim());
+}
+
+export function isConfusedOrFrustrated(text) {
+  const value = String(text || "").trim();
+  if (!value || isBareWhat(value)) return false;
+  return /\b(what are you talking about|not helpful|no help|unhelpful|doesn'?t make sense|doesnt make sense|that'?s not what i|you'?re not (listening|helping|useful)|are you (even )?listening|i don'?t understand|makes no sense|useless|this is (stupid|useless|dumb)|stop (asking|repeating)|you already asked|that'?s not (an )?answer|why (are you|would you) ask)\b/i.test(value)
+    || /^(huh\??|what\?+|sorry\?? what\??|come again\??|i don'?t (get|follow) (that|this|it)?\??)$/i.test(value);
+}
+
+export function cannedWouldRepeat(reply, history) {
+  const next = normalizeCanned(reply);
+  if (!next || next.length < 16) return false;
+  return (history || []).some((entry) => {
+    if (entry?.role !== "assistant") return false;
+    const prev = normalizeCanned(entry.content);
+    if (!prev) return false;
+    if (prev === next) return true;
+    return next.length > 32 && (prev.includes(next) || next.includes(prev));
+  });
+}
+
+export function shouldKeepLocal({ latest, prior = [], userTurns = 1, stage, scripted, reply } = {}) {
+  if (isConfusedOrFrustrated(latest)) return false;
+  if (scripted || stage === "form") return true;
+  if (cannedWouldRepeat(reply, prior)) return false;
+  if (isBareWhat(latest)) return true;
+  if (userTurns <= 1) return stage === "clarify" || stage === "recommend" || stage === "script";
+  return false;
+}
+
