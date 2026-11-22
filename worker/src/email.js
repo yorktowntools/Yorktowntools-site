@@ -3,6 +3,7 @@ import { escapeHtml, isAllowedCustomerUrl } from "../../shared/customer-text.js"
 import { filterCustomerText } from "./source-filter.js";
 import { formatMoney } from "../../shared/pricing.js";
 import { BULK_EMAIL, feeSentence } from "./policy.js";
+import { LEAD_SOURCE_FIELD, LEAD_SOURCE_LINE, LEAD_SUBJECT, decorateAlertMail } from "./lead.js";
 
 function clean(value, fallback = "") {
   const text = filterCustomerText(value).text;
@@ -156,7 +157,7 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
   const company = clean(lead.company) || "no company given";
   const flag = tier === 1 ? "TIER 1 / PRIORITY" : (bulk ? `TIER ${tier} / BULK` : `TIER ${tier}`);
   const ready = invoiceFlag(lead, items, totals, leadInfo);
-  const subject = `${flag} — George lead — ${company}`;
+  const subject = `${LEAD_SUBJECT} — ${flag} — ${company}`;
   const callLine = tier === 1
     ? "PRIORITY. Call this lead. They look like a bulk, ongoing, or multi-site account. Ask about typical order volume and how often they buy if that is not in the notes."
     : (bulk
@@ -226,15 +227,19 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
     <strong>OTD total ${escapeHtml(otd == null ? "confirm" : formatMoney(otd))}</strong></p>
   </div>`;
 
-  return { subject, html, text };
+  return decorateAlertMail({ subject, html, text });
 }
 
 export function buildHandoffEmail({ identity, items, why, transcript, update = false }) {
   const name = identity?.name || "No name yet";
   const missing = !identity?.phone && !identity?.email;
-  const subject = `${update ? "UPDATE — " : ""}HANDOFF — George — ${name}${missing ? " — missing phone or email" : ""}`;
-  const lines = (items || []).map((item) => `- ${item.qty || 1} × ${item.name || "Item"}${item.sku ? ` (${item.sku})` : ""}`);
+  const subject = `${update ? "UPDATE — " : ""}${LEAD_SUBJECT}${name ? ` — ${name}` : ""}${missing ? " — missing phone or email" : ""}`;
+  const lines = (items || []).map((item) => {
+    const qty = Object.prototype.hasOwnProperty.call(item || {}, "qty") && item.qty != null ? `${item.qty} × ` : "";
+    return `- ${qty}${item.name || "Item"}${item.sku ? ` (${item.sku})` : ""}`;
+  });
   const text = [
+    LEAD_SOURCE_LINE,
     update ? "Update on a handoff already sent." : "George handed this chat to the team.",
     `Why: ${why || "handoff"}`,
     missing ? "MISSING PHONE OR EMAIL. The note below is enough to start, but we still need a way to reach them." : "",
@@ -252,7 +257,7 @@ export function buildHandoffEmail({ identity, items, why, transcript, update = f
     transcript || "—",
   ].filter(Boolean).join("\n");
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap;">${escapeHtml(text)}</div>`;
-  return { subject, html, text };
+  return decorateAlertMail({ subject, html, text, source: LEAD_SOURCE_FIELD });
 }
 
 export function handoffFormspreeBody(mail) {
@@ -268,7 +273,8 @@ export function handoffFormspreeBody(mail) {
     email: pick("Email"),
     phone: pick("Phone"),
     message: text,
-    _subject: mail?.subject || "HANDOFF — George",
+    source: LEAD_SOURCE_FIELD,
+    _subject: mail?.subject || LEAD_SUBJECT,
   };
 }
 
@@ -285,6 +291,7 @@ export function formspreeBody(lead, items, leadInfo) {
     delivery: clean(lead.jobsite),
     needed_by: clean(lead.neededBy),
     message: `${flag}\n${bulk ? BULK_EMAIL : "Instant estimate sent if email is connected."}\n${summary}\n${clean(lead.notes || "")}`.trim(),
-    _subject: `${flag} — George lead`,
+    source: LEAD_SOURCE_FIELD,
+    _subject: `${LEAD_SUBJECT} — ${flag}`,
   };
 }

@@ -13,6 +13,7 @@ import {
   LOCATION_LINE,
   HOURS,
   PHONE_DISPLAY,
+  PRICING_LINE,
   SAFE_COST_REPLY,
   SERVICE_AREA,
 } from "./copy.js";
@@ -236,7 +237,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (isThanks(text)) {
     const items = cartFromThread(history);
-    const handedOff = (history || []).some((entry) => entry.role === "assistant" && /for our team to price|specialist will reach out|you're all set/i.test(entry.content || ""));
+    const handedOff = (history || []).some((entry) => entry.role === "assistant" && /for our team to price|specialist will reach out|you['’]re all set|member of our yorktown tools team will review/i.test(entry.content || ""));
     const read = items.filter((item) => item?.name).map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
     return {
       reply: handedOff && read ? `You bet. I have ${read}.` : "You bet.",
@@ -248,10 +249,30 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     return { reply: washingtonReply(), quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true } };
   }
 
+  if (/\b(am i talking to a real person|are you a real person|are you (a )?human|are you (an )?ai|are you a bot)\b/i.test(text)) {
+    return {
+      reply: "I'm an AI assistant for Yorktown Tools. I can help pick tools and build your quote request, and our team handles pricing and final confirmation. Want to keep going?",
+      quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
+    };
+  }
+
+  if (/^what\??$/i.test(text)) {
+    return {
+      reply: confusedWhatReply(history),
+      quote: { items: [], offerForm: false, hold: false, stage: "clarify" },
+    };
+  }
+
+  const earlySaw = genericSawQuestion(text);
+  if (earlySaw) {
+    return { reply: earlySaw, quote: { items: [], offerForm: false, hold: false, stage: "quote" } };
+  }
+
+
   const pending = pendingModelConfirm(history);
   if (pending && acceptsModel(text)) {
     return {
-      reply: `I can price the ${pending.label} for you.`,
+      reply: `Got it, the ${pending.label}.`,
       quote: { items: [], offerForm: false, hold: false, stage: "quote" },
     };
   }
@@ -266,6 +287,22 @@ export function localReply({ message, history = [], catalog, discount, page, reb
       reply: label ? `${label}. ${heard.clarify}` : heard.clarify,
       quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
     };
+  }
+
+
+  if ((isCustomerPriceAsk(text) || /\b(how much|what(?:'s| is| does) it cost|pricing|do you have any pric)\b/i.test(text))
+    && !/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text)
+    && !genericSawQuestion(text)) {
+    const items = matches.map((priced) => toQuoteItem(priced, priced.qty || qty));
+    const read = items.filter((item) => item.name).map((item) => `${item.qty ? `${item.qty} × ` : ""}${item.name}`).join(", ");
+    const typed = text.match(/\b([a-z]{1,6}\d{3,}[a-z0-9-]*)\b/i);
+    const kit = !read && !typed && /\b(drill|driver|saw|grinder|impact|hammer)\b/i.test(text)
+      ? " Are you looking for just the tool, or a kit with battery and charger?"
+      : "";
+    const spoken = read
+      ? `I have ${read}. ${PRICING_LINE}`
+      : (typed ? `I have the ${typed[1].toUpperCase()}. ${PRICING_LINE}` : `${PRICING_LINE}${kit}`);
+    return finish(spoken.trim(), items, false);
   }
 
   const gloves = gloveTurn(text, heard, catalog, percent, history);
@@ -299,7 +336,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (heard.tools.length === 1 && !/\b(jack\s*hammers?|grinders?|gloves?|ladders?|respirators?|ppe|hi-vis|safety glasses|glasses)\b/i.test(text)) {
     const name = heard.tools[0].name;
-    if (name === "Jackhammer") {
+    if (name === "Jackhammer" && !(/\b(concrete|tile|asphalt|brick|masonry)\b/i.test(text) && /\b(corded|cordless|pneumatic|electric)\b/i.test(text))) {
       return {
         reply: "We can source a jackhammer. What are you breaking up, and do you want electric corded, cordless, or pneumatic?",
         quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
@@ -321,7 +358,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     const item = (catalog?.items || []).find((entry) => entry.sku === picked);
     if (item) {
       const priced = priceEntry({ ...item, qty: 1 }, percent);
-      return finish(`Okay, the ${priced.model}.`, [priced], true);
+      return finish(`Okay, the ${priced.model}. ${PRICING_LINE}`, [priced], true);
     }
   }
 
@@ -372,7 +409,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   };
   const lastAssistant = [...history].reverse().find((entry) => entry.role === "assistant");
   const lastText = lastAssistant?.content || "";
-  if (/would you like the invoice by text or email/i.test(lastText)) {
+  if (/would you like the invoice by text or email/i.test(lastText) && false) {
     const carried = carryQuote(text, history, catalog, discount, page);
     if (/\b(?:\d[ -]?){13,16}\b/.test(text)) {
       return {
@@ -449,7 +486,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     }
     return asked && !answered;
   })();
-  if (/would you like to place an order/i.test(lastText) && yes && !accessoryPending && !isAccessoryQuestion(lastText)) {
+  if (false && /would you like to place an order/i.test(lastText) && yes && !accessoryPending && !isAccessoryQuestion(lastText)) {
     const carried = carryQuote(text, history, catalog, discount, page);
     return {
       reply: "Would you like the invoice by text or email?",
@@ -525,7 +562,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     if (gaveContact(text)) {
       const carried = carryQuote(text, history, catalog, discount, page);
       return {
-        reply: `${HANDOFF_LINE} ${CLOSING_LINE}`,
+        reply: `${HANDOFF_LINE}`,
         quote: {
           items: carried?.quote?.items || [],
           offerForm: false,
@@ -564,7 +601,8 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   }
   if (drill?.stage === "recommend") return recommendCordedHammers(catalog, percent);
 
-  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text)) {
+  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text)
+    && !(/\b(concrete|tile|asphalt|brick|masonry)\b/i.test(text) && /\b(corded|cordless|pneumatic|electric)\b/i.test(text))) {
     return {
       reply: "Yes, we can source a jack hammer. What are you breaking up? And do you want it electric corded, cordless, or pneumatic?",
       quote: { items: [], offerForm: false, hold: false, stage: "quote" },
@@ -640,9 +678,9 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   const screen = screenOutOfArea(text, history);
   if (screen) return finish(screen, [], false);
 
-  if (/\b(talk to|speak to|real person|human|someone on the phone)\b/i.test(text)) {
+  if (/\b(talk to|speak to|someone on the phone|call me back)\b/i.test(text) && !/real person|are you (a )?human|are you (an )?ai|are you a bot/i.test(text)) {
     return finish(
-      `You can reach our team at ${PHONE_DISPLAY}, Monday through Friday, 8 to 5. What's your name, company, and cell or email? ${HANDOFF_LINE} ${CLOSING_LINE}`,
+      `You can reach our team at ${PHONE_DISPLAY}, Monday through Friday, 8 to 5. I can also take your name and a cell or email and have a specialist follow up.`,
       [],
       false,
     );
@@ -658,7 +696,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
 
   if (/\b(crew time|pick (it|them) up myself)\b/i.test(text)) {
     return finish(
-      `A supply run feels like it costs $10 to $20, but it really costs $100 to $300 in lost crew time. ${DELIVERY_LINE}`,
+      `A supply run feels cheap until you count the lost crew time. ${DELIVERY_LINE}`,
       [],
       false,
     );
@@ -707,26 +745,17 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   if (matches.length && (!ongoing || namedModel || isCustomerPriceAsk(text) || rebuilding || isSpecificAsk(text, catalog))) {
     const lines = matches.map((priced) => {
       const lineQty = priced.qty || qty;
-      const amount = formatEstimate(priced);
       const qtyBit = lineQty ? `${lineQty} × ` : "";
-      if (priced.estimate == null) return `- ${qtyBit}${priced.name}.`;
-      if (priced.kind === "listed" && /victory/i.test(priced.name || "")) {
-        const fees = paymentOnTop(priced.estimate);
-        return `- ${qtyBit}${priced.name}: ${amount} a pair. Card about ${formatMoney(fees.card)}. ACH about ${formatMoney(fees.ach)}. No fee by check.`;
-      }
-      if ((lineQty >= 5 && priced.kind !== "listed") || (lineQty >= 2 && /\bcase/i.test(priced.name || ""))) {
-        return `- ${qtyBit}${priced.name}: Starting estimate ${amount}.`;
-      }
-      return `- ${qtyBit}${priced.name}: ${amount}.`;
+      return `- ${qtyBit}${priced.name}.`;
     });
     const links = [];
     for (const priced of matches) {
       const link = itemLink(priced);
       if (link && !links.includes(link)) links.push(link);
     }
-    const blocks = [lines.join("\n")];
+    const blocks = [lines.join("\n"), PRICING_LINE];
     if (links.length) blocks.push(links.join("\n"));
-    return finish(blocks.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), true);
+    return finish(blocks.join("\n\n"), matches.map((priced) => toQuoteItem(priced, priced.qty || qty)), false);
   }
 
   if (isCustomerPriceAsk(text) || /\b(price|pricing|how much|quote|cost)\b/i.test(text)) {
@@ -737,12 +766,12 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     const model = text.match(/\b([a-z]{1,6}\d{3,}[a-z0-9-]*)\b/i);
     if (model) {
       return {
-        reply: `I can price the ${model[1].toUpperCase()} for you.`,
+        reply: `I have the ${model[1].toUpperCase()}. ${PRICING_LINE}`,
         quote: { items: [], offerForm: false, hold: false, stage: "quote" },
       };
     }
     return finish(
-      `Tell me the brand and model, and how many you need. I'll write the estimate. Free delivery from ${SERVICE_AREA}.`,
+      `Tell me the brand and model, and how many you need. ${PRICING_LINE} Free delivery from ${SERVICE_AREA}.`,
       [],
       true,
       { stage: "quote" },
@@ -781,7 +810,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   if (modelCode || /\b(i need|i'm looking|im looking|looking for|got any|do you have)\b/i.test(text)) {
     const code = modelCode ? modelCode[1].toUpperCase() : "";
     return {
-      reply: code ? `I can price the ${code} for you.` : "I can quote that. Brand and model help, plus the quantity.",
+      reply: code ? `Got it, the ${code}. ${PRICING_LINE}` : `${PRICING_LINE} Brand and model help, plus the quantity.`,
       quote: { items: [], offerForm: false, hold: false, stage: "quote" },
     };
   }
@@ -811,10 +840,8 @@ function pairsInBox(item) {
 }
 
 function gloveQuote(priced, qty) {
-  const each = formatMoney(priced.estimate);
-  const otd = formatMoney(roundMoney(priced.estimate * qty * 1.07 * 1.03));
   return {
-    reply: `We keep Victory Series drivers gloves on hand. I have ${qty} × ${priced.name}: ${each} a pair. Out the door that's ${otd} on a card. Other glove types are available. Would you like to place an order?`,
+    reply: `We keep Victory Series drivers gloves on hand. I have ${qty} × ${priced.name}. Other glove types are available. Our team will put a free quote together. What's your name and a cell or email so they can reach you?`,
     quote: { items: [toQuoteItem(priced, qty)], offerForm: false, hold: true, stage: "script", scripted: true },
   };
 }
@@ -837,14 +864,14 @@ function gloveTurn(text, heard, catalog, percent, history) {
   if (boxes) {
     if (askedBox) return null;
     return {
-      reply: "We keep Victory Series drivers gloves on hand at $19.99 a pair. Other glove types are available. How many pairs are in the box?",
+      reply: "We keep Victory Series drivers gloves on hand. Other glove types are available. How many pairs are in the box?",
       quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
     };
   }
   const qty = extractQty(text);
   if (qty && priced) return gloveQuote(priced, qty);
   return {
-    reply: "We keep Victory Series drivers gloves on hand at $19.99 a pair. Other glove types are available. How many pairs do you want?",
+    reply: "We keep Victory Series drivers gloves on hand. Other glove types are available. How many pairs do you want?",
     quote: { items: [], offerForm: false, hold: false, stage: "script", scripted: true },
   };
 }
@@ -896,7 +923,7 @@ function screenOutOfArea(text, history) {
   if (!/business address/i.test(asked) && !/\d+\s+[a-z]/i.test(text)) return "What's the business address?";
   if (!/how did you find us/i.test(asked) && !/found you|google|referral/i.test(text)) return "How did you find us?";
   if (!/how do you plan to pay/i.test(asked) && !/\b(card|check|ach|wire)\b/i.test(text)) return "How do you plan to pay?";
-  return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+  return `${HANDOFF_LINE}`;
 }
 
 function isLocationAsk(text) {
@@ -929,7 +956,7 @@ function governmentTurn(text, history) {
   if (!product && !saidCreds) return `${CREDS} Do you need a formal quote or purchase order?`;
   if (!product) return "";
   const contact = /\b[\w.+-]+@[\w.-]+\.\w+\b/.test(text) || (/\b(my name|i'm|i am)\b/i.test(text) && /\b(unit|company|navy|army)\b/i.test(text));
-  if (saidCreds && contact) return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+  if (saidCreds && contact) return `${HANDOFF_LINE}`;
   const creds = saidCreds ? "Yes." : CREDS;
   return `${creds} I have ${product}. What's your name, unit or company, and cell or email?`;
 }
@@ -944,7 +971,7 @@ function consignmentTurn(text, history) {
   if (!inThread) return "";
   if (/brands or sizes/i.test(asked) && /name, company, and cell/i.test(asked)) {
     if (/\b[\w.+-]+@|\b\d{3}[-.\s]?\d{3}/.test(text) || /\b(my name|i'm|i am)\b/i.test(text)) {
-      return `${HANDOFF_LINE} ${CLOSING_LINE}`;
+      return `${HANDOFF_LINE}`;
     }
   }
   if (/brands or sizes/i.test(asked) && !/name, company, and cell/i.test(asked)) {

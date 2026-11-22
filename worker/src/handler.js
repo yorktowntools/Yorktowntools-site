@@ -1,13 +1,13 @@
 import catalog from "../../data/prices.json" with { type: "json" };
 import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
-import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE } from "../../shared/copy.js";
+import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, LEAD_FAILURE_LINE, LEAD_SUCCESS_LINE, PRICING_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE, ensureSingleSuccess, leadFailureReply, stripLeadSuccess } from "../../shared/copy.js";
 import { cartFromThread, eachQty, listReadback, readIdentity, readyClose, askedForReach, sawGuide, userBlob } from "../../shared/job.js";
 import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
 import { isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { filterCustomerText } from "./source-filter.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
-import { cannedWouldRepeat, chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isConfusedOrFrustrated, isShortReply, shouldKeepLocal } from "../../shared/talk.js";
+import { cannedWouldRepeat, chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isBareWhat, isConfusedOrFrustrated, isShortReply, shouldKeepLocal } from "../../shared/talk.js";
 import {
   collectSearchShelves,
   collectSearchUrls,
@@ -31,8 +31,19 @@ import {
   shouldSearch,
   splitRequestedItems,
 } from "../../shared/pricing.js";
-import { buildHandoffEmail, buildQuoteEmail, buildSalesEmail, formspreeBody, handoffFormspreeBody } from "./email.js";
+import { buildHandoffEmail, formspreeBody, handoffFormspreeBody } from "./email.js";
 import { buildInstructions } from "./prompt.js";
+import {
+  LEAD_SUBJECT,
+  SUBMIT_LEAD_TOOL,
+  claimedLeadSuccess,
+  decorateAlertMail,
+  formspreeFields,
+  functionCalls,
+  parseLeadJson,
+  scrubPrices,
+  submitLead,
+} from "./lead.js";
 import { privateCostFor, readPrivateCosts } from "../config/private-costs.js";
 import { itemLinkLine, presentQuote, priceFromShelf, replyWithFinalPrices, rules, withoutRepeatedAfterHours } from "./policy.js";
 
@@ -191,15 +202,15 @@ async function callXai(env, instructions, input, useSearch) {
     instructions,
     input,
     temperature: 0.3,
-    max_output_tokens: num(env.MAX_OUTPUT_TOKENS, 320),
+    max_output_tokens: num(env.MAX_OUTPUT_TOKENS, 600),
     // grok-4.3 defaults to low reasoning, which is most of a no-search wait.
     // none skips that. Search turns stay on low so tool use still works.
     reasoning: { effort: useSearch ? "low" : "none" },
   };
+  full.tools = [SUBMIT_LEAD_TOOL];
   if (useSearch) {
-    full.tools = [{
+    full.tools = [SUBMIT_LEAD_TOOL, {
       type: "web_search",
-      filters: { allowed_domains: ["homedepot.com", "lowes.com"] },
     }];
   }
   const send = (body) => fetch("https://api.x.ai/v1/responses", {
@@ -212,8 +223,7 @@ async function callXai(env, instructions, input, useSearch) {
   });
   let response = await send(full);
   if (response.status === 400) {
-    const slim = { model, instructions, input };
-    if (useSearch) slim.tools = [{ type: "web_search" }];
+    const slim = { model, instructions, input, tools: [SUBMIT_LEAD_TOOL] };
     response = await send(slim);
   }
   const data = await response.json().catch(() => ({}));
@@ -348,7 +358,7 @@ function withJackery(latest, prior, local) {
   const offer = accessoryOffer(`${latest} ${hit.item.name}`);
   const ask = offer && !accessoryAsked(prior) ? `\n\n${offer.line}` : "";
   return {
-    reply: `Okay, the ${hit.item.name}.${ask}`,
+    reply: `Okay, the ${hit.item.name}. ${PRICING_LINE}${ask}`,
     quote: {
       items: [{ name: hit.item.name, sku: hit.item.sku, qty: 1, stockNote: hit.item.stockNote || "" }],
       offerForm: false,
@@ -487,6 +497,9 @@ function normalizedReply(value) {
 function replaceRepeatedReply(modelReply, drafted, priorMessages) {
   const previous = [...(priorMessages || [])].reverse().find((message) => message.role === "assistant")?.content || "";
   if (!previous || normalizedReply(modelReply) !== normalizedReply(previous)) return drafted;
+  if (!/what are you (cutting|using|breaking)|do you want it electric|brand or model in mind|height and duty rating|cell or email/i.test(previous)) {
+    return drafted;
+  }
   return confusedWhatReply(priorMessages);
 }
 
@@ -542,7 +555,7 @@ function customerConfirmed(text) {
 
 function genericCategoryReply(items, text) {
   const blob = `${text || ""}\n${(items || []).map((item) => item?.name || "").join("\n")}`;
-  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text || "")) {
+  if (/\bjack\s*hammers?\b|\bdemolition hammers?\b/i.test(text || "") && !customerConfirmed(text)) {
     return "We can source a jack hammer for you. What are you breaking up, and do you want electric corded, cordless, or pneumatic?";
   }
   const saw = genericSawQuestion(blob);
@@ -553,7 +566,7 @@ function genericCategoryReply(items, text) {
 
 function priceAnswer(text) {
   if (/\b(my cost|my price|how much|what would i pay|what(?:'s| is| does) it cost|pricing|do you have any pric)\b/i.test(String(text || ""))) {
-    return "Yes, we can price that. ";
+    return `${PRICING_LINE} `;
   }
   return "";
 }
@@ -719,12 +732,9 @@ function composeQuote(baseReply, lines, { government = false, bulk = false, aske
   }
   if (uncertain || over || bulk) {
     const bulkNote = bulk ? ` ${BULK_LINE}` : "";
-    return `${head}I have ${read}.${bulkNote} ${teamShort} ${HANDOFF_LINE} ${CLOSING_LINE}${linkBlock}`;
+    return `${head}I have ${read}.${bulkNote} ${teamShort} ${HANDOFF_LINE}${linkBlock}`;
   }
-  const total = otdHigh && otdHigh !== otdLow
-    ? `${formatMoney(otdLow)} to ${formatMoney(otdHigh)}`
-    : formatMoney(otdLow);
-  return `${head}I have ${read}. Out the door that's ${total}. Would you like to place an order?${linkBlock}`;
+  return `${head}I have ${read}. ${PRICING_LINE} What's your name and a cell or email so our team can reach you?${linkBlock}`;
 }
 
 function mergeNotes(reply, notes) {
@@ -753,9 +763,10 @@ function withoutRepeatedGreeting(reply, priorMessages) {
   const greeted = (priorMessages || []).some((message) => message.role === "assistant" && /hey, i'm george|welcome to yorktown tools/i.test(message.content || ""));
   if (!greeted) return String(reply || "");
   const stripped = String(reply || "")
-    .replace(/Hey, I'm George\.\s*Welcome to Yorktown Tools!(?:\s*Are you putting together a tool order for an upcoming jobsite\?)?/gi, "")
-    .replace(/Hey, I'm George\.\s*/gi, "")
-    .replace(/Welcome to Yorktown Tools!\s*/gi, "")
+    .replace(/Hey, I['’]m George\.\s*Welcome to Yorktown Tools\.?(?:\s*What tools are you looking for\?)?/gi, "")
+    .replace(/Hey, I['’]m George\.\s*Welcome to Yorktown Tools!?(?:\s*Are you putting together a tool order for an upcoming jobsite\?)?/gi, "")
+    .replace(/Hey, I['’]m George\.\s*/gi, "")
+    .replace(/Welcome to Yorktown Tools!?\s*/gi, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
   return stripped || "What do you need for the job?";
@@ -779,10 +790,10 @@ function fallbackAnswer(latest) {
   const saw = genericSawQuestion(latest);
   if (saw) return saw;
   if (isCustomerPriceAsk(latest) || /\b(price|pricing|cost|how much)\b/i.test(String(latest || ""))) {
-    return "Yes, we can price that. Tell me the brand and model if I don't have it yet.";
+    return PRICING_LINE;
   }
   if (/\b(what|how|which|can i|do you)\b/i.test(String(latest || ""))) {
-    return "Yes, we can help with that. What tool or job is this for?";
+    return "What tool or job is this for?";
   }
   return "What do you need for the job?";
 }
@@ -801,7 +812,7 @@ function finalizeReply(reply, priorMessages = [], latest = "") {
     const next = fallbackAnswer(latest);
     if (!isConfusedOrFrustrated(latest) && !cannedWouldRepeat(next, priorMessages)) body = next;
   }
-  return withoutRepeatedAfterHours(filterCustomerText(body).text, priorMessages);
+  return scrubPrices(withoutRepeatedAfterHours(filterCustomerText(body).text, priorMessages));
 }
 
 async function readJson(request) {
@@ -877,12 +888,12 @@ function handoffWhy(reply) {
   if (/bulk pricing/i.test(reply)) reasons.push("bulk");
   if (/consign/i.test(reply)) reasons.push("consignment");
   if (reply === SCAM_CLOSE || /only able to serve local/i.test(reply)) reasons.push("scam screen");
-  if (/specialist will reach out/i.test(reply)) reasons.push("specialist handoff");
+  if (/specialist will reach out|member of our yorktown tools team will review/i.test(reply)) reasons.push("team follow-up");
   return reasons.join(", ");
 }
 
 function isOwnerHandoff(reply) {
-  return /for our team to price|specialist will reach out|only able to serve local customers/i.test(String(reply || ""));
+  return /for our team to price|specialist will reach out|member of our yorktown tools team will review|you['’]re all set|i can send this to our team|i['’]ll note that he knows you|only able to serve local customers/i.test(String(reply || ""));
 }
 
 function alertFingerprint(identity, items) {
@@ -901,7 +912,8 @@ async function postHandoff(url, init) {
 }
 
 async function sendOwnerMail(env, mail) {
-  if (Array.isArray(env.handoffOutbox)) env.handoffOutbox.push({ subject: mail.subject, text: mail.text, html: mail.html });
+  mail = decorateAlertMail(mail);
+  if (Array.isArray(env.handoffOutbox)) env.handoffOutbox.push({ subject: mail.subject, text: mail.text, html: mail.html, source: mail.source });
   const mock = env.MOCK_MODE === "true";
   // Same RESEND_API_KEY, from address, and sales inbox as the quote-form mail.
   if (env.RESEND_API_KEY) {
@@ -924,44 +936,40 @@ async function sendOwnerMail(env, mail) {
     if (sent) return true;
     console.error("handoff mail failed: resend");
   } else if (mock) {
-    console.error("handoff mail skipped: RESEND_API_KEY is not set");
-    return Boolean(env.handoffOutbox);
+    return env.failLeadSend ? false : true;
   } else {
     console.error("handoff mail: RESEND_API_KEY is not set, using formspree");
   }
-  if (mock) return Boolean(env.handoffOutbox);
+  if (mock) return env.failLeadSend ? false : true;
   const formspree = env.FORMSPREE_URL || "https://formspree.io/f/xanlvyan";
   const sent = await postHandoff(formspree, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify(handoffFormspreeBody(mail)),
+    body: JSON.stringify({ ...handoffFormspreeBody(mail), ...formspreeFields(mail), source: mail.source, _subject: mail.subject || LEAD_SUBJECT }),
   });
-  if (sent) console.log("handoff mail sent via formspree");
+  if (sent) console.log(`handoff mail sent via formspree fromGeorge=${/George/i.test(mail.subject || "")} source=${mail.source} subjectHint=${/George/i.test(mail.subject || "") ? "New lead from George (yorktowntools.com chat)" : mail.subject || ""}`);
   else console.error("handoff mail failed: formspree");
   return sent;
 }
 
-async function maybeAlert(env, messages, reply, items, sessionKey) {
+async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent = false) {
   const identity = readIdentity(messages);
   const canSend = identity.name && (identity.phone || identity.email || identity.knowsZach);
   const prior = handoffSent.get(sessionKey);
+  if (alreadySent) return { reply, alerted: true };
   if (!isOwnerHandoff(reply) && !prior) return { reply, alerted: false };
   if (!canSend) return { reply, alerted: false };
   const listed = (items || []).length ? items : cartFromThread(messages.slice(0, -1));
-  let next = reply;
-  if (isOwnerHandoff(reply)) {
-    const close = readyClose(identity, askedForReach(messages.slice(0, -1)), listed);
-    next = String(reply || "")
-      .replace(/What's your name, company, and cell or email\??/gi, "")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-    if (!/you're all set/i.test(next)) {
-      next = next.replace(/A Yorktown Tools specialist will reach out shortly\.?\s*Tools Worth Fighting For!/gi, close).trim();
-      if (!/you're all set/i.test(next)) next = `${next}\n\n${close}`.trim();
-    } else if (listed.some((item) => item?.name && !next.includes(item.name))) {
-      const read = listed.filter((item) => item?.name).map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
-      next = `I have ${read}.\n\n${next}`;
-    }
+  let next = String(reply || "")
+    .replace(/What's your name, company, and cell or email\??/gi, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  if (listed.some((item) => item?.name && !next.includes(item.name))) {
+    const read = listed.filter((item) => item?.name).map((item) => {
+      const qty = Object.prototype.hasOwnProperty.call(item, "qty") && item.qty != null ? `${item.qty} × ` : "";
+      return `${qty}${item.name}`;
+    }).join(", ");
+    next = `I have ${read}.\n\n${next}`;
   }
   const fingerprint = alertFingerprint(identity, listed);
   if ((isOwnerHandoff(reply) || prior) && prior !== fingerprint) {
@@ -972,14 +980,25 @@ async function maybeAlert(env, messages, reply, items, sessionKey) {
       transcript: messages.map((message) => `${message.role}: ${message.content}`).slice(-8).join("\n"),
       update: Boolean(prior),
     });
-    await sendOwnerMail(env, mail);
-    handoffSent.set(sessionKey, fingerprint);
+    const sent = await sendOwnerMail(env, mail);
+    if (sent) handoffSent.set(sessionKey, fingerprint);
+    if (isOwnerHandoff(reply)) {
+      const completeContact = Boolean(identity.phone || identity.email);
+      if (sent) {
+        if (completeContact) {
+          next = ensureSingleSuccess(/you['’]re all set/i.test(next) ? next : `${next}\n\n${LEAD_SUCCESS_LINE}`);
+        }
+      } else if (completeContact) {
+        next = stripLeadSuccess(next);
+        next = leadFailureReply(listed);
+      }
+    }
   }
   return { reply: next, alerted: canSend };
 }
 
 function followUpSearch(code) {
-  return `Search again for the current shelf price of exact model ${code}. Check both Home Depot and Lowe's, and use a different retailer if the first results were only one store. Return product page URLs for ${code} only, and write the visible shelf price next to each URL as $123.45. Do not substitute a different model.`;
+  return `Search again for the current shelf price of exact model ${code}. Use official manufacturer and major national product pages, and try a second source if the first results were only one site. Return product page URLs for ${code} only, and write the visible shelf price next to each URL as $123.45. Do not substitute a different model. Never write a store or retailer name in any customer-facing text.`;
 }
 
 async function chat(request, env, ctx) {
@@ -1017,7 +1036,7 @@ async function chat(request, env, ctx) {
     const meant = pendingModelConfirm(prior);
     if (meant && acceptsModel(latest) && !new RegExp(meant.code, "i").test(payload.reply || "")) {
       const items = (payload.quote?.items || []).filter((item) => new RegExp(meant.code, "i").test(`${item?.name || ""} ${item?.sku || ""}`));
-      payload.reply = `I can price the ${meant.label} for you.`;
+      payload.reply = `Got it, the ${meant.label}.`;
       payload.quote = { ...(payload.quote || {}), items };
     }
     const guided = sawGuide(prior, latest);
@@ -1036,7 +1055,7 @@ async function chat(request, env, ctx) {
         payload.quote = { ...(payload.quote || {}), items: cart, hold: true };
       }
     }
-    const alert = await maybeAlert(env, messages, payload.reply, payload.quote?.items || [], sid);
+    const alert = await maybeAlert(env, messages, payload.reply, payload.quote?.items || [], sid, Boolean(payload.lead?.ok));
     payload.reply = alert.reply;
     return json(payload, status, request, env);
   };
@@ -1047,7 +1066,9 @@ async function chat(request, env, ctx) {
   const stage = local.quote?.stage || chatStage(latest, prior, catalog);
   const pricedLocally = (local.quote?.items || []).some((item) => item.name && !/^item$/i.test(item.name));
   const followUp = isShortReply(latest);
-  const keepLocal = shouldKeepLocal({
+  const preferModel = typeof env.callXai === "function" || (!mock && env.XAI_API_KEY);
+  const scamHold = local.reply === SCAM_CLOSE || /only able to serve local customers/i.test(local.reply || "");
+  let keepLocal = shouldKeepLocal({
     latest,
     prior,
     userTurns: userTurns.length,
@@ -1055,6 +1076,14 @@ async function chat(request, env, ctx) {
     scripted: Boolean(local.quote?.scripted),
     reply: local.reply,
   });
+  if (preferModel && !scamHold) {
+    const firstClarify = userTurns.length <= 1 && stage === "clarify" && !isCustomerPriceAsk(latest) && !isConfusedOrFrustrated(latest) && !customerConfirmed(latest);
+    const catchAll = /I stick to tools, quotes, and delivery/i.test(local.reply || "");
+    const toolClarify = /what are you (cutting|using|breaking)|brand or model in mind|height and duty rating|corded or cordless|which model/i.test(local.reply || "");
+    const faqKeep = (Boolean(local.quote?.scripted) || stage === "script" || stage === "form") && !catchAll && !toolClarify && stage !== "clarify" && stage !== "quote";
+    const keepCannedQuestion = Boolean(genericSawQuestion(latest)) || /Did you mean the /i.test(local.reply || "");
+    keepLocal = isBareWhat(latest) || firstClarify || faqKeep || keepCannedQuestion;
+  }
   if (keepLocal) {
     return respond({
       reply: finalizeReply(local.reply, messages, latest),
@@ -1068,203 +1097,116 @@ async function chat(request, env, ctx) {
       mode: mock ? "mock" : "live",
     });
   }
-  const localHasPrice = (local.quote?.items || []).some((item) => {
-    const estimate = Number(item?.estimate);
-    const shelf = Number(item?.shelf);
-    return (Number.isFinite(estimate) && estimate > 0) || (Number.isFinite(shelf) && shelf > 0);
-  });
-  const exactUnpriced = !mock && exactModelsIn(latest).length > 0 && !localHasPrice;
-  if ((mock || pricedLocally || followUp) && !exactUnpriced) {
-    const alreadyNamed = (local.quote?.items || []).length > 0 && (local.quote.items || []).every((item) => item.sku);
-    const sourceItems = preferSpecific(followUp || alreadyNamed
-      ? (local.quote?.items || [])
-      : alignRequested(local.quote?.items || [], convo));
-    const lines = linesFromQuote({ items: sourceItems }, convo, await costsFromEnv(env), convo);
-    const view = viewFor(lines, { text: convo });
-    const kept = (view.items.length ? view.items : local.quote.items).filter((item) => item?.name && !/^item$/i.test(item.name));
-    const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
-    const reply = kept.length
-      ? finalizeReply(scriptOrderReply(local.reply, kept, { government, bulk: view.lead.bulk || Boolean(local.quote?.bulk), text: convo, latest }), messages, latest)
-      : finalizeReply(local.reply, messages, latest);
+
+  const useModel = typeof env.callXai === "function" || (!mock && env.XAI_API_KEY);
+  const stripEstimates = (item) => {
+    const next = { ...item };
+    delete next.estimate;
+    delete next.estimateHigh;
+    delete next.shelf;
+    delete next.shelfLow;
+    delete next.shelfHigh;
+    return next;
+  };
+  const listedItems = (local.quote?.items || [])
+    .filter((item) => item?.name && !/^item$/i.test(item.name))
+    .map(stripEstimates);
+
+  if (!useModel) {
     return respond({
-      reply,
-      quote: { items: kept, offerForm: false, hold: true, bulk: view.lead.bulk || Boolean(local.quote?.bulk) },
+      reply: scrubPrices(finalizeReply(local.reply, messages, latest)),
+      quote: {
+        items: listedItems,
+        offerForm: Boolean(local.quote?.offerForm),
+        hold: listedItems.length > 0,
+        bulk: Boolean(local.quote?.bulk),
+      },
       searchesUsed: 0,
-      mode: mock ? "mock" : "live",
+      mode: "mock",
     });
   }
 
-  const searchCap = num(env.MAX_SEARCHES_PER_CHAT, 2);
-  const dayCap = num(env.MAX_SEARCHES_PER_IP_DAY, 15);
-  const canSearch = stage === "quote" && shouldSearch(latest, catalog)
-    && underCap(`search-s:${sid}`, searchCap, 6 * 60 * 60 * 1000, now)
-    && underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
-  if (canSearch) {
-    take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
-    take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
-  }
-
-  const preload = {};
-  for (const code of exactModelsIn(latest)) {
-    const saved = await readModelShelf(env, code);
-    if (saved > 0) preload[normalizeModel(code)] = saved;
-  }
+  const transcript = messages.map((message) => `${message.role}: ${message.content}`).join("\n");
+  const instructions = buildInstructions({ catalog: quoteCatalog, page });
+  const ask = typeof env.callXai === "function" ? env.callXai : callXai;
+  const baseInput = messages.map((message) => ({ role: message.role, content: message.content }));
 
   try {
-    const data = await (typeof env.callXai === "function" ? env.callXai : callXai)(
-      env,
-      buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
-      messages.map((message) => ({ role: message.role, content: message.content })),
-      canSearch,
-    );
-    const parsed = splitModelOutput(outputText(data));
-    let prose = [latest, parsed.reply, ...searchCards(data), ...collectDollarText(data)].join("\n");
-    let rawItems = alignItemsToCustomerModels(alignRequested(parsed.quote?.items || [], latest), latest);
-    const costs = await costsFromEnv(env);
-    let lines = linesFromQuote({ items: rawItems }, prose, costs, convo);
-    let extraSearches = 0;
-    const namedModel = exactModelsIn(latest).length > 0 || rawItems.some((item) => modelCodeOf(item));
-    if (namedModel && (lines.some((line) => specificItem(line) || customerConfirmed(latest)) || exactModelsIn(latest).length)) {
-      try {
-        const fetchImpl = typeof env.fetchProductPage === "function" ? env.fetchProductPage : fetch;
-        const budgetMs = num(env.SHELF_FETCH_TIMEOUT_MS, 4000);
-        const deadline = Date.now() + budgetMs;
-        const askModel = typeof env.callXai === "function" ? env.callXai : callXai;
-        const code = exactModelsIn(latest)[0] || "";
-        let pages = collectSearchUrls(data, 4, code);
-        const dollarBits = collectDollarText(data).concat(searchCards(data));
-        console.log(`shelf search: model=${code || "none"} urls=${pages.map((page) => page.url).join(" | ") || "none"} dollarTexts=${dollarBits.length} sample=${(dollarBits[0] || outputText(data) || "").replace(/\s+/g, " ").slice(0, 220)}`);
-        const matchedUrls = code ? pages.filter((page) => pageMatchesModel(page, code)) : pages;
-        const already = canSearch ? Math.max(1, countSearches(data)) : 0;
-        const firstSnippets = code ? collectSearchShelves(data, code) : [];
-        const ipRoom = underCap(`search-ip:${ip}`, dayCap, 24 * 60 * 60 * 1000, now);
-        // Home Depot and Lowe's product pages 403 from the Worker, so a named
-        // model with no snippet price gets one follow-up even at the chat cap.
-        const room = ipRoom && (already < searchCap
-          || (firstSnippets.length === 0 && underCap(`search-s:${sid}`, searchCap + 1, 6 * 60 * 60 * 1000, now)));
-        const firstFetch = pages.length
-          ? fetchShelfPrices(pages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 })
-          : Promise.resolve([]);
-        let secondSearch = Promise.resolve(null);
-        if (code && (matchedUrls.length < 2 || firstSnippets.length < 2) && room) {
-          take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
-          take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
-          extraSearches += 1;
-          secondSearch = askModel(
-            env,
-            buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
-            [
-              ...messages.map((message) => ({ role: message.role, content: message.content })),
-              { role: "user", content: followUpSearch(code.toUpperCase()) },
-            ],
-            true,
-          ).catch((error) => {
-            console.error(`shelf search: follow-up failed: ${error instanceof Error ? error.message : "error"}`);
-            return null;
-          });
-        }
-        const [firstPages, extra] = await Promise.all([firstFetch, secondSearch]);
-        let fetched = firstPages;
-        if (extra) {
-          const extraBits = collectDollarText(extra).concat(searchCards(extra));
-          console.log(`shelf search follow-up: urls=${collectSearchUrls(extra, 4, code).map((page) => page.url).join(" | ") || "none"} dollarTexts=${extraBits.length} sample=${(extraBits[0] || outputText(extra) || "").replace(/\s+/g, " ").slice(0, 220)}`);
-          const seen = new Set(pages.map((page) => page.url));
-          const morePages = collectSearchUrls(extra, 4, code).filter((page) => page.url && !seen.has(page.url));
-          if (morePages.length && Date.now() + 30 < deadline) {
-            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
-            fetched = fetched.concat(more);
-            pages = pages.concat(morePages);
-          }
-        } else if (code && matchingPageCount(rawItems, fetched) < 2 && extraSearches === 0 && room && Date.now() + 150 < deadline) {
-          take(`search-s:${sid}`, 1, 6 * 60 * 60 * 1000, now);
-          take(`search-ip:${ip}`, 1, 24 * 60 * 60 * 1000, now);
-          extraSearches += 1;
-          const follow = await askModel(
-            env,
-            buildInstructions({ catalog: quoteCatalog, discount: percent, page }),
-            [
-              ...messages.map((message) => ({ role: message.role, content: message.content })),
-              { role: "user", content: followUpSearch(code.toUpperCase()) },
-            ],
-            true,
-          );
-          const seen = new Set(pages.map((page) => page.url));
-          const morePages = collectSearchUrls(follow, 4, code).filter((page) => page.url && !seen.has(page.url));
-          if (morePages.length && Date.now() + 30 < deadline) {
-            const more = await fetchShelfPrices(morePages, { fetchImpl, timeoutMs: budgetMs, deadline, perPageMs: 1500 });
-            fetched = fetched.concat(more);
-          }
-        }
-        const snippets = (code ? firstSnippets.concat(extra ? collectSearchShelves(extra, code) : []) : []);
-        if (snippets.length) fetched = fetched.concat(snippets);
-        rawItems = applyLowestFetchedShelves(rawItems, fetched, preload);
-        const wrote = [];
-        for (const item of rawItems) {
-          const itemCode = modelCodeOf(item);
-          if (!itemCode) continue;
-          const seen = pagesForLine(item, fetched).map((page) => Number(page.shelf)).filter((price) => price > 0);
-          const quoted = Number(item.shelf);
-          const saved = Number(preload[normalizeModel(itemCode)]) || 0;
-          // Persist the lowest shelf we are actually quoting, including a
-          // model- or snippet-supplied price when product-page fetches miss.
-          const durable = lowestShelf(saved, seen.concat(quoted > 0 ? [quoted] : []));
-          if (!(durable > 0) || (saved > 0 && durable > saved)) continue;
-          const stored = await writeModelShelf(env, itemCode, durable, ctx);
-          if (stored > 0) wrote.push(`${normalizeModel(itemCode).toUpperCase()}:${stored}`);
-        }
-        const fetchNotes = fetched.map((page) => {
-          const host = (() => { try { return new URL(page.url).hostname.replace(/^www\./, ""); } catch { return "snippet"; } })();
-          return `${host}${page.status ? ":" + page.status : ""}:${page.shelf || 0}`;
+    let data = await ask(env, instructions, baseInput, false);
+    let leadResult = null;
+    for (let step = 0; step < 3; step += 1) {
+      const calls = functionCalls(data);
+      if (!calls.length) break;
+      const outputs = [];
+      for (const call of calls) {
+        leadResult = await submitLead(env, call.arguments, { transcript });
+        outputs.push({
+          type: "function_call_output",
+          call_id: call.call_id,
+          output: JSON.stringify(leadResult),
         });
-        console.log(`shelf lookup: model=${code || "none"} pages=${pages.length} fetched=${fetchNotes.join(",") || "none"} snippets=${snippets.length} wrote=${wrote.join(",") || "none"} ctx=${ctx && typeof ctx.waitUntil === "function" ? "yes" : "no"}`);
-        lines = linesFromQuote({ items: rawItems }, prose, costs, convo);
-      } catch (error) {
-        console.error(`shelf lookup failed: ${error instanceof Error ? error.message : "error"}`);
-        rawItems = applyLowestFetchedShelves(rawItems, [], preload);
-        lines = linesFromQuote({ items: rawItems }, prose, costs, convo);
       }
+      const nextInput = [...baseInput, ...(data.output || calls.map((call) => call.raw)), ...outputs];
+      data = await ask(env, instructions, nextInput, false);
     }
-    const view = viewFor(lines, { text: latest });
-    const government = /\b(government|gpc|tax-exempt|tax exempt)\b/i.test(convo);
-    const quotable = view.items.filter((item) => item?.name && !isPlaceholderName(item.name));
-    const pricedReply = mergeNotes(replyWithFinalPrices(parsed.reply, quotable), view.notes);
-    let ordered = view.items.length
-      ? scriptOrderReply(pricedReply, quotable, { government, bulk: view.lead.bulk, text: convo, latest })
-      : pricedReply;
-    let quoteItems = quotable;
-    const sawAsk = genericSawQuestion(latest);
-    if (sawAsk && !/cordless or corded|which model/i.test(ordered)) {
-      ordered = sawAsk;
-      quoteItems = quoteItems.filter((item) => specificItem(item) && !/\b(sawzall|sawzaw|reciprocat)/i.test(`${item.name} ${item.sku}`));
+    const rawText = outputText(data);
+    const parsedQuote = splitModelOutput(rawText);
+    const parsedLead = parseLeadJson(parsedQuote.reply);
+    let reply = parsedLead.reply || parsedQuote.reply || "";
+    if (/LEAD_JSON\s*:/i.test(rawText) && !parsedQuote.reply && parsedLead.reply) reply = parsedLead.reply;
+    if (parsedLead.lead && !leadResult) {
+      leadResult = await submitLead(env, parsedLead.lead, { transcript });
     }
-    const advice = concreteDrillingAdvice(latest);
-    if (advice) {
-      const modelText = String(parsed.reply || "");
-      if (/sds-max/i.test(modelText) && /\brebar\b/i.test(modelText)) {
-        ordered = modelText.replace(/\s*What'?s your name, company, and cell or email\??/gi, "").trim();
-        if (!/\?/.test(ordered)) ordered = `${ordered} Do you already have an SDS-Max hammer?`;
+    reply = scrubPrices(reply);
+    const rawItems = alignItemsToCustomerModels(alignRequested(parsedQuote.quote?.items || [], latest), latest)
+      .filter((item) => item?.name && !isPlaceholderName(item.name))
+      .map(stripEstimates);
+    const items = rawItems.length ? rawItems : listedItems;
+    if (!reply) {
+      const allGeneric = !items.length || items.every((item) => !specificItem(item));
+      const generic = genericCategoryReply(items, latest);
+      if (allGeneric && generic) {
+        reply = generic;
+      } else if (items.some((item) => item?.name) && customerConfirmed(latest)) {
+        reply = listReadback(items);
       } else {
-        ordered = advice;
+        const read = items.filter((item) => item?.name).map((item) => {
+          const qty = Object.prototype.hasOwnProperty.call(item, "qty") && item.qty != null ? `${item.qty} × ` : "";
+          return `${qty}${item.name}`;
+        }).join(", ");
+        reply = read ? `I have ${read}. ${PRICING_LINE}` : PRICING_LINE;
       }
-      quoteItems = [];
     }
-    const finalized = finalizeReply(ordered, messages, latest);
-    const reply = advice ? finalized : replaceRepeatedReply(parsed.reply, finalized, messages);
-    const firstSearches = canSearch ? Math.max(1, countSearches(data)) : 0;
-    if (canSearch && firstSearches > 1) {
-      take(`search-s:${sid}`, firstSearches - 1, 6 * 60 * 60 * 1000, now);
-      take(`search-ip:${ip}`, firstSearches - 1, 24 * 60 * 60 * 1000, now);
+    reply = replaceRepeatedReply(reply, reply, messages);
+    const sawAsk = genericSawQuestion(`${latest}\n${items.map((item) => item?.name || "").join("\n")}`);
+    if (sawAsk && items.some((item) => !specificItem(item) && /reciprocating|sawzall/i.test(item?.name || ""))) {
+      const specifics = items.filter((item) => specificItem(item) && item?.name);
+      const read = specifics.map((item) => {
+        const qty = Object.prototype.hasOwnProperty.call(item, "qty") && item.qty != null ? `${item.qty} × ` : "";
+        return `${qty}${item.name}`;
+      }).join(", ");
+      reply = read ? `I have ${read}. ${sawAsk}` : sawAsk;
     }
-    const searchesUsed = firstSearches + extraSearches;
+    const listForClose = items.length ? items : (parsedLead.lead?.items || []);
+    if (leadResult?.ok) {
+      reply = ensureSingleSuccess(/you['’]re all set/i.test(reply) ? reply : `${reply}\n\n${LEAD_SUCCESS_LINE}`);
+    } else if (claimedLeadSuccess(reply) && !leadResult?.ok) {
+      reply = leadResult?.error === "missing_info"
+        ? `I still need ${((leadResult.missing || []).join(" and ") || "a little more information")} before I can send this to the team.`
+        : leadFailureReply(listForClose);
+    } else if (leadResult && !leadResult.ok && leadResult.error !== "missing_info") {
+      if (!/wasn['’]t able to send/i.test(reply)) reply = leadFailureReply(listForClose);
+    }
     return respond({
-      reply: reply || "",
+      reply: finalizeReply(reply, messages, latest),
       quote: {
-        items: quoteItems,
+        items,
         offerForm: false,
-        hold: quoteItems.length > 0,
-        bulk: view.lead.bulk,
+        hold: items.length > 0,
+        bulk: Boolean(local.quote?.bulk),
       },
-      searchesUsed,
+      searchesUsed: 0,
+      lead: leadResult || undefined,
       mode: "live",
     });
   } catch {
@@ -1272,7 +1214,7 @@ async function chat(request, env, ctx) {
     const fallbackReply = (!isConfusedOrFrustrated(latest) && !cannedWouldRepeat(fallback.reply, prior) && fallback.reply)
       ? fallback.reply
       : "I'm having trouble answering that right now. Call or text (757) 940-5171 and we'll take it from here.";
-    return json({ ...fallback, reply: fallbackReply, mode: "fallback", searchesUsed: 0 }, 200, request, env);
+    return json({ ...fallback, reply: scrubPrices(fallbackReply), mode: "fallback", searchesUsed: 0 }, 200, request, env);
   }
 }
 
@@ -1309,116 +1251,40 @@ async function quote(request, env) {
   if (!gate.ok) {
     return json({
       error: "rate_limited",
-      message: "That's enough quote emails from this connection for today. Call or text (757) 940-5171.",
+      message: "That's enough requests from this connection for today. Call or text (757) 940-5171.",
     }, 429, request, env);
   }
   const body = await readJson(request);
   if (body.error) return json({ error: body.error }, 400, request, env);
   const lead = cleanLead(body.data || {});
-  const missing = [];
-  if (!lead.name) missing.push("name");
-  if (!validEmail(lead.email)) missing.push("email");
-  if (!validPhone(lead.phone)) missing.push("phone");
-  if (!lead.jobsite) missing.push("jobsite");
-  if (!lead.neededBy) missing.push("neededBy");
-  if (!lead.items.length || lead.items.some((item) => !item.qty || !item.name)) missing.push("quantity");
-  if (missing.length) return json({ error: "missing", missing }, 400, request, env);
-
-  const view = viewFor(linesFromQuote({ items: lead.items }, "", await costsFromEnv(env)), {
-    text: `${lead.notes} ${lead.company}`,
-    company: lead.company,
-    jobsite: lead.jobsite,
-    taxExempt: lead.taxExempt,
-  });
-  const customerMail = buildQuoteEmail({
-    lead,
-    items: view.items,
-    totals: view.totals,
-    leadInfo: view.lead,
-    notes: view.notes.filter((note) => !note.startsWith("About how often")),
-  });
-  const salesMail = buildSalesEmail({ lead, items: view.items, leadInfo: view.lead, totals: view.totals });
-  const leaked = filterCustomerText(`${customerMail.subject}\n${customerMail.text}\n${salesMail.text}`);
-  if (leaked.costHit || leaked.retailerHit) {
-    return json({ error: "blocked" }, 422, request, env);
+  const result = await submitLead(env, {
+    name: lead.name,
+    phone: lead.phone,
+    email: lead.email,
+    city_state: lead.jobsite,
+    items: (lead.items || []).map((item) => ({
+      product: item.name,
+      model: item.sku,
+      qty: item.qty,
+    })),
+    notes: [lead.company && `Company: ${lead.company}`, lead.neededBy && `Needed by: ${lead.neededBy}`, lead.taxExempt && "Government or tax-exempt.", lead.notes].filter(Boolean).join(" "),
+    reason: "quote_request",
+  }, { transcript: "Submitted from the website request form." });
+  if (!result.ok && result.error === "missing_info") {
+    return json({ error: "missing", missing: result.missing, message: LEAD_FAILURE_LINE }, 400, request, env);
   }
-
-  const done = view.lead.bulk
-    ? "We'll send your bulk pricing. Yorktown Tools has the details."
-    : "A copy is on the way to your email, and Yorktown Tools has it too.";
-  if (env.MOCK_MODE === "true") {
-    return json({ ok: true, via: "mock", customerEmailed: false, message: "Preview only. Nothing was sent." }, 200, request, env);
+  if (!result.ok) {
+    return json({ error: "delivery_failed", message: leadFailureReply(lead.items) }, 502, request, env);
   }
-
-  let customerEmailed = false;
-  if (env.RESEND_API_KEY) {
-    const from = env.FROM_EMAIL || "Yorktown Tools <quotes@quotes.yorktowntools.com>";
-    const sales = env.SALES_EMAIL || SALES_EMAIL;
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from,
-          to: [lead.email],
-          reply_to: sales,
-          subject: customerMail.subject,
-          html: customerMail.html,
-          text: customerMail.text,
-        }),
-      });
-      customerEmailed = response.ok;
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from,
-          to: [sales],
-          reply_to: lead.email,
-          subject: salesMail.subject,
-          html: salesMail.html,
-          text: salesMail.text,
-        }),
-      });
-    } catch {
-      customerEmailed = false;
-    }
-  }
-
-  if (!customerEmailed) {
-    const formspree = env.FORMSPREE_URL || "https://formspree.io/f/xanlvyan";
-    try {
-      const response = await fetch(formspree, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(formspreeBody(lead, view.items, view.lead)),
-      });
-      if (!response.ok) return json({ error: "delivery_failed" }, 502, request, env);
-      return json({
-        ok: true,
-        via: "formspree",
-        customerEmailed: false,
-        message: view.lead.bulk
-          ? "We'll send your bulk pricing. Yorktown Tools has the details."
-          : "Yorktown Tools has the quote. If a branded email is not set up yet, call or text (757) 940-5171. We still have your request.",
-      }, 200, request, env);
-    } catch {
-      return json({ error: "delivery_failed" }, 502, request, env);
-    }
-  }
-
+  const message = env.MOCK_MODE === "true"
+    ? "Preview only. Nothing was sent."
+    : LEAD_SUCCESS_LINE;
   return json({
     ok: true,
-    via: "resend",
-    customerEmailed: true,
-    message: done,
+    via: env.MOCK_MODE === "true" ? "mock" : "lead",
+    customerEmailed: false,
+    message,
   }, 200, request, env);
 }
 
-export { splitModelOutput, finalizeReply, catalog };
+export { splitModelOutput, finalizeReply, catalog, scrubPrices };

@@ -1,4 +1,4 @@
-import { CLOSING_LINE, HANDOFF_LINE, READY_LINE } from "./copy.js";
+import { CLOSING_LINE, HANDOFF_LINE, LAST_NAME_LINE, READY_LINE } from "./copy.js";
 import { interpretLine, normalizeTrade } from "./trade.js";
 
 const BRANDS = "dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt";
@@ -75,16 +75,20 @@ function titleName(value) {
   return String(value || "").toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
 }
 
+export function lastNameReply() {
+  return LAST_NAME_LINE;
+}
+
 export function washingtonReply() {
-  return "Washington. Yorktown Tools is veteran-owned, inspired by the Battle of Yorktown and the Historic Triangle of Jamestown, Yorktown, and Williamsburg. I'm George Washington, and the mascot is George Washington running a saw.";
+  return lastNameReply();
 }
 
 export function isLastNameAsk(text, history = []) {
   const raw = String(text || "").trim();
   if (/\blast name\b/i.test(raw)) return true;
-  if (/\bmake it washington\b/i.test(raw)) return true;
-  const prior = (history || []).some((entry) => entry.role === "assistant" && /George Washington running a saw/i.test(entry.content || ""));
-  return prior && /^washington\b/i.test(raw);
+  if (/\bwhat(?:'s| is) your name\b/i.test(raw) && /last/i.test(raw)) return true;
+  const prior = (history || []).some((entry) => entry.role === "assistant" && /just go by George/i.test(entry.content || ""));
+  return prior && /^(washington|just george)\b/i.test(raw);
 }
 
 export function sawAttributes(history, latest = "") {
@@ -146,10 +150,10 @@ function itemRead(items) {
 export function readyClose(identity, alreadyAsked, items = []) {
   const read = itemRead(items);
   const list = read ? ` I have ${read}.` : "";
-  if (identity.phone || identity.email) return read ? `I have ${read}. ${READY_LINE}` : READY_LINE;
+  if (identity.phone || identity.email) return read ? `I have ${read}. I can send this to our team.` : "I can send this to our team.";
   if (identity.knowsZach && !alreadyAsked) {
     const who = identity.first ? `Thanks, ${identity.first}. ` : "";
-    return `${who}I'll note that he knows you.${list} What's the best cell or email so we can reach you?\n\n${READY_LINE}`;
+    return `${who}I'll note that he knows you.${list} What's the best cell or email so we can reach you?`;
   }
-  return `${read ? `I have ${read}. ` : ""}${HANDOFF_LINE} ${CLOSING_LINE}`;
+  return `${read ? `I have ${read}. ` : ""}${HANDOFF_LINE}`;
 }
