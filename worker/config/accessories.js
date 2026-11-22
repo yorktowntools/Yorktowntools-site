@@ -71,7 +71,7 @@ export const accessoryRules = [
   {
     id: "safety",
     test: (text) => /\b(safety|ppe|hard hat|safety glasses)\b/i.test(text) && !/\b(victory|gloves?)\b/i.test(text),
-    prompt: "Need Victory Series gloves with that? They're $19.99 a pair.",
+    prompt: "Need Victory Series gloves with that?",
     suggestions: [{ name: "Victory Series drivers gloves", sku: "VICTORY-GLOVE", qty: 1 }],
   },
 ];

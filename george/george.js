@@ -1,7 +1,6 @@
-import { BULK_LINE, GREETING, PHONE_DISPLAY, PHONE_TEL } from "../shared/copy.js";
+import { BULK_LINE, GREETING, LEAD_FAILURE_LINE, LEAD_SUCCESS_LINE, PHONE_DISPLAY, PHONE_TEL } from "../shared/copy.js";
 import { filterCustomerText, renderSafeHtml } from "../shared/customer-text.js";
 import { localReply } from "../shared/local-reply.js";
-import { formatEstimate, formatMoney, paymentOnTop } from "../shared/pricing.js";
 
 // Live Worker for now. window.GEORGE_API overrides this.
 // Later, a custom domain can replace it: https://george.yorktowntools.com
@@ -47,11 +46,11 @@ const catalogReady = fetch(new URL("../data/prices.json", import.meta.url))
 const root = document.createElement("div");
 root.innerHTML = `
   <div class="george-backdrop" hidden></div>
-  <button type="button" class="george-launcher" aria-label="Chat with George for quotes and pricing" aria-expanded="false" aria-controls="george-panel">
+  <button type="button" class="george-launcher" aria-label="Chat with George for a free quote" aria-expanded="false" aria-controls="george-panel">
     ${mascotPicture("george-launcher-mascot", 72, 68)}
     <span class="george-launcher-copy">
       <strong>Chat with George</strong>
-      <small>Quotes &amp; pricing in seconds</small>
+      <small>Free quotes from our team</small>
     </span>
   </button>
   <section id="george-panel" class="george-panel" role="dialog" aria-modal="true" aria-labelledby="george-title" hidden>
@@ -68,10 +67,10 @@ root.innerHTML = `
       </div>
     </header>
     <div class="george-log" role="log" aria-live="polite"></div>
-    <button type="button" class="george-review" hidden>Review &amp; send quote</button>
+    <button type="button" class="george-review" hidden>Send my request</button>
     <form class="george-quote" hidden>
       <div class="george-quote-bar">
-        <h3>Quote for Yorktown Tools</h3>
+        <h3>Send my request</h3>
         <button type="button" class="george-quote-close">Close</button>
       </div>
       <p class="george-bulk"></p>
@@ -80,15 +79,15 @@ root.innerHTML = `
       <div class="george-fields">
         <label class="george-wide">Name <input name="name" autocomplete="name" required></label>
         <label class="george-wide">Company, if this is for a business <input name="company" autocomplete="organization"></label>
-        <label>Phone <input name="phone" type="tel" autocomplete="tel" required></label>
-        <label>Email <input name="email" type="email" autocomplete="email" required></label>
-        <label class="george-wide">Job-site address <input name="jobsite" autocomplete="street-address" required></label>
-        <label>Needed by <input name="neededBy" type="date" required></label>
+        <label>Phone <input name="phone" type="tel" autocomplete="tel"></label>
+        <label>Email <input name="email" type="email" autocomplete="email"></label>
+        <label class="george-wide">City and state <input name="jobsite" autocomplete="address-level2" placeholder="City, ST"></label>
+        <label>Needed by <input name="neededBy" type="date"></label>
         <label class="george-wide"><input name="taxExempt" type="checkbox"> Government or tax-exempt. A certificate is required.</label>
         <label class="george-wide">Notes <textarea name="notes" rows="2" placeholder="For a company account: how often you order"></textarea></label>
       </div>
       <p class="george-error" role="alert"></p>
-      <button type="submit" class="george-submit">Send quote</button>
+      <button type="submit" class="george-submit">Send my request</button>
     </form>
     <form class="george-compose">
       <textarea aria-label="Message to George" rows="2" maxlength="1200" placeholder="Brand, model, quantity"></textarea>
@@ -96,7 +95,7 @@ root.innerHTML = `
     </form>
     <div class="george-foot">
       <a href="/privacy.html">Privacy</a>
-      <span>Estimates only. ${PHONE_DISPLAY}</span>
+      <span>Free quotes. ${PHONE_DISPLAY}</span>
     </div>
   </section>
 `;
@@ -178,35 +177,21 @@ function renderItems() {
     qty.max = "9999";
     qty.placeholder = "Qty";
     qty.ariaLabel = `Quantity for item ${index + 1}`;
-    qty.required = true;
+    qty.required = false;
     qty.value = item.qty || "";
     qty.addEventListener("input", () => {
       item.qty = Number(qty.value) || null;
       item.touched = true;
     });
-    const price = document.createElement("p");
-    price.className = "george-price";
-    const amount = formatEstimate(item);
-    const gloves = item.sku === "VICTORY-GLOVE" || (/victory/i.test(item.name || "") && /glove/i.test(item.name || ""));
-    const ballpark = item.ballpark || item.kind === "ballpark";
-    const confirm = item.confirm || item.kind === "unsure" || (!amount && item.confidence === "unsure");
-    if (gloves && item.estimate != null && item.estimateHigh == null) {
-      const fees = paymentOnTop(item.estimate);
-      price.textContent = `${amount} a pair. Card ${formatMoney(fees.card)}. ACH ${formatMoney(fees.ach)}. No fee by check.`;
-    } else if (ballpark && amount) price.textContent = `Starting estimate ${amount}.`;
-    else if ((confirm || !amount) && !draft.saidConfirm) {
-      draft.saidConfirm = true;
-      price.textContent = "We'll confirm the price.";
-    } else if (confirm || !amount) price.textContent = "";
-    else price.textContent = `${amount} estimate. Free delivery is included. Not a promise of stock.`;
-    row.append(name, qty, price);
+    row.append(name, qty);
+
     itemsEl.appendChild(row);
   });
   bulkNote.textContent = draft.bulk ? BULK_LINE : "Free job-site delivery. Virginia sales tax is added unless the order is tax-exempt.";
-  quoteForm.querySelector(".george-submit").textContent = draft.bulk ? "Send details to Yorktown Tools" : "Send quote";
+  quoteForm.querySelector(".george-submit").textContent = "Send my request";
   const hasItems = draft.items.some((item) => item.name);
   reviewButton.hidden = !hasItems;
-  reviewButton.textContent = draft.open ? "Hide quote form" : "Review & send quote";
+  reviewButton.textContent = draft.open ? "Hide request form" : "Send my request";
   quoteForm.hidden = !draft.open;
   pinLog();
   requestAnimationFrame(() => {
@@ -347,17 +332,12 @@ function formData() {
     neededBy: String(data.get("neededBy") || "").trim(),
     notes: String(data.get("notes") || "").trim(),
     taxExempt: data.get("taxExempt") === "on",
-    items: draft.items.map((item) => ({
-      name: item.name,
-      sku: item.sku,
-      qty: Number(item.qty),
-      estimate: item.estimate,
-      estimateHigh: item.estimateHigh,
-      confidence: item.confidence,
-      kind: item.kind,
-      manufacturerUrl: item.manufacturerUrl,
-      categoryPage: item.categoryPage,
-    })),
+    items: draft.items.map((item) => {
+      const row = { name: item.name, sku: item.sku };
+      const qty = Number(item.qty);
+      if (Number.isFinite(qty) && qty > 0) row.qty = qty;
+      return row;
+    }),
   };
 }
 
@@ -365,8 +345,12 @@ async function onQuote(event) {
   event.preventDefault();
   errorEl.textContent = "";
   const lead = formData();
-  if (lead.items.some((item) => !item.name || !item.qty)) {
-    errorEl.textContent = "Each item needs a name and a quantity.";
+  if (lead.items.some((item) => !item.name)) {
+    errorEl.textContent = "Each item needs a name.";
+    return;
+  }
+  if (!lead.phone && !lead.email) {
+    errorEl.textContent = "Add a phone number or an email so we can reach you.";
     return;
   }
   if (!quoteForm.reportValidity()) return;
@@ -374,7 +358,7 @@ async function onQuote(event) {
   button.disabled = true;
   try {
     if (preview && mode !== "live") {
-      addMessage("assistant", "Preview only. Nothing was sent. On the live site this quote goes to Yorktown Tools.");
+      addMessage("assistant", "Preview only. Nothing was sent. On the live site this request goes to Yorktown Tools.");
       return;
     }
     await detect();
@@ -386,7 +370,7 @@ async function onQuote(event) {
       });
       const data = await response.json().catch(() => ({}));
       if (response.ok) {
-        addMessage("assistant", data.message || "Yorktown Tools has the quote.");
+        addMessage("assistant", data.message || LEAD_SUCCESS_LINE);
         return;
       }
     }
@@ -400,14 +384,15 @@ async function onQuote(event) {
         phone: lead.phone,
         delivery: lead.jobsite,
         needed_by: lead.neededBy,
-        message: lead.items.map((item) => `${item.qty} x ${item.name}`).join("\n"),
-        _subject: "George chat quote",
+        message: `Source: George – website chat assistant\n\n${lead.items.map((item) => `${item.qty || ""} ${item.name}`.trim()).join("\n")}`,
+        source: "George – website chat assistant",
+        _subject: "New lead from George (yorktowntools.com chat)",
       }),
     });
     if (!response.ok) throw new Error("form");
-    addMessage("assistant", "Yorktown Tools has the quote. If you don't see an email, call or text (757) 940-5171.");
+    addMessage("assistant", LEAD_SUCCESS_LINE);
   } catch {
-    errorEl.textContent = "That didn't send. Call or text (757) 940-5171 and we'll take it from there.";
+    errorEl.textContent = "I wasn’t able to send your request to our team from here, and I don’t want it to get lost. Please text or email your list to 757-940-5171 or sales@yorktowntools.com and they’ll follow up with pricing and availability.";
   } finally {
     button.disabled = false;
   }

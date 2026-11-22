@@ -22,7 +22,7 @@ XAI_MODEL = "grok-4.3"
 # No-search turns send reasoning.effort "none" so this model does not think first.
 # Search turns stay on "low". Both are set in worker/src/handler.js.
 # Match percent, tax, fees, fuel, and the margin floor are in worker/config/rules.js.
-MAX_OUTPUT_TOKENS = "320"
+MAX_OUTPUT_TOKENS = "600"
 MAX_HISTORY_MESSAGES = "8"
 MAX_USER_TURNS = "12"
 MAX_SEARCHES_PER_CHAT = "2"
