@@ -11,7 +11,8 @@ import {
   PRICING_LINE,
 } from "../../shared/copy.js";
 import { localReply } from "../../shared/local-reply.js";
-import { lastNameReply } from "../../shared/job.js";
+import { itemsFromModelsInThread, lastNameReply, readIdentity } from "../../shared/job.js";
+import { extractModelCodes, isGluedModelLabel } from "../../shared/models.js";
 import { clarifyingQuestion } from "../../shared/talk.js";
 import { buildInstructions } from "../src/prompt.js";
 import { GEORGE_V3 } from "../src/george-v3.js";
@@ -21,6 +22,7 @@ import {
   LEAD_SOURCE_LINE,
   LEAD_SUBJECT,
   buildLeadMail,
+  leadFormspreeBody,
   submitLead,
   validateLead,
 } from "../src/lead.js";
@@ -313,4 +315,189 @@ test("a claimed success without a send is replaced by the failure line", async (
   assert.ok(body.reply.startsWith(LEAD_FAILURE_LINE));
   assert.doesNotMatch(body.reply, /you['’]re all set/i);
   assert.doesNotMatch(body.reply, /reach out shortly/i);
+});
+
+test("server submits the lead itself when model emits success text without submit_lead, and omits empty email from Formspree", async () => {
+  resetLimits();
+  const calls = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), body: JSON.parse(init?.body || "{}") });
+    return new Response(JSON.stringify({ ok: true, next: "/thanks" }), { status: 200 });
+  };
+  try {
+    const env = {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      XAI_API_KEY: "test-key",
+      handoffOutbox: [],
+      callXai: async () => ({
+        output_text: "You're all set. A member of our Yorktown Tools team will review your request and follow up with pricing and availability. If you need help sooner, call or text 757-940-5171.",
+      }),
+    };
+    const history = [
+      { role: "user", content: "I need a Milwaukee M18 Fuel hammer drill" },
+      { role: "assistant", content: "Are you looking for just the bare tool, or a kit?" },
+      { role: "user", content: "Yes" },
+      { role: "assistant", content: "Got it. To get you a free quote, could you give me your name and a phone number or email?" },
+      { role: "user", content: "Alex Smith, 7575550101" },
+    ];
+    const body = await chat(history, env, "auto-submit-01");
+    assert.equal(body.reply, LEAD_SUCCESS_LINE);
+    assert.equal(body.lead?.ok, true);
+    assert.equal(env.handoffOutbox.length, 1);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, "https://formspree.io/f/xanlvyan");
+    assert.equal(calls[0].body.name, "Alex Smith");
+    assert.equal(calls[0].body.phone, "7575550101");
+    assert.equal(Object.prototype.hasOwnProperty.call(calls[0].body, "email"), false);
+    assert.equal(calls[0].body.source, LEAD_SOURCE_FIELD);
+
+    // Follow-up Thanks must not send a duplicate lead or repeat the success line
+    const thanksEnv = {
+      ...env,
+      handoffOutbox: [],
+      callXai: async () => ({ output_text: "You bet." }),
+    };
+    const thanks = await chat([
+      ...history,
+      { role: "assistant", content: body.reply },
+      { role: "user", content: "Thanks" },
+    ], thanksEnv, "auto-submit-01");
+    assert.match(thanks.reply, /^You bet\./);
+    assert.doesNotMatch(thanks.reply, /you['’]re all set/i);
+    assert.equal(calls.length, 1);
+    assert.equal(thanksEnv.handoffOutbox.length, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("server submits the lead when contact and items are known even if model omits both tool call and success line, and fails closed if Formspree returns ok: false", async () => {
+  resetLimits();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ ok: false, error: "rejected" }), { status: 200 });
+  try {
+    const env = {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      XAI_API_KEY: "test-key",
+      handoffOutbox: [],
+      callXai: async () => ({ output_text: "Got it, thanks!" }),
+    };
+    const body = await chat([
+      { role: "user", content: "I need 5 inch grinding wheels" },
+      { role: "assistant", content: "What's your name and phone or email?" },
+      { role: "user", content: "Alex, 7575550101" },
+    ], env, "fail-closed-01");
+    assert.ok(body.reply.startsWith(LEAD_FAILURE_LINE));
+    assert.match(body.reply, /grinding wheels/i);
+    assert.doesNotMatch(body.reply, /you['’]re all set/i);
+    assert.equal(body.lead?.ok, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("readIdentity ignores tool requests and captures single-word name before phone, and leadFormspreeBody omits blank email", () => {
+  const onlyToolAndPhone = readIdentity([
+    { role: "user", content: "I need a Milwaukee drill" },
+    { role: "user", content: "7575550101" },
+  ]);
+  assert.equal(onlyToolAndPhone.name, "");
+  assert.equal(onlyToolAndPhone.phone, "7575550101");
+
+  const oneWordName = readIdentity([{ role: "user", content: "Alex, (757) 555-0101" }]);
+  assert.equal(oneWordName.name, "Alex");
+  assert.equal(oneWordName.phone, "(757) 555-0101");
+
+  const mail = buildLeadMail({
+    name: "Alex",
+    phone: "7575550101",
+    items: [{ product: "grinding wheels" }],
+    reason: "quote_request",
+  });
+  const form = leadFormspreeBody(mail, { name: "Alex", phone: "7575550101", email: "", city_state: "" });
+  assert.equal(form.name, "Alex");
+  assert.equal(form.phone, "7575550101");
+  assert.equal(Object.prototype.hasOwnProperty.call(form, "email"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(form, "city_state"), false);
+});
+
+const SEVEN_MODELS = "Sweet I need Models 2880-20 2131-20 2837-20 2821-20 2953-20 2904-20 2834-20";
+const SEVEN_CODES = ["2880-20", "2131-20", "2837-20", "2821-20", "2953-20", "2904-20", "2834-20"];
+
+test("a Models prefix is not glued onto the first SKU, and space-separated model numbers split into separate items", () => {
+  assert.deepEqual(extractModelCodes(SEVEN_MODELS), SEVEN_CODES);
+  assert.equal(isGluedModelLabel("MODELS2880"), true);
+  assert.equal(isGluedModelLabel("Milwaukee 2880-20"), false);
+  const history = [
+    { role: "user", content: SEVEN_MODELS },
+    { role: "assistant", content: "Got it. Those are all Milwaukee M18 Fuel models. Do you need any accessories?" },
+    { role: "user", content: "This is everything" },
+    { role: "assistant", content: "Here's what I have so far. Does that look right?" },
+    { role: "user", content: "Yup" },
+    { role: "assistant", content: "What's your name and a phone number or email?" },
+    { role: "user", content: "Zach 7579405171" },
+  ];
+  const items = itemsFromModelsInThread(history);
+  assert.equal(items.length, 7);
+  assert.deepEqual(items.map((item) => item.sku), SEVEN_CODES);
+  items.forEach((item) => {
+    assert.match(item.name, /^Milwaukee \d{4}-20$/);
+    assert.doesNotMatch(item.name, /MODELS2880|Models2880/i);
+  });
+  const identity = readIdentity(history);
+  assert.equal(identity.name, "Zach");
+  assert.equal(identity.phone, "7579405171");
+  assert.equal(readIdentity([{ role: "user", content: "This is everything" }]).name, "");
+  const fourWord = readIdentity([{ role: "user", content: "TEST Lead Preview QA, 7579405171" }]);
+  assert.match(fourWord.name, /^Test Lead Preview/i);
+  assert.equal(fourWord.phone, "7579405171");
+});
+
+test("the 7-model phone conversation returns a structured cart and identity, submits all 7 items, and sets leadSent", async () => {
+  resetLimits();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    return new Response(JSON.stringify({ ok: true, next: "/thanks" }), { status: 200 });
+  };
+  try {
+    const env = {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      XAI_API_KEY: "test-key",
+      handoffOutbox: [],
+      callXai: async () => ({
+        output_text: "You're all set. A member of our Yorktown Tools team will review your request and follow up with pricing and availability. If you need help sooner, call or text 757-940-5171.",
+      }),
+    };
+    const history = [
+      { role: "user", content: SEVEN_MODELS },
+      { role: "assistant", content: "Got it. Those are all Milwaukee M18 Fuel models. Do you need any accessories?" },
+      { role: "user", content: "This is everything" },
+      { role: "assistant", content: "Here's what I have so far: Milwaukee 2880-20, 2131-20, 2837-20, 2821-20, 2953-20, 2904-20, 2834-20. Does that look right?" },
+      { role: "user", content: "Yup" },
+      { role: "assistant", content: "To get you a free quote, could you give me your name and a phone number or email?" },
+      { role: "user", content: "TEST Lead, 7575550101" },
+    ];
+    const body = await chat(history, env, "seven-models-01");
+    assert.equal(body.leadSent, true);
+    assert.equal(body.lead?.ok, true);
+    assert.equal(body.quote?.offerForm, false);
+    assert.equal(body.identity?.name, "Test Lead");
+    assert.equal(body.identity?.phone, "7575550101");
+    assert.equal(body.cart.length, 7);
+    assert.deepEqual(body.cart.map((item) => item.sku), SEVEN_CODES);
+    body.cart.forEach((item) => assert.match(item.name, /Milwaukee 2\d{3}-20/));
+    assert.doesNotMatch(JSON.stringify(body.cart), /MODELS2880/i);
+    assert.equal(body.reply, LEAD_SUCCESS_LINE);
+    assert.equal(env.handoffOutbox.length, 1);
+    const mail = env.handoffOutbox[0].text;
+    for (const code of SEVEN_CODES) assert.match(mail, new RegExp(code));
+    assert.doesNotMatch(mail, /MODELS2880/i);
+    assert.match(env.handoffOutbox[0].subject, /TEST/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

@@ -1,10 +1,11 @@
 import catalog from "../../data/prices.json" with { type: "json" };
 import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
-import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, LEAD_FAILURE_LINE, LEAD_SUCCESS_LINE, PRICING_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE, ensureSingleSuccess, leadFailureReply, stripLeadSuccess } from "../../shared/copy.js";
-import { cartFromThread, eachQty, listReadback, readIdentity, readyClose, askedForReach, sawGuide, userBlob } from "../../shared/job.js";
+import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, LEAD_FAILURE_LINE, LEAD_SUCCESS_LINE, PRICING_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE, ensureSingleSuccess, hasLeadSuccess, leadFailureReply, stripLeadSuccess } from "../../shared/copy.js";
+import { cartFromThread, eachQty, fallbackItemsFromThread, itemsFromModelsInThread, listReadback, readIdentity, readyClose, askedForReach, sawGuide, userBlob } from "../../shared/job.js";
 import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
 import { isCustomerPriceAsk } from "../../shared/customer-text.js";
+import { isGluedModelLabel } from "../../shared/models.js";
 import { filterCustomerText } from "./source-filter.js";
 import { confusedWhatReply, localReply } from "../../shared/local-reply.js";
 import { cannedWouldRepeat, chatStage, clarifyingQuestion, concreteDrillingAdvice, genericSawQuestion, isBareWhat, isConfusedOrFrustrated, isShortReply, shouldKeepLocal } from "../../shared/talk.js";
@@ -41,6 +42,7 @@ import {
   formspreeFields,
   functionCalls,
   parseLeadJson,
+  postHandoff as postLeadRequest,
   scrubPrices,
   submitLead,
 } from "./lead.js";
@@ -621,7 +623,7 @@ function alignItemsToCustomerModels(items, latest) {
     return {
       name: label ? `${label} ${pretty}` : pretty,
       sku: pretty,
-      qty: 1,
+      qty: null,
       shelf: null,
       source: "U",
     };
@@ -836,6 +838,41 @@ function validPhone(value) {
   return digits.length >= 10 && digits.length <= 15;
 }
 
+
+function usefulQuoteItems(items) {
+  return (items || []).filter((item) => item?.name && !isPlaceholderName(item.name) && !isGluedModelLabel(item.name) && !isGluedModelLabel(item.sku));
+}
+
+function publicIdentity(messages) {
+  const identity = readIdentity(messages);
+  const out = {};
+  if (identity.name) out.name = identity.name;
+  if (identity.phone) out.phone = identity.phone;
+  if (identity.email) out.email = identity.email;
+  if (identity.company) out.company = identity.company;
+  return out;
+}
+
+function publicCart(items, messages) {
+  const threadItems = itemsFromModelsInThread(messages);
+  const quoted = usefulQuoteItems(items);
+  const list = threadItems.length ? threadItems.map((item) => {
+    const hit = quoted.find((row) => normalizeModel(row.sku || row.model || row.name) === normalizeModel(item.sku || item.model || item.name));
+    return {
+      name: item.name,
+      sku: item.sku || item.model || "",
+      model: item.model || item.sku || "",
+      qty: hit?.qty ?? item.qty ?? null,
+    };
+  }) : quoted.map((item) => ({
+    name: item.name,
+    sku: item.sku || item.model || "",
+    model: item.model || item.sku || "",
+    qty: item.qty ?? null,
+  }));
+  return list;
+}
+
 export async function handleRequest(request, env = {}, ctx) {
   try {
     return await routeRequest(request, env, ctx || env.ctx);
@@ -901,16 +938,6 @@ function alertFingerprint(identity, items) {
   return [identity.name, identity.phone, identity.email, identity.note, list].join("~");
 }
 
-async function postHandoff(url, init) {
-  try {
-    const response = await fetch(url, init);
-    return Boolean(response?.ok);
-  } catch (error) {
-    console.error(`handoff mail failed: ${error instanceof Error ? error.message : "error"}`);
-    return false;
-  }
-}
-
 async function sendOwnerMail(env, mail) {
   mail = decorateAlertMail(mail);
   if (Array.isArray(env.handoffOutbox)) env.handoffOutbox.push({ subject: mail.subject, text: mail.text, html: mail.html, source: mail.source });
@@ -919,7 +946,7 @@ async function sendOwnerMail(env, mail) {
   if (env.RESEND_API_KEY) {
     const from = env.FROM_EMAIL || "Yorktown Tools <quotes@quotes.yorktowntools.com>";
     const sales = env.SALES_EMAIL || SALES_EMAIL;
-    const sent = await postHandoff("https://api.resend.com/emails", {
+    const res = await postLeadRequest("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
@@ -933,8 +960,8 @@ async function sendOwnerMail(env, mail) {
         text: mail.text,
       }),
     });
-    if (sent) return true;
-    console.error("handoff mail failed: resend");
+    if (res.ok) return true;
+    console.error(`handoff mail failed: resend status=${res.status} body=${res.body}`);
   } else if (mock) {
     return env.failLeadSend ? false : true;
   } else {
@@ -942,24 +969,27 @@ async function sendOwnerMail(env, mail) {
   }
   if (mock) return env.failLeadSend ? false : true;
   const formspree = env.FORMSPREE_URL || "https://formspree.io/f/xanlvyan";
-  const sent = await postHandoff(formspree, {
+  const res = await postLeadRequest(formspree, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ ...handoffFormspreeBody(mail), ...formspreeFields(mail), source: mail.source, _subject: mail.subject || LEAD_SUBJECT }),
+    body: JSON.stringify({ ...handoffFormspreeBody(mail), source: mail.source, _subject: mail.subject || LEAD_SUBJECT }),
   });
-  if (sent) console.log(`handoff mail sent via formspree fromGeorge=${/George/i.test(mail.subject || "")} source=${mail.source} subjectHint=${/George/i.test(mail.subject || "") ? "New lead from George (yorktowntools.com chat)" : mail.subject || ""}`);
-  else console.error("handoff mail failed: formspree");
-  return sent;
+  if (res.ok) console.log(`handoff mail sent via formspree status=${res.status} body=${res.body || "ok"} fromGeorge=${/George/i.test(mail.subject || "")} source=${mail.source} subjectHint=${/George/i.test(mail.subject || "") ? "New lead from George (yorktowntools.com chat)" : mail.subject || ""}`);
+  else console.error(`handoff mail failed: formspree status=${res.status} body=${res.body}`);
+  return res.ok;
 }
 
 async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent = false) {
   const identity = readIdentity(messages);
-  const canSend = identity.name && (identity.phone || identity.email || identity.knowsZach);
+  const canSend = Boolean(identity.name && (identity.phone || identity.email || identity.knowsZach));
+  const completeContact = Boolean(identity.name && (identity.phone || identity.email));
   const prior = handoffSent.get(sessionKey);
-  if (alreadySent) return { reply, alerted: true };
-  if (!isOwnerHandoff(reply) && !prior) return { reply, alerted: false };
-  if (!canSend) return { reply, alerted: false };
-  const listed = (items || []).length ? items : cartFromThread(messages.slice(0, -1));
+  if (alreadySent) return { reply, alerted: true, sentOk: true };
+  const listed = (items || []).length ? items : fallbackItemsFromThread(messages);
+  const priorSucceeded = messages.slice(0, -1).some((entry) => entry.role === "assistant" && (hasLeadSuccess(entry.content) || /you['’]re all set/i.test(entry.content || "")));
+  const autoReady = completeContact && listed.length > 0 && !priorSucceeded;
+  if (!isOwnerHandoff(reply) && !prior && !autoReady) return { reply, alerted: false, sentOk: false };
+  if (!canSend) return { reply, alerted: false, sentOk: false };
   let next = String(reply || "")
     .replace(/What's your name, company, and cell or email\??/gi, "")
     .replace(/\n{3,}/g, "\n\n")
@@ -972,18 +1002,19 @@ async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent =
     next = `I have ${read}.\n\n${next}`;
   }
   const fingerprint = alertFingerprint(identity, listed);
-  if ((isOwnerHandoff(reply) || prior) && prior !== fingerprint) {
+  let sentOk = Boolean(prior && prior === fingerprint);
+  if ((isOwnerHandoff(reply) || prior || autoReady) && prior !== fingerprint) {
     const mail = buildHandoffEmail({
       identity,
       items: listed,
-      why: handoffWhy(reply) || "contact update",
+      why: handoffWhy(reply) || (autoReady ? "quote request" : "contact update"),
       transcript: messages.map((message) => `${message.role}: ${message.content}`).slice(-8).join("\n"),
       update: Boolean(prior),
     });
     const sent = await sendOwnerMail(env, mail);
+    sentOk = Boolean(sent);
     if (sent) handoffSent.set(sessionKey, fingerprint);
-    if (isOwnerHandoff(reply)) {
-      const completeContact = Boolean(identity.phone || identity.email);
+    if (isOwnerHandoff(reply) || autoReady) {
       if (sent) {
         if (completeContact) {
           next = ensureSingleSuccess(/you['’]re all set/i.test(next) ? next : `${next}\n\n${LEAD_SUCCESS_LINE}`);
@@ -994,7 +1025,7 @@ async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent =
       }
     }
   }
-  return { reply: next, alerted: canSend };
+  return { reply: next, alerted: canSend, sentOk };
 }
 
 function followUpSearch(code) {
@@ -1055,8 +1086,23 @@ async function chat(request, env, ctx) {
         payload.quote = { ...(payload.quote || {}), items: cart, hold: true };
       }
     }
+    const threadCart = itemsFromModelsInThread(messages);
+    if (threadCart.length) {
+      const existing = usefulQuoteItems(payload.quote?.items || []);
+      if (existing.length < threadCart.length) {
+        payload.quote = { ...(payload.quote || {}), items: threadCart, hold: true };
+      }
+    }
     const alert = await maybeAlert(env, messages, payload.reply, payload.quote?.items || [], sid, Boolean(payload.lead?.ok));
     payload.reply = alert.reply;
+    if (claimedLeadSuccess(payload.reply) && !payload.lead?.ok && !alert.sentOk) {
+      const list = usefulQuoteItems(payload.quote?.items || []).length ? payload.quote.items : fallbackItemsFromThread(messages);
+      payload.reply = leadFailureReply(list);
+    }
+    payload.identity = publicIdentity(messages);
+    payload.cart = publicCart(payload.quote?.items, messages);
+    payload.leadSent = Boolean(payload.lead?.ok || alert.sentOk);
+    if (payload.leadSent && payload.quote) payload.quote.offerForm = false;
     return json(payload, status, request, env);
   };
   const convo = [...prior.filter((message) => message.role === "user").map((message) => message.content), latest].join("\n");
@@ -1132,6 +1178,9 @@ async function chat(request, env, ctx) {
   const baseInput = messages.map((message) => ({ role: message.role, content: message.content }));
 
   try {
+    const identity = readIdentity(messages);
+    const threadFallbackItems = listedItems.length ? listedItems : cartFromThread(messages);
+    const priorSucceeded = prior.some((entry) => entry.role === "assistant" && (hasLeadSuccess(entry.content) || /you['’]re all set/i.test(entry.content || "")));
     let data = await ask(env, instructions, baseInput, false);
     let leadResult = null;
     for (let step = 0; step < 3; step += 1) {
@@ -1139,11 +1188,16 @@ async function chat(request, env, ctx) {
       if (!calls.length) break;
       const outputs = [];
       for (const call of calls) {
-        leadResult = await submitLead(env, call.arguments, { transcript });
+        const res = await submitLead(env, call.arguments, {
+          transcript,
+          fallbackIdentity: identity,
+          fallbackItems: threadFallbackItems,
+        });
+        if (!leadResult?.ok) leadResult = res;
         outputs.push({
           type: "function_call_output",
           call_id: call.call_id,
-          output: JSON.stringify(leadResult),
+          output: JSON.stringify(res),
         });
       }
       const nextInput = [...baseInput, ...(data.output || calls.map((call) => call.raw)), ...outputs];
@@ -1154,11 +1208,15 @@ async function chat(request, env, ctx) {
     const parsedLead = parseLeadJson(parsedQuote.reply);
     let reply = parsedLead.reply || parsedQuote.reply || "";
     if (/LEAD_JSON\s*:/i.test(rawText) && !parsedQuote.reply && parsedLead.reply) reply = parsedLead.reply;
-    if (parsedLead.lead && !leadResult) {
-      leadResult = await submitLead(env, parsedLead.lead, { transcript });
+    if (parsedLead.lead && !leadResult?.ok) {
+      leadResult = await submitLead(env, parsedLead.lead, {
+        transcript,
+        fallbackIdentity: identity,
+        fallbackItems: threadFallbackItems,
+      });
     }
     reply = scrubPrices(reply);
-    const rawItems = alignItemsToCustomerModels(alignRequested(parsedQuote.quote?.items || [], latest), latest)
+    const rawItems = alignItemsToCustomerModels(alignRequested(parsedQuote.quote?.items || [], latest), messages.map((message) => message.content).join("\n"))
       .filter((item) => item?.name && !isPlaceholderName(item.name))
       .map(stripEstimates);
     const items = rawItems.length ? rawItems : listedItems;
@@ -1187,13 +1245,56 @@ async function chat(request, env, ctx) {
       }).join(", ");
       reply = read ? `I have ${read}. ${sawAsk}` : sawAsk;
     }
-    const listForClose = items.length ? items : (parsedLead.lead?.items || []);
+    const fallbackItems = items.length
+      ? items
+      : (parsedLead.lead?.items?.length ? parsedLead.lead.items : fallbackItemsFromThread(messages));
+    const listForClose = fallbackItems;
+    const hasContact = Boolean(identity.name && (identity.phone || identity.email));
+    const fp = alertFingerprint(identity, fallbackItems);
+    if (!leadResult?.ok) {
+      if (claimedLeadSuccess(reply)) {
+        if (hasContact && fallbackItems.length) {
+          if (priorSucceeded && handoffSent.get(sid) === fp) {
+            leadResult = { ok: true };
+          } else {
+            leadResult = await submitLead(env, {
+              name: identity.name,
+              phone: identity.phone,
+              email: identity.email,
+              items: fallbackItems.map((item) => ({
+                product: item.product || item.name,
+                model: item.model || item.sku,
+                qty: item.qty,
+                needs_verification: Boolean(item.needs_verification),
+              })),
+              notes: identity.note,
+              reason: "quote_request",
+              is_update: Boolean(handoffSent.get(sid)),
+            }, { transcript });
+          }
+        }
+      } else if (hasContact && fallbackItems.length && !priorSucceeded && handoffSent.get(sid) !== fp) {
+        leadResult = await submitLead(env, {
+          name: identity.name,
+          phone: identity.phone,
+          email: identity.email,
+          items: fallbackItems.map((item) => ({
+            product: item.product || item.name,
+            model: item.model || item.sku,
+            qty: item.qty,
+            needs_verification: Boolean(item.needs_verification),
+          })),
+          notes: identity.note,
+          reason: "quote_request",
+          is_update: Boolean(handoffSent.get(sid)),
+        }, { transcript });
+      }
+    }
     if (leadResult?.ok) {
+      handoffSent.set(sid, fp);
       reply = ensureSingleSuccess(/you['’]re all set/i.test(reply) ? reply : `${reply}\n\n${LEAD_SUCCESS_LINE}`);
     } else if (claimedLeadSuccess(reply) && !leadResult?.ok) {
-      reply = leadResult?.error === "missing_info"
-        ? `I still need ${((leadResult.missing || []).join(" and ") || "a little more information")} before I can send this to the team.`
-        : leadFailureReply(listForClose);
+      reply = leadFailureReply(listForClose);
     } else if (leadResult && !leadResult.ok && leadResult.error !== "missing_info") {
       if (!/wasn['’]t able to send/i.test(reply)) reply = leadFailureReply(listForClose);
     }

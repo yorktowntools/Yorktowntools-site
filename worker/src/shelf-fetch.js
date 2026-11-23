@@ -1,3 +1,4 @@
+import { extractModelCodes } from "../../shared/models.js";
 /** Pull a shelf price off a few product pages when search returns URLs only. */
 
 const TTL_MS = 6 * 60 * 60 * 1000;
@@ -28,21 +29,8 @@ export function normalizeModel(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
-const MODEL_TOKEN = /\b[a-z]{1,6}\d{3,}[a-z0-9-]*\b/gi;
-
 export function exactModelsIn(text) {
-  const found = [];
-  const seen = new Set();
-  const add = (value) => {
-    const norm = normalizeModel(value);
-    if (norm.length < 5 || !/\d{3,}/.test(norm) || seen.has(norm)) return;
-    seen.add(norm);
-    found.push(norm);
-  };
-  const raw = String(text || "");
-  for (const match of raw.matchAll(MODEL_TOKEN)) add(match[0]);
-  for (const match of raw.matchAll(/\b([a-z]{2,6})[\s-]+(\d{3,}[a-z0-9]*)\b/gi)) add(`${match[1]}${match[2]}`);
-  return found;
+  return extractModelCodes(text);
 }
 
 export function textHasExactModel(value, model) {
@@ -256,9 +244,9 @@ function modelFromJson(value, depth = 0) {
   if (typeof value !== "object") return "";
   const type = String(value["@type"] || "");
   if (/product/i.test(type) || value.sku || value.mpn || value.model) {
-    const direct = exactModelsIn(`${value.sku || ""} ${value.mpn || ""} ${value.model || ""}`)[0];
+    const direct = normalizeModel(exactModelsIn(`${value.sku || ""} ${value.mpn || ""} ${value.model || ""}`)[0] || "");
     if (direct) return direct;
-    const named = exactModelsIn(String(value.name || ""))[0];
+    const named = normalizeModel(exactModelsIn(String(value.name || ""))[0] || "");
     if (named) return named;
   }
   if (value["@graph"]) return modelFromJson(value["@graph"], depth + 1);
@@ -275,11 +263,11 @@ export function extractPageModel(html) {
   const title = text.match(/<title[^>]*>([^<]{0,300})<\/title>/i);
   if (title) {
     const fromTitle = exactModelsIn(title[1])[0];
-    if (fromTitle) return fromTitle;
+    if (fromTitle) return normalizeModel(fromTitle);
   }
   for (const match of text.matchAll(/"(?:sku|mpn|model|modelNumber|itemNumber)"\s*:\s*"([^"]{3,40})"/gi)) {
     const found = exactModelsIn(match[1])[0];
-    if (found) return found;
+    if (found) return normalizeModel(found);
   }
   return "";
 }
@@ -425,7 +413,7 @@ function walkSearchShelves(value, pages, seen, depth, model) {
           url: url || "",
           title,
           shelf,
-          model: normalizeModel(model) || exactModelsIn(blob)[0] || "",
+          model: normalizeModel(model) || normalizeModel(exactModelsIn(blob)[0] || "") || "",
         });
       }
     }

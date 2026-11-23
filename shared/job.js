@@ -1,5 +1,6 @@
 import { CLOSING_LINE, HANDOFF_LINE, LAST_NAME_LINE, READY_LINE } from "./copy.js";
-import { interpretLine, normalizeTrade } from "./trade.js";
+import { interpretLine, normalizeTrade, canonicalBrand, brandLabel } from "./trade.js";
+import { extractModelCodes, isGluedModelLabel } from "./models.js";
 
 const BRANDS = "dewalt|milwaukee|makita|bosch|hilti|festool|metabo|ridgid|skil|flex|hercules|kobalt";
 
@@ -24,8 +25,25 @@ export function productsInText(text) {
   return interpretLine(text).tools.map((tool) => tool.name);
 }
 
+export function itemsFromModelsInThread(history, latest = "") {
+  const entries = [...(history || [])];
+  if (latest) entries.push({ role: "user", content: latest });
+  const userText = entries.filter((entry) => entry.role === "user").map((entry) => entry.content || "").join("\n");
+  const allText = entries.map((entry) => entry.content || "").join("\n");
+  const found = extractModelCodes(userText);
+  const brand = brandLabel(canonicalBrand(allText));
+  return found.filter((code) => !isGluedModelLabel(code)).map((code) => ({
+    name: brand ? `${brand} ${code}` : code,
+    sku: code,
+    model: code,
+    brand,
+    qty: null,
+    source: "U",
+  }));
+}
+
 export function cartFromThread(history, latest = "") {
-  const items = [];
+  const items = itemsFromModelsInThread(history, latest);
   for (const line of users(history, latest)) {
     const qty = eachQty(line);
     if (qty) {
@@ -41,11 +59,13 @@ export function cartFromThread(history, latest = "") {
   return items;
 }
 
+const NON_NAME_WORDS = /^(?:yes|yeah|yep|no|nope|nah|ok|okay|hi|hey|hello|thanks|thank you|please|call|text|email|phone|cell|i need|need|how much|what|which|who|where|when|why|can you|do you|looking for|just|bare|kit|both|all)\b/i;
+
 export function readIdentity(history, latest = "") {
   const identity = { name: "", first: "", company: "", phone: "", email: "", knowsZach: false, note: "" };
   for (const line of users(history, latest)) {
     const email = line.match(/\b[\w.+-]+@[\w.-]+\.\w+\b/);
-    const phone = line.match(/\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/);
+    const phone = line.match(/(?:\+?1[-.\s]?)?(?:\(\d{3}\)|\b\d{3})[-.\s]?\d{3}[-.\s]?\d{4}\b/);
     if (email) identity.email = email[0];
     if (phone) identity.phone = phone[0];
     if (/\bzach knows me\b|\bknows zach\b/i.test(line)) {
@@ -54,17 +74,51 @@ export function readIdentity(history, latest = "") {
       const before = line.replace(/\bzach knows me\b|\bknows zach\b/ig, " ").replace(/\s+/g, " ").trim();
       if (before) identity.name = titleName(before);
     }
-    const named = line.match(/\b(?:i'm|i am|my name is|this is)\s+([A-Za-z]+(?:\s+[A-Za-z]+){0,2})/i);
-    const leading = line.match(/^([A-Za-z]+(?:\s+[A-Za-z]+)+)\b/);
-    const picked = named?.[1] || (!identity.knowsZach ? leading?.[1] : "") || "";
-    if (picked && !/yorktown|george|washington/i.test(picked)) {
-      identity.name = titleName(picked.replace(/\s+(zach|and|at)$/i, "").trim());
+    const named = line.match(/\b(?:i['’]?m|i am|my name is|this is)\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})/i);
+    const namedValue = named?.[1] && !/^(?:everything|all|it|me|us|that|this|ok|okay|fine|good|great|perfect|done|ready|yes|yeah|yep|yup)$/i.test(named[1])
+      ? named[1]
+      : "";
+    const hasContact = Boolean(email || phone);
+    const beforeContact = hasContact
+      ? line.match(/^([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,4})\s*(?:[,;|\-]|\s+(?=(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?\d{3}|[\w.+-]+@)))/)
+      : null;
+    const leadingTwoWords = !hasContact && !/[?\d]/.test(line) && line.trim().split(/\s+/).length <= 3
+      ? line.match(/^([A-Za-z][A-Za-z'-]*\s+[A-Za-z][A-Za-z'-]*)$/)
+      : null;
+    const candidate = namedValue || (!identity.knowsZach ? (beforeContact?.[1] || leadingTwoWords?.[1]) : "") || "";
+    const picked = candidate.replace(/\s+(zach|and|at|phone|cell|email)$/i, "").trim();
+    if (picked && !/yorktown|george|washington/i.test(picked) && !NON_NAME_WORDS.test(picked)) {
+      identity.name = titleName(picked);
     }
     const company = line.match(/\bat\s+([A-Za-z0-9&.' -]+?)(?:,|$)/i);
     if (company && !/zach/i.test(company[1])) identity.company = company[1].trim();
   }
   identity.first = identity.name.split(/\s+/)[0] || "";
   return identity;
+}
+
+export function fallbackItemsFromThread(history, latest = "") {
+  const list = cartFromThread(history, latest);
+  if (list.length) return list;
+  const skip = /^(?:yes|yeah|yep|yup|no|nope|nah|ok|okay|hi|hey|hello|thanks|thank you|please send(?: the quote| it)?|send it)\.?$/i;
+  const candidates = [];
+  for (const raw of users(history, latest)) {
+    const stripped = raw
+      .replace(/\b[\w.+-]+@[\w.-]+\.\w+\b/g, " ")
+      .replace(/(?:\+?1[-.\s]?)?(?:\(\d{3}\)|\b\d{3})[-.\s]?\d{3}[-.\s]?\d{4}\b/g, " ")
+      .replace(/\b(?:i['’]?m|i am|my name is|this is)\s+[A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2}/gi, " ")
+      .replace(/\bzach knows me\b|\bknows zach\b/gi, " ")
+      .replace(/^[,;\s-]+|[,;\s-]+$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!stripped || stripped.length < 3 || skip.test(stripped)) continue;
+    // Skip lines that look purely like a person name (no tool/number words, right with contact)
+    if (stripped !== raw.trim() && stripped.split(/\s+/).length <= 3 && !/\d|drill|saw|grinder|hammer|wheel|blade|bit|glove|ladder|battery|kit|tool|lift|jack/i.test(stripped)) continue;
+    candidates.push(stripped);
+  }
+  if (!candidates.length) return [];
+  const label = candidates.join("; ").slice(0, 140);
+  return [{ name: label, qty: null, sku: "", source: "U", needs_verification: true }];
 }
 
 export function askedForReach(history) {
