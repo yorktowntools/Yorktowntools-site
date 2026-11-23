@@ -314,7 +314,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     const items = cartFromThread(history, text);
     if (items.length) {
       return {
-        reply: listReadback(items),
+        reply: listReadback(items, history),
         quote: { items, offerForm: false, hold: true, stage: "script", scripted: true },
       };
     }
@@ -330,7 +330,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   if (openHandoff && identity.name && (identity.phone || identity.email || identity.knowsZach)) {
     const items = cartFromThread(history);
     return {
-      reply: readyClose(identity, askedForReach(history), items),
+      reply: readyClose(identity, askedForReach(history), items, history),
       quote: { items, offerForm: false, hold: items.length > 0, stage: "script", scripted: true },
     };
   }
@@ -802,7 +802,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     const items = cartFromThread([], text);
     if (items.length) {
       return {
-        reply: listReadback(items),
+        reply: listReadback(items, history),
         quote: { items, offerForm: false, hold: true, stage: "script", scripted: true },
       };
     }

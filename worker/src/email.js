@@ -3,7 +3,7 @@ import { escapeHtml, isAllowedCustomerUrl } from "../../shared/customer-text.js"
 import { filterCustomerText } from "./source-filter.js";
 import { formatMoney } from "../../shared/pricing.js";
 import { BULK_EMAIL, feeSentence } from "./policy.js";
-import { LEAD_SOURCE_FIELD, LEAD_SOURCE_LINE, LEAD_SUBJECT, decorateAlertMail } from "./lead.js";
+import { LEAD_SOURCE_FIELD, LEAD_SOURCE_LINE, LEAD_SUBJECT, buildLeadBodies, decorateAlertMail, itemLabel } from "./lead.js";
 
 function clean(value, fallback = "") {
   const text = filterCustomerText(value).text;
@@ -233,30 +233,27 @@ export function buildSalesEmail({ lead, items, leadInfo, totals }) {
 export function buildHandoffEmail({ identity, items, why, transcript, update = false }) {
   const name = identity?.name || "No name yet";
   const missing = !identity?.phone && !identity?.email;
-  const subject = `${update ? "UPDATE — " : ""}${LEAD_SUBJECT}${name ? ` — ${name}` : ""}${missing ? " — missing phone or email" : ""}`;
-  const lines = (items || []).map((item) => {
-    const qty = Object.prototype.hasOwnProperty.call(item || {}, "qty") && item.qty != null ? `${item.qty} × ` : "";
-    return `- ${qty}${item.name || "Item"}${item.sku ? ` (${item.sku})` : ""}`;
+  const subject = `${update ? "UPDATE — " : ""}${LEAD_SUBJECT}${identity?.name ? ` — ${name}` : ""}${missing ? " — missing phone or email" : ""}`;
+  const itemLines = (items || []).map((item) => `- ${itemLabel(item)}`);
+  const { text, html } = buildLeadBodies({
+    intro: [
+      LEAD_SOURCE_LINE,
+      update ? "Update on a handoff already sent." : "George handed this chat to the team.",
+      `Why: ${why || "handoff"}`,
+      missing ? "MISSING PHONE OR EMAIL. The note below is enough to start, but we still need a way to reach them." : "",
+    ],
+    fields: {
+      Name: identity?.name || name,
+      Company: identity?.company,
+      Phone: identity?.phone,
+      Email: identity?.email,
+      "City/state": identity?.city_state || identity?.jobsite,
+      Reason: why || "handoff",
+      Notes: identity?.note,
+    },
+    itemLines,
+    transcript,
   });
-  const text = [
-    LEAD_SOURCE_LINE,
-    update ? "Update on a handoff already sent." : "George handed this chat to the team.",
-    `Why: ${why || "handoff"}`,
-    missing ? "MISSING PHONE OR EMAIL. The note below is enough to start, but we still need a way to reach them." : "",
-    "",
-    `Name: ${name}`,
-    `Company: ${identity?.company || "—"}`,
-    `Phone: ${identity?.phone || "—"}`,
-    `Email: ${identity?.email || "—"}`,
-    identity?.note ? `Note: ${identity.note}` : "",
-    "",
-    "Items:",
-    ...(lines.length ? lines : ["- none listed"]),
-    "",
-    "Transcript:",
-    transcript || "—",
-  ].filter(Boolean).join("\n");
-  const html = `<div style="font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap;">${escapeHtml(text)}</div>`;
   return decorateAlertMail({ subject, html, text, source: LEAD_SOURCE_FIELD });
 }
 

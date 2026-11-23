@@ -23,11 +23,12 @@ export const SUBMIT_LEAD_TOOL = {
   type: "function",
   name: "submit_lead",
   description:
-    "Send a quote request to the Yorktown Tools team. Call this only when you have the customer's name and a phone or email, plus the current product list. The lead is sent only if this tool returns ok: true.",
+    "Send a quote request to the Yorktown Tools team. Call this only after you have a specific product list, quantities, and any brand preference, plus the customer's name (unless they declined after a second ask) and a phone or email. The lead is sent only if this tool returns ok: true.",
   parameters: {
     type: "object",
     properties: {
       name: { type: "string", description: "Customer's name" },
+      company: { type: "string", description: "Company name, if given" },
       phone: { type: "string", description: "Phone or cell number, if given" },
       email: { type: "string", description: "Email address, if given" },
       city_state: { type: "string", description: "City and state, if given" },
@@ -88,12 +89,88 @@ function asItem(raw) {
   return item;
 }
 
-function itemLabel(item) {
-  const bits = [item.brand, item.product, item.model].filter(Boolean);
-  const name = bits.join(" ").trim() || item.category || "Item";
-  const qty = Object.prototype.hasOwnProperty.call(item, "qty") ? `${item.qty} × ` : "";
-  const verify = item.needs_verification ? " (needs verification)" : "";
+function isPlaceholder(value) {
+  return !value || /^(not specified|n\/?a|none|unknown|unspecified|tbd|—|-|\.)+$/i.test(String(value).trim());
+}
+
+export function itemLabel(item) {
+  if (!item || typeof item !== "object") return String(item || "Item").trim() || "Item";
+  const bits = [item.brand, item.product || item.name, item.model || item.sku]
+    .filter((value) => value && !isPlaceholder(value));
+  const category = item.category && !isPlaceholder(item.category) ? item.category : "";
+  const name = bits.join(" ").trim() || category || "Item (details not confirmed)";
+  const qty = item.qty != null && item.qty !== "" ? `${item.qty} × ` : "";
+  const verify = item.needs_verification ? " — details need confirmation" : "";
   return `${qty}${name}${verify}`;
+}
+
+const MAIL_WRAP = "font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#111;";
+
+function dash(value) {
+  const text = String(value || "").trim();
+  return text || "—";
+}
+
+export function formatLeadTranscript(transcript) {
+  const raw = String(transcript || "").replace(/\r\n/g, "\n").trim();
+  if (!raw) return [];
+  const pieces = raw
+    .split(/\n+/)
+    .flatMap((line) => line.split(/(?=\b(?:user|assistant|customer|george)\s*:)/i))
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const turns = [];
+  for (const part of pieces) {
+    const match = part.match(/^(user|assistant|customer|george)\s*:\s*([\s\S]*)$/i);
+    if (match) {
+      const role = /^(user|customer)$/i.test(match[1]) ? "Customer" : "George";
+      const text = match[2].replace(/\s+/g, " ").trim();
+      if (text) turns.push({ role, text });
+    } else if (turns.length) {
+      turns[turns.length - 1].text = `${turns[turns.length - 1].text} ${part.replace(/\s+/g, " ").trim()}`.trim();
+    }
+  }
+  return turns;
+}
+
+export function htmlFromPlainText(text) {
+  return `<div data-george-mail="1" style="${MAIL_WRAP}">${escapeHtml(text).replace(/\n/g, "<br>\n")}</div>`;
+}
+
+export function buildLeadBodies({ intro = [], fields = {}, itemLines = [], transcript = "" } = {}) {
+  const fieldOrder = ["Name", "Company", "Phone", "Email", "City/state", "Reason"];
+  const fieldLines = fieldOrder.map((key) => `${key}: ${dash(fields[key])}`);
+  const extraFieldLines = fields.Notes ? [`Notes: ${fields.Notes}`] : [];
+  const items = itemLines.length ? itemLines : ["- none listed"];
+  const turns = formatLeadTranscript(transcript);
+  const transcriptLines = turns.length
+    ? turns.map((turn) => `${turn.role}: ${turn.text}`)
+    : [dash(transcript)];
+
+  const text = [
+    ...intro.filter(Boolean),
+    "",
+    ...fieldLines,
+    ...extraFieldLines,
+    "",
+    "Items:",
+    ...items,
+    "",
+    "Transcript:",
+    ...transcriptLines,
+  ].join("\n").replace(/\n{3,}/g, "\n\n").trim();
+
+  const html = [
+    `<div data-george-mail="1" style="${MAIL_WRAP}">`,
+    ...intro.filter(Boolean).map((line) => `<p>${escapeHtml(line)}</p>`),
+    `<p>${[...fieldLines, ...extraFieldLines].map((line) => escapeHtml(line)).join("<br>\n")}</p>`,
+    `<p><strong>Items:</strong></p>`,
+    `<ul>${items.map((line) => `<li>${escapeHtml(String(line).replace(/^-\s*/, ""))}</li>`).join("")}</ul>`,
+    `<p><strong>Transcript:</strong><br>\n${transcriptLines.map((line) => escapeHtml(line)).join("<br>\n")}</p>`,
+    `</div>`,
+  ].join("\n");
+
+  return { text, html };
 }
 
 
@@ -114,9 +191,10 @@ function phoneFromUserText(text) {
   return match ? match[0] : "";
 }
 
-export function validateLead(input) {
+export function validateLead(input, { allowMissingName = false } = {}) {
   const data = input && typeof input === "object" ? input : {};
   const name = clean(data.name, 120);
+  const company = clean(data.company, 160);
   const phone = clean(data.phone, 40);
   const email = clean(data.email, 160);
   const cityState = clean(data.city_state || data.cityState || data.jobsite, 160);
@@ -126,7 +204,7 @@ export function validateLead(input) {
   const isUpdate = data.is_update === true || data.isUpdate === true;
   const items = Array.isArray(data.items) ? data.items.map(asItem).filter(Boolean).slice(0, 40) : [];
   const missing = [];
-  if (!name) missing.push("name");
+  if (!name && !allowMissingName) missing.push("name");
   const phoneOk = phone && validPhone(phone);
   const emailOk = email && validEmail(email);
   if (!phoneOk && !emailOk) {
@@ -138,6 +216,7 @@ export function validateLead(input) {
   if (missing.length) return { ok: false, error: "missing_info", missing };
   const lead = {
     name,
+    company,
     phone: phoneOk ? phone : "",
     email: emailOk ? email : "",
     city_state: cityState,
@@ -155,26 +234,25 @@ export function buildLeadMail(lead, { transcript = "", test = false, why = "" } 
   const subjectParts = [testMark ? "TEST — " : "", update ? "UPDATE — " : "", LEAD_SUBJECT];
   const subject = subjectParts.join("");
   const itemLines = (lead?.items || []).map((item) => `- ${itemLabel(item)}`);
-  const text = [
-    LEAD_SOURCE_LINE,
-    testMark ? "This is a TEST lead from George QA. It is not a real customer request." : "",
-    update ? "This is an update to a lead already sent from the website chat." : "",
-    why ? `Why: ${why}` : "",
-    lead?.reason ? `Reason: ${lead.reason}` : "",
-    "",
-    `Name: ${lead?.name || "—"}`,
-    `Phone: ${lead?.phone || "—"}`,
-    `Email: ${lead?.email || "—"}`,
-    `City/state: ${lead?.city_state || "—"}`,
-    lead?.notes ? `Notes: ${lead.notes}` : "",
-    "",
-    "Items:",
-    ...(itemLines.length ? itemLines : ["- none listed"]),
-    "",
-    "Transcript:",
-    transcript || "—",
-  ].filter((line, index, all) => line !== "" || all[index - 1] !== "").join("\n").trim();
-  const html = `<div style="font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap;">${escapeHtml(text)}</div>`;
+  const { text, html } = buildLeadBodies({
+    intro: [
+      LEAD_SOURCE_LINE,
+      testMark ? "This is a TEST lead from George QA. It is not a real customer request." : "",
+      update ? "This is an update to a lead already sent from the website chat." : "",
+      why ? `Why: ${why}` : "",
+    ],
+    fields: {
+      Name: lead?.name,
+      Company: lead?.company,
+      Phone: lead?.phone,
+      Email: lead?.email,
+      "City/state": lead?.city_state,
+      Reason: lead?.reason,
+      Notes: lead?.notes,
+    },
+    itemLines,
+    transcript,
+  });
   return { subject, html, text, source: LEAD_SOURCE_FIELD };
 }
 
@@ -196,8 +274,14 @@ export function decorateAlertMail(mail) {
   const alreadyTitled = /new lead from george/i.test(subject);
   const nextSubject = alreadyTitled ? subject : (subject ? `${LEAD_SUBJECT} — ${subject}` : LEAD_SUBJECT);
   let text = String(mail?.text || "").trim();
+  let html = String(mail?.html || "").trim();
   if (!text.startsWith(LEAD_SOURCE_LINE)) text = `${LEAD_SOURCE_LINE}\n\n${text}`.trim();
-  const html = `<div style="font-family:Arial,Helvetica,sans-serif;white-space:pre-wrap;">${escapeHtml(text)}</div>`;
+  const structured = /data-george-mail="1"/.test(html);
+  if (!structured) {
+    html = htmlFromPlainText(text);
+  } else if (!html.includes(escapeHtml(LEAD_SOURCE_LINE))) {
+    html = html.replace(">", `><p>${escapeHtml(LEAD_SOURCE_LINE)}</p>`, 1);
+  }
   return {
     ...mail,
     subject: nextSubject,
@@ -296,11 +380,14 @@ export async function sendLeadMail(env, mail, lead = {}) {
   return res.ok;
 }
 
-export async function submitLead(env, input, { transcript = "", test = false, why = "", fallbackIdentity = null, fallbackItems = null } = {}) {
+export async function submitLead(env, input, { transcript = "", test = false, why = "", fallbackIdentity = null, fallbackItems = null, allowMissingName = false } = {}) {
   const data = input && typeof input === "object" ? { ...input } : {};
   const fromUser = userTranscript(transcript);
   if (!String(data.name || "").trim() && fallbackIdentity?.name) {
     data.name = fallbackIdentity.name;
+  }
+  if (!String(data.company || "").trim() && fallbackIdentity?.company) {
+    data.company = fallbackIdentity.company;
   }
   if (!String(data.email || "").trim()) {
     const found = emailFromUserText(fromUser) || fallbackIdentity?.email || "";
@@ -314,7 +401,7 @@ export async function submitLead(env, input, { transcript = "", test = false, wh
   if (!hasValidItems && Array.isArray(fallbackItems) && fallbackItems.length) {
     data.items = fallbackItems;
   }
-  const checked = validateLead(data);
+  const checked = validateLead(data, { allowMissingName });
   if (!checked.ok) return { ok: false, error: checked.error, missing: checked.missing };
   const mail = buildLeadMail(checked.lead, { transcript, test, why });
   const sent = await sendLeadMail(env, mail, checked.lead);
