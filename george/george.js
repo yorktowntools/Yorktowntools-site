@@ -1,6 +1,7 @@
 import { BULK_LINE, GREETING, LEAD_FAILURE_LINE, LEAD_SUCCESS_LINE, PHONE_DISPLAY, PHONE_TEL } from "../shared/copy.js";
 import { filterCustomerText, renderSafeHtml } from "../shared/customer-text.js";
 import { localReply } from "../shared/local-reply.js";
+import { isGluedModelLabel } from "../shared/models.js";
 
 // Live Worker for now. window.GEORGE_API overrides this.
 // Later, a custom domain can replace it: https://george.yorktowntools.com
@@ -18,7 +19,7 @@ document.head.appendChild(css);
 let catalog = { items: [], discountPercent: 1 };
 let mode = params.get("george") === "mock" ? "local" : "unknown";
 let sessionId = "";
-let draft = { items: [], open: false };
+let draft = { items: [], open: false, sent: false };
 let busy = false;
 
 try {
@@ -27,6 +28,7 @@ try {
     sessionId = crypto.randomUUID();
     sessionStorage.setItem("george-session", sessionId);
   }
+  draft.sent = sessionStorage.getItem("george-lead-sent") === sessionId;
 } catch {
   sessionId = `web${Date.now()}`;
 }
@@ -67,10 +69,11 @@ root.innerHTML = `
       </div>
     </header>
     <div class="george-log" role="log" aria-live="polite"></div>
-    <button type="button" class="george-review" hidden>Send my request</button>
+    <p class="george-done" hidden>Request sent ✓</p>
+    <button type="button" class="george-review" hidden>Optional: review request</button>
     <form class="george-quote" hidden>
       <div class="george-quote-bar">
-        <h3>Send my request</h3>
+        <h3>Optional request form</h3>
         <button type="button" class="george-quote-close">Close</button>
       </div>
       <p class="george-bulk"></p>
@@ -107,6 +110,7 @@ const panel = root.querySelector(".george-panel");
 const log = root.querySelector(".george-log");
 const quoteForm = root.querySelector(".george-quote");
 const reviewButton = root.querySelector(".george-review");
+const doneEl = root.querySelector(".george-done");
 const itemsEl = root.querySelector(".george-items");
 const compose = root.querySelector(".george-compose");
 const textarea = compose.querySelector("textarea");
@@ -187,12 +191,22 @@ function renderItems() {
 
     itemsEl.appendChild(row);
   });
-  bulkNote.textContent = draft.bulk ? BULK_LINE : "Free job-site delivery. Virginia sales tax is added unless the order is tax-exempt.";
+  bulkNote.textContent = draft.sent
+    ? "Your request is already with our team."
+    : (draft.bulk ? BULK_LINE : "This form is optional. George can send your request from the chat. Use this only if you want to review or add something.");
   quoteForm.querySelector(".george-submit").textContent = "Send my request";
   const hasItems = draft.items.some((item) => item.name);
-  reviewButton.hidden = !hasItems;
-  reviewButton.textContent = draft.open ? "Hide request form" : "Send my request";
-  quoteForm.hidden = !draft.open;
+  if (draft.sent) {
+    reviewButton.hidden = true;
+    quoteForm.hidden = true;
+    draft.open = false;
+    doneEl.hidden = false;
+  } else {
+    doneEl.hidden = true;
+    reviewButton.hidden = !hasItems;
+    reviewButton.textContent = draft.open ? "Hide optional form" : "Optional: review request";
+    quoteForm.hidden = !draft.open;
+  }
   pinLog();
   requestAnimationFrame(() => {
     if (quoteForm.hidden) return;
@@ -214,33 +228,81 @@ function openQuote() {
   renderItems();
 }
 
+function cleanCartItem(item) {
+  if (!item || !item.name) return null;
+  if (isGluedModelLabel(item.name) || isGluedModelLabel(item.sku)) return null;
+  return item;
+}
+
 function absorbQuote(quote) {
   if (!quote) return;
-  if (quote.hold && !quote.offerForm) {
-    draft.pending = quote.items || [];
-    draft.pendingBulk = Boolean(quote.bulk);
+  const incoming = (quote.items || []).map(cleanCartItem).filter(Boolean);
+  if (quote.hold && !quote.offerForm && !incoming.length) {
+    draft.pendingBulk = Boolean(quote.bulk) || draft.pendingBulk;
     return;
   }
-  const incoming = quote.items?.length ? quote.items : (draft.pending || []);
-  for (const item of incoming) {
-    const key = (item.sku || item.name || "").toLowerCase();
+  if (quote.hold && !quote.offerForm) {
+    draft.pending = incoming;
+    draft.pendingBulk = Boolean(quote.bulk);
+    if (!draft.sent) mergeCart(incoming);
+    if (quote.bulk || draft.pendingBulk) draft.bulk = true;
+    renderItems();
+    return;
+  }
+  const rows = incoming.length ? incoming : (draft.pending || []);
+  mergeCart(rows);
+  if (quote.bulk || draft.pendingBulk) draft.bulk = true;
+  if (quote.offerForm && !draft.sent) draft.open = true;
+  draft.saidConfirm = false;
+  renderItems();
+}
+
+function mergeCart(incoming) {
+  for (const item of incoming || []) {
+    const clean = cleanCartItem(item);
+    if (!clean) continue;
+    const key = (clean.sku || clean.model || clean.name || "").toLowerCase();
     if (!key) continue;
-    const existing = draft.items.find((row) => (row.sku || row.name || "").toLowerCase() === key);
+    const existing = draft.items.find((row) => (row.sku || row.model || row.name || "").toLowerCase() === key);
     if (existing) {
-      existing.estimate = item.estimate;
-      existing.estimateHigh = item.estimateHigh;
-      existing.confidence = item.confidence;
-      existing.kind = item.kind;
-      existing.manufacturerUrl = item.manufacturerUrl;
-      existing.categoryPage = item.categoryPage;
-      if (item.qty && !existing.touched) existing.qty = item.qty;
+      existing.name = clean.name || existing.name;
+      existing.sku = clean.sku || existing.sku;
+      existing.model = clean.model || existing.model;
+      if (clean.qty && !existing.touched) existing.qty = clean.qty;
     } else {
-      draft.items.push({ ...item, touched: false });
+      draft.items.push({ ...clean, touched: false });
     }
   }
-  if (quote.bulk || draft.pendingBulk) draft.bulk = true;
-  if (quote.offerForm) draft.open = true;
-  draft.saidConfirm = false;
+}
+
+function fillIdentity(identity) {
+  if (!identity) return;
+  const set = (name, value) => {
+    if (!value) return;
+    const field = quoteForm.querySelector(`[name="${name}"]`);
+    if (field && !field.value) field.value = value;
+  };
+  set("name", identity.name);
+  set("phone", identity.phone);
+  set("email", identity.email);
+  set("company", identity.company);
+}
+
+function markRequestSent() {
+  draft.sent = true;
+  draft.open = false;
+  try { sessionStorage.setItem("george-lead-sent", sessionId); } catch {}
+  renderItems();
+}
+
+function applyServerState(result) {
+  if (!result) return;
+  if (result.identity) fillIdentity(result.identity);
+  if (Array.isArray(result.cart) && result.cart.length) mergeCart(result.cart);
+  if (result.leadSent || result.lead?.ok) {
+    markRequestSent();
+    return;
+  }
   renderItems();
 }
 
@@ -304,6 +366,7 @@ async function onSend(event) {
     pending.remove();
     addMessage("assistant", result.reply);
     absorbQuote(result.quote);
+    applyServerState(result);
   } catch {
     pending.remove();
     const fallback = localReply({
@@ -314,6 +377,7 @@ async function onSend(event) {
     });
     addMessage("assistant", fallback.reply);
     absorbQuote(fallback.quote);
+    applyServerState(fallback);
     mode = "local";
   } finally {
     busy = false;
@@ -371,6 +435,7 @@ async function onQuote(event) {
       const data = await response.json().catch(() => ({}));
       if (response.ok) {
         addMessage("assistant", data.message || LEAD_SUCCESS_LINE);
+        markRequestSent();
         return;
       }
     }
@@ -391,6 +456,7 @@ async function onQuote(event) {
     });
     if (!response.ok) throw new Error("form");
     addMessage("assistant", LEAD_SUCCESS_LINE);
+    markRequestSent();
   } catch {
     errorEl.textContent = "I wasn’t able to send your request to our team from here, and I don’t want it to get lost. Please text or email your list to 757-940-5171 or sales@yorktowntools.com and they’ll follow up with pricing and availability.";
   } finally {

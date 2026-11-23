@@ -1,3 +1,4 @@
+import { maskModelCodes } from "./models.js";
 /** Instant-price math. Shelf numbers stay internal. Customer numbers are estimates. */
 
 export function roundMoney(value) {
@@ -245,7 +246,7 @@ export function matchCatalog(catalog, query, context = "") {
  * A bare "need 2" with no product words returns nothing so the single-item path can handle it.
  */
 export function splitRequestedItems(text) {
-  const source = String(text || "");
+  const source = maskModelCodes(text);
   const re = /(?:(\d{1,4})|(?:\b(?:a|an|one)\b))\s+(?:(cases?|boxes|pairs?|packs?)\s+of\s+)?([a-z0-9][^.\n;]{1,80}?)(?=\s*(?:,|\band\b|\bfor\b|\bin\b)|$)/gi;
   const found = [];
   let match;
