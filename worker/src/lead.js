@@ -270,6 +270,7 @@ export async function sendLeadMail(env, mail, lead = {}) {
       body: JSON.stringify({
         from,
         to: [sales],
+        ...(lead?.email ? { reply_to: lead.email } : {}),
         subject: labeled.subject,
         html: labeled.html,
         text: labeled.text,

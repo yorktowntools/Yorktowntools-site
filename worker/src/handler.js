@@ -986,8 +986,11 @@ async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent =
   const prior = handoffSent.get(sessionKey);
   if (alreadySent) return { reply, alerted: true, sentOk: true };
   const listed = (items || []).length ? items : fallbackItemsFromThread(messages);
-  const priorSucceeded = messages.slice(0, -1).some((entry) => entry.role === "assistant" && (hasLeadSuccess(entry.content) || /you['’]re all set/i.test(entry.content || "")));
-  const autoReady = completeContact && listed.length > 0 && !priorSucceeded;
+  const priorList = messages.slice(0, -1);
+  const priorSucceeded = priorList.some((entry) => entry.role === "assistant" && (hasLeadSuccess(entry.content) || /you['’]re all set/i.test(entry.content || "")));
+  const priorAskedContact = priorList.some((entry) => entry.role === "assistant" && /name|phone|email|cell|reach you|get this quote/i.test(entry.content || ""));
+  const stillAsking = /\?\s*$/.test(String(reply || "").trim()) && !/you['’]re all set/i.test(String(reply || ""));
+  const autoReady = completeContact && listed.length > 0 && !priorSucceeded && (priorAskedContact || !stillAsking);
   if (!isOwnerHandoff(reply) && !prior && !autoReady) return { reply, alerted: false, sentOk: false };
   if (!canSend) return { reply, alerted: false, sentOk: false };
   let next = String(reply || "")
@@ -1048,7 +1051,7 @@ async function chat(request, env, ctx) {
   if (body.error) return json({ error: body.error }, 400, request, env);
   const page = safePage(body.data?.page);
   const percent = rules.matchPercentBelow;
-  const messages = trimMessages(body.data?.messages, num(env.MAX_HISTORY_MESSAGES, 8));
+  const messages = trimMessages(body.data?.messages, num(env.MAX_HISTORY_MESSAGES, 16));
   const userTurns = messages.filter((message) => message.role === "user");
   if (!userTurns.length) return json({ error: "empty" }, 400, request, env);
   if (userTurns.length > num(env.MAX_USER_TURNS, 12)) {
@@ -1126,9 +1129,10 @@ async function chat(request, env, ctx) {
     const firstClarify = userTurns.length <= 1 && stage === "clarify" && !isCustomerPriceAsk(latest) && !isConfusedOrFrustrated(latest) && !customerConfirmed(latest);
     const catchAll = /I stick to tools, quotes, and delivery/i.test(local.reply || "");
     const toolClarify = /what are you (cutting|using|breaking)|brand or model in mind|height and duty rating|corded or cordless|which model/i.test(local.reply || "");
-    const faqKeep = (Boolean(local.quote?.scripted) || stage === "script" || stage === "form") && !catchAll && !toolClarify && stage !== "clarify" && stage !== "quote";
+    const faqKeep = (Boolean(local.quote?.scripted) || stage === "script") && !catchAll && !toolClarify && stage !== "clarify" && stage !== "quote" && stage !== "form";
     const keepCannedQuestion = Boolean(genericSawQuestion(latest)) || /Did you mean the /i.test(local.reply || "");
-    keepLocal = isBareWhat(latest) || firstClarify || faqKeep || keepCannedQuestion;
+    const wouldRepeat = cannedWouldRepeat(local.reply, prior);
+    keepLocal = !wouldRepeat && (isBareWhat(latest) || firstClarify || faqKeep || keepCannedQuestion);
   }
   if (keepLocal) {
     return respond({
@@ -1273,7 +1277,10 @@ async function chat(request, env, ctx) {
             }, { transcript });
           }
         }
-      } else if (hasContact && fallbackItems.length && !priorSucceeded && handoffSent.get(sid) !== fp) {
+      } else if (hasContact && fallbackItems.length && !priorSucceeded && handoffSent.get(sid) !== fp && (
+        prior.some((entry) => entry.role === "assistant" && /name|phone|email|cell|reach you|get this quote/i.test(entry.content || ""))
+        || !/\?\s*$/.test(reply.trim())
+      )) {
         leadResult = await submitLead(env, {
           name: identity.name,
           phone: identity.phone,

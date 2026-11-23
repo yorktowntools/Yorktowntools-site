@@ -20,6 +20,7 @@ import {
 import { filterCustomerText, isCustomerPriceAsk, isPrivateCostAsk } from "./customer-text.js";
 import { acceptingQuote, answeredClarifyingQuestion, chatStage, clarifyingQuestion, concreteDrillingAdvice, drillTurn, genericSawQuestion, isShortReply, isSpecificAsk } from "./talk.js";
 import { askedForReach, cartFromThread, eachQty, isLastNameAsk, listReadback, readIdentity, readyClose, sawGuide, washingtonReply } from "./job.js";
+import { extractModelCodes } from "./models.js";
 import { acceptsModel, brandLabel, interpretLine, isThanks, pendingModelConfirm } from "./trade.js";
 import { accessoryAsked, accessoryOffer, isAccessoryQuestion } from "../worker/config/accessories.js";
 import {
@@ -702,7 +703,8 @@ export function localReply({ message, history = [], catalog, discount, page, reb
     );
   }
 
-  if (/\b(deliver|delivery|service area|how far|norfolk|newport news|richmond|virginia beach|hampton roads|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester|jobsite|job site)\b/i.test(text) && !matches.length) {
+  const mentionsTool = Boolean(matches.length || heard.tools.length || heard.brand || extractModelCodes(text).length);
+  if (/\b(deliver|delivery|service area|how far|norfolk|newport news|richmond|virginia beach|hampton roads|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester|jobsite|job site)\b/i.test(text) && !mentionsTool) {
     const named = text.match(/\b(norfolk|newport news|richmond|virginia beach|hampton|chesapeake|portsmouth|yorktown|williamsburg|gloucester)\b/i);
     const ack = named ? `Yes, we deliver to ${named[1]}.` : "Yes.";
     return finish(
@@ -715,7 +717,7 @@ export function localReply({ message, history = [], catalog, discount, page, reb
   const government = governmentTurn(text, history);
   if (government) return finish(government, [], false);
 
-  if (!isCustomerPriceAsk(text) && /\b(pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
+  if (!isCustomerPriceAsk(text) && !mentionsTool && /\b(pay|payment|cards?|ach|check|net ?30|net ?15|credit|terms|invoice|po)\b/i.test(text)) {
     return finish(
       `Card, a government purchase card, ACH, and check are all fine. Card costs more to process than ACH, and a check has no fee. Don't send card or bank numbers in this chat. Net terms are only for approved customers. The credit application is here: [credit application](${CREDIT_APP_URL}). Sending it does not promise terms. Virginia sales tax is on the quote unless the order is tax-exempt, and a tax-exempt order needs a certificate.`,
       [],

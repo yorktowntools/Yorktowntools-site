@@ -59,11 +59,23 @@ export function cartFromThread(history, latest = "") {
   return items;
 }
 
-const NON_NAME_WORDS = /^(?:yes|yeah|yep|no|nope|nah|ok|okay|hi|hey|hello|thanks|thank you|please|call|text|email|phone|cell|i need|need|how much|what|which|who|where|when|why|can you|do you|looking for|just|bare|kit|both|all)\b/i;
+const NON_NAME_WORDS = /^(?:yes|yeah|yep|yup|no|nope|nah|ok|okay|hi|hey|hello|thanks|thank you|please|call|text|email|phone|cell|i need|need|needs|how much|what|which|who|where|when|why|can you|do you|looking|just|bare|kit|both|all|tool|tools|saw|saws|drill|drills|grinder|hammer|driver|ladder|glove|gloves|blade|blades|bit|bits|battery|batteries|charger|wood|concrete|metal|steel|pvc|framing|cutting|drilling|dewalt|milwaukee|makita|bosch|cordless|corded|quote|pricing|delivery|pickup|everything|nothing|something|anything|correct|right|sure|good|great|fine|done|ready)\b/i;
+const PHRASE_NON_NAME = /^(?:a|an|the|for|looking|trying|working|cutting|drilling|framing|building|ordering|needing|wanting|interested|comparing|just|only|doing|using|not|here|all|everything|nothing|something|anything|good|great|fine|okay|ok|ready|done|set|homeowner|contractor|sure|yes|yeah|yep|yup|no|nope|going|asking|wondering|checking|shopping|pricing|quoting)\b/i;
+const TOOL_OR_TRADE_WORD = /\b(?:saw|saws|drill|drills|grinder|grinders|hammer|hammers|driver|drivers|ladder|ladders|glove|gloves|blade|blades|bit|bits|battery|batteries|charger|chargers|tool|tools|kit|bare|cordless|corded|wood|concrete|metal|steel|pvc|framing|cutting|drilling|dewalt|milwaukee|makita|bosch|flexvolt|brushless|fuel|quote|pricing|order|job|jobsite|crew|company|contractor|homeowner|delivery|warehouse)\b/i;
 
 export function readIdentity(history, latest = "") {
   const identity = { name: "", first: "", company: "", phone: "", email: "", knowsZach: false, note: "" };
-  for (const line of users(history, latest)) {
+  const entries = [...(history || [])];
+  if (latest) entries.push({ role: "user", content: latest });
+  let prevAssistant = "";
+  for (const entry of entries) {
+    if (entry?.role === "assistant") {
+      prevAssistant = String(entry.content || "");
+      continue;
+    }
+    if (entry?.role !== "user") continue;
+    const line = String(entry.content || "");
+    if (!line.trim()) continue;
     const email = line.match(/\b[\w.+-]+@[\w.-]+\.\w+\b/);
     const phone = line.match(/(?:\+?1[-.\s]?)?(?:\(\d{3}\)|\b\d{3})[-.\s]?\d{3}[-.\s]?\d{4}\b/);
     if (email) identity.email = email[0];
@@ -74,24 +86,28 @@ export function readIdentity(history, latest = "") {
       const before = line.replace(/\bzach knows me\b|\bknows zach\b/ig, " ").replace(/\s+/g, " ").trim();
       if (before) identity.name = titleName(before);
     }
-    const named = line.match(/\b(?:i['’]?m|i am|my name is|this is)\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})/i);
-    const namedValue = named?.[1] && !/^(?:everything|all|it|me|us|that|this|ok|okay|fine|good|great|perfect|done|ready|yes|yeah|yep|yup)$/i.test(named[1])
-      ? named[1]
-      : "";
+    const explicitNamed = line.match(/\b(?:my name is|name\s*:)\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})/i);
+    const introNamed = line.match(/\b(?:i['’]?m|i am|this is)\s+([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})/i);
+    const introCandidate = introNamed?.[1] || "";
+    const introValid = introCandidate
+      && !PHRASE_NON_NAME.test(introCandidate)
+      && !TOOL_OR_TRADE_WORD.test(introCandidate);
+    const namedValue = explicitNamed?.[1] || (introValid ? introCandidate : "");
     const hasContact = Boolean(email || phone);
     const beforeContact = hasContact
       ? line.match(/^([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,4})\s*(?:[,;|\-]|\s+(?=(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?\d{3}|[\w.+-]+@)))/)
       : null;
-    const leadingTwoWords = !hasContact && !/[?\d]/.test(line) && line.trim().split(/\s+/).length <= 3
-      ? line.match(/^([A-Za-z][A-Za-z'-]*\s+[A-Za-z][A-Za-z'-]*)$/)
+    const askedForName = /\b(?:what['’]?s|what is|share|give me|need)\s+your\s+name\b|\bname\s+and\s+(?:a\s+)?(?:phone|cell|email)\b/i.test(prevAssistant);
+    const bareName = askedForName && !hasContact && !/[?\d]/.test(line) && line.trim().split(/\s+/).length <= 3
+      ? line.trim().match(/^([A-Za-z][A-Za-z'-]*(?:\s+[A-Za-z][A-Za-z'-]*){0,2})$/)
       : null;
-    const candidate = namedValue || (!identity.knowsZach ? (beforeContact?.[1] || leadingTwoWords?.[1]) : "") || "";
+    const candidate = namedValue || (!identity.knowsZach ? (beforeContact?.[1] || bareName?.[1]) : "") || "";
     const picked = candidate.replace(/\s+(zach|and|at|phone|cell|email)$/i, "").trim();
-    if (picked && !/yorktown|george|washington/i.test(picked) && !NON_NAME_WORDS.test(picked)) {
+    if (picked && !/yorktown|george|washington/i.test(picked) && !NON_NAME_WORDS.test(picked) && !TOOL_OR_TRADE_WORD.test(picked)) {
       identity.name = titleName(picked);
     }
-    const company = line.match(/\bat\s+([A-Za-z0-9&.' -]+?)(?:,|$)/i);
-    if (company && !/zach/i.test(company[1])) identity.company = company[1].trim();
+    const company = line.match(/\bat\s+([A-Za-z][A-Za-z0-9&.' -]+?)(?:,|$)/i);
+    if (company && !/zach/i.test(company[1]) && !/^\d[-\d\s().]+$/.test(company[1].trim())) identity.company = company[1].trim();
   }
   identity.first = identity.name.split(/\s+/)[0] || "";
   return identity;
@@ -100,7 +116,7 @@ export function readIdentity(history, latest = "") {
 export function fallbackItemsFromThread(history, latest = "") {
   const list = cartFromThread(history, latest);
   if (list.length) return list;
-  const skip = /^(?:yes|yeah|yep|yup|no|nope|nah|ok|okay|hi|hey|hello|thanks|thank you|please send(?: the quote| it)?|send it)\.?$/i;
+  const skip = /^(?:yes|yeah|yep|yup|no|nope|nah|ok|okay|hi|hey|hello|thanks|thank you|correct|looks good|looks right|that looks right|that.?s right|nothing else|that.?s all|this is everything|just that|no accessories|bare tool|please send(?: the quote| it)?|send it)\.?$/i;
   const candidates = [];
   for (const raw of users(history, latest)) {
     const stripped = raw
@@ -145,19 +161,29 @@ export function isLastNameAsk(text, history = []) {
   return prior && /^(washington|just george)\b/i.test(raw);
 }
 
+function parseBladeSize(blob) {
+  const frac = blob.match(/(\d+)\s*[- ]\s*(\d+)\s*\/\s*(\d+)/);
+  if (frac) return `${frac[1]}-${frac[2]}/${frac[3]}`;
+  const dec = blob.match(/\b(6\.5|7\.25|10\.25|5\.5|6|7|8|10)\s*(?:"|in(?:ch(?:es)?)?\b)?/i);
+  if (!dec) return "";
+  const map = { "6.5": "6-1/2", "7.25": "7-1/4", "10.25": "10-1/4", "5.5": "5-1/2" };
+  return map[dec[1]] || dec[1];
+}
+
 export function sawAttributes(history, latest = "") {
   const blob = normalizeTrade(userBlob(history, latest));
-  const size = blob.match(/(\d+)\s*[- ]\s*(\d+)\s*\/\s*(\d+)/);
   const voltage = /60\s*v|flexvolt/i.test(blob) ? "60V" : (/\b20\s*v\b/i.test(blob) ? "20V" : "");
+  const noBrake = /\b(?:no|without)\s+(?:a\s+)?brake\b/i.test(blob);
+  const cordless = /\bcordless\b|\b20\s*v\b|\b60\s*v\b|flexvolt|\bbare\b|\bkit\b/i.test(blob) && !/\bcorded\b/i.test(blob);
   return {
     circular: /\b(?:circ(?:ular)?\s+saws?)\b/i.test(blob),
     brand: (blob.match(new RegExp(`\\b(${BRANDS})\\b`, "gi")) || []).pop()?.toLowerCase() || "",
-    cordless: /\bcordless\b/i.test(blob) && !/\bcorded\b/i.test(blob),
+    cordless,
     corded: /\bcorded\b/i.test(blob),
     voltage,
-    size: size ? `${size[1]}-${size[2]}/${size[3]}` : "",
-    brake: /\bbrake\b/i.test(blob),
-    use: /\bwood\b/i.test(blob) ? "wood" : "",
+    size: parseBladeSize(blob),
+    brake: /\bbrake\b/i.test(blob) && !noBrake,
+    use: /\b(wood|framing|plywood|lumber|metal|steel|concrete|masonry)\b/i.test(blob) ? blob.match(/\b(wood|framing|plywood|lumber|metal|steel|concrete|masonry)\b/i)[1].toLowerCase() : "",
     bare: /\bbare\b/i.test(String(latest || "")),
     kit: /\bkit\b/i.test(String(latest || "")),
   };
@@ -167,24 +193,32 @@ export function sawGuide(history, latest = "") {
   const attrs = sawAttributes(history, latest);
   if (!attrs.circular || attrs.brand !== "dewalt") return null;
   if (/\bDCS577/i.test(String(latest || ""))) return null;
+  const askedBefore = (pattern) => (history || []).some((entry) => entry.role === "assistant" && pattern.test(entry.content || ""));
+  let next = "";
   if (!attrs.size) {
-    return "We can source a DeWalt circular saw. We don't keep a warehouse, so I'll confirm the lead time. What blade size do you want, and do you want a brake?";
-  }
-  if (!attrs.cordless && !attrs.corded) {
-    return `DeWalt, ${attrs.size} in.${attrs.brake ? " with a brake" : ""}. Corded or cordless?`;
-  }
-  if (attrs.cordless && !attrs.voltage) {
-    return "Cordless DeWalt. Do you want 20V MAX or 60V FLEXVOLT?";
-  }
-  if (attrs.voltage === "60V" && attrs.size === "8-1/4") {
+    if (askedBefore(/what blade size do you want/i)) return null;
+    next = "We can source a DeWalt circular saw, and our team confirms sourcing and lead time. What blade size do you want, and do you want a brake?";
+  } else if (!attrs.cordless && !attrs.corded) {
+    if (askedBefore(/corded or cordless\?/i)) return null;
+    next = `DeWalt, ${attrs.size} in.${attrs.brake ? " with a brake" : ""}. Corded or cordless?`;
+  } else if (attrs.cordless && !attrs.voltage) {
+    if (askedBefore(/20V MAX or 60V FLEXVOLT/i)) return null;
+    next = "Cordless DeWalt. Do you want 20V MAX or 60V FLEXVOLT?";
+  } else if (attrs.voltage === "60V" && attrs.size === "8-1/4") {
     if (attrs.bare) return null;
     if (attrs.kit && !attrs.bare) {
-      return "The kit in that family is the DeWalt DCS577X1. How many do you want?";
+      if (askedBefore(/The kit in that family/i)) return null;
+      next = "The kit in that family is the DeWalt DCS577X1. How many do you want?";
+    } else if (!askedBefore(/DCS577 family/i)) {
+      next = "That's a DeWalt 60V MAX FLEXVOLT 8-1/4 in. cordless circular saw with a brake, in the DCS577 family. The DCS577B is the bare tool and the DCS577X1 is the kit. Which one do you want, and how many?";
+    } else if (attrs.use && !askedBefore(/bare tool \(DCS577B\)/i)) {
+      next = "Got it, for cutting that with the DeWalt 60V 8-1/4 in. saw, do you want the bare tool (DCS577B) or the kit (DCS577X1), and how many?";
     }
-    return "That's a DeWalt 60V MAX FLEXVOLT 8-1/4 in. cordless circular saw with a brake, in the DCS577 family. The DCS577B is the bare tool and the DCS577X1 is the kit. Which one do you want, and how many?";
+  } else if (!attrs.use && !askedBefore(/what are you cutting\?/i)) {
+    const bits = [`DeWalt ${attrs.size} in.`, attrs.cordless ? "cordless" : "corded", attrs.brake ? "with a brake" : ""].filter(Boolean);
+    next = `${bits.join(" ")}. What are you cutting?`;
   }
-  const bits = [`DeWalt ${attrs.size} in.`, attrs.cordless ? "cordless" : "corded", attrs.brake ? "with a brake" : ""].filter(Boolean);
-  return `${bits.join(" ")}. What are you cutting?`;
+  return next || null;
 }
 
 export function listReadback(items) {
