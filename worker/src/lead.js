@@ -179,15 +179,16 @@ export function buildLeadMail(lead, { transcript = "", test = false, why = "" } 
 }
 
 export function leadFormspreeBody(mail, lead = {}) {
-  return {
-    name: lead.name || "",
-    email: lead.email || "",
-    phone: lead.phone || "",
-    city_state: lead.city_state || "",
+  const body = {
     message: mail.text,
     source: LEAD_SOURCE_FIELD,
     _subject: mail.subject || LEAD_SUBJECT,
   };
+  if (lead.name) body.name = lead.name;
+  if (lead.email) body.email = lead.email;
+  if (lead.phone) body.phone = lead.phone;
+  if (lead.city_state) body.city_state = lead.city_state;
+  return body;
 }
 
 export function decorateAlertMail(mail) {
@@ -218,13 +219,31 @@ export function formspreeFields(mail, extras = {}) {
   };
 }
 
-async function postHandoff(url, init) {
+export async function postHandoff(url, init) {
   try {
     const response = await fetch(url, init);
-    return Boolean(response?.ok);
+    let bodyText = "";
+    if (typeof response?.text === "function") {
+      bodyText = await response.text().catch(() => "");
+    } else if (typeof response?.json === "function") {
+      const parsed = await response.json().catch(() => null);
+      if (parsed != null) bodyText = JSON.stringify(parsed);
+    }
+    let data = null;
+    if (bodyText) {
+      try { data = JSON.parse(bodyText); } catch { data = null; }
+    }
+    const bodyOk = !data || (data.ok !== false && !data.error && !(Array.isArray(data.errors) && data.errors.length));
+    const ok = Boolean(response?.ok) && bodyOk;
+    return {
+      ok,
+      status: Number(response?.status || (ok ? 200 : 0)),
+      body: bodyText.replace(/[\r\n]+/g, " ").slice(0, 300),
+    };
   } catch (error) {
-    console.error(`lead mail failed: ${error instanceof Error ? error.message : "error"}`);
-    return false;
+    const msg = error instanceof Error ? error.message : "error";
+    console.error(`lead mail failed: ${msg}`);
+    return { ok: false, status: 0, body: msg };
   }
 }
 
@@ -242,7 +261,7 @@ export async function sendLeadMail(env, mail, lead = {}) {
   if (env?.RESEND_API_KEY) {
     const from = env.FROM_EMAIL || "Yorktown Tools <quotes@quotes.yorktowntools.com>";
     const sales = env.SALES_EMAIL || SALES_EMAIL;
-    const sent = await postHandoff("https://api.resend.com/emails", {
+    const res = await postHandoff("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
@@ -256,8 +275,8 @@ export async function sendLeadMail(env, mail, lead = {}) {
         text: labeled.text,
       }),
     });
-    if (sent) return true;
-    console.error("lead mail failed: resend");
+    if (res.ok) return true;
+    console.error(`lead mail failed: resend status=${res.status} body=${res.body}`);
   } else if (mock) {
     return env.failLeadSend ? false : true;
   } else {
@@ -265,26 +284,34 @@ export async function sendLeadMail(env, mail, lead = {}) {
   }
   if (mock) return env.failLeadSend ? false : true;
   const formspree = env?.FORMSPREE_URL || "https://formspree.io/f/xanlvyan";
-  const sent = await postHandoff(formspree, {
+  const res = await postHandoff(formspree, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(leadFormspreeBody(labeled, lead)),
   });
-  if (sent) console.log(`lead mail sent via formspree fromGeorge=${/George/i.test(mail.subject || "")} source=${mail.source} subjectHint=${/TEST/i.test(mail.subject || "") ? "TEST — New lead from George (yorktowntools.com chat)" : "New lead from George (yorktowntools.com chat)"}`);
-  else console.error("lead mail failed: formspree");
-  return sent;
+  const hint = /TEST/i.test(labeled.subject || "") ? "TEST — New lead from George (yorktowntools.com chat)" : "New lead from George (yorktowntools.com chat)";
+  if (res.ok) console.log(`lead mail sent via formspree status=${res.status} body=${res.body || "ok"} fromGeorge=${/George/i.test(labeled.subject || "")} source=${labeled.source} subjectHint=${hint}`);
+  else console.error(`lead mail failed: formspree status=${res.status} body=${res.body}`);
+  return res.ok;
 }
 
-export async function submitLead(env, input, { transcript = "", test = false, why = "" } = {}) {
+export async function submitLead(env, input, { transcript = "", test = false, why = "", fallbackIdentity = null, fallbackItems = null } = {}) {
   const data = input && typeof input === "object" ? { ...input } : {};
   const fromUser = userTranscript(transcript);
+  if (!String(data.name || "").trim() && fallbackIdentity?.name) {
+    data.name = fallbackIdentity.name;
+  }
   if (!String(data.email || "").trim()) {
-    const found = emailFromUserText(fromUser);
+    const found = emailFromUserText(fromUser) || fallbackIdentity?.email || "";
     if (found) data.email = found;
   }
   if (!String(data.phone || "").trim()) {
-    const found = phoneFromUserText(fromUser);
+    const found = phoneFromUserText(fromUser) || fallbackIdentity?.phone || "";
     if (found) data.phone = found;
+  }
+  const hasValidItems = Array.isArray(data.items) && data.items.map(asItem).filter(Boolean).length > 0;
+  if (!hasValidItems && Array.isArray(fallbackItems) && fallbackItems.length) {
+    data.items = fallbackItems;
   }
   const checked = validateLead(data);
   if (!checked.ok) return { ok: false, error: checked.error, missing: checked.missing };
@@ -299,7 +326,10 @@ export function parseLeadJson(raw) {
   const index = text.search(/LEAD_JSON\s*:/i);
   if (index < 0) return { reply: text.trim(), lead: null };
   const reply = text.slice(0, index).trim();
-  const jsonPart = text.slice(index).replace(/^[^\n{]*/, "");
+  let tail = text.slice(index);
+  const quoteAfter = tail.search(/\n\s*QUOTE_JSON\s*:/i);
+  if (quoteAfter >= 0) tail = tail.slice(0, quoteAfter);
+  const jsonPart = tail.replace(/^[^\n{]*/, "");
   const start = jsonPart.indexOf("{");
   const end = jsonPart.lastIndexOf("}");
   if (start < 0 || end <= start) return { reply, lead: null };

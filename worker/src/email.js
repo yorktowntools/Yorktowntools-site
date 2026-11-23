@@ -267,15 +267,20 @@ export function handoffFormspreeBody(mail) {
     const value = match?.[1]?.trim() || "";
     return value === "—" ? "" : value;
   };
-  return {
-    name: pick("Name"),
-    company: pick("Company"),
-    email: pick("Email"),
-    phone: pick("Phone"),
+  const body = {
     message: text,
     source: LEAD_SOURCE_FIELD,
     _subject: mail?.subject || LEAD_SUBJECT,
   };
+  const name = pick("Name");
+  const company = pick("Company");
+  const email = pick("Email");
+  const phone = pick("Phone");
+  if (name) body.name = name;
+  if (company) body.company = company;
+  if (email) body.email = email;
+  if (phone) body.phone = phone;
+  return body;
 }
 
 export function formspreeBody(lead, items, leadInfo) {

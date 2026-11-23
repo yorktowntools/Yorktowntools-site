@@ -11,7 +11,7 @@ import {
   PRICING_LINE,
 } from "../../shared/copy.js";
 import { localReply } from "../../shared/local-reply.js";
-import { lastNameReply } from "../../shared/job.js";
+import { lastNameReply, readIdentity } from "../../shared/job.js";
 import { clarifyingQuestion } from "../../shared/talk.js";
 import { buildInstructions } from "../src/prompt.js";
 import { GEORGE_V3 } from "../src/george-v3.js";
@@ -21,6 +21,7 @@ import {
   LEAD_SOURCE_LINE,
   LEAD_SUBJECT,
   buildLeadMail,
+  leadFormspreeBody,
   submitLead,
   validateLead,
 } from "../src/lead.js";
@@ -313,4 +314,111 @@ test("a claimed success without a send is replaced by the failure line", async (
   assert.ok(body.reply.startsWith(LEAD_FAILURE_LINE));
   assert.doesNotMatch(body.reply, /you['’]re all set/i);
   assert.doesNotMatch(body.reply, /reach out shortly/i);
+});
+
+test("server submits the lead itself when model emits success text without submit_lead, and omits empty email from Formspree", async () => {
+  resetLimits();
+  const calls = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), body: JSON.parse(init?.body || "{}") });
+    return new Response(JSON.stringify({ ok: true, next: "/thanks" }), { status: 200 });
+  };
+  try {
+    const env = {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      XAI_API_KEY: "test-key",
+      handoffOutbox: [],
+      callXai: async () => ({
+        output_text: "You're all set. A member of our Yorktown Tools team will review your request and follow up with pricing and availability. If you need help sooner, call or text 757-940-5171.",
+      }),
+    };
+    const history = [
+      { role: "user", content: "I need a Milwaukee M18 Fuel hammer drill" },
+      { role: "assistant", content: "Are you looking for just the bare tool, or a kit?" },
+      { role: "user", content: "Yes" },
+      { role: "assistant", content: "Got it. To get you a free quote, could you give me your name and a phone number or email?" },
+      { role: "user", content: "Alex Smith, 7575550101" },
+    ];
+    const body = await chat(history, env, "auto-submit-01");
+    assert.equal(body.reply, LEAD_SUCCESS_LINE);
+    assert.equal(body.lead?.ok, true);
+    assert.equal(env.handoffOutbox.length, 1);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, "https://formspree.io/f/xanlvyan");
+    assert.equal(calls[0].body.name, "Alex Smith");
+    assert.equal(calls[0].body.phone, "7575550101");
+    assert.equal(Object.prototype.hasOwnProperty.call(calls[0].body, "email"), false);
+    assert.equal(calls[0].body.source, LEAD_SOURCE_FIELD);
+
+    // Follow-up Thanks must not send a duplicate lead or repeat the success line
+    const thanksEnv = {
+      ...env,
+      handoffOutbox: [],
+      callXai: async () => ({ output_text: "You bet." }),
+    };
+    const thanks = await chat([
+      ...history,
+      { role: "assistant", content: body.reply },
+      { role: "user", content: "Thanks" },
+    ], thanksEnv, "auto-submit-01");
+    assert.match(thanks.reply, /^You bet\./);
+    assert.doesNotMatch(thanks.reply, /you['’]re all set/i);
+    assert.equal(calls.length, 1);
+    assert.equal(thanksEnv.handoffOutbox.length, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("server submits the lead when contact and items are known even if model omits both tool call and success line, and fails closed if Formspree returns ok: false", async () => {
+  resetLimits();
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ ok: false, error: "rejected" }), { status: 200 });
+  try {
+    const env = {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: "http://localhost:8765",
+      XAI_API_KEY: "test-key",
+      handoffOutbox: [],
+      callXai: async () => ({ output_text: "Got it, thanks!" }),
+    };
+    const body = await chat([
+      { role: "user", content: "I need 5 inch grinding wheels" },
+      { role: "assistant", content: "What's your name and phone or email?" },
+      { role: "user", content: "Alex, 7575550101" },
+    ], env, "fail-closed-01");
+    assert.ok(body.reply.startsWith(LEAD_FAILURE_LINE));
+    assert.match(body.reply, /grinding wheels/i);
+    assert.doesNotMatch(body.reply, /you['’]re all set/i);
+    assert.equal(body.lead?.ok, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("readIdentity ignores tool requests and captures single-word name before phone, and leadFormspreeBody omits blank email", () => {
+  const onlyToolAndPhone = readIdentity([
+    { role: "user", content: "I need a Milwaukee drill" },
+    { role: "user", content: "7575550101" },
+  ]);
+  assert.equal(onlyToolAndPhone.name, "");
+  assert.equal(onlyToolAndPhone.phone, "7575550101");
+
+  const oneWordName = readIdentity([{ role: "user", content: "Alex, (757) 555-0101" }]);
+  assert.equal(oneWordName.name, "Alex");
+  assert.equal(oneWordName.phone, "(757) 555-0101");
+
+  const mail = buildLeadMail({
+    name: "Alex",
+    phone: "7575550101",
+    items: [{ product: "grinding wheels" }],
+    reason: "quote_request",
+  });
+  const form = leadFormspreeBody(mail, { name: "Alex", phone: "7575550101", email: "", city_state: "" });
+  assert.equal(form.name, "Alex");
+  assert.equal(form.phone, "7575550101");
+  assert.equal(Object.prototype.hasOwnProperty.call(form, "email"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(form, "city_state"), false);
 });
