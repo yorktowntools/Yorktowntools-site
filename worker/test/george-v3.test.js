@@ -12,6 +12,11 @@ import {
 } from "../../shared/copy.js";
 import { localReply } from "../../shared/local-reply.js";
 import { itemsFromModelsInThread, lastNameReply, readIdentity } from "../../shared/job.js";
+import {
+  intakeReadyForContact,
+  intakeReadyForSubmit,
+  nextIntakeQuestion,
+} from "../../shared/intake.js";
 import { extractModelCodes, isGluedModelLabel } from "../../shared/models.js";
 import { clarifyingQuestion } from "../../shared/talk.js";
 import { buildInstructions } from "../src/prompt.js";
@@ -22,6 +27,8 @@ import {
   LEAD_SOURCE_LINE,
   LEAD_SUBJECT,
   buildLeadMail,
+  formatLeadTranscript,
+  itemLabel,
   leadFormspreeBody,
   submitLead,
   validateLead,
@@ -339,6 +346,8 @@ test("server submits the lead itself when model emits success text without submi
       { role: "user", content: "I need a Milwaukee M18 Fuel hammer drill" },
       { role: "assistant", content: "Are you looking for just the bare tool, or a kit?" },
       { role: "user", content: "Yes" },
+      { role: "assistant", content: "How many do you need?" },
+      { role: "user", content: "Just one" },
       { role: "assistant", content: "Got it. To get you a free quote, could you give me your name and a phone number or email?" },
       { role: "user", content: "Alex Smith, 7575550101" },
     ];
@@ -387,6 +396,8 @@ test("server submits the lead when contact and items are known even if model omi
     };
     const body = await chat([
       { role: "user", content: "I need 5 inch grinding wheels" },
+      { role: "assistant", content: "How many do you need, and do you have a brand preference, or is any brand fine?" },
+      { role: "user", content: "10, any brand is fine" },
       { role: "assistant", content: "What's your name and phone or email?" },
       { role: "user", content: "Alex, 7575550101" },
     ], env, "fail-closed-01");
@@ -579,7 +590,11 @@ test("early contact info does not auto-submit while George is still asking tool 
 
 test("SITE NOTES asks for quantities before closing, widget clears stale sessionStorage, and Resend path sets reply_to", async () => {
   const instructions = buildInstructions({ catalog, page: "/" });
-  assert.match(instructions, /ask how many of each item.*quantity is not yet specified/i);
+  assert.match(instructions, /Intake order before you ask for contact info or call submit_lead/i);
+  assert.match(instructions, /Ask quantity, and whether they have a brand preference/i);
+  assert.match(instructions, /ask once more for their name/i);
+  assert.match(instructions, /We carry 600\+ brands/i);
+  assert.match(instructions, /Never say we lack a warehouse/i);
 
   const widgetSource = readFileSync(new URL("../../george/george.js", import.meta.url), "utf8");
   assert.match(widgetSource, /sessionStorage\.removeItem\("george-lead-sent"\)/);
@@ -638,4 +653,169 @@ test("phone numbers are never parsed as model codes or company names, and delive
   );
   assert.equal(modelCalled, true);
   assert.match(body.reply, /Norfolk/i);
+});
+
+
+const CAMARO_TRANSCRIPT = [
+  { role: "assistant", content: "Hey, I'm George. Welcome to Yorktown Tools. What tools are you looking for?" },
+  { role: "user", content: "George I need some tools. I am working on my car" },
+  { role: "assistant", content: "What kind of work are you doing on the car?" },
+  { role: "user", content: "68 Camaro" },
+  { role: "assistant", content: "What specific tasks are you doing on the 68 Camaro?" },
+  { role: "user", content: "Battery" },
+  { role: "assistant", content: "Are you replacing the battery, jump-starting, or something else?" },
+  { role: "user", content: "Replace" },
+  { role: "assistant", content: "Do you need a portable power station to charge or maintain the battery, or are you looking for hand tools to remove and install the battery?" },
+  { role: "user", content: "Just the hand tools" },
+];
+
+test("the Camaro battery chat asks for specific tools, then quantity or brand, then name, before any lead is sent", async () => {
+  const afterTools = CAMARO_TRANSCRIPT;
+  assert.equal(intakeReadyForContact(afterTools), false);
+  assert.match(nextIntakeQuestion(afterTools), /terminal puller|wrench or socket|terminal brush/i);
+
+  resetLimits();
+  const originalFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return new Response(JSON.stringify({ id: "re_skip" }), { status: 200 });
+  };
+  try {
+    const env = {
+      MOCK_MODE: "true",
+      ALLOWED_ORIGINS: origin,
+      XAI_API_KEY: "test-key",
+      handoffOutbox: [],
+      callXai: async () => ({
+        output_text: "What's your phone number or email so I can get this to the team?",
+      }),
+    };
+    const jumped = await chat(afterTools, env, "camaro-01");
+    assert.doesNotMatch(jumped.reply, /phone number or email so I can get this to the team/i);
+    assert.match(jumped.reply, /terminal puller|wrench or socket|terminal brush/i);
+    assert.equal(jumped.leadSent, false);
+    assert.equal(env.handoffOutbox.length, 0);
+    assert.equal(fetchCalls, 0);
+
+    const specific = [
+      ...afterTools,
+      { role: "assistant", content: jumped.reply },
+      { role: "user", content: "A terminal puller, a 10mm wrench, and a terminal brush" },
+    ];
+    assert.equal(intakeReadyForContact(specific), false);
+    assert.match(nextIntakeQuestion(specific), /how many|brand preference/i);
+    const qtyAsk = await chat(specific, { ...env, handoffOutbox: [] }, "camaro-02");
+    assert.match(qtyAsk.reply, /how many|brand preference/i);
+    assert.doesNotMatch(qtyAsk.reply, /best phone number or email/i);
+    assert.equal(qtyAsk.leadSent, false);
+
+    const afterQty = [
+      ...specific,
+      { role: "assistant", content: qtyAsk.reply },
+      { role: "user", content: "One of each, any brand is fine" },
+    ];
+    assert.equal(intakeReadyForContact(afterQty), true);
+    assert.match(nextIntakeQuestion(afterQty), /your name.*company.*phone number or email/i);
+    const nameAsk = await chat(afterQty, { ...env, handoffOutbox: [] }, "camaro-03");
+    assert.match(nameAsk.reply, /your name/i);
+    assert.match(nameAsk.reply, /company/i);
+    assert.match(nameAsk.reply, /phone|email/i);
+    assert.equal(nameAsk.leadSent, false);
+
+    const phoneOnly = [
+      ...afterQty,
+      { role: "assistant", content: nameAsk.reply },
+      { role: "user", content: "7579405171" },
+    ];
+    const identity = readIdentity(phoneOnly);
+    assert.equal(identity.phone, "7579405171");
+    assert.equal(intakeReadyForSubmit(phoneOnly, identity), false);
+    assert.match(nextIntakeQuestion(phoneOnly, [], identity), /your name/i);
+    const secondName = await chat(phoneOnly, { ...env, handoffOutbox: [] }, "camaro-04");
+    assert.match(secondName.reply, /your name/i);
+    assert.equal(secondName.leadSent, false);
+    assert.equal(env.handoffOutbox.length, 0);
+    assert.equal(fetchCalls, 0);
+
+    const declined = [
+      ...phoneOnly,
+      { role: "assistant", content: secondName.reply },
+      { role: "user", content: "Just the number" },
+    ];
+    const readyId = readIdentity(declined);
+    assert.equal(intakeReadyForSubmit(declined, readyId, [
+      { name: "terminal puller", qty: 1 },
+      { name: "10mm wrench", qty: 1 },
+      { name: "terminal brush", qty: 1 },
+    ]), true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("lead and handoff emails use HTML line breaks, a Company field, clear item lines, and a Customer/George transcript", () => {
+  const runOn = "Source: George – website chat assistant Reason: quote_request Name: 7579405171 Phone: 7579405171 Email: — City/state: — Items: - Not specified hand tools for battery replacement Not specified (needs verification) Transcript: assistant: Hey, I'm George. Welcome to Yorktown Tools. What tools are you looking for? user: George I need some tools. I am working on my car assistant: What kind of work are you doing on the car? user: 68 Camaro assistant: What specific tasks are you doing on the 68 Camaro? user: Battery assistant: Are you replacing the battery, jump-starting, or something else? user: Replace assistant: Do you need a portable power station to charge or maintain the battery, or are you looking for hand tools to remove and install the battery? user: Just the hand tools assistant: What's your phone number or email so I can get this to the team? user: 7579405171";
+  const turns = formatLeadTranscript(runOn.slice(runOn.indexOf("Transcript:") + "Transcript:".length));
+  assert.ok(turns.length >= 10);
+  assert.equal(turns[0].role, "George");
+  assert.equal(turns[1].role, "Customer");
+  assert.match(turns[1].text, /working on my car/i);
+  assert.equal(turns.at(-1).role, "Customer");
+  assert.match(turns.at(-1).text, /7579405171/);
+
+  assert.equal(
+    itemLabel({ brand: "Not specified", product: "hand tools for battery replacement", model: "Not specified", needs_verification: true }),
+    "hand tools for battery replacement — details need confirmation",
+  );
+
+  const mail = buildLeadMail({
+    name: "Alex Rivera",
+    company: "Rivera Auto",
+    phone: "7575550101",
+    email: "",
+    city_state: "Yorktown, VA",
+    items: [
+      { brand: "Not specified", product: "hand tools for battery replacement", model: "Not specified", needs_verification: true },
+      { product: "terminal puller", qty: 1 },
+    ],
+    reason: "quote_request",
+  }, {
+    transcript: "user: Just the hand tools\nassistant: Which specific hand tools do you need?\nuser: A terminal puller",
+  });
+  assert.match(mail.text, /^Source: George/m);
+  assert.match(mail.text, /^Name: Alex Rivera$/m);
+  assert.match(mail.text, /^Company: Rivera Auto$/m);
+  assert.match(mail.text, /^Phone: 7575550101$/m);
+  assert.match(mail.text, /^Email: —$/m);
+  assert.match(mail.text, /^City\/state: Yorktown, VA$/m);
+  assert.match(mail.text, /^Reason: quote_request$/m);
+  assert.match(mail.text, /^Items:$/m);
+  assert.match(mail.text, /^- hand tools for battery replacement — details need confirmation$/m);
+  assert.match(mail.text, /^- 1 × terminal puller$/m);
+  assert.doesNotMatch(mail.text, /Not specified/);
+  assert.match(mail.text, /^Customer: Just the hand tools$/m);
+  assert.match(mail.text, /^George: Which specific hand tools do you need\?$/m);
+  assert.match(mail.html, /data-george-mail="1"/);
+  assert.doesNotMatch(mail.html, /white-space:\s*pre-wrap/);
+  assert.match(mail.html, /Name: Alex Rivera<br>/);
+  assert.match(mail.html, /<ul>/);
+  assert.match(mail.html, /<li>1 × terminal puller<\/li>/);
+  assert.match(mail.html, /Customer: Just the hand tools<br>/);
+  assert.match(mail.html, /George: Which specific hand tools do you need\?/);
+
+  const handoff = buildHandoffEmail({
+    identity: { name: "Alex Rivera", company: "Rivera Auto", phone: "7575550101" },
+    items: [{ name: "terminal puller", qty: 1 }],
+    why: "quote request",
+    transcript: "user: I need a terminal puller\nassistant: How many do you need?",
+  });
+  assert.match(handoff.text, /^Name: Alex Rivera$/m);
+  assert.match(handoff.text, /^Company: Rivera Auto$/m);
+  assert.match(handoff.text, /^Reason: quote request$/m);
+  assert.match(handoff.text, /^Customer: I need a terminal puller$/m);
+  assert.match(handoff.text, /^George: How many do you need\?$/m);
+  assert.match(handoff.html, /Customer: I need a terminal puller<br>/);
+  assert.match(handoff.html, /data-george-mail="1"/);
+  assert.doesNotMatch(handoff.html, /white-space:\s*pre-wrap/);
 });

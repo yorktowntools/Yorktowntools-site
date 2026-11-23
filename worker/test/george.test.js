@@ -1420,7 +1420,7 @@ test("a small unmatched power tool is one out-the-door total, then an invoice", 
   }));
   const codedBody = await coded.json();
   assert.match(codedBody.reply, /free quotes|team to price/i);
-  assert.match(codedBody.reply, /name, company, and cell or email/i);
+  assert.match(codedBody.reply, /name.*company.*(?:phone|cell|email)/i);
   assert.doesNotMatch(codedBody.reply, /would you like to place an order/i);
   const handed = await send([
     { role: "user", content: "One DeWalt D25133K SDS-Plus rotary hammer, just the tool." },

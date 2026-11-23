@@ -15,6 +15,9 @@ export const LINE_CARD_URL = "https://yorktowntools.com/Yorktown-Tools-Line-Card
 
 export const HANDOFF_LINE = "I can send this to our team once I have your name and a cell or email.";
 
+export const CONTACT_ASK_LINE =
+  "What's your name, and a company name if you have one, plus the best phone number or email to reach you?";
+
 export const SCAM_CLOSE = "We're only able to serve local customers right now.";
 
 export const CLOSING_LINE = "Tools Worth Fighting For!";

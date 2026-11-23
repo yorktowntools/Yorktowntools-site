@@ -1,4 +1,5 @@
-import { CLOSING_LINE, HANDOFF_LINE, LAST_NAME_LINE, READY_LINE } from "./copy.js";
+import { CLOSING_LINE, CONTACT_ASK_LINE, HANDOFF_LINE, LAST_NAME_LINE, READY_LINE } from "./copy.js";
+import { intakeReadyForContact, nextIntakeQuestion } from "./intake.js";
 import { interpretLine, normalizeTrade, canonicalBrand, brandLabel } from "./trade.js";
 import { extractModelCodes, isGluedModelLabel } from "./models.js";
 
@@ -221,12 +222,15 @@ export function sawGuide(history, latest = "") {
   return next || null;
 }
 
-export function listReadback(items) {
+export function listReadback(items, history = []) {
   const names = (items || []).filter((item) => item?.name);
   if (!names.length) return "";
   const read = names.map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
   const team = names.length > 1 ? "Those are for our team to price." : "That one's for our team to price.";
-  return `I have ${read}. ${team} What's your name, company, and cell or email?`;
+  const next = intakeReadyForContact(history, items)
+    ? CONTACT_ASK_LINE
+    : (nextIntakeQuestion(history, items) || CONTACT_ASK_LINE);
+  return `I have ${read}. ${team} ${next}`;
 }
 
 function itemRead(items) {
@@ -235,13 +239,24 @@ function itemRead(items) {
   return named.map((item) => `${item.qty || 1} × ${item.name}`).join(", ");
 }
 
-export function readyClose(identity, alreadyAsked, items = []) {
+export function readyClose(identity, alreadyAsked, items = [], history = []) {
   const read = itemRead(items);
   const list = read ? ` I have ${read}.` : "";
-  if (identity.phone || identity.email) return read ? `I have ${read}. I can send this to our team.` : "I can send this to our team.";
-  if (identity.knowsZach && !alreadyAsked) {
+  if (identity.knowsZach) {
     const who = identity.first ? `Thanks, ${identity.first}. ` : "";
+    if (identity.phone || identity.email) {
+      return read ? `I have ${read}. I'll note that he knows you. I can send this to our team.` : "I'll note that he knows you. I can send this to our team.";
+    }
     return `${who}I'll note that he knows you.${list} What's the best cell or email so we can reach you?`;
   }
-  return `${read ? `I have ${read}. ` : ""}${HANDOFF_LINE}`;
+  if (!intakeReadyForContact(history, items)) {
+    const next = nextIntakeQuestion(history, items, identity);
+    return `${read ? `I have ${read}. ` : ""}${next || HANDOFF_LINE}`;
+  }
+  if (identity.phone || identity.email) {
+    const next = nextIntakeQuestion(history, items, identity);
+    if (next) return `${read ? `I have ${read}. ` : ""}${next}`;
+    return read ? `I have ${read}. I can send this to our team.` : "I can send this to our team.";
+  }
+  return `${read ? `I have ${read}. ` : ""}${CONTACT_ASK_LINE}`;
 }

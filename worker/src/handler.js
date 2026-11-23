@@ -3,6 +3,7 @@ import { accessoryAsked, accessoryOffer } from "../config/accessories.js";
 import { jackeryItems, resolveJackery, resolveJackeryFollowup } from "../config/jackery.js";
 import { BULK_LINE, CLOSING_LINE, HANDOFF_LINE, LEAD_FAILURE_LINE, LEAD_SUCCESS_LINE, PRICING_LINE, READY_LINE, SALES_EMAIL, SCAM_CLOSE, ensureSingleSuccess, hasLeadSuccess, leadFailureReply, stripLeadSuccess } from "../../shared/copy.js";
 import { cartFromThread, eachQty, fallbackItemsFromThread, itemsFromModelsInThread, listReadback, readIdentity, readyClose, askedForReach, sawGuide, userBlob } from "../../shared/job.js";
+import { applyIntakeGate, customerDeclinedName, intakeReadyForSubmit, intakeSubmitBlock, nameAskCount, nextIntakeQuestion } from "../../shared/intake.js";
 import { acceptsModel, pendingModelConfirm } from "../../shared/trade.js";
 import { isCustomerPriceAsk } from "../../shared/customer-text.js";
 import { isGluedModelLabel } from "../../shared/models.js";
@@ -981,8 +982,9 @@ async function sendOwnerMail(env, mail) {
 
 async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent = false) {
   const identity = readIdentity(messages);
-  const canSend = Boolean(identity.name && (identity.phone || identity.email || identity.knowsZach));
-  const completeContact = Boolean(identity.name && (identity.phone || identity.email));
+  const nameOk = Boolean(identity.name) || nameAskCount(messages) >= 2 || customerDeclinedName(messages);
+  const canSend = Boolean(nameOk && (identity.phone || identity.email || identity.knowsZach));
+  const completeContact = Boolean(nameOk && (identity.phone || identity.email));
   const prior = handoffSent.get(sessionKey);
   if (alreadySent) return { reply, alerted: true, sentOk: true };
   const listed = (items || []).length ? items : fallbackItemsFromThread(messages);
@@ -990,7 +992,7 @@ async function maybeAlert(env, messages, reply, items, sessionKey, alreadySent =
   const priorSucceeded = priorList.some((entry) => entry.role === "assistant" && (hasLeadSuccess(entry.content) || /you['’]re all set/i.test(entry.content || "")));
   const priorAskedContact = priorList.some((entry) => entry.role === "assistant" && /name|phone|email|cell|reach you|get this quote/i.test(entry.content || ""));
   const stillAsking = /\?\s*$/.test(String(reply || "").trim()) && !/you['’]re all set/i.test(String(reply || ""));
-  const autoReady = completeContact && listed.length > 0 && !priorSucceeded && (priorAskedContact || !stillAsking);
+  const autoReady = completeContact && listed.length > 0 && !priorSucceeded && (priorAskedContact || !stillAsking) && intakeReadyForSubmit(messages, identity, listed);
   if (!isOwnerHandoff(reply) && !prior && !autoReady) return { reply, alerted: false, sentOk: false };
   if (!canSend) return { reply, alerted: false, sentOk: false };
   let next = String(reply || "")
@@ -1085,7 +1087,7 @@ async function chat(request, env, ctx) {
     if (eachQty(latest)) {
       const cart = cartFromThread(prior, latest);
       if (cart.length) {
-        payload.reply = listReadback(cart);
+        payload.reply = listReadback(cart, messages);
         payload.quote = { ...(payload.quote || {}), items: cart, hold: true };
       }
     }
@@ -1096,7 +1098,14 @@ async function chat(request, env, ctx) {
         payload.quote = { ...(payload.quote || {}), items: threadCart, hold: true };
       }
     }
-    const alert = await maybeAlert(env, messages, payload.reply, payload.quote?.items || [], sid, Boolean(payload.lead?.ok));
+    const gateItems = payload.quote?.items || fallbackItemsFromThread(messages);
+    const gateIdentity = readIdentity(messages);
+    payload.reply = applyIntakeGate(payload.reply, messages, gateItems, gateIdentity);
+    if (claimedLeadSuccess(payload.reply) && !intakeReadyForSubmit(messages, gateIdentity, gateItems)) {
+      const next = nextIntakeQuestion(messages, gateItems, gateIdentity);
+      if (next) payload.reply = next;
+    }
+    const alert = await maybeAlert(env, messages, payload.reply, payload.quote?.items || [], sid, Boolean(payload.lead?.ok) && intakeReadyForSubmit(messages, gateIdentity, gateItems));
     payload.reply = alert.reply;
     if (claimedLeadSuccess(payload.reply) && !payload.lead?.ok && !alert.sentOk) {
       const list = usefulQuoteItems(payload.quote?.items || []).length ? payload.quote.items : fallbackItemsFromThread(messages);
@@ -1192,10 +1201,21 @@ async function chat(request, env, ctx) {
       if (!calls.length) break;
       const outputs = [];
       for (const call of calls) {
-        const res = await submitLead(env, call.arguments, {
+        const mergedIdentity = {
+          name: call.arguments?.name || identity.name,
+          phone: call.arguments?.phone || identity.phone,
+          email: call.arguments?.email || identity.email,
+          company: call.arguments?.company || identity.company,
+        };
+        const callItems = Array.isArray(call.arguments?.items) && call.arguments.items.length
+          ? call.arguments.items
+          : threadFallbackItems;
+        const blocked = intakeSubmitBlock(messages, mergedIdentity, callItems);
+        const res = blocked || await submitLead(env, call.arguments, {
           transcript,
           fallbackIdentity: identity,
           fallbackItems: threadFallbackItems,
+          allowMissingName: !mergedIdentity.name,
         });
         if (!leadResult?.ok) leadResult = res;
         outputs.push({
@@ -1213,10 +1233,20 @@ async function chat(request, env, ctx) {
     let reply = parsedLead.reply || parsedQuote.reply || "";
     if (/LEAD_JSON\s*:/i.test(rawText) && !parsedQuote.reply && parsedLead.reply) reply = parsedLead.reply;
     if (parsedLead.lead && !leadResult?.ok) {
-      leadResult = await submitLead(env, parsedLead.lead, {
+      const mergedIdentity = {
+        name: parsedLead.lead.name || identity.name,
+        phone: parsedLead.lead.phone || identity.phone,
+        email: parsedLead.lead.email || identity.email,
+        company: parsedLead.lead.company || identity.company,
+      };
+      const leadItems = Array.isArray(parsedLead.lead.items) && parsedLead.lead.items.length
+        ? parsedLead.lead.items
+        : threadFallbackItems;
+      leadResult = intakeSubmitBlock(messages, mergedIdentity, leadItems) || await submitLead(env, parsedLead.lead, {
         transcript,
         fallbackIdentity: identity,
         fallbackItems: threadFallbackItems,
+        allowMissingName: !mergedIdentity.name,
       });
     }
     reply = scrubPrices(reply);
@@ -1230,7 +1260,7 @@ async function chat(request, env, ctx) {
       if (allGeneric && generic) {
         reply = generic;
       } else if (items.some((item) => item?.name) && customerConfirmed(latest)) {
-        reply = listReadback(items);
+        reply = listReadback(items, messages);
       } else {
         const read = items.filter((item) => item?.name).map((item) => {
           const qty = Object.prototype.hasOwnProperty.call(item, "qty") && item.qty != null ? `${item.qty} × ` : "";
@@ -1253,16 +1283,17 @@ async function chat(request, env, ctx) {
       ? items
       : (parsedLead.lead?.items?.length ? parsedLead.lead.items : fallbackItemsFromThread(messages));
     const listForClose = fallbackItems;
-    const hasContact = Boolean(identity.name && (identity.phone || identity.email));
+    const hasContact = Boolean((identity.name || nameAskCount(messages) >= 2 || customerDeclinedName(messages)) && (identity.phone || identity.email));
     const fp = alertFingerprint(identity, fallbackItems);
     if (!leadResult?.ok) {
       if (claimedLeadSuccess(reply)) {
-        if (hasContact && fallbackItems.length) {
+        if (hasContact && fallbackItems.length && intakeReadyForSubmit(messages, identity, fallbackItems)) {
           if (priorSucceeded && handoffSent.get(sid) === fp) {
             leadResult = { ok: true };
           } else {
             leadResult = await submitLead(env, {
               name: identity.name,
+              company: identity.company,
               phone: identity.phone,
               email: identity.email,
               items: fallbackItems.map((item) => ({
@@ -1274,15 +1305,16 @@ async function chat(request, env, ctx) {
               notes: identity.note,
               reason: "quote_request",
               is_update: Boolean(handoffSent.get(sid)),
-            }, { transcript });
+            }, { transcript, allowMissingName: !identity.name });
           }
         }
-      } else if (hasContact && fallbackItems.length && !priorSucceeded && handoffSent.get(sid) !== fp && (
+      } else if (hasContact && fallbackItems.length && intakeReadyForSubmit(messages, identity, fallbackItems) && !priorSucceeded && handoffSent.get(sid) !== fp && (
         prior.some((entry) => entry.role === "assistant" && /name|phone|email|cell|reach you|get this quote/i.test(entry.content || ""))
         || !/\?\s*$/.test(reply.trim())
       )) {
         leadResult = await submitLead(env, {
           name: identity.name,
+          company: identity.company,
           phone: identity.phone,
           email: identity.email,
           items: fallbackItems.map((item) => ({
@@ -1294,7 +1326,7 @@ async function chat(request, env, ctx) {
           notes: identity.note,
           reason: "quote_request",
           is_update: Boolean(handoffSent.get(sid)),
-        }, { transcript });
+        }, { transcript, allowMissingName: !identity.name });
       }
     }
     if (leadResult?.ok) {
