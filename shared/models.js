@@ -5,6 +5,7 @@ const SKIP_PREFIXES = new Set([
   "part", "parts", "type", "types", "size", "code", "codes", "qty", "order",
   "sweet", "just", "with", "from", "this", "that", "have", "want", "like",
   "only", "also", "plus", "and", "the", "for", "our", "your", "any", "all",
+  "at", "in", "on", "to", "by", "or", "of", "is", "my", "it", "we", "us", "no", "ok", "call", "text", "cell", "phone",
 ]);
 
 const HYPHENATED = /\b\d{3,5}-\d{1,3}[a-z]?\b/gi;
@@ -33,7 +34,9 @@ function isSkippedPrefix(prefix) {
  * "Models 2880-20 2131-20" becomes ["2880-20", "2131-20"], never "MODELS2880".
  */
 export function extractModelCodes(text) {
-  const raw = String(text || "");
+  const raw = String(text || "")
+    .replace(/\b[\w.+-]+@[\w.-]+\.\w+\b/g, " ")
+    .replace(/(?:\+?1[-.\s]?)?(?:\(\d{3}\)|\b\d{3})[-.\s]?\d{3}[-.\s]?\d{4}\b/g, " ");
   const found = [];
   const seen = new Set();
   const add = (value) => {

@@ -86,6 +86,7 @@ export function genericSawQuestion(text) {
 export function drillTurn(message, history) {
   const latest = String(message || "");
   if (concreteDrillingAdvice(latest)) return null;
+  if (/\b(deliver|delivery|ship|shipping|norfolk|richmond|virginia beach|hampton|price|cost|quote|m12|m18|20v|60v|flexvolt|fuel|xr|atomic|lxt)\b/i.test(latest)) return null;
   const blob = userBlob(latest, history);
   if (!/\bdrills?\b|\bhammer drill\b/i.test(blob)) return null;
   if (/\b[a-z]{0,6}\d{3,}[a-z0-9-]*/i.test(latest)) return null;

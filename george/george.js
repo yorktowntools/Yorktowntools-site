@@ -23,12 +23,9 @@ let draft = { items: [], open: false, sent: false };
 let busy = false;
 
 try {
-  sessionId = sessionStorage.getItem("george-session") || "";
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    sessionStorage.setItem("george-session", sessionId);
-  }
-  draft.sent = sessionStorage.getItem("george-lead-sent") === sessionId;
+  sessionStorage.removeItem("george-lead-sent");
+  sessionStorage.removeItem("george-session");
+  sessionId = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `web${Date.now()}`;
 } catch {
   sessionId = `web${Date.now()}`;
 }
@@ -291,7 +288,6 @@ function fillIdentity(identity) {
 function markRequestSent() {
   draft.sent = true;
   draft.open = false;
-  try { sessionStorage.setItem("george-lead-sent", sessionId); } catch {}
   renderItems();
 }
 
@@ -338,7 +334,7 @@ async function ask(text) {
       page: location.pathname,
     });
   }
-  const history = messages.filter((message) => message.role === "user" || message.role === "assistant").slice(-8);
+  const history = messages.filter((message) => message.role === "user" || message.role === "assistant").slice(-24);
   const response = await fetch(`${API}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

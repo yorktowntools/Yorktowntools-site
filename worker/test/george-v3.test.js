@@ -501,3 +501,141 @@ test("the 7-model phone conversation returns a structured cart and identity, sub
     globalThis.fetch = originalFetch;
   }
 });
+
+test("readIdentity ignores two-word tool phrases and intros, and only accepts bare names after a name prompt", () => {
+  for (const phrase of [
+    "Circular saw",
+    "Wood framing",
+    "DeWalt cordless",
+    "Bare tool",
+    "I'm looking at drills",
+    "I'm framing a deck",
+    "This is for my crew",
+    "This is everything",
+  ]) {
+    assert.equal(readIdentity([{ role: "user", content: phrase }]).name, "", `expected empty name for ${phrase}`);
+  }
+  const afterAsk = readIdentity([
+    { role: "assistant", content: "What's your name and phone number or email?" },
+    { role: "user", content: "Sam Miller" },
+  ]);
+  assert.equal(afterAsk.name, "Sam Miller");
+});
+
+test("DeWalt circular saw chat never repeats a warehouse loop and hands off to the model on follow-ups", async () => {
+  resetLimits();
+  let modelCalls = 0;
+  const thread = [];
+  const say = async (user) => {
+    thread.push({ role: "user", content: user });
+    const body = await chat(thread, {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: origin,
+      XAI_API_KEY: "test-key",
+      callXai: async () => {
+        modelCalls += 1;
+        return { output_text: "What blade size and power source do you need, and how many saws?" };
+      },
+    }, "saw-loop-01");
+    thread.push({ role: "assistant", content: body.reply });
+    return body;
+  };
+  const r1 = await say("I need a DeWalt circular saw");
+  const r2 = await say("Bare tool");
+  const r3 = await say("7.25 inch, no brake");
+  assert.doesNotMatch(r1.reply, /don't keep a warehouse/i);
+  assert.notEqual(r2.reply, r1.reply);
+  assert.ok(modelCalls >= 1);
+  assert.doesNotMatch(r3.reply, /with a brake/i);
+});
+
+test("early contact info does not auto-submit while George is still asking tool or quantity questions", async () => {
+  resetLimits();
+  const originalFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  globalThis.fetch = async () => {
+    fetchCalls += 1;
+    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+  };
+  try {
+    const body = await chat(
+      [{ role: "user", content: "Hi I'm Alex at 7575550101, I need a circular saw" }],
+      {
+        MOCK_MODE: "false",
+        ALLOWED_ORIGINS: origin,
+        XAI_API_KEY: "test-key",
+        handoffOutbox: [],
+        callXai: async () => ({ output_text: "What blade size do you need, and how many saws?" }),
+      },
+      "early-contact-01",
+    );
+    assert.equal(body.leadSent, false);
+    assert.equal(fetchCalls, 0);
+    assert.doesNotMatch(body.reply, /you['’]re all set/i);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("SITE NOTES asks for quantities before closing, widget clears stale sessionStorage, and Resend path sets reply_to", async () => {
+  const instructions = buildInstructions({ catalog, page: "/" });
+  assert.match(instructions, /ask how many of each item.*quantity is not yet specified/i);
+
+  const widgetSource = readFileSync(new URL("../../george/george.js", import.meta.url), "utf8");
+  assert.match(widgetSource, /sessionStorage\.removeItem\("george-lead-sent"\)/);
+  assert.doesNotMatch(widgetSource, /draft\.sent\s*=\s*sessionStorage/);
+  assert.match(widgetSource, /\.slice\(-24\)/);
+
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), headers: init?.headers || {}, body: JSON.parse(init?.body || "{}") });
+    return new Response(JSON.stringify({ id: "re_123" }), { status: 200 });
+  };
+  try {
+    const res = await submitLead({
+      MOCK_MODE: "false",
+      RESEND_API_KEY: "re_test_key",
+      FROM_EMAIL: "Yorktown Tools <quotes@quotes.yorktowntools.com>",
+      SALES_EMAIL: "sales@yorktowntools.com",
+    }, {
+      name: "Alex Smith",
+      email: "alex@example.com",
+      items: [{ brand: "DeWalt", product: "7-1/4 circular saw kit", qty: 2 }],
+      reason: "quote_request",
+    }, { transcript: "user: 2 DeWalt circular saw kits" });
+    assert.equal(res.ok, true);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, "https://api.resend.com/emails");
+    assert.equal(calls[0].body.reply_to, "alex@example.com");
+    assert.deepEqual(calls[0].body.to, ["sales@yorktowntools.com"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("phone numbers are never parsed as model codes or company names, and delivery+tool turns reach the model", async () => {
+  assert.deepEqual(extractModelCodes("Hi I'm Alex at 757-555-0101, which DeWalt circular saw?"), []);
+  const id = readIdentity([{ role: "user", content: "Hi I'm Alex at 757-555-0101, which DeWalt circular saw?" }]);
+  assert.equal(id.name, "Alex");
+  assert.equal(id.phone, "757-555-0101");
+  assert.equal(id.company, "");
+
+  resetLimits();
+  let modelCalled = false;
+  const body = await chat(
+    [{ role: "user", content: "Can you deliver 5 Milwaukee M18 Fuel drills to Norfolk?" }],
+    {
+      MOCK_MODE: "false",
+      ALLOWED_ORIGINS: origin,
+      XAI_API_KEY: "test-key",
+      callXai: async () => {
+        modelCalled = true;
+        return { output_text: "Yes, we deliver to Norfolk for free. Which M18 Fuel drill do you want?" };
+      },
+    },
+    "deliv-drill-01",
+  );
+  assert.equal(modelCalled, true);
+  assert.match(body.reply, /Norfolk/i);
+});
