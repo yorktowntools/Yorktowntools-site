@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" hreflang="en-us">
 <head>
+    <style>:where(img[width][height]){width:auto;height:auto}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Veteran-owned Yorktown Tools supplies premium hand tools, power tools, portable power solutions, ladders, safety PPE & storage for commercial & government contractors in Hampton Roads. Free delivery.">
@@ -15,13 +16,18 @@
 
     <meta property="og:title" content="Yorktown Tools | Contractor Tools & Portable Power Solutions - Free Delivery">
     <meta property="og:description" content="Veteran-owned supplier of hand tools, power tools, portable power stations, ladders & safety gear. Fast free delivery to job sites & military bases.">
-    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
+    <meta property="og:image" content="https://yorktowntools.com/img/og-yorktown-tools-truck.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="628">
+    <meta property="og:image:alt" content="Yorktown Tools delivery truck in front of the Yorktown Victory Monument">
+    <meta name="twitter:card" content="summary_large_image">
     <meta property="og:url" content="https://yorktowntools.com">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_US">
 
-    <link rel="icon" href="/Yorktown.PNG" type="image/png">
-    <link rel="apple-touch-icon" href="/Yorktown.PNG">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/img/icon-192.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,7 +83,7 @@
       "priceRange": "$$",
       "paymentAccepted": ["Cash", "Credit Card", "Invoice", "Government Purchase Order"],
       "currenciesAccepted": "USD",
-      "image": "https://yorktowntools.com/hero-artwork.jpg",
+      "image": "https://yorktowntools.com/img/og-yorktown-tools-truck.jpg",
       "slogan": "Tools Worth Fighting For"
     }
     </script>
@@ -111,7 +117,7 @@
             transform: translate(-50%, -50%);
             width: 140vw; height: 140vw;
             max-width: 1400px; max-height: 1400px;
-            background: url('/george-mascot.PNG') center center / contain no-repeat;
+            background: url('/img/opt/george-mascot.webp') center center / contain no-repeat;
             opacity: 0.15;
             pointer-events: none;
             z-index: -1;
@@ -233,6 +239,14 @@
         }
         .hero h1 { font-size: clamp(2.7rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
         .hero > p { font-size: clamp(1.2rem, 4.6vw, 1.45rem); margin-bottom:2.6rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
+
+        .hero.has-photo { padding: 0 1rem 4rem; overflow: hidden; }
+        .hero-photo { display:block; margin: 0 -1rem 2.4rem; }
+        .hero-photo img { display:block; width:100%; height:auto; aspect-ratio:16/10; max-height:620px; object-fit:cover; object-position:center 22%; }
+        @media (max-width: 700px) {
+            .hero-photo img { aspect-ratio: 4/5; max-height: 500px; object-position: center 30%; }
+        }
+        .hero.has-photo h1 { margin-top: .4rem; }
 
         .tagline-rotator { 
             position: relative; 
@@ -422,6 +436,19 @@
         .card h3 { color: var(--navy); margin: 0 0 0.8rem; font-size: 1.38rem; font-weight: 700; }
         .card p { color: #444; font-size: 1.03rem; line-height: 1.55; }
 
+        .customer-band {
+            display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: center;
+            background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow);
+            padding: clamp(1.6rem, 5vw, 3rem); margin: 4rem 0;
+        }
+        .customer-band img { width: 100%; height: auto; border-radius: 16px; display:block; box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+        .customer-band h2 { text-align:left; color: var(--navy); font-size: clamp(1.7rem, 4.6vw, 2.2rem); margin-bottom: 1rem; }
+        .customer-band p { font-size: 1.1rem; line-height: 1.7; color:#333; margin-bottom: 1.4rem; }
+        @media (max-width: 900px) {
+            .customer-band { grid-template-columns: 1fr; gap: 1.6rem; text-align:center; }
+            .customer-band h2 { text-align:center; }
+        }
+
         .reviews-section {
             background: var(--light);
             padding: clamp(3.2rem, 8vw, 4.5rem) 1rem;
@@ -500,7 +527,7 @@
     </div>
 
     <div class="logo-header">
-        <img src="/Yorktown.PNG" alt="Yorktown Tools" loading="eager">
+        <img width="520" height="520" src="/img/opt/yorktown.webp" alt="Yorktown Tools" loading="eager">
     </div>
 
     <nav id="main-nav">
@@ -520,7 +547,12 @@
     </nav>
 
     <main>
-        <section id="home" class="hero">
+        <section id="home" class="hero has-photo">
+            <picture class="hero-photo">
+                <source media="(max-width: 700px)" srcset="/img/truck-monument-mobile-800.webp 800w, /img/truck-monument-mobile-1200.webp 1200w" sizes="100vw">
+                <source srcset="/img/truck-monument-hero-800.webp 800w, /img/truck-monument-hero-1500.webp 1500w" sizes="(min-width: 1200px) 1200px, 100vw">
+                <img src="/img/truck-monument-hero-1500.webp" width="1500" height="1000" fetchpriority="high" decoding="async" alt="Yorktown Tools delivery truck parked in front of the Yorktown Victory Monument">
+            </picture>
             <h1>Tools Worth Fighting For</h1>
             <p>Free delivery to contractors, construction companies, and government agencies throughout Hampton Roads: serving Yorktown, Newport News, Hampton, Williamsburg, Norfolk, Virginia Beach & beyond.</p>
             <div class="tagline-rotator">
@@ -534,12 +566,12 @@
         <!-- ========== STORY SECTION ========== -->
         <section class="story-section">
             <div>
-                <img src="/zach-portrait.JPG" alt="Zachary Barber, founder of Yorktown Tools" class="story-photo" loading="lazy">
+                <img src="/img/curbside-delivery-900.webp" srcset="/img/curbside-delivery-600.webp 600w, /img/curbside-delivery-900.webp 900w" sizes="(max-width: 900px) 340px, 420px" width="900" height="900" alt="A Yorktown Tools team member handing a cordless tool kit to a contractor at the tailgate of our delivery truck" class="story-photo" loading="lazy" decoding="async">
             </div>
             <div class="story-content">
                 <h2>You shouldn’t lose hours just getting the tools you need.</h2>
-                <p>I learned that the hard way as a turbine engine mechanic on Army flightlines around the world. Starting a job only to realize you’re missing a critical tool or part means stopping, walking back to the shop, and killing your entire flow. It’s one of the most frustrating wastes of time on any job site.</p>
-                <p>That’s why I built Yorktown Tools.</p>
+                <p>Starting a job only to realize you’re missing a critical tool or part means stopping, walking back to the shop, and killing your entire flow. It’s one of the most frustrating wastes of time on any job site.</p>
+                <p>That’s why we built Yorktown Tools. We’re a veteran-owned team, and we learned on military flightlines what a missing tool costs a crew.</p>
                 <p>We deliver the tools and accessories contractors, construction companies, and government teams need - right to the job site or your shop. We also offer a consignment mini-store option so your everyday consumables are always stocked where you work, and you only pay for what you use.</p>
                 <p class="highlight">Stay in flow. Save time and money. Never lose hours hunting for tools again.<br>With Yorktown Tools, you never will.</p>
             </div>
@@ -550,25 +582,25 @@
             <h2>Free Resources for Contractors</h2>
             <div class="free-resources-grid">
                 <a href="https://yorktowntools.beehiiv.com" target="_blank" class="free-resource-card">
-                    <img src="/IMG_6190.jpeg" alt="Yorktown Tools Journal" class="resource-image" loading="lazy" decoding="async">
+                    <img width="1125" height="1274" src="/IMG_6190.jpeg" alt="Yorktown Tools Journal" class="resource-image" loading="lazy" decoding="async">
                     <h3>Journal</h3>
-                    <p>Founder insights on starting and growing a tool business - real stories, lessons, and behind-the-scenes tips from the front lines.</p>
+                    <p>Behind-the-scenes stories, job-site tips, and company news from the Yorktown Tools team.</p>
                 </a>
 
                 <a href="/Yorktown-Tools-Line-Card-2026.pdf" target="_blank" class="free-resource-card">
-                    <img src="/IMG_5353.jpeg" alt="Yorktown Tools Line Card" class="resource-image" loading="lazy" decoding="async">
+                    <img width="1125" height="1427" src="/img/opt/img-5353.webp" alt="Yorktown Tools Line Card" class="resource-image" loading="lazy" decoding="async">
                     <h3>Line Card</h3>
                     <p>Download our product catalog with brands and tools</p>
                 </a>
 
                 <a href="/yorktown tools credit application.pdf" target="_blank" class="free-resource-card">
-                    <img src="/IMG_6180.jpeg" alt="Yorktown Tools Credit Application" class="resource-image" loading="lazy" decoding="async">
+                    <img width="1074" height="1600" src="/img/opt/img-6180.webp" alt="Yorktown Tools Credit Application" class="resource-image" loading="lazy" decoding="async">
                     <h3>Credit Application</h3>
                     <p>Apply for net 30 terms - fast approval for qualified contractors & government accounts</p>
                 </a>
 
                 <a href="/Consignment-Card.pdf" target="_blank" class="free-resource-card">
-                    <img src="/IMG_8920.jpeg" alt="Yorktown Tools Consignment Card" class="resource-image" loading="lazy" decoding="async">
+                    <img width="1092" height="1419" src="/img/opt/img-8920.webp" alt="Yorktown Tools Consignment Card" class="resource-image" loading="lazy" decoding="async">
                     <h3>Consignment Card</h3>
                     <p>Stock everyday consumables on-site with our mini-store option - only pay for what you use. Keep your crew moving.</p>
                 </a>
@@ -582,28 +614,28 @@
             </p>
             <div class="grid">
                 <a href="/precision-hand-tools.html" class="card">
-                    <img src="/Pliers.PNG" alt="Precision hand tools" loading="lazy" decoding="async">
+                    <img width="1536" height="1024" src="/img/opt/pliers.webp" alt="Precision hand tools" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Precision Hand Tools</h3>
                         <p>Eliminate slippage, stripped bolts, and callbacks. Torque-perfect results every time with wrenches, pliers, levels, and layout tools built for daily abuse.</p>
                     </div>
                 </a>
                 <a href="/Power-tools.html" class="card">
-                    <img src="EDA4F95B-582F-40AC-965C-1D0351B6448A.jpeg" alt="Cordless power tools" loading="lazy" decoding="async">
+                    <img width="1024" height="1365" src="/img/opt/eda4f95b-582f-40ac-965c-1d0351b6448a.webp" alt="Cordless power tools" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Power Tools & Combo Kits</h3>
                         <p>Cut faster, drill straighter, drive stronger. High-output batteries and rapid chargers so your crew stays productive - never waiting.</p>
                     </div>
                 </a>
                 <a href="/portable-power.html" class="card">
-                    <img src="/Jackerygenerator.JPG" alt="Portable Power Solutions for Job Sites" loading="lazy" decoding="async">
+                    <img width="800" height="800" src="/img/opt/jackerygenerator.webp" alt="Portable Power Solutions for Job Sites" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Portable Power Solutions</h3>
                         <p>Portable power stations, solar generators, inverters, and high-capacity battery systems. Keep crews running on remote sites, during outages, or off-grid. Multiple top brands available.</p>
                     </div>
                 </a>
                 <a href="/Measuring tools.html" class="card">
-                    <img src="/Bosch-laser.jpg" alt="Measuring and layout tools" loading="lazy" decoding="async">
+                    <img width="1125" height="757" src="/img/opt/bosch-laser.webp" alt="Measuring and layout tools" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Measuring & Layout</h3>
                         <p>Dead-accurate levels, lasers, tapes, and squares. Premium brands like Stabila, Bosch, Dewalt - eliminate rework and speed layout.</p>
@@ -619,21 +651,21 @@
             </p>
             <div class="grid">
                 <a href="/Bits-blades.html" class="card">
-                    <img src="/Blades.PNG" alt="Bits and blades" loading="lazy" decoding="async">
+                    <img width="1536" height="1024" src="/img/opt/blades.webp" alt="Bits and blades" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Bits, Blades & Abrasives</h3>
                         <p>Stop wasting time on dull consumables. Blades that stay sharp 3–5× longer - fewer changeouts, less downtime.</p>
                     </div>
                 </a>
                 <a href="/Storage-organization.html" class="card">
-                    <img src="/Knaack.PNG" alt="Jobsite storage" loading="lazy" decoding="async">
+                    <img width="1024" height="1024" src="/img/opt/knaack.webp" alt="Jobsite storage" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Storage & Organization</h3>
                         <p>End lost tools and theft. Lockable boxes keep your investment secure and your crew moving job to job.</p>
                     </div>
                 </a>
                 <a href="/Safety-PPE.html" class="card">
-                    <img src="/Gloves.JPG" alt="Safety gear" loading="lazy" decoding="async">
+                    <img width="1600" height="1067" src="/img/opt/gloves.webp" alt="Safety gear" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Safety & PPE</h3>
                         <p>Pass every inspection first time. ANSI/OSHA-compliant gloves, eyewear, hearing, hi-vis, fall protection - in stock, delivered free.</p>
@@ -649,12 +681,21 @@
             </p>
             <div class="grid">
                 <a href="/Ladders.html" class="card">
-                    <img src="/Laddercloseup.png" alt="Professional ladders" loading="lazy" decoding="async">
+                    <img width="1125" height="756" src="/img/opt/laddercloseup.webp" alt="Professional ladders" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Professional Ladders & Platforms</h3>
                         <p>Werner ladders that adjust fast, hold 375+ lbs, and clear base safety checks - delivered free to your trailer.</p>
                     </div>
                 </a>
+            </div>
+        </section>
+
+        <section class="customer-band">
+            <img src="/img/contractor-handshake-1200.webp" srcset="/img/contractor-handshake-800.webp 800w, /img/contractor-handshake-1200.webp 1200w" sizes="(max-width: 900px) 92vw, 600px" width="1200" height="800" alt="A Yorktown Tools team member shaking hands with a contractor who is holding a DeWalt tool kit" loading="lazy" decoding="async">
+            <div>
+                <h2>Built around the crews we serve</h2>
+                <p>From small repair shops to commercial builders and government teams, our customers count on us to show up with the right tools, on time, with free delivery. We stock and deliver 600+ brands crews already trust, including Milwaukee, DeWalt, Klein, Metabo, and Bosch.</p>
+                <a href="#contact" class="btn" style="padding:1rem 2.4rem;font-size:1.1rem;">Get Your Quote Now</a>
             </div>
         </section>
 
@@ -716,7 +757,7 @@
     </main>
 
     <footer>
-        <img src="/hero.png" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy" decoding="async">
+        <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy" decoding="async">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:#ffffff !important; text-decoration:none;">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
