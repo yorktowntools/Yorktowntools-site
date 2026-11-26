@@ -4,13 +4,13 @@
     <style>:where(img[width][height]){width:auto;height:auto}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="About Yorktown Tools – Veteran-owned small business supplying premium tools with free delivery across Hampton Roads. A veteran-owned team serving commercial contractors and government agencies.">
+    <meta name="description" content="About Yorktown Tools: Veteran-owned small business supplying premium tools with free delivery across Hampton Roads. A veteran-owned team serving commercial contractors and government agencies.">
     <meta name="keywords" content="yorktown tools about, veteran owned tool company hampton roads, zachary barber yorktown tools, army veteran tool supplier, free delivery contractor tools virginia">
     <meta name="author" content="Zachary Barber">
     <meta name="robots" content="index, follow">
 
     <!-- Optimized Title -->
-    <title>About Yorktown Tools | Veteran-Owned Tool Supplier – Hampton Roads</title>
+    <title>About Yorktown Tools | Veteran-Owned Tool Supplier, Hampton Roads</title>
 
     <!-- Open Graph -->
     <meta property="og:title" content="About Yorktown Tools | Veteran-Owned Contractor Tool Supplier">
@@ -99,24 +99,18 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.85rem 1rem;
+            padding: 0.65rem 1rem;
             font-weight: 700;
-            font-size: 1.05rem;
-            min-height: 54px;
-            position: relative;
-            overflow: hidden;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
         }
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 1s ease;
-            font-weight: 600;
+        @media (max-width: 480px) {
+            .top-red-banner { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
         }
-        .banner-text.active { opacity: 1; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
 
         .logo-header {
             text-align: center;
@@ -301,9 +295,7 @@
 <body>
 
 <div class="top-red-banner">
-        <div class="banner-text active">757-940-5171</div>
-        <div class="banner-text">Free Delivery.</div>
-        <div class="banner-text">Free Quote.</div>
+        Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.
     </div>
 
     <div class="logo-header">
@@ -329,16 +321,16 @@
     <main>
         <section class="hero">
             <img src="/img/reviewing-plans-1500.webp" srcset="/img/reviewing-plans-800.webp 800w, /img/reviewing-plans-1500.webp 1500w" sizes="(min-width: 1200px) 1100px, 100vw" width="1500" height="983" alt="A Yorktown Tools team member and a contractor reviewing plans together over tool kits at a lumber supply shop" class="hero-image" decoding="async">
-            <h1>About Yorktown Tools – Veteran-Owned Contractor Supplier</h1>
+            <h1>About Yorktown Tools: Veteran-Owned Contractor Supplier</h1>
         </section>
 
         <section class="about-content">
-            <p>Yorktown Tools is a veteran-owned supplier based in Yorktown, Virginia. Our team delivers premium tools, materials and safety gear to commercial contractors and government agencies across Hampton Roads — with free job-site delivery and exceptional service.</p>
+            <p>Yorktown Tools is a veteran-owned supplier based in Yorktown, Virginia. Our team delivers premium tools, materials and safety gear to commercial contractors and government agencies across Hampton Roads, with free job-site delivery and exceptional service.</p>
         </section>
 
         <div class="commitment-box">
             <strong>Our Commitment:</strong><br>
-            You build the project. We deliver the tools — free quotes, free delivery, zero hassle.
+            You build the project. We deliver the tools: free quotes, free delivery, zero hassle.
         </div>
 
         <!-- 1. Our Story -->
@@ -362,7 +354,7 @@
 
         <!-- 2. Newsletter -->
         <section class="section-card">
-            <h2>Starting a Tool Company – First 6 Months</h2>
+            <h2>Starting a Tool Company: First 6 Months</h2>
             <p>Real stories and lessons from the first six months of building Yorktown Tools. Yorktown Tools shares the journey, challenges, and vision behind the company.</p>
             <a href="https://yorktowntools.beehiiv.com/" target="_blank" class="btn">Read the Full Newsletter Series →</a>
         </section>
@@ -390,20 +382,14 @@
         <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools" class="footer-image" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:white;">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com" style="color:white;">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
 
     <script>
-        const banners = document.querySelectorAll('.banner-text');
-        let j = 0;
-        setInterval(() => {
-            banners[j].classList.remove('active');
-            j = (j + 1) % banners.length;
-            banners[j].classList.add('active');
-        }, 3500);
+
     </script>
     <script type="module" src="/george/george.js"></script>
 </body>

@@ -73,23 +73,18 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.8rem 1rem;
+            padding: 0.65rem 1rem;
             font-weight: 700;
-            font-size: 1.05rem;
-            min-height: 52px;
-            position: relative;
-            overflow: hidden;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
         }
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 1s ease;
+        @media (max-width: 480px) {
+            .top-red-banner { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
         }
-        .banner-text.active { opacity: 1; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
 
         .logo-header {
             text-align: center;
@@ -372,9 +367,7 @@
 <body>
 
 <div class="top-red-banner">
-        <div class="banner-text active">Free Delivery.</div>
-        <div class="banner-text">Free Quote.</div>
-        <div class="banner-text">No Hassle.</div>
+        Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.
     </div>
 
     <div class="logo-header">
@@ -402,7 +395,7 @@
     <main>
         <section class="hero">
             <h1>Yorktown Tools Swag</h1>
-            <p>Exclusive premium t-shirts for the real fans — show your support for a veteran-owned tool supplier.</p>
+            <p>Exclusive premium t-shirts for the real fans, show your support for a veteran-owned tool supplier.</p>
             
             <img width="1536" height="1024" src="/img/opt/yorktowntoolsswag.webp" alt="Yorktown Tools Swag Banner" class="hero-banner" loading="lazy" onclick="openLightbox(this.src, this.alt)">
         </section>
@@ -410,7 +403,7 @@
         <section id="shirts">
             <h2>Available Designs</h2>
             <p style="text-align:center; max-width:900px; margin:0 auto 3rem; color:#555;">
-                High-quality, comfortable fit (sizes S–3XL). All shirts share the same premium front design. Unique artwork is on the back.<br>
+                High-quality, comfortable fit (sizes S-3XL). All shirts share the same premium front design. Unique artwork is on the back.<br>
                 Click any image to enlarge • Tap Back/Front buttons to switch views • Select size below to order.
             </p>
 
@@ -431,7 +424,7 @@
                         <p>Timeless Yorktown Tools branding.</p>
 
                         <select class="tool-select" onchange="handleSizeSelect(this)">
-                            <option value="">— Select Size —</option>
+                            <option value="">Select a size</option>
                             <option value="Small">Small</option>
                             <option value="Medium">Medium</option>
                             <option value="Large">Large</option>
@@ -466,7 +459,7 @@
                         <p>Classic design featuring our signature slogan.</p>
 
                         <select class="tool-select" onchange="handleSizeSelect(this)">
-                            <option value="">— Select Size —</option>
+                            <option value="">Select a size</option>
                             <option value="Small">Small</option>
                             <option value="Medium">Medium</option>
                             <option value="Large">Large</option>
@@ -500,7 +493,7 @@
                         <p>Patriotic design featuring George Washington.</p>
 
                         <select class="tool-select" onchange="handleSizeSelect(this)">
-                            <option value="">— Select Size —</option>
+                            <option value="">Select a size</option>
                             <option value="Small">Small</option>
                             <option value="Medium">Medium</option>
                             <option value="Large">Large</option>
@@ -531,7 +524,7 @@
         <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business & SAM.gov Registered</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>
@@ -551,13 +544,7 @@
         });
 
         // Top banner rotation
-        const banners = document.querySelectorAll('.banner-text');
-        let j = 0;
-        setInterval(() => {
-            banners[j].classList.remove('active');
-            j = (j + 1) % banners.length;
-            banners[j].classList.add('active');
-        }, 2000);
+
 
         // Shirt view switching
         const frontSrc = 'Ytfront.png';
@@ -627,7 +614,7 @@
             let qty = parseInt(qtyInput.value);
             if (isNaN(qty) || qty < 1) qty = 1;
 
-            if (!size || size === '— Select Size —') {
+            if (!size || size === 'Select a size') {
                 alert('Please select a size before ordering.');
                 return;
             }

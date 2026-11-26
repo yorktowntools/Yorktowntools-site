@@ -127,25 +127,18 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.85rem 1rem;
+            padding: 0.65rem 1rem;
             font-weight: 700;
-            font-size: 1.05rem;
-            min-height: 54px;
-            position: relative;
-            overflow: hidden;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
         }
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.9s ease;
-            font-weight: 600;
-            font-size: 1.02rem;
+        @media (max-width: 480px) {
+            .top-red-banner { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
         }
-        .banner-text.active { opacity: 1; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
 
         .gov-ids-header {
             background: var(--navy);
@@ -238,7 +231,7 @@
             box-shadow: var(--shadow); 
         }
         .hero h1 { font-size: clamp(2.7rem, 9vw, 3.9rem); margin-bottom:1.2rem; color: var(--navy); font-weight: 800; }
-        .hero > p { font-size: clamp(1.2rem, 4.6vw, 1.45rem); margin-bottom:2.6rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
+        .hero > p { font-size: clamp(1.2rem, 4.6vw, 1.45rem); margin-bottom:2rem; max-width:900px; margin-left:auto; margin-right:auto; color:#495057; }
 
         .hero.has-photo { padding: 0 1rem 4rem; overflow: hidden; }
         .hero-photo { display:block; margin: 0 -1rem 2.4rem; }
@@ -248,37 +241,6 @@
         }
         .hero.has-photo h1 { margin-top: .4rem; }
 
-        .tagline-rotator { 
-            position: relative; 
-            min-height: 175px; 
-            margin: 4rem auto; 
-            max-width: 1000px; 
-            padding: 2.2rem 1.6rem; 
-            overflow: hidden; 
-        }
-        .tagline-rotator::before { 
-            content: ""; 
-            position: absolute; 
-            inset: 0; 
-            background: var(--white); 
-            border: 2px solid rgba(11,30,63,0.12); 
-            border-radius: var(--radius); 
-            box-shadow: var(--shadow); 
-        }
-        .tagline { 
-            position: absolute; 
-            width: 100%; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); 
-            font-size: clamp(1.42rem, 4.7vw, 1.82rem); 
-            line-height: 1.48; 
-            font-weight: 700; 
-            color: var(--navy); 
-            opacity: 0; 
-            transition: opacity 1.3s ease; 
-            text-align: center; 
-        }
-        .tagline.active { opacity: 1; z-index: 1; }
 
         .btn { 
             display:inline-block; 
@@ -293,6 +255,71 @@
             box-shadow:0 10px 30px rgba(200,16,46,0.3); 
         }
         .btn:hover { background:#a00d22; transform:translateY(-5px); }
+
+
+        /* ===== HOW IT WORKS ===== */
+        .how-it-works {
+            text-align: center;
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: clamp(2.5rem, 6vw, 4rem) 1.4rem;
+            margin: 3rem 0 4rem;
+            box-shadow: var(--shadow);
+        }
+        .how-it-works h2 {
+            color: var(--navy);
+            font-size: clamp(1.9rem, 5vw, 2.4rem);
+            margin-bottom: 0.6rem;
+        }
+        .how-it-works .hiw-lead {
+            color: #555;
+            font-size: 1.12rem;
+            margin: 0 auto 2.4rem;
+            max-width: 640px;
+        }
+        .hiw-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto 2.4rem;
+        }
+        .hiw-step {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.8rem 1.3rem 1.6rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .hiw-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 0.9rem;
+            border-radius: 50%;
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hiw-icon svg { width: 32px; height: 32px; display: block; }
+        .hiw-step h3 {
+            color: var(--navy);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.55rem;
+        }
+        .hiw-step p {
+            color: #333;
+            font-size: 1.02rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .hiw-step a { color: var(--red); font-weight: 600; text-decoration: none; }
+        .hiw-step a:hover { text-decoration: underline; }
+        @media (max-width: 800px) {
+            .hiw-grid { grid-template-columns: 1fr; gap: 1.1rem; max-width: 480px; }
+        }
+        /* ===== END HOW IT WORKS ===== */
 
         /* ===== STORY SECTION ===== */
         .story-section {
@@ -514,9 +541,7 @@
 
 
 <div class="top-red-banner">
-        <div class="banner-text active">757-940-5171</div>
-        <div class="banner-text">Free Delivery.</div>
-        <div class="banner-text">Free Quote.</div>
+        Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.
     </div>
 
     <div class="gov-ids-header">
@@ -554,11 +579,30 @@
                 <img src="/img/truck-monument-hero-1500.webp" width="1500" height="1000" fetchpriority="high" decoding="async" alt="Yorktown Tools delivery truck parked in front of the Yorktown Victory Monument">
             </picture>
             <h1>Tools Worth Fighting For</h1>
-            <p>Free delivery to contractors, construction companies, and government agencies throughout Hampton Roads: serving Yorktown, Newport News, Hampton, Williamsburg, Norfolk, Virginia Beach & beyond.</p>
-            <div class="tagline-rotator">
-                <div class="tagline active">Stop hunting tools for hours.<br>Get back to the job fast - free quote + free delivery.</div>
-                <div class="tagline">Never run out. Never overpay.<br>Premium tools delivered free, right when you need them.</div>
-                <div class="tagline">You build the project.<br>We deliver the tools - free quotes, free delivery, zero hassle.</div>
+            <p>Free job-site delivery across Hampton Roads.</p>
+            <a href="#contact" class="btn">Get Your Quote Now</a>
+        </section>
+
+
+        <section class="how-it-works" id="how-it-works">
+            <h2>How It Works</h2>
+            <p class="hiw-lead">Three simple steps from your list to free delivery.</p>
+            <div class="hiw-grid">
+                <article class="hiw-step">
+                    <div class="hiw-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7h8M8 11h8M8 15h5"/><rect x="5" y="3" width="14" height="18" rx="2"/></svg></div>
+                    <h3>1. Send your list</h3>
+                    <p>Tell us what you need: items, quantity, and brand, through the quote form, chat with George, or call or text <a href="tel:757-940-5171">(757) 940-5171</a>.</p>
+                </article>
+                <article class="hiw-step">
+                    <div class="hiw-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8 13h8M8 17h5"/></svg></div>
+                    <h3>2. Get your quote</h3>
+                    <p>Our team prices it and sends you a quote.</p>
+                </article>
+                <article class="hiw-step">
+                    <div class="hiw-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v10H3z"/><path d="M14 11h4l3 3v3h-7z"/><circle cx="6.5" cy="18.5" r="1.7"/><circle cx="17.5" cy="18.5" r="1.7"/></svg></div>
+                    <h3>3. We deliver</h3>
+                    <p>Free delivery to your job site or shop across Hampton Roads. Pay by a secure invoice link.</p>
+                </article>
             </div>
             <a href="#contact" class="btn">Get Your Quote Now</a>
         </section>
@@ -654,7 +698,7 @@
                     <img width="1536" height="1024" src="/img/opt/blades.webp" alt="Bits and blades" loading="lazy" decoding="async">
                     <div class="card-content">
                         <h3>Bits, Blades & Abrasives</h3>
-                        <p>Stop wasting time on dull consumables. Blades that stay sharp 3–5× longer - fewer changeouts, less downtime.</p>
+                        <p>Stop wasting time on dull consumables. Blades that stay sharp 3-5× longer - fewer changeouts, less downtime.</p>
                     </div>
                 </a>
                 <a href="/Storage-organization.html" class="card">
@@ -760,7 +804,7 @@
         <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy" decoding="async">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171" style="color:#ffffff !important; text-decoration:none;">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4  |  <strong>CAGE:</strong> 16LD9</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
@@ -790,25 +834,7 @@
             }
         });
 
-        // Tagline Rotator
-        const taglines = document.querySelectorAll('.tagline');
-        let tagIdx = 0;
-        setInterval(() => {
-            taglines[tagIdx].classList.remove('active');
-            tagIdx = (tagIdx + 1) % taglines.length;
-            taglines[tagIdx].classList.add('active');
-        }, 7000);
-
-        // Banner Rotator
-        const banners = document.querySelectorAll('.banner-text');
-        let bannerIdx = 0;
-        setInterval(() => {
-            banners[bannerIdx].classList.remove('active');
-            bannerIdx = (bannerIdx + 1) % banners.length;
-            banners[bannerIdx].classList.add('active');
-        }, 4000);
-
-        function addItem() {
+function addItem() {
             const list = document.getElementById('item-list');
             const row = document.createElement('div');
             row.className = 'item-row';

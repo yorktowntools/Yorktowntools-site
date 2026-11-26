@@ -21,7 +21,7 @@
 
     <!-- Open Graph Tags -->
     <meta property="og:title" content="Yorktown Tools | Veteran-Owned Contractor Tools with Free Delivery in Yorktown, VA">
-    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Home-based in Yorktown – free delivery to Yorktown contractors, Naval Weapons Station, historic sites, and all of Hampton Roads.">
+    <meta property="og:description" content="Veteran-owned. SAM.gov registered. Home-based in Yorktown: free delivery to Yorktown contractors, Naval Weapons Station, historic sites, and all of Hampton Roads.">
     <meta property="og:image" content="https://yorktowntools.com/img/og-yorktown-tools-truck.jpg">
     <meta property="og:url" content="https://yorktowntools.com/yorktown/">
     <meta property="og:type" content="website">
@@ -138,23 +138,18 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.8rem 1rem;
+            padding: 0.65rem 1rem;
             font-weight: 700;
-            font-size: 1.05rem;
-            min-height: 52px;
-            position: relative;
-            overflow: hidden;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
         }
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 1s ease;
+        @media (max-width: 480px) {
+            .top-red-banner { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
         }
-        .banner-text.active { opacity: 1; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
 
         .gov-ids-header {
             background: var(--navy);
@@ -467,9 +462,7 @@
 <body>
 
 <div class="top-red-banner">
-        <div class="banner-text active">Free Delivery.</div>
-        <div class="banner-text">Free Quote.</div>
-        <div class="banner-text">No Hassle.</div>
+        Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.
     </div>
 
     <div class="gov-ids-header">
@@ -508,13 +501,13 @@
             <p>Veteran-Owned • Home-based in Yorktown, VA • Free delivery to local contractors, Naval Weapons Station, historic sites, and all of Hampton Roads.</p>
             <div class="tagline-rotator">
                 <div class="tagline active">
-                    Stop hunting tools for hours.<br>Get back to the job fast — free quote + free delivery right here in Yorktown.
+                    Stop hunting tools for hours.<br>Get back to the job fast: free quote + free delivery right here in Yorktown.
                 </div>
                 <div class="tagline">
                     Never run out. Never overpay.<br>Premium tools delivered free to your Yorktown site or base.
                 </div>
                 <div class="tagline">
-                    You build the project.<br>We deliver the tools — free quotes, free delivery, zero hassle from your hometown supplier.
+                    You build the project.<br>We deliver the tools: free quotes, free delivery, zero hassle from your hometown supplier.
                 </div>
             </div>
             <a href="#contact" class="btn">Get Your Quote Now</a>
@@ -522,8 +515,8 @@
 
         <section style="max-width:1000px; margin:0 auto 5rem; text-align:center; color:#444; font-size:1.1rem; line-height:1.7; background:#f8f9fa; padding:2rem; border-radius:var(--radius); box-shadow:var(--shadow);">
             <h2>Your Local Yorktown Contractor Tool Supplier</h2>
-            <p>Yorktown Tools is proudly **based right here in Yorktown, Virginia** – veteran-owned, SAM.gov-registered, and committed to serving our community first. We provide fast, free delivery to contractors working on projects at the Naval Weapons Station Yorktown and Cheatham Annex, historic preservation and restoration at Yorktown Battlefield and Colonial National Historical Park sites, commercial/residential development throughout York County, infrastructure work, and local government facilities. As your hometown supplier, we offer the fastest response times, full military/base access support, and no-hassle service to keep your crew on schedule.</p>
-            <p>Stock up on premium brands — DeWalt, Milwaukee, Stabila, Werner, Klein, and more — for power tools, precision hand tools, measuring & layout equipment, bits & blades, secure jobsite storage, OSHA-compliant ladders, and complete safety/PPE. Delivered directly to your Yorktown site or base. Get your quote in 24 hours or less – we're just down the road.</p>
+            <p>Yorktown Tools is proudly **based right here in Yorktown, Virginia**, veteran-owned, SAM.gov-registered, and committed to serving our community first. We provide fast, free delivery to contractors working on projects at the Naval Weapons Station Yorktown and Cheatham Annex, historic preservation and restoration at Yorktown Battlefield and Colonial National Historical Park sites, commercial/residential development throughout York County, infrastructure work, and local government facilities. As your hometown supplier, we offer the fastest response times, full military/base access support, and no-hassle service to keep your crew on schedule.</p>
+            <p>Stock up on premium brands like DeWalt, Milwaukee, Stabila, Werner, Klein, and more, for power tools, precision hand tools, measuring & layout equipment, bits & blades, secure jobsite storage, OSHA-compliant ladders, and complete safety/PPE. Delivered directly to your Yorktown site or base. Get your quote in 24 hours or less, we're just down the road.</p>
         </section>
 
         <section id="free-resources">
@@ -531,11 +524,11 @@
             <div class="free-resources-grid">
                 <a href="/Can-we-pour-today.html" target="_blank" class="free-resource-card">
                     <h3>Can We Pour Today?</h3>
-                    <p>Live concrete pouring forecast — Richmond to Virginia Beach</p>
+                    <p>Live concrete pouring forecast, Richmond to Virginia Beach</p>
                 </a>
                 <a href="/rebar-calculator.html" target="_blank" class="free-resource-card">
                     <h3>Rebar Lap Splice Calculator</h3>
-                    <p>Instant ACI 318 lap lengths — no code book needed</p>
+                    <p>Instant ACI 318 lap lengths, no code book needed</p>
                 </a>
             </div>
         </section>
@@ -543,7 +536,7 @@
         <section id="tools">
             <h2>High-Performance Tools That Win Bids & Finish Jobs Faster</h2>
             <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">
-                Tools trusted by commercial and government contractors — delivered free, priced right, and ready when you are.
+                Tools trusted by commercial and government contractors, delivered free, priced right, and ready when you are.
             </p>
 
             <div class="grid">
@@ -559,7 +552,7 @@
                     <img src="/Dewalttoolpile.PNG" alt="Cordless power tools for fast, reliable work" loading="lazy">
                     <div class="card-content">
                         <h3>Power Tools & Combo Kits</h3>
-                        <p>Cut faster, drill straighter, drive stronger. Stock up on systems that keep your crew productive — includes high-output batteries and rapid chargers so you're never waiting.</p>
+                        <p>Cut faster, drill straighter, drive stronger. Stock up on systems that keep your crew productive, includes high-output batteries and rapid chargers so you're never waiting.</p>
                     </div>
                 </a>
 
@@ -567,7 +560,7 @@
                     <img width="1125" height="757" src="/img/opt/bosch-laser.webp" alt="Measuring and layout tools for dead-accurate work" loading="lazy">
                     <div class="card-content">
                         <h3>Measuring & Layout</h3>
-                        <p>Dead-accurate levels, lasers, tapes, and squares that eliminate rework and speed layout on base and commercial projects — premium brands like Stabila, Bosch, and Dewalt for precision you can trust.</p>
+                        <p>Dead-accurate levels, lasers, tapes, and squares that eliminate rework and speed layout on base and commercial projects, premium brands like Stabila, Bosch, and Dewalt for precision you can trust.</p>
                     </div>
                 </a>
             </div>
@@ -575,13 +568,13 @@
 
         <section id="accessories">
             <h2>Stay Organized, Compliant & Protected</h2>
-            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Everything your crew needs to work safer, smarter, and faster — delivered free to your site or base.</p>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Everything your crew needs to work safer, smarter, and faster, delivered free to your site or base.</p>
             <div class="grid">
                 <a href="/Bits-blades.html" class="card">
                     <img width="1536" height="1024" src="/img/opt/blades.webp" alt="Long-lasting bits and blades" loading="lazy">
                     <div class="card-content">
                         <h3>Bits, Blades & Abrasives</h3>
-                        <p>Stop wasting time on dull consumables. Get blades that stay sharp 3–5× longer — fewer changeouts, less downtime, lower cost per cut.</p>
+                        <p>Stop wasting time on dull consumables. Get blades that stay sharp 3-5× longer, fewer changeouts, less downtime, lower cost per cut.</p>
                     </div>
                 </a>
 
@@ -597,7 +590,7 @@
                     <img width="1125" height="1067" src="/img/opt/img-4175.webp" alt="OSHA-compliant safety gear" loading="lazy">
                     <div class="card-content">
                         <h3>Safety & PPE</h3>
-                        <p>Pass every safety inspection on day one. ANSI/OSHA-compliant gloves, eyewear, hearing protection, hi-vis, and fall protection — in stock and delivered free so your crew stays safe and on schedule.</p>
+                        <p>Pass every safety inspection on day one. ANSI/OSHA-compliant gloves, eyewear, hearing protection, hi-vis, and fall protection, in stock and delivered free so your crew stays safe and on schedule.</p>
                     </div>
                 </a>
             </div>
@@ -605,13 +598,13 @@
 
         <section id="ladders">
             <h2>OSHA-Compliant Ladders & Access</h2>
-            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Heavy-duty fiberglass ladders that won’t fail inspections or your crew — Type IA & IAA rated for daily commercial use.</p>
+            <p style="text-align:center;max-width:900px;margin:0 auto 2.5rem;color:#555;">Heavy-duty fiberglass ladders that won’t fail inspections or your crew, Type IA & IAA rated for daily commercial use.</p>
             <div class="grid">
                 <a href="/Ladders.html" class="card">
                     <img width="1125" height="756" src="/img/opt/laddercloseup.webp" alt="Professional ladders for safe access" loading="lazy">
                     <div class="card-content">
                         <h3>Professional Ladders & Platforms</h3>
-                        <p>Werner ladders that adjust in seconds, support 375+ lbs, and pass base safety checks every time — free delivery direct to your job trailer.</p>
+                        <p>Werner ladders that adjust in seconds, support 375+ lbs, and pass base safety checks every time, free delivery direct to your job trailer.</p>
                     </div>
                 </a>
             </div>
@@ -676,19 +669,19 @@
         <section id="swag">
             <h2>Yorktown Tools: Swag</h2>
             <p style="max-width:800px;margin:0 auto 2.5rem;color:#555;">
-                Rep the brand that reps you. T-shirts, hats, mugs, stickers — premium gear for true supporters.
+                Rep the brand that reps you. T-shirts, hats, mugs, stickers, and premium gear for true supporters.
             </p>
 
             <div class="swag-rotator">
-                <img width="1536" height="1024" src="/img/opt/yorktowntoolsswag.webp" alt="Yorktown Tools Swag Collection – hats, t-shirts, mugs, koozies, and more" loading="lazy">
+                <img width="1536" height="1024" src="/img/opt/yorktowntoolsswag.webp" alt="Yorktown Tools Swag Collection: hats, t-shirts, mugs, koozies, and more" loading="lazy">
             </div>
 
             <a href="/swag.html" class="btn" style="margin-top:2rem;">Shop Swag Now</a>
         </section>
 
         <section id="contact" class="contact-form">
-            <h2>Get Your Quote Today – Yorktown</h2>
-            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need — we’ll respond with pricing, availability, and free delivery options to Yorktown (Naval Weapons Station, historic sites, local projects, etc.) in 24 hours or less.</p>
+            <h2>Get Your Quote Today: Yorktown</h2>
+            <p style="text-align:center;max-width:800px;margin:0 auto 2.5rem;color:#555;">List the tools and quantities you need. We'll respond with pricing, availability, and free delivery options to Yorktown (Naval Weapons Station, historic sites, local projects, etc.) in 24 hours or less.</p>
             <form action="https://formspree.io/f/xanlvyan" method="POST" class="quote-form">
                 <div class="form-group">
                     <label for="name">Name <span class="required">*</span></label>
@@ -734,7 +727,7 @@
         <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">(757) 940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered – Proudly Serving Yorktown (Our Home Base)</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business & SAM.gov Registered. Proudly Serving Yorktown (Our Home Base)</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
@@ -764,13 +757,7 @@
         }, 7000);
 
         // Top banner rotation
-        const banners = document.querySelectorAll('.banner-text');
-        let j = 0;
-        setInterval(() => {
-            banners[j].classList.remove('active');
-            j = (j + 1) % banners.length;
-            banners[j].classList.add('active');
-        }, 2000);
+
 
         // Reviews rotator
         const reviews = document.querySelectorAll('.review-card');
