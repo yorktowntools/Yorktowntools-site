@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" hreflang="en-us">
 <head>
+    <style>:where(img[width][height]){width:auto;height:auto}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -17,12 +18,13 @@
     <!-- Open Graph -->
     <meta property="og:title" content="Free Delivery Service Area - Hampton Roads & Military Bases | Yorktown Tools">
     <meta property="og:description" content="Veteran-owned tool supplier offering free delivery throughout Hampton Roads and to military installations. Fast quotes available.">
-    <meta property="og:image" content="https://yorktowntools.com/hero-artwork.jpg">
+    <meta property="og:image" content="https://yorktowntools.com/img/og-yorktown-tools-truck.jpg">
     <meta property="og:url" content="https://yorktowntools.com/contact.html">
     <meta property="og:type" content="website">
 
-    <link rel="icon" href="Yorktown.PNG" type="image/png">
-    <link rel="apple-touch-icon" sizes="180x180" href="Yt-logo.PNG">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/img/icon-192.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="Yt-logo.PNG">
     <link rel="icon" type="image/png" sizes="16x16" href="Yt-logo.PNG">
     <link rel="manifest" href="/site.webmanifest">
@@ -79,7 +81,7 @@
           "closes": "17:00"
         }
       ],
-      "image": "https://yorktowntools.com/hero-artwork.jpg",
+      "image": "https://yorktowntools.com/img/og-yorktown-tools-truck.jpg",
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "5.0",
@@ -121,7 +123,7 @@
             transform: translate(-50%, -50%);
             width: 140vw; height: 140vw;
             max-width: 1400px; max-height: 1400px;
-            background: url('george-mascot.PNG') center center / contain no-repeat;
+            background: url('/img/opt/george-mascot.webp') center center / contain no-repeat;
             opacity: 0.15;
             pointer-events: none;
             z-index: -1;
@@ -255,7 +257,8 @@
             margin: 3rem 0;
         }
         @media (min-width: 992px) {
-            .contact-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+            .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 3rem; }
+            .contact-grid > .contact-card { max-width: 760px; width: 100%; margin: 0 auto; }
         }
 
         .contact-card {
@@ -317,6 +320,9 @@
             margin-right: auto;
             line-height: 1.7;
         }
+
+        .delivery-photo { margin: 0 auto 1.8rem; max-width: 900px; }
+        .delivery-photo img { width:100%; height:auto; border-radius:16px; display:block; box-shadow: 0 10px 28px rgba(0,0,0,.12); }
 
         .delivery-cities {
             display: grid;
@@ -449,7 +455,7 @@
     </div>
 
     <div class="logo-header">
-        <img src="Yorktown.PNG" alt="Yorktown Tools logo">
+        <img width="520" height="520" src="/img/opt/yorktown.webp" alt="Yorktown Tools logo">
     </div>
 
     <nav id="main-nav">
@@ -457,6 +463,7 @@
             <a href="index.html">Home</a>
             <a href="precision-hand-tools.html">Hand Tools</a>
             <a href="Power-tools.html">Power Tools</a>
+            <a href="portable-power.html">Portable Power</a>
             <a href="Measuring tools.html">Measuring & Layout</a>
             <a href="Bits-blades.html">Bits & Blades</a>
             <a href="Storage-organization.html">Storage</a>
@@ -484,15 +491,18 @@
                 </ul>
                 <p class="response-promise">We respond promptly — for urgent jobsite needs.</p>
                 <div class="social-links">
-                    <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram"><img src="Instagram.png" alt="Instagram"></a>
-                    <a href="https://www.facebook.com/share/14V4GeG3P67/" target="_blank" aria-label="Facebook"><img src="Facebook.png" alt="Facebook"></a>
-                    <a href="https://www.linkedin.com/company/yorktown-tools" target="_blank" aria-label="LinkedIn"><img src="LinkedIn.png" alt="LinkedIn"></a>
+                    <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram"><img width="128" height="128" src="/img/opt/instagram.webp" alt="Instagram"></a>
+                    <a href="https://www.facebook.com/share/14V4GeG3P67/" target="_blank" aria-label="Facebook"><img width="2084" height="2084" src="Facebook.png" alt="Facebook"></a>
+                    <a href="https://www.linkedin.com/company/yorktown-tools" target="_blank" aria-label="LinkedIn"><img width="635" height="540" src="LinkedIn.png" alt="LinkedIn"></a>
                 </div>
             </section>
 
             <section class="delivery-section" id="delivery">
                 <h2>Free Delivery Across Hampton Roads</h2>
                 <p>Yorktown Tools delivers free throughout the entire Hampton Roads region — fast, no minimums, straight to your jobsite, trailer, or base.</p>
+                <figure class="delivery-photo">
+                    <img src="/img/delivery-truck-1500.webp" srcset="/img/delivery-truck-800.webp 800w, /img/delivery-truck-1500.webp 1500w" sizes="(min-width: 1100px) 900px, 92vw" width="1500" height="1001" alt="Yorktown Tools delivery truck and a team member carrying a Milwaukee tool box to a customer" loading="lazy" decoding="async">
+                </figure>
                 <div class="delivery-cities">
                     <a href="https://yorktowntools.com/yorktown/">Yorktown</a>
                     <a href="https://yorktowntools.com/newport-news/">Newport News</a>
@@ -546,7 +556,7 @@
     </main>
 
     <footer>
-        <img src="hero.png" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy">
+        <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy">
         <p><strong>Phone/Text:</strong> <a href="tel:757-940-5171">(757) 940-5171</a>  | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
         <p>Yorktown, Virginia – Veteran-Owned Small Business • SAM.gov Registered</p>

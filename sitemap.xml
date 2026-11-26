@@ -5,7 +5,7 @@
     <!-- Homepage -->
     <url>
         <loc>https://yorktowntools.com/</loc>
-        <lastmod>2026-04-19</lastmod>
+        <lastmod>2026-11-25</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
@@ -24,7 +24,13 @@
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://yorktowntools.com/Measuring tools.html</loc>
+        <loc>https://yorktowntools.com/portable-power.html</loc>
+        <lastmod>2026-11-25</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://yorktowntools.com/Measuring%20tools.html</loc>
         <lastmod>2026-04-19</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.85</priority>
@@ -57,13 +63,13 @@
     <!-- About, Contact/Service Area, Swag -->
     <url>
         <loc>https://yorktowntools.com/about.html</loc>
-        <lastmod>2026-04-19</lastmod>
+        <lastmod>2026-11-25</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.75</priority>
     </url>
     <url>
         <loc>https://yorktowntools.com/contact.html</loc>
-        <lastmod>2026-04-19</lastmod>
+        <lastmod>2026-11-25</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.85</priority>
     </url>
@@ -75,6 +81,12 @@
     </url>
 
     <!-- Location / City Pages -->
+    <url>
+        <loc>https://yorktowntools.com/yorktown/</loc>
+        <lastmod>2026-11-25</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
     <url>
         <loc>https://yorktowntools.com/portsmouth/</loc>
         <lastmod>2026-04-19</lastmod>
