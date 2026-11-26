@@ -4,7 +4,7 @@
     <style>:where(img[width][height]){width:auto;height:auto}</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Free Rebar Lap Splice Calculator – ACI 318-19 instant results. Yorktown Tools – Veteran-owned rebar & concrete tools.">
+    <meta name="description" content="Free Rebar Lap Splice Calculator, ACI 318-19 instant results. Yorktown Tools, Veteran-owned rebar & concrete tools.">
     <title>Rebar Lap Splice Calculator • Yorktown Tools</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/img/icon-192.png" type="image/png" sizes="192x192">
@@ -64,9 +64,14 @@
             background: var(--navy);
             color: white;
             text-align: center;
-            padding: 11px;
-            font-size: 1.05rem;
+            padding: 0.65rem 1rem;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
             font-weight: 700;
+        }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
         }
 
         .logo-area {
@@ -273,7 +278,7 @@
     </div>
 </div>
 
-<div class="gov-bar">Free Delivery • Free Quote</div>
+<div class="gov-bar">Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.</div>
 
 <div class="logo-area">
     <img width="520" height="520" src="/img/opt/yorktown.webp" alt="Yorktown Tools">
@@ -289,7 +294,7 @@
 <main>
     <section class="hero">
         <h1>Rebar Lap Splice Calculator</h1>
-        <p>Instant ACI 318-19 Class A & B lap lengths — no code book needed</p>
+        <p>Instant ACI 318-19 Class A & B lap lengths, no code book needed</p>
     </section>
 
     <div class="calculator-box">

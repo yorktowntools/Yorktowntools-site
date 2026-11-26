@@ -134,24 +134,18 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.8rem 1rem;
+            padding: 0.65rem 1rem;
             font-weight: 700;
-            font-size: clamp(0.95rem, 3.5vw, 1.05rem);
-            min-height: 48px;
-            position: relative;
-            overflow: hidden;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
         }
-
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 1s ease;
+        @media (max-width: 480px) {
+            .top-red-banner { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
         }
-        .banner-text.active { opacity: 1; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
 
         .gov-ids-header {
             background: var(--navy);
@@ -441,9 +435,7 @@
 <body>
 
 <div class="top-red-banner">
-        <div class="banner-text active">Free Delivery</div>
-        <div class="banner-text">Fast Quotes</div>
-        <div class="banner-text">Veteran-Owned</div>
+        Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.
     </div>
 
     <div class="gov-ids-header">
@@ -487,9 +479,9 @@
                     <li><strong>Call or Text (Fastest):</strong> <a href="tel:757-940-5171">(757) 940-5171</a></li>
                     <li><strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></li>
                     <li><strong>Location:</strong> Yorktown, VA (York County)</li>
-                    <li><strong>Hours:</strong> Monday–Friday, 8:00 AM – 5:00 PM</li>
+                    <li><strong>Hours:</strong> Monday-Friday, 8:00 AM to 5:00 PM</li>
                 </ul>
-                <p class="response-promise">We respond promptly — for urgent jobsite needs.</p>
+                <p class="response-promise">We respond promptly, for urgent jobsite needs.</p>
                 <div class="social-links">
                     <a href="https://www.instagram.com/yorktowntools" target="_blank" aria-label="Instagram"><img width="128" height="128" src="/img/opt/instagram.webp" alt="Instagram"></a>
                     <a href="https://www.facebook.com/share/14V4GeG3P67/" target="_blank" aria-label="Facebook"><img width="2084" height="2084" src="Facebook.png" alt="Facebook"></a>
@@ -499,7 +491,7 @@
 
             <section class="delivery-section" id="delivery">
                 <h2>Free Delivery Across Hampton Roads</h2>
-                <p>Yorktown Tools delivers free throughout the entire Hampton Roads region — fast, no minimums, straight to your jobsite, trailer, or base.</p>
+                <p>Yorktown Tools delivers free throughout the entire Hampton Roads region, fast, no minimums, straight to your jobsite, trailer, or base.</p>
                 <figure class="delivery-photo">
                     <img src="/img/delivery-truck-1500.webp" srcset="/img/delivery-truck-800.webp 800w, /img/delivery-truck-1500.webp 1500w" sizes="(min-width: 1100px) 900px, 92vw" width="1500" height="1001" alt="Yorktown Tools delivery truck and a team member carrying a Milwaukee tool box to a customer" loading="lazy" decoding="async">
                 </figure>
@@ -514,7 +506,7 @@
                     <a href="https://yorktowntools.com/chesapeake/">Chesapeake</a>
                     <a href="https://yorktowntools.com/virginiabeach/">Virginia Beach</a>
                 </div>
-                <p class="closing-text">Including military installations, shipyards, hangars, and job sites across the region — we're already on the way with free delivery.</p>
+                <p class="closing-text">Including military installations, shipyards, hangars, and job sites across the region, we're already on the way with free delivery.</p>
 
                 <div class="map-wrapper">
                     <h3>Our Service Area</h3>
@@ -527,7 +519,7 @@
         <section class="quote-form">
             <h2>Request a Quote</h2>
             <p style="text-align:center; max-width:800px; margin:0 auto 2rem; color:#555; font-size: clamp(1rem, 3.5vw, 1.1rem);">
-                Tell us what you need — we'll get back with pricing, availability, and free delivery details quickly (usually same day).
+                Tell us what you need. We'll get back with pricing, availability, and free delivery details quickly (usually same day).
             </p>
             <form action="https://formspree.io/f/xanlvyan" method="POST">
                 <div class="form-group">
@@ -559,7 +551,7 @@
         <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools artwork" class="footer-artwork" loading="lazy">
         <p><strong>Phone/Text:</strong> <a href="tel:757-940-5171">(757) 940-5171</a>  | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business • SAM.gov Registered</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business • SAM.gov Registered</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4  |  <strong>CAGE:</strong> 16LD9</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
@@ -577,13 +569,7 @@
         });
 
         // Banner rotator
-        const banners = document.querySelectorAll('.banner-text');
-        let bannerIdx = 0;
-        setInterval(() => {
-            banners[bannerIdx].classList.remove('active');
-            bannerIdx = (bannerIdx + 1) % banners.length;
-            banners[bannerIdx].classList.add('active');
-        }, 2200);
+
     </script>
     <script type="module" src="/george/george.js"></script>
 </body>

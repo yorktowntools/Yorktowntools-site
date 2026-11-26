@@ -16,7 +16,11 @@
         :root { --navy: #0b1e3f; --red: #c8102e; --white: #fff; }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: Inter, system-ui, sans-serif; color: #212529; line-height: 1.6; background: #fff; }
-        .banner { background: var(--red); color: #fff; text-align: center; padding: 0.85rem 1rem; font-weight: 700; }
+        .banner { background: var(--red); color: #fff; text-align: center; padding: 0.65rem 1rem; font-weight: 700; font-size: clamp(0.78rem, 2.4vw, 1.05rem); line-height: 1.35; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
         .logo-header { text-align: center; padding: 1.2rem 1rem 0.4rem; }
         .logo-header img { max-width: 220px; width: 70%; height: auto; }
         nav { background: var(--navy); }
@@ -33,7 +37,7 @@
     <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-    <div class="banner">Free quote. Free delivery. No hassle.</div>
+    <div class="banner">Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.</div>
     <div class="logo-header">
         <a href="/"><img width="520" height="520" src="/img/opt/yorktown.webp" alt="Yorktown Tools"></a>
     </div>
@@ -70,7 +74,7 @@
     <footer>
         <p><strong>Phone:</strong> <a href="tel:+17579405171">(757) 940-5171</a> |
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
     </footer>

@@ -113,23 +113,18 @@
             background: var(--red);
             color: var(--white);
             text-align: center;
-            padding: 0.8rem 1rem;
+            padding: 0.65rem 1rem;
             font-weight: 700;
-            font-size: 1.05rem;
-            min-height: 52px;
-            position: relative;
-            overflow: hidden;
+            font-size: clamp(0.78rem, 2.4vw, 1.05rem);
+            line-height: 1.35;
         }
-        .banner-text {
-            position: absolute;
-            width: 100%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 1s ease;
+        @media (max-width: 480px) {
+            .top-red-banner { font-size: 0.78rem; padding: 0.6rem 0.8rem; }
         }
-        .banner-text.active { opacity: 1; }
+        .banner-break { display: none; }
+        @media (max-width: 860px) {
+            .banner-break { display: block; }
+        }
 
         .logo-header {
             text-align: center;
@@ -334,9 +329,7 @@
 <body>
 
 <div class="top-red-banner">
-        <div class="banner-text active">Free Delivery.</div>
-        <div class="banner-text">Free Quote.</div>
-        <div class="banner-text">No Hassle.</div>
+        Never run out. Never overpay.<br class="banner-break"> Premium tools delivered free, right when you need them.
     </div>
 
     <div class="logo-header">
@@ -372,7 +365,7 @@
                     <p>Cut-resistant, impact, high-dexterity, insulated, nitrile-coated, and more.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Work Gloves" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="victory-gloves.html">Yorktown Tools Gloves</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.pyramex.com/collections/gloves?uff_v0ddq5_varMetafield%3Acustom.region=US%20and%20Other%20Markets">Pyramex Gloves</option>
@@ -400,7 +393,7 @@
                     <p>ANSI Z87.1+ rated, anti-fog, tinted, sealed goggles.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Safety Glasses" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.pyramex.com/collections/eyewear?uff_krpehw_varMetafield%3Acustom.region=US%20and%20Other%20Markets">Pyramex Eyewear</option>
                         <option value="https://www.3m.com/3M/en_US/p/c/ppe/eye-protection/glasses/">3M Safety Glasses</option>
@@ -426,7 +419,7 @@
                     <p>Earmuffs, foam earplugs, banded plugs, high NRR options.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Hearing Protection" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.pyramex.com/collections/hearing?uff_e51uam_varMetafield%3Acustom.region=US%20and%20Other%20Markets">Pyramex Hearing Protection</option>
                         <option value="https://www.3m.com/3M/en_US/p/c/ppe/hearing-protection/">3M Hearing Protection</option>
@@ -452,7 +445,7 @@
                     <p>Type I & II, vented/unvented, cap or full-brim styles.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Hard Hats" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.pyramex.com/collections/headgear?uff_lm4pcy_varMetafield%3Acustom.region=US%20and%20Other%20Markets">Pyramex Hard Hats</option>
                         <option value="https://liftsafety.com/collections/head-protection">Lift Safety Head Protection</option>
@@ -478,7 +471,7 @@
                     <p>N95, half-mask, full-face, filters, cartridges.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Respirators" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.3m.com/3M/en_US/p/c/ppe/respiratory-protection/">3M Respirators</option>
                         <option value="https://www.milwaukeetool.com/products/safety-solutions/personal-protective-equipment/respirators">Milwaukee Respirators</option>
@@ -502,7 +495,7 @@
                     <p>ANSI Class 2/3 vests, jackets, shirts, cooling gear.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Hi-Vis Apparel" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.pyramex.com/collections/workwear?uff_scxebe_varMetafield%3Acustom.region=US%20and%20Other%20Markets">Pyramex Hi-Vis Workwear</option>
                         <option value="https://www.ergodyne.com/workwear">Ergodyne Hi-Vis & Workwear</option>
@@ -527,7 +520,7 @@
                     <p>Harnesses, lanyards, self-retracting lifelines, anchor points.</p>
                     <p class="popular-note">Choose a brand to view their full catalog, or select "Request Quote / Other Brands" for custom pricing.</p>
                     <select class="tool-select" data-category="Fall Protection" onchange="handleSelect(this)">
-                        <option value="">— Select Option —</option>
+                        <option value="">Select an option</option>
                         <option value="custom">Request Quote / Other Brands</option>
                         <option value="https://www.3m.com/3M/en_US/p/c/ppe/fall-protection/">3M Fall Protection</option>
                         <option value="https://us.msasafety.com/products/fall-protection">MSA Fall Protection</option>
@@ -556,7 +549,7 @@
         <img width="1536" height="1024" src="/img/opt/hero.webp" alt="Yorktown Tools" class="footer-artwork" loading="lazy">
         <p><strong>Phone:</strong> <a href="tel:757-940-5171">757-940-5171</a> | 
            <strong>Email:</strong> <a href="mailto:sales@yorktowntools.com">sales@yorktowntools.com</a></p>
-        <p>Yorktown, Virginia – Veteran-Owned Small Business & SAM.gov Registered</p>
+        <p>Yorktown, Virginia. Veteran-Owned Small Business & SAM.gov Registered</p>
         <p><strong>UEI:</strong> SMYXDLJDJMZ4 | <strong>CAGE:</strong> 16LD9</p>
         <p><a href="/privacy.html">Privacy</a></p>
         <p>© Yorktown Tools. All rights reserved.</p>
@@ -589,7 +582,7 @@
                 return;
             }
 
-            const itemHeader = `${category} – Custom Quote Request (Safety & PPE):`;
+            const itemHeader = `${category}: Custom Quote Request (Safety & PPE):`;
             const itemsList = lines.map(l => '• ' + l.trim()).join('\n');
             const bodyText = `Quote Request from YorktownTools.com\n\n${itemHeader}\n${itemsList}\n\nPlease send pricing, availability, and delivery options. Thank you!`;
 
@@ -606,13 +599,7 @@
         }
 
         // Banner rotation
-        const banners = document.querySelectorAll('.banner-text');
-        let j = 0;
-        setInterval(() => {
-            banners[j].classList.remove('active');
-            j = (j + 1) % banners.length;
-            banners[j].classList.add('active');
-        }, 3500);
+
 
         // Sticky nav
         const nav = document.getElementById('main-nav');
